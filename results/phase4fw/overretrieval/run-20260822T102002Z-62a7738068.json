@@ -1,0 +1,367 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4164,
+    "distiller_cpu_ms": 0.0,
+    "distiller_wall_ms": 1.698,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1042,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 14,
+        "record_id": "410994326670080c3fb5f32f",
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "wal"
+      },
+      {
+        "page_id": 14,
+        "record_id": "717669418865321c238768db",
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "wal"
+      },
+      {
+        "page_id": 9,
+        "record_id": "73fe07518d90c4474c0060de",
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "wal checkpoint v2"
+      }
+    ],
+    "records_pruned": [
+      "8ac1d6d5f4b2febef24927d9",
+      "ec3d4f55b0862ac30c2cb167",
+      "1ccf3ab37263037dd48df2cd",
+      "c881b56dc9b63d07517c60ad",
+      "91d2cf537ad180a4671b4a42"
+    ],
+    "records_retained": [
+      "410994326670080c3fb5f32f",
+      "717669418865321c238768db",
+      "73fe07518d90c4474c0060de"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "410994326670080c3fb5f32f",
+      "717669418865321c238768db",
+      "73fe07518d90c4474c0060de"
+    ],
+    "text": "[SOURCE: 410994326670080c3fb5f32f] wal\nThe journal_mode pragma returns a string which is the new journal mode. On success, the pragma will return the string \"wal\". If the conversion to WAL could not be completed (for example, if the VFS does not support the necessary shared-memory primitives) then the journaling mode will be unchanged and the string returned from the primitive will be the prior journaling mode (for example \"delete\"). By default, SQLite will automatically checkpoint whenever a COMMIT occurs that causes the WAL file to be 1000 pages or more in size, or when the last database connection on a database file closes. The default configuration is intended to work well for most applications. But programs that want more control can force a checkpoint using the wal_checkpoint pragma or by calling the sqlite3_wal_checkpoint() C interface. The automatic checkpoint threshold can be changed or automatic checkpointing can be completely disabled using the wal_autocheckpoint pragma or by calling the sqlite3_wal_autocheckpoint() C interface. A program can also use sqlite3_wal_hook() to register a callback to be invoked whenever any transaction commits to the WAL. This callback can then invoke sqlite3_wal_checkpoint() or sqlite3_wal_checkpoint_v2() based on whatever criteria it thinks is appropriate. (The automatic checkpoint mechanism is implemented as a simple wrapper around sqlite3_wal_hook().)\n\n[SOURCE: 717669418865321c238768db] wal\nThere is write permission on the directory containing the database so that the -shm and -wal files can be created. Even though it is possible to open a read-only WAL-mode database, it is good practice to convert the database to PRAGMA journal_mode=DELETE prior to burning an SQLite database image onto read-only media. In normal cases, new content is appended to the WAL file until the WAL file accumulates about 1000 pages (and is thus about 4MB in size) at which point a checkpoint is automatically run and the WAL file is recycled. The checkpoint does not normally truncate the WAL file (unless the journal_size_limit pragma is set). Instead, it merely causes SQLite to start overwriting the WAL file from the beginning. This is done because it is normally faster to overwrite an existing file than to append. When the last connection to a database closes, that connection does one last checkpoint and then deletes the WAL and its associated shared-memory file, to clean up the disk. So in the vast majority of cases, applications need not worry about the WAL file at all. SQLite will automatically take care of it. But it is possible to get SQLite into a state where the WAL file will grow without bound, causing excess disk space usage and slow query speeds. The following bullets enumerate some of the ways that this can happen and how to avoid them.\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2\nint sqlite3_wal_checkpoint_v2( sqlite3 *db, /* Database handle */ const char *zDb, /* Name of attached database (or NULL) */ int eMode, /* SQLITE_CHECKPOINT_* value */ int *pnLog, /* OUT: Size of WAL log in frames */ int *pnCkpt /* OUT: Total number of frames checkpointed */ ); The sqlite3_wal_checkpoint_v2(D,X,M,L,C) interface runs a checkpoint operation on database X of database connection D in mode M. Status information is written back into integers pointed to by L and C. The M parameter must be a valid checkpoint mode: SQLITE_CHECKPOINT_PASSIVE Checkpoint as many frames as possible without waiting for any database readers or writers to finish, then sync the database file if all frames in the log were checkpointed. The busy-handler callback is never invoked in the SQLITE_CHECKPOINT_PASSIVE mode. On the other hand, passive mode might leave the checkpoint unfinished if there are concurrent readers or writers. SQLITE_CHECKPOINT_FULL This mode blocks (it invokes the busy-handler callback) until there is no database writer and all readers are reading from the most recent database snapshot. It then checkpoints all frames in the log file and syncs the database file. This mode blocks new database writers while it is pending, but new database readers are allowed to continue unimpeded."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2581,
+    "context_activation_rate": 0.4037194885703216,
+    "context_density": 0.08445297504798464,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 1042.0,
+    "useful_oracle_tokens": 88
+  },
+  "context_sha256": "d90eeac3d8a52d8dc07dca74e1403fa486e3213387b469b500af554cbac273c2",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1011,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 1,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        true
+      ],
+      "recall": 1.0,
+      "total": 1
+    },
+    "correctness": false,
+    "diagnostic": "FALSE_NO_KNOWLEDGE",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 5104.541199980304,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 55.0,
+      "cpu_kernel_seconds": 0.6875,
+      "cpu_percent_total_average": 398.84828434881786,
+      "cpu_percent_total_peak": 590.1571232365183,
+      "cpu_time_seconds": 20.359375,
+      "cpu_user_seconds": 19.671875,
+      "generated_tokens": 6,
+      "generation_eval_ms": 208.623,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 5104.541199980304,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621211648,
+      "private_bytes_min": 619380736,
+      "prompt_eval_ms": 4881.173,
+      "prompt_tokens": 1011,
+      "prompt_tokens_per_second": 207.12234538706167,
+      "queries_served": 55,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 54,
+      "system_available_ram_bytes_min": 3115720704,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 28.760012079205076,
+      "ttft_ms": 4894.936099997722,
+      "working_set_bytes_max": 1208156160,
+      "working_set_bytes_min": 1206329344,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 780
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_wal_checkpoint::PRUNING_ONLY",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 54,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1042,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 40,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 103.06627101879327,
+      "instructions": 8.90207715133531,
+      "other_or_chat_envelope": 0.0,
+      "question": 1.6815034619188922
+    },
+    "question": 17,
+    "total": 1011
+  },
+  "prompt_sha256": "02b7cb3cedd3241004f1108f6be0b5733d0b92fa754f2f45c832819b5405f28b",
+  "query_spec": {
+    "category": "direct_fact",
+    "expected_record_ids": [
+      "c881b56dc9b63d07517c60ad"
+    ],
+    "query": "At what WAL size does SQLite automatically checkpoint by default?",
+    "query_id": "holdout_wal_checkpoint",
+    "required_fact_groups": [
+      [
+        "1000 pages"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      9,
+      14
+    ],
+    "record_bytes": 10311,
+    "records_retrieved": [
+      "410994326670080c3fb5f32f",
+      "717669418865321c238768db",
+      "8ac1d6d5f4b2febef24927d9",
+      "ec3d4f55b0862ac30c2cb167",
+      "1ccf3ab37263037dd48df2cd",
+      "73fe07518d90c4474c0060de",
+      "c881b56dc9b63d07517c60ad",
+      "91d2cf537ad180a4671b4a42"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102002Z-62a7738068",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:20:02Z",
+  "variant": "PRUNING_ONLY",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "410994326670080c3fb5f32f",
+          "score": 0.9997142332607927
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "717669418865321c238768db",
+          "score": 0.8535241876682662
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "checkpoint",
+            "default",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "8ac1d6d5f4b2febef24927d9",
+          "score": 0.8229688052149982
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "size",
+            "wal"
+          ],
+          "record_id": "ec3d4f55b0862ac30c2cb167",
+          "score": 0.8007041716020958
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "1ccf3ab37263037dd48df2cd",
+          "score": 0.8305255644523168
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "checkpoint",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "73fe07518d90c4474c0060de",
+          "score": 0.8430936570204445
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "c881b56dc9b63d07517c60ad",
+          "score": 0.7738790983544622
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "checkpoint",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "91d2cf537ad180a4671b4a42",
+          "score": 0.7907913573492953
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "8ac1d6d5f4b2febef24927d9",
+        "ec3d4f55b0862ac30c2cb167",
+        "1ccf3ab37263037dd48df2cd",
+        "c881b56dc9b63d07517c60ad",
+        "91d2cf537ad180a4671b4a42"
+      ],
+      "retained_record_ids": [
+        "410994326670080c3fb5f32f",
+        "717669418865321c238768db",
+        "73fe07518d90c4474c0060de"
+      ],
+      "wall_ms": 1.698
+    }
+  }
+}

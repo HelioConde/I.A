@@ -1,0 +1,400 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4022,
+    "distiller_cpu_ms": 0.0,
+    "distiller_wall_ms": 1.9221,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1007,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 12,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "isolation"
+      },
+      {
+        "page_id": 12,
+        "record_id": "54295977f935d3e92d41aa5d",
+        "section": "pragma",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "pragma"
+      },
+      {
+        "page_id": 9,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "atomiccommit"
+      }
+    ],
+    "records_pruned": [
+      "a91aae524418f2c55306061a",
+      "4dd1cf18bd40b4e647cbd8fb",
+      "fefb03e1e3da0dd0e4ebdb80",
+      "0ae87f7578f62e508e800622",
+      "86c2f2aecc202302f11dbd80"
+    ],
+    "records_retained": [
+      "d43d637b9c5311cd0567076e",
+      "54295977f935d3e92d41aa5d",
+      "0dc19137b796270a8d2ec298"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "d43d637b9c5311cd0567076e",
+      "54295977f935d3e92d41aa5d",
+      "0dc19137b796270a8d2ec298"
+    ],
+    "text": "[SOURCE: d43d637b9c5311cd0567076e] isolation\nWAL mode permits simultaneous readers and writers. It can do this because changes do not overwrite the original database file, but rather go into the separate write-ahead log file. That means that readers can continue to read the old, original, unaltered content from the original database file at the same time that the writer is appending to the write-ahead log. In WAL mode, SQLite exhibits \"snapshot isolation\". When a read transaction starts, that reader continues to see an unchanging \"snapshot\" of the database file as it existed at the moment in time when the read transaction started. Any write transactions that commit while the read transaction is active are still invisible to the read transaction, because the reader is seeing a snapshot of database file from a prior moment in time. An example: Suppose there are two database connections X and Y. X starts a read transaction using BEGIN followed by one or more SELECT statements. Then Y comes along and runs an UPDATE statement to modify the database. X can subsequently do a SELECT against the records that Y modified but X will see the older unmodified entries because Y's changes are all invisible to X while X is holding a read transaction. If X wants to see the changes that Y made, then X must end its read transaction and start a new one (by running COMMIT followed by another BEGIN.)\n\n[SOURCE: 54295977f935d3e92d41aa5d] pragma\nIf the write-ahead log is enabled (via the journal_mode pragma), this pragma causes a checkpoint operation to run on database database, or on all attached databases if database is omitted. If write-ahead log mode is disabled, this pragma is a harmless no-op. Invoking this pragma without an argument is equivalent to calling the sqlite3_wal_checkpoint() C interface. Invoking this pragma with an argument is equivalent to calling the sqlite3_wal_checkpoint_v2() C interface with a 3rd parameter corresponding to the argument: PASSIVE Checkpoint as many frames as possible without waiting for any database readers or writers to finish. Sync the db file if all frames in the log are checkpointed. This mode is the same as calling the sqlite3_wal_checkpoint() C interface. The busy-handler callback is never invoked in this mode. FULL This mode blocks (invokes the busy-handler callback) until there is no database writer and all readers are reading from the most recent database snapshot. It then checkpoints all frames in the log file and syncs the database file. FULL blocks concurrent writers while it is running, but readers can proceed.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit\nAn important feature of transactional databases like SQLite is \"atomic commit\". Atomic commit means that either all database changes within a single transaction occur or none of them occur. With atomic commit, it is as if many different writes to different sections of the database file occur instantaneously and simultaneously. Real hardware serializes writes to mass storage, and writing a single sector takes a finite amount of time. So it is impossible to truly write many different sectors of a database file simultaneously and/or instantaneously. But the atomic commit logic within SQLite makes it appear as if the changes for a transaction are all written instantaneously and simultaneously. SQLite has the important property that transactions appear to be atomic even if the transaction is interrupted by an operating system crash or power failure. This article describes the techniques used by SQLite to create the illusion of atomic commit. The information in this article applies only when SQLite is operating in \"rollback mode\", or in other words when SQLite is not using a write-ahead log. SQLite still supports atomic commit when write-ahead logging is enabled, but it accomplishes atomic commit by a different mechanism from the one described in this article. See the write-ahead log documentation for additional information on how SQLite supports atomic commit in that context."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2462,
+    "context_activation_rate": 0.409017059301381,
+    "context_density": 0.05461767626613704,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 335.6666666666667,
+    "useful_oracle_tokens": 55
+  },
+  "context_sha256": "cb99669f3851544d4279790895e0fab5f688c4f30433f9db36bf3c0bcfaeae13",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 931,
+    "answer_quality": {
+      "cited_source_ids": [
+        "54295977f935d3e92d41aa5d",
+        "d43d637b9c5311cd0567076e"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "YES_KNOWLEDGE. [SOURCE: d43d637b9c5311cd0567076e] [SOURCE: 54295977f935d3e92d41aa5d]",
+    "metrics": {
+      "backend_total_ms": 8155.580199963879,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 38.0,
+      "cpu_kernel_seconds": 1.4375,
+      "cpu_percent_total_average": 391.60304008955063,
+      "cpu_percent_total_peak": 649.0000176916183,
+      "cpu_time_seconds": 31.9375,
+      "cpu_user_seconds": 30.5,
+      "generated_tokens": 61,
+      "generation_eval_ms": 2866.706,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 8155.580199963879,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621142016,
+      "private_bytes_min": 619311104,
+      "prompt_eval_ms": 5273.712,
+      "prompt_tokens": 931,
+      "prompt_tokens_per_second": 176.53599589814536,
+      "queries_served": 38,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 37,
+      "system_available_ram_bytes_min": 3143794688,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 21.27877780281619,
+      "ttft_ms": 5287.251699948683,
+      "working_set_bytes_max": 1208004608,
+      "working_set_bytes_min": 1206177792,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 779
+    },
+    "output_sha256": "3006628e28502ae868762d82a77e426bd91d76b8e6f2ddeb01bbb828e02c18bd",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_wal_concurrency::PRUNING_ONLY",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 37,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1007,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 41,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 108.16326530612245,
+      "instructions": 9.66702470461869,
+      "other_or_chat_envelope": 0.0,
+      "question": 2.577873254564984
+    },
+    "question": 24,
+    "total": 931
+  },
+  "prompt_sha256": "969c1309e30e70c7222345113422c8f8947ce7982519c2d8adf36ade2083ed6c",
+  "query_spec": {
+    "category": "paraphrase",
+    "expected_record_ids": [
+      "d43d637b9c5311cd0567076e"
+    ],
+    "query": "Can SQLite readers and a writer operate at the same time in write-ahead logging mode, and why?",
+    "query_id": "dev_wal_concurrency",
+    "required_fact_groups": [
+      [
+        "simultaneous",
+        "same time"
+      ],
+      [
+        "write-ahead log",
+        "wal"
+      ],
+      [
+        "original database",
+        "snapshot"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      9,
+      11,
+      12,
+      14
+    ],
+    "record_bytes": 9838,
+    "records_retrieved": [
+      "d43d637b9c5311cd0567076e",
+      "54295977f935d3e92d41aa5d",
+      "a91aae524418f2c55306061a",
+      "0dc19137b796270a8d2ec298",
+      "4dd1cf18bd40b4e647cbd8fb",
+      "fefb03e1e3da0dd0e4ebdb80",
+      "0ae87f7578f62e508e800622",
+      "86c2f2aecc202302f11dbd80"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T101730Z-eba2e28513",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:17:30Z",
+  "variant": "PRUNING_ONLY",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "same",
+            "sqlite",
+            "time",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "d43d637b9c5311cd0567076e",
+          "score": 0.8542072822681686
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "same",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "54295977f935d3e92d41aa5d",
+          "score": 0.859120004306948
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "readers",
+            "same",
+            "time",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "a91aae524418f2c55306061a",
+          "score": 0.7624650058809739
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "ahead",
+            "logging",
+            "mode",
+            "sqlite",
+            "time",
+            "write",
+            "write-ahead"
+          ],
+          "record_id": "0dc19137b796270a8d2ec298",
+          "score": 0.7293112382083101
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "sqlite",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "4dd1cf18bd40b4e647cbd8fb",
+          "score": 0.6725605465722535
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "sqlite",
+            "time",
+            "write",
+            "write-ahead"
+          ],
+          "record_id": "fefb03e1e3da0dd0e4ebdb80",
+          "score": 0.678576309172373
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "same",
+            "sqlite",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "0ae87f7578f62e508e800622",
+          "score": 0.6456555013319861
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "sqlite",
+            "write",
+            "write-ahead"
+          ],
+          "record_id": "86c2f2aecc202302f11dbd80",
+          "score": 0.7051939247603876
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "a91aae524418f2c55306061a",
+        "4dd1cf18bd40b4e647cbd8fb",
+        "fefb03e1e3da0dd0e4ebdb80",
+        "0ae87f7578f62e508e800622",
+        "86c2f2aecc202302f11dbd80"
+      ],
+      "retained_record_ids": [
+        "d43d637b9c5311cd0567076e",
+        "54295977f935d3e92d41aa5d",
+        "0dc19137b796270a8d2ec298"
+      ],
+      "wall_ms": 1.9221
+    }
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 950,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 15.7848,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 237,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 192,
+        "estimated_tokens": 60,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 0,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.6031261218696345,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.",
+        "title": "json"
+      },
+      {
+        "end": 318,
+        "estimated_tokens": 92,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 0,
+        "record_id": "18893306b3c2b47f6463001c",
+        "score": 0.37260043715457497,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by implementing specific object APIs);",
+        "title": "pickle"
+      },
+      {
+        "end": 820,
+        "estimated_tokens": 85,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 3,
+        "record_id": "18893306b3c2b47f6463001c",
+        "score": 0.3538504371545749,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 533,
+        "text": "The data format used by \"pickle\" is Python-specific. This has the advantage that there are no restrictions imposed by external standards such as JSON (which can't represent pointer sharing); however it means that non-Python programs may not be able to reconstruct pickled Python objects.",
+        "title": "pickle"
+      }
+    ],
+    "records_pruned": [
+      "7409230c3d31263ba576b2d1",
+      "859fda16a4d715b5f6c73141",
+      "224d71d9f13fc0d43000d9c5",
+      "b227a6f4bc64f5797a340f22",
+      "b83cccde7b72abcccc6e5c93",
+      "dcc841948e6ec5fbcb6b8043"
+    ],
+    "records_retained": [
+      "2b0a025ac1549a6b04ae5a17",
+      "18893306b3c2b47f6463001c"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 3,
+    "source_ids": [
+      "2b0a025ac1549a6b04ae5a17",
+      "18893306b3c2b47f6463001c"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\nUnlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.\n\n[SOURCE: 18893306b3c2b47f6463001c] pickle — pickle\n* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by implementing specific object APIs);\n\n[SOURCE: 18893306b3c2b47f6463001c] pickle — pickle\nThe data format used by \"pickle\" is Python-specific. This has the advantage that there are no restrictions imposed by external standards such as JSON (which can't represent pointer sharing); however it means that non-Python programs may not be able to reconstruct pickled Python objects."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2574,
+    "context_activation_rate": 0.09207459207459208,
+    "context_density": 0.25316455696202533,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 118.5,
+    "useful_oracle_tokens": 60
+  },
+  "context_sha256": "a4c7acd3f94bb4d7b7a99bd9d7a5a10189e1c2abd4fba4c22770935c101b411d",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 358,
+    "answer_quality": {
+      "cited_source_ids": [
+        "2b0a025ac1549a6b04ae5a17"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 2,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": true,
+    "diagnostic": "PASS",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17]  \n\nThe source: 2b0a025ac1549a6b04ae5a17 states that JSON is not a framed protocol, and repeated calls to \"dump()\" with the same file pointer will result in an invalid JSON file.",
+    "metrics": {
+      "backend_total_ms": 4374.862800003029,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 148.0,
+      "cpu_kernel_seconds": 0.84375,
+      "cpu_percent_total_average": 400.0125443931152,
+      "cpu_percent_total_peak": 554.4533703326681,
+      "cpu_time_seconds": 17.5,
+      "cpu_user_seconds": 16.65625,
+      "generated_tokens": 88,
+      "generation_eval_ms": 2795.507,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 4374.862800003029,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621584384,
+      "private_bytes_min": 619753472,
+      "prompt_eval_ms": 1566.656,
+      "prompt_tokens": 358,
+      "prompt_tokens_per_second": 228.51219412557703,
+      "queries_served": 148,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 147,
+      "system_available_ram_bytes_min": 3356459008,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 31.479084116047645,
+      "ttft_ms": 1578.3767999964766,
+      "working_set_bytes_max": 993923072,
+      "working_set_bytes_min": 992096256,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "944e6887a090aae46383399299cf92f558ae25e69dd222fb4bdbeb138a2d456d",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_json_frames::EXTRACTIVE_B256",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 147,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 238,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 35,
+    "other_or_chat_envelope": 6,
+    "percent": {
+      "evidence": 66.4804469273743,
+      "instructions": 25.139664804469273,
+      "other_or_chat_envelope": 1.675977653631285,
+      "question": 6.70391061452514
+    },
+    "question": 24,
+    "total": 358
+  },
+  "prompt_sha256": "8a42a4e6c0f56ea48450fdfcfe3919bdfa393b961577f9b0b16a30f7f3de87e9",
+  "query_spec": {
+    "category": "distractor",
+    "expected_record_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+    "query_id": "holdout_json_frames",
+    "required_fact_groups": [
+      [
+        "not a framed protocol"
+      ],
+      [
+        "invalid json"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      3,
+      4
+    ],
+    "record_bytes": 10286,
+    "records_retrieved": [
+      "2b0a025ac1549a6b04ae5a17",
+      "7409230c3d31263ba576b2d1",
+      "859fda16a4d715b5f6c73141",
+      "18893306b3c2b47f6463001c",
+      "224d71d9f13fc0d43000d9c5",
+      "b227a6f4bc64f5797a340f22",
+      "b83cccde7b72abcccc6e5c93",
+      "dcc841948e6ec5fbcb6b8043"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T103034Z-7282812d4a",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:30:34Z",
+  "variant": "EXTRACTIVE_B256",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

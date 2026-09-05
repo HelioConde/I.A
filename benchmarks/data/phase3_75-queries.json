@@ -1,0 +1,1290 @@
+{
+  "development_count": 11,
+  "holdout_count": 36,
+  "queries": [
+    {
+      "category": "single_topic",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "abrir JSON em Python",
+      "query_id": "d_exact_json",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "multi_domain",
+      "expected_domains": [
+        "linux"
+      ],
+      "expected_topics": [
+        "processes",
+        "networking"
+      ],
+      "optional_pages": [
+        90,
+        129,
+        168,
+        91,
+        130,
+        169
+      ],
+      "query": "processos e rede no Linux",
+      "query_id": "d_multi",
+      "required_page_causes": {
+        "networking": [
+          13,
+          52
+        ],
+        "processes": [
+          12,
+          51
+        ]
+      },
+      "required_pages": [
+        12,
+        51,
+        13,
+        52
+      ],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "noise_typo",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "pythno jsom abrir",
+      "query_id": "d_fuzzy",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "rotina cooperativa sem espera",
+      "query_id": "d_sem_async",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "networking"
+      ],
+      "expected_topics": [
+        "dns"
+      ],
+      "optional_pages": [
+        98,
+        137,
+        176
+      ],
+      "query": "localizar endereço de um site pelo nome",
+      "query_id": "d_sem_dns",
+      "required_page_causes": {
+        "dns": [
+          20,
+          59
+        ]
+      },
+      "required_pages": [
+        20,
+        59
+      ],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "multi_turn",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "arquivos Python",
+      "query_id": "d_partial1",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": "dev_context",
+      "split": "development",
+      "turn_index": 1
+    },
+    {
+      "category": "partial_cue",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "e sem bloquear?",
+      "query_id": "d_partial2",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": "dev_context",
+      "split": "development",
+      "turn_index": 2
+    },
+    {
+      "category": "topic_switch",
+      "expected_domains": [
+        "biology"
+      ],
+      "expected_topics": [
+        "genetics"
+      ],
+      "optional_pages": [
+        105,
+        144,
+        183
+      ],
+      "query": "agora explique genes e DNA",
+      "query_id": "d_switch",
+      "required_page_causes": {
+        "genetics": [
+          27,
+          66
+        ]
+      },
+      "required_pages": [
+        27,
+        66
+      ],
+      "sequence_id": "dev_context",
+      "split": "development",
+      "turn_index": 3
+    },
+    {
+      "category": "unknown",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "acordes para violoncelo barroco",
+      "query_id": "d_ood",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "nearest_neighbor_trap",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "rede de acordes para composição musical",
+      "query_id": "d_nn_trap",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "nearest_neighbor_trap",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "servidor de receitas culinárias",
+      "query_id": "d_server_trap",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "development",
+      "turn_index": 0
+    },
+    {
+      "category": "single_topic",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "decodificar um documento JSON no Python",
+      "query_id": "h_json",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "single_topic",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "carregar conteúdo de um caminho com pathlib",
+      "query_id": "h_files",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "single_topic",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.sqlite"
+      ],
+      "optional_pages": [
+        80,
+        119,
+        158
+      ],
+      "query": "persistir registros numa base SQLite",
+      "query_id": "h_sql",
+      "required_page_causes": {
+        "python.sqlite": [
+          2,
+          41
+        ]
+      },
+      "required_pages": [
+        2,
+        41
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "paraphrase",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "executar a tarefa sem bloquear",
+      "query_id": "h_async",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "paraphrase",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "fazer isso concorrentemente usando Python",
+      "query_id": "h_async2",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "multi_domain",
+      "expected_domains": [
+        "linux"
+      ],
+      "expected_topics": [
+        "processes",
+        "networking"
+      ],
+      "optional_pages": [
+        90,
+        129,
+        168,
+        91,
+        130,
+        169
+      ],
+      "query": "ver processos e conectividade do servidor",
+      "query_id": "h_linux_net",
+      "required_page_causes": {
+        "networking": [
+          13,
+          52
+        ],
+        "processes": [
+          12,
+          51
+        ]
+      },
+      "required_pages": [
+        12,
+        51,
+        13,
+        52
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "multi_domain",
+      "expected_domains": [
+        "networking",
+        "storage"
+      ],
+      "expected_topics": [
+        "nvme",
+        "http"
+      ],
+      "optional_pages": [
+        95,
+        134,
+        173,
+        97,
+        136,
+        175
+      ],
+      "query": "expor dados do NVMe através de uma API HTTP",
+      "query_id": "h_storage_net",
+      "required_page_causes": {
+        "http": [
+          19,
+          58
+        ],
+        "nvme": [
+          17,
+          56
+        ]
+      },
+      "required_pages": [
+        17,
+        56,
+        19,
+        58
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "single_topic",
+      "expected_domains": [
+        "storage"
+      ],
+      "expected_topics": [
+        "checksums"
+      ],
+      "optional_pages": [
+        96,
+        135,
+        174
+      ],
+      "query": "detectar corrupção validando o hash",
+      "query_id": "h_checksum",
+      "required_page_causes": {
+        "checksums": [
+          18,
+          57
+        ]
+      },
+      "required_pages": [
+        18,
+        57
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "noise_typo",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "PYHTON, abriir o JsOn por favor",
+      "query_id": "h_typo",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "noise_typo",
+      "expected_domains": [
+        "networking"
+      ],
+      "expected_topics": [
+        "dns"
+      ],
+      "optional_pages": [
+        98,
+        137,
+        176
+      ],
+      "query": "por favor talvez DNS resolver nome??? obrigado",
+      "query_id": "h_noise",
+      "required_page_causes": {
+        "dns": [
+          20,
+          59
+        ]
+      },
+      "required_pages": [
+        20,
+        59
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "distractor",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "abrir script Python sobre genes sem explicar genética",
+      "query_id": "h_distractor",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "ambiguous",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "como carregar isso",
+      "query_id": "h_ambiguous",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "unknown",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "harmonia quartal para saxofone",
+      "query_id": "h_unknown1",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "unknown",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "receita de pão com fermentação longa",
+      "query_id": "h_unknown2",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "multi_turn",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "trabalhando com arquivos em Python",
+      "query_id": "mt1",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": "python_flow",
+      "split": "holdout",
+      "turn_index": 1
+    },
+    {
+      "category": "multi_turn",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "agora os dados são JSON",
+      "query_id": "mt2",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": "python_flow",
+      "split": "holdout",
+      "turn_index": 2
+    },
+    {
+      "category": "partial_cue",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "e executar sem bloquear?",
+      "query_id": "mt3",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": "python_flow",
+      "split": "holdout",
+      "turn_index": 3
+    },
+    {
+      "category": "partial_cue",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.sqlite"
+      ],
+      "optional_pages": [
+        80,
+        119,
+        158
+      ],
+      "query": "depois persistir no banco",
+      "query_id": "mt4",
+      "required_page_causes": {
+        "python.sqlite": [
+          2,
+          41
+        ]
+      },
+      "required_pages": [
+        2,
+        41
+      ],
+      "sequence_id": "python_flow",
+      "split": "holdout",
+      "turn_index": 4
+    },
+    {
+      "category": "partial_cue",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.sqlite"
+      ],
+      "optional_pages": [
+        80,
+        119,
+        158
+      ],
+      "query": "e depois?",
+      "query_id": "mt5",
+      "required_page_causes": {
+        "python.sqlite": [
+          2,
+          41
+        ]
+      },
+      "required_pages": [
+        2,
+        41
+      ],
+      "sequence_id": "python_flow",
+      "split": "holdout",
+      "turn_index": 5
+    },
+    {
+      "category": "topic_switch",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "usar JSON em Python",
+      "query_id": "sw1",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": "switch",
+      "split": "holdout",
+      "turn_index": 1
+    },
+    {
+      "category": "topic_switch",
+      "expected_domains": [
+        "biology"
+      ],
+      "expected_topics": [
+        "genetics"
+      ],
+      "optional_pages": [
+        105,
+        144,
+        183
+      ],
+      "query": "agora explique DNA e herança genética",
+      "query_id": "sw2",
+      "required_page_causes": {
+        "genetics": [
+          27,
+          66
+        ]
+      },
+      "required_pages": [
+        27,
+        66
+      ],
+      "sequence_id": "switch",
+      "split": "holdout",
+      "turn_index": 2
+    },
+    {
+      "category": "partial_cue",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.sqlite"
+      ],
+      "optional_pages": [
+        80,
+        119,
+        158
+      ],
+      "query": "voltando, salvar no SQLite",
+      "query_id": "sw3",
+      "required_page_causes": {
+        "python.sqlite": [
+          2,
+          41
+        ]
+      },
+      "required_pages": [
+        2,
+        41
+      ],
+      "sequence_id": "switch",
+      "split": "holdout",
+      "turn_index": 3
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "execução cooperativa não bloqueante",
+      "query_id": "hs_sem_async",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "transformar texto estruturado em objetos",
+      "query_id": "hs_sem_json",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "storage"
+      ],
+      "expected_topics": [
+        "nvme"
+      ],
+      "optional_pages": [
+        95,
+        134,
+        173
+      ],
+      "query": "armazenamento flash com baixa latência",
+      "query_id": "hs_sem_nvme",
+      "required_page_causes": {
+        "nvme": [
+          17,
+          56
+        ]
+      },
+      "required_pages": [
+        17,
+        56
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "storage"
+      ],
+      "expected_topics": [
+        "checksums"
+      ],
+      "optional_pages": [
+        96,
+        135,
+        174
+      ],
+      "query": "verificar soma criptográfica contra dano",
+      "query_id": "hs_sem_checksum",
+      "required_page_causes": {
+        "checksums": [
+          18,
+          57
+        ]
+      },
+      "required_pages": [
+        18,
+        57
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "semantic_paraphrase",
+      "expected_domains": [
+        "networking"
+      ],
+      "expected_topics": [
+        "dns"
+      ],
+      "optional_pages": [
+        98,
+        137,
+        176
+      ],
+      "query": "resolver endereço de internet pelo nome",
+      "query_id": "hs_sem_dns",
+      "required_page_causes": {
+        "dns": [
+          20,
+          59
+        ]
+      },
+      "required_pages": [
+        20,
+        59
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "noise_typo",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "pythn assicrono sem bloqear",
+      "query_id": "hs_typo",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "nearest_neighbor_trap",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "rede harmônica para improvisação musical",
+      "query_id": "hs_nn_trap",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "nearest_neighbor_trap",
+      "expected_domains": [],
+      "expected_topics": [],
+      "optional_pages": [],
+      "query": "servidor doméstico de receitas",
+      "query_id": "hs_server_trap",
+      "required_page_causes": {},
+      "required_pages": [],
+      "sequence_id": null,
+      "split": "holdout",
+      "turn_index": 0
+    },
+    {
+      "category": "adversarial_context",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "arquivos Python",
+      "query_id": "adv1",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": "adversarial",
+      "split": "holdout",
+      "turn_index": 1
+    },
+    {
+      "category": "adversarial_context",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.json"
+      ],
+      "optional_pages": [
+        78,
+        117,
+        156
+      ],
+      "query": "JSON Python",
+      "query_id": "adv2",
+      "required_page_causes": {
+        "python.json": [
+          0,
+          39
+        ]
+      },
+      "required_pages": [
+        0,
+        39
+      ],
+      "sequence_id": "adversarial",
+      "split": "holdout",
+      "turn_index": 2
+    },
+    {
+      "category": "adversarial_context",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.sqlite"
+      ],
+      "optional_pages": [
+        80,
+        119,
+        158
+      ],
+      "query": "SQLite Python",
+      "query_id": "adv3",
+      "required_page_causes": {
+        "python.sqlite": [
+          2,
+          41
+        ]
+      },
+      "required_pages": [
+        2,
+        41
+      ],
+      "sequence_id": "adversarial",
+      "split": "holdout",
+      "turn_index": 3
+    },
+    {
+      "category": "adversarial_context",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.asyncio"
+      ],
+      "optional_pages": [
+        81,
+        120,
+        159
+      ],
+      "query": "asyncio Python",
+      "query_id": "adv4",
+      "required_page_causes": {
+        "python.asyncio": [
+          3,
+          42
+        ]
+      },
+      "required_pages": [
+        3,
+        42
+      ],
+      "sequence_id": "adversarial",
+      "split": "holdout",
+      "turn_index": 4
+    },
+    {
+      "category": "adversarial_context",
+      "expected_domains": [
+        "programming"
+      ],
+      "expected_topics": [
+        "python.files"
+      ],
+      "optional_pages": [
+        79,
+        118,
+        157
+      ],
+      "query": "pathlib arquivos Python",
+      "query_id": "adv5",
+      "required_page_causes": {
+        "python.files": [
+          1,
+          40
+        ]
+      },
+      "required_pages": [
+        1,
+        40
+      ],
+      "sequence_id": "adversarial",
+      "split": "holdout",
+      "turn_index": 5
+    },
+    {
+      "category": "adversarial_context",
+      "expected_domains": [
+        "biology"
+      ],
+      "expected_topics": [
+        "genetics"
+      ],
+      "optional_pages": [
+        105,
+        144,
+        183
+      ],
+      "query": "explique completamente DNA genes e herança",
+      "query_id": "adv6",
+      "required_page_causes": {
+        "genetics": [
+          27,
+          66
+        ]
+      },
+      "required_pages": [
+        27,
+        66
+      ],
+      "sequence_id": "adversarial",
+      "split": "holdout",
+      "turn_index": 6
+    }
+  ],
+  "schema_version": 1,
+  "seed": 20260807
+}

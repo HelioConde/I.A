@@ -1,0 +1,247 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 350,
+    "context_fact_recall": 1.0,
+    "covered_fact_groups": [
+      0
+    ],
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 2530.3262,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 88,
+    "evaluation_only": true,
+    "metadata_bytes": 0,
+    "oracle_runtime_allowed": false,
+    "oracle_wall_ms": 2530.3262,
+    "provenance": [
+      {
+        "end": 303,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "c881b56dc9b63d07517c60ad",
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "By default, SQLite does a checkpoint automatically when the WAL file reaches a threshold size of 1000 pages. (The SQLITE_DEFAULT_WAL_AUTOCHECKPOINT compile-time option can be used to specify a different default.) Applications using WAL do not have to do anything in order for these checkpoints to occur.",
+        "title": "wal"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "c881b56dc9b63d07517c60ad"
+    ],
+    "required_fact_groups": 1,
+    "sentences_retained": 1,
+    "source_ids": [
+      "c881b56dc9b63d07517c60ad"
+    ],
+    "text": "[SOURCE: c881b56dc9b63d07517c60ad] wal — wal\nBy default, SQLite does a checkpoint automatically when the WAL file reaches a threshold size of 1000 pages. (The SQLITE_DEFAULT_WAL_AUTOCHECKPOINT compile-time option can be used to specify a different default.) Applications using WAL do not have to do anything in order for these checkpoints to occur."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2581,
+    "context_activation_rate": 0.03409531189461449,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 88.0,
+    "useful_oracle_tokens": 88
+  },
+  "context_sha256": "e9b55c6bb028b1e770c4e5127acc2eb38370e9e9e0f95da42f9b46c52f233a01",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 190,
+    "answer_quality": {
+      "cited_source_ids": [
+        "c881b56dc9b63d07517c60ad"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 1,
+      "required_facts_total": 1,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        true
+      ],
+      "recall": 1.0,
+      "total": 1
+    },
+    "correctness": true,
+    "diagnostic": "PASS",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The default WAL size for automatic checkpointing is 1000 pages. \n\n[SOURCE: c881b56dc9b63d07517c60ad]",
+    "metrics": {
+      "backend_total_ms": 2091.383400023915,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 95.0,
+      "cpu_kernel_seconds": 0.234375,
+      "cpu_percent_total_average": 397.46418566318096,
+      "cpu_percent_total_peak": 669.6595989719115,
+      "cpu_time_seconds": 8.3125,
+      "cpu_user_seconds": 8.078125,
+      "generated_tokens": 44,
+      "generation_eval_ms": 1311.677,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 2091.383400023915,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621367296,
+      "private_bytes_min": 619536384,
+      "prompt_eval_ms": 767.423,
+      "prompt_tokens": 190,
+      "prompt_tokens_per_second": 247.58184208708886,
+      "queries_served": 95,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 94,
+      "system_available_ram_bytes_min": 3423940608,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 33.54484373820689,
+      "ttft_ms": 778.6138000083156,
+      "working_set_bytes_max": 993685504,
+      "working_set_bytes_min": 991858688,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "a954597d263da545e27e90157b8b19d24a200516578394211ea8132ffcb12df3",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_wal_checkpoint::ORACLE_EVAL",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 94,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 88,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 11,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 46.31578947368421,
+      "instructions": 47.36842105263158,
+      "other_or_chat_envelope": 0.0,
+      "question": 8.947368421052632
+    },
+    "question": 17,
+    "total": 190
+  },
+  "prompt_sha256": "21ef5497961f4a4c3e2ded06cae33d54881e487e35fbc8326f4ad7bf93316558",
+  "query_spec": {
+    "category": "direct_fact",
+    "expected_record_ids": [
+      "c881b56dc9b63d07517c60ad"
+    ],
+    "query": "At what WAL size does SQLite automatically checkpoint by default?",
+    "query_id": "holdout_wal_checkpoint",
+    "required_fact_groups": [
+      [
+        "1000 pages"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      9,
+      14
+    ],
+    "record_bytes": 10311,
+    "records_retrieved": [
+      "410994326670080c3fb5f32f",
+      "717669418865321c238768db",
+      "8ac1d6d5f4b2febef24927d9",
+      "ec3d4f55b0862ac30c2cb167",
+      "1ccf3ab37263037dd48df2cd",
+      "73fe07518d90c4474c0060de",
+      "c881b56dc9b63d07517c60ad",
+      "91d2cf537ad180a4671b4a42"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102502Z-bd25007b39",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:25:02Z",
+  "variant": "ORACLE_EVAL",
+  "variant_metadata": {
+    "evaluation_only": true,
+    "pruning": null
+  }
+}

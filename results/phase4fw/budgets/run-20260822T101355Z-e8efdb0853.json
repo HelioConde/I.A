@@ -1,0 +1,346 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 1963,
+    "distiller_cpu_ms": 31.25,
+    "distiller_wall_ms": 21.1637,
+    "duplicate_tokens_removed": 58,
+    "estimated_tokens": 491,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 579,
+        "estimated_tokens": 74,
+        "kind": "sentence",
+        "page_id": 10,
+        "position": 3,
+        "record_id": "9123361d84e174851100ff2e",
+        "score": 0.54625,
+        "section": "compile",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 339,
+        "text": "When compiled with SQLITE_THREADSAFE=2, SQLite can be used in a multithreaded program so long as no two threads attempt to use the same database connection (or any prepared statements derived from that database connection) at the same time.",
+        "title": "compile"
+      },
+      {
+        "end": 1132,
+        "estimated_tokens": 64,
+        "kind": "code_block",
+        "page_id": 10,
+        "position": 6,
+        "record_id": "9123361d84e174851100ff2e",
+        "score": 0.5435714285714286,
+        "section": "compile",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 930,
+        "text": "When SQLite has been compiled with SQLITE_THREADSAFE=1 or SQLITE_THREADSAFE=2 then the threading mode can be altered at run-time using the sqlite3_config() interface together with one of these verbs:",
+        "title": "compile"
+      },
+      {
+        "end": 823,
+        "estimated_tokens": 71,
+        "kind": "paragraph",
+        "page_id": 10,
+        "position": 4,
+        "record_id": "9123361d84e174851100ff2e",
+        "score": 0.485,
+        "section": "compile",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 592,
+        "text": "To put it another way, SQLITE_THREADSAFE=1 sets the default threading mode to Serialized. SQLITE_THREADSAFE=2 sets the default threading mode to Multi-threaded. And SQLITE_THREADSAFE=0 sets the threading mode to Single-threaded.",
+        "title": "compile"
+      },
+      {
+        "end": 349,
+        "estimated_tokens": 103,
+        "kind": "paragraph",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "9df5eed704858ddff8cccd35",
+        "score": 0.4713809391882342,
+        "section": "threadsafe",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "Use the SQLITE_THREADSAFE compile-time parameter to select the threading mode. If no SQLITE_THREADSAFE compile-time parameter is present, then serialized mode is used. This can be made explicit with -DSQLITE_THREADSAFE=1. With -DSQLITE_THREADSAFE=0 the threading mode is single-thread. With -DSQLITE_THREADSAFE=2 the threading mode is multi-thread.",
+        "title": "threadsafe"
+      },
+      {
+        "end": 623,
+        "estimated_tokens": 84,
+        "kind": "paragraph",
+        "page_id": 14,
+        "position": 1,
+        "record_id": "9df5eed704858ddff8cccd35",
+        "score": 0.4588809391882342,
+        "section": "threadsafe",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 351,
+        "text": "The return value of the sqlite3_threadsafe() interface is the value of SQLITE_THREADSAFE set at compile-time. It does not reflect changes to the threading mode made at runtime via the sqlite3_config() interface or by flags given as the third argument to sqlite3_open_v2().",
+        "title": "threadsafe"
+      },
+      {
+        "end": 173,
+        "estimated_tokens": 59,
+        "kind": "paragraph",
+        "page_id": 9,
+        "position": 0,
+        "record_id": "d660299e870f9680794da980",
+        "score": 0.4498493254592143,
+        "section": "threadsafe",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "The sqlite3_threadsafe() function returns zero if and only if SQLite was compiled with mutexing code omitted due to the SQLITE_THREADSAFE compile-time option being set to 0.",
+        "title": "threadsafe"
+      },
+      {
+        "end": 213,
+        "estimated_tokens": 36,
+        "kind": "sentence",
+        "page_id": 10,
+        "position": 1,
+        "record_id": "9123361d84e174851100ff2e",
+        "score": 0.4325,
+        "section": "compile",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 125,
+        "text": "The default is SQLITE_THREADSAFE=1 which is safe for use in a multithreaded environment.",
+        "title": "compile"
+      }
+    ],
+    "records_pruned": [
+      "0ee4b1f6bcaf0d64344a3c93",
+      "fa1005bf9482a80e4da6ebde",
+      "775dfe0170d7c7b1f2f43edf",
+      "8556aee9b6e030630899d952",
+      "59e50001967c30e2b0a4ffc5"
+    ],
+    "records_retained": [
+      "9123361d84e174851100ff2e",
+      "9df5eed704858ddff8cccd35",
+      "d660299e870f9680794da980"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 7,
+    "source_ids": [
+      "9123361d84e174851100ff2e",
+      "9df5eed704858ddff8cccd35",
+      "d660299e870f9680794da980"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 9123361d84e174851100ff2e] compile — compile\nWhen compiled with SQLITE_THREADSAFE=2, SQLite can be used in a multithreaded program so long as no two threads attempt to use the same database connection (or any prepared statements derived from that database connection) at the same time.\n\n[SOURCE: 9123361d84e174851100ff2e] compile — compile\nWhen SQLite has been compiled with SQLITE_THREADSAFE=1 or SQLITE_THREADSAFE=2 then the threading mode can be altered at run-time using the sqlite3_config() interface together with one of these verbs:\n\n[SOURCE: 9123361d84e174851100ff2e] compile — compile\nTo put it another way, SQLITE_THREADSAFE=1 sets the default threading mode to Serialized. SQLITE_THREADSAFE=2 sets the default threading mode to Multi-threaded. And SQLITE_THREADSAFE=0 sets the threading mode to Single-threaded.\n\n[SOURCE: 9df5eed704858ddff8cccd35] threadsafe — threadsafe\nUse the SQLITE_THREADSAFE compile-time parameter to select the threading mode. If no SQLITE_THREADSAFE compile-time parameter is present, then serialized mode is used. This can be made explicit with -DSQLITE_THREADSAFE=1. With -DSQLITE_THREADSAFE=0 the threading mode is single-thread. With -DSQLITE_THREADSAFE=2 the threading mode is multi-thread.\n\n[SOURCE: 9df5eed704858ddff8cccd35] threadsafe — threadsafe\nThe return value of the sqlite3_threadsafe() interface is the value of SQLITE_THREADSAFE set at compile-time. It does not reflect changes to the threading mode made at runtime via the sqlite3_config() interface or by flags given as the third argument to sqlite3_open_v2().\n\n[SOURCE: d660299e870f9680794da980] threadsafe — threadsafe\nThe sqlite3_threadsafe() function returns zero if and only if SQLite was compiled with mutexing code omitted due to the SQLITE_THREADSAFE compile-time option being set to 0.\n\n[SOURCE: 9123361d84e174851100ff2e] compile — compile\nThe default is SQLITE_THREADSAFE=1 which is safe for use in a multithreaded environment."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2463,
+    "context_activation_rate": 0.1993503857084856,
+    "context_density": 0.034623217922606926,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 163.66666666666666,
+    "useful_oracle_tokens": 17
+  },
+  "context_sha256": "4f50c15427b376cd413e591a3939a76e8896b4891abe59424276e06c172599e1",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 651,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 3,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "GROUNDING_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "- SQLITE_THREADSAFE=0 → Single-threaded  \n- SQLITE_THREADSAFE=1 → Serialized  \n- SQLITE_THREADSAFE=2 → Multi-threaded  \n\nSOURCE: 9123361d84e174851100ff2e",
+    "metrics": {
+      "backend_total_ms": 5883.265700016636,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 10.0,
+      "cpu_kernel_seconds": 1.171875,
+      "cpu_percent_total_average": 390.6737545430764,
+      "cpu_percent_total_peak": 593.0485225290139,
+      "cpu_time_seconds": 22.984375,
+      "cpu_user_seconds": 21.8125,
+      "generated_tokens": 58,
+      "generation_eval_ms": 2336.358,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 5883.265700016636,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621047808,
+      "private_bytes_min": 619216896,
+      "prompt_eval_ms": 3532.272,
+      "prompt_tokens": 651,
+      "prompt_tokens_per_second": 184.300642759108,
+      "queries_served": 10,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 9,
+      "system_available_ram_bytes_min": 3118632960,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 24.824962612750273,
+      "ttft_ms": 3545.670000021346,
+      "working_set_bytes_max": 1207377920,
+      "working_set_bytes_min": 1205551104,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 816
+    },
+    "output_sha256": "9e5cf2356e2d0bb8026057705457c900b7f5b72bde5cdd97bea99a2e271decc8",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_thread_modes::EXTRACTIVE_B512",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 9,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 491,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 94,
+    "other_or_chat_envelope": 51,
+    "percent": {
+      "evidence": 75.42242703533026,
+      "instructions": 13.824884792626728,
+      "other_or_chat_envelope": 7.8341013824884795,
+      "question": 2.9185867895545314
+    },
+    "question": 19,
+    "total": 651
+  },
+  "prompt_sha256": "449c7665806ec5751de1297636be134a7364212883119584e0ca1c32cb6fd9b4",
+  "query_spec": {
+    "category": "multi_domain",
+    "expected_record_ids": [
+      "9123361d84e174851100ff2e"
+    ],
+    "query": "Map SQLITE_THREADSAFE values zero, one, and two to SQLite threading modes.",
+    "query_id": "holdout_thread_modes",
+    "required_fact_groups": [
+      [
+        "threadsafe=0",
+        "single-thread"
+      ],
+      [
+        "threadsafe=1",
+        "serialized"
+      ],
+      [
+        "threadsafe=2",
+        "multi-thread"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 3145728,
+    "active_pages": [
+      9,
+      10,
+      14
+    ],
+    "record_bytes": 9837,
+    "records_retrieved": [
+      "9123361d84e174851100ff2e",
+      "9df5eed704858ddff8cccd35",
+      "d660299e870f9680794da980",
+      "0ee4b1f6bcaf0d64344a3c93",
+      "fa1005bf9482a80e4da6ebde",
+      "775dfe0170d7c7b1f2f43edf",
+      "8556aee9b6e030630899d952",
+      "59e50001967c30e2b0a4ffc5"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T101355Z-e8efdb0853",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:13:55Z",
+  "variant": "EXTRACTIVE_B512",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

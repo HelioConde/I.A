@@ -1,0 +1,117 @@
+{
+  "backends": [
+    {
+      "bytes": 5949440,
+      "capability": "one process per query",
+      "exists": true,
+      "name": "llama-completion.exe",
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+      "required_recompilation": false,
+      "sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+    },
+    {
+      "bytes": 18535936,
+      "capability": "persistent HTTP Core",
+      "exists": true,
+      "name": "llama-server.exe",
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "required_recompilation": true,
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    {
+      "bytes": 99840,
+      "capability": "official auxiliary executable",
+      "exists": true,
+      "name": "llama-ui-embed.exe",
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\tools\\ui\\llama-ui-embed.exe",
+      "required_recompilation": false,
+      "sha256": "ab71e12ba6d60dc822ccd25848498f664c8ba50087f2c18a5564dc374802f6f4"
+    }
+  ],
+  "baseline_runtime_preserved": true,
+  "config_hash": "bbfd7a9aab56de9e4a457121fc9f806f345c3d531ee00048054f20e0ab138fa1",
+  "configuration": {
+    "context_size": 4096,
+    "device": "none",
+    "duration_minutes": null,
+    "max_tokens": 96,
+    "mode": "audit",
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "experiment": "WINDOWS_CORE_RUNTIME_EXPERIMENT",
+  "experiment_alias": "WCRE-1",
+  "experimental_build": {
+    "directory": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent",
+    "flags": {
+      "BUILD_SHARED_LIBS:BOOL": "OFF",
+      "CMAKE_BUILD_TYPE:STRING": "Release",
+      "CMAKE_CXX_COMPILER:STRING": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+      "CMAKE_GENERATOR:INTERNAL": "Ninja",
+      "GGML_CUDA:BOOL": "OFF",
+      "GGML_NATIVE:BOOL": "ON",
+      "GGML_OPENMP:BOOL": "ON",
+      "GGML_VULKAN:BOOL": "OFF",
+      "LLAMA_BUILD_SERVER:BOOL": "ON",
+      "LLAMA_CURL:UNINITIALIZED": "OFF"
+    },
+    "performed": true,
+    "source_commit": "217df17ac30ba2a8c374088772f81926cc5beee3"
+  },
+  "hypothesis": "ENG-CORE-001",
+  "hypothesis_status": "UNTESTED",
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model_bytes": 639446688,
+    "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "persistent_runtime": {
+      "bytes": 18535936,
+      "experimental_runtime": true,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "subprocess_runtime": {
+      "bytes": 5949440,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+      "sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+    }
+  },
+  "llama_source_tracked_clean": true,
+  "matrix_id": "matrix-20260821T091306Z-95bf26ce26",
+  "mode": "audit",
+  "network_scope": "127.0.0.1 only; dynamic local port",
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux native environment.",
+  "phase4e_valid": false,
+  "phase4ew_after": {
+    "exists": true,
+    "files": 22,
+    "sha256": "baf5863a00ab6895204caabd841a154c6b96f0ad42bd0fbd9b6c7596e11a8713"
+  },
+  "phase4ew_before": {
+    "exists": true,
+    "files": 22,
+    "sha256": "baf5863a00ab6895204caabd841a154c6b96f0ad42bd0fbd9b6c7596e11a8713"
+  },
+  "phase4ew_modified": false,
+  "phase4f_started": false,
+  "phase5_or_prefetch_started": false,
+  "platform": {
+    "logical_cpus": 12,
+    "machine": "AMD64",
+    "python": "3.14.3",
+    "release": "11",
+    "system": "Windows",
+    "version": "10.0.26200"
+  },
+  "run_id": "audit-20260821T091306Z-ae52daad80",
+  "schema_version": 1,
+  "standard_rag": "NOT_RUN",
+  "status": "PASS",
+  "timestamp_utc": "2026-08-21T09:13:06Z"
+}

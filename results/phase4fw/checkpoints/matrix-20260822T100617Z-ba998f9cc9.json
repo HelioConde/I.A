@@ -1,0 +1,160 @@
+{
+  "canonical": false,
+  "complete": true,
+  "completed": {
+    "dev_json_ascii::COMBINED_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\ablation\\run-20260822T100746Z-d700bac3cd.json",
+      "sha256": "d2ab6da4ef7d5454ac4fa428e40e18bde131d081c1db11b9ad0a409d7c43fdfa"
+    },
+    "dev_json_ascii::EXTRACTIVE_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100645Z-5bb9b189b5.json",
+      "sha256": "fdd7163e52f54b497f08355a5c4304ef24edaeb0b9980cdc69f9d04b53d313cb"
+    },
+    "dev_json_ascii::EXTRACTIVE_B768": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100904Z-e7a4667ef7.json",
+      "sha256": "2e08dda8ad8df954afa91262d0274a15a9a796c9450fdaa180cba020dd30c372"
+    },
+    "dev_json_ascii::ORACLE_EVAL": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\oracle\\run-20260822T100757Z-84ce3a80c6.json",
+      "sha256": "e2014ddb75bc065d381347851d462c2c921ad07af804be537613be9d620afa1c"
+    },
+    "dev_json_ascii::PRUNING_ONLY": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\overretrieval\\run-20260822T100855Z-910c31fd63.json",
+      "sha256": "93db4dc169860844f303f1579b07dc39bc6c276a78cd84aca4936865164de5da"
+    },
+    "dev_json_ascii::V0": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\baseline\\run-20260822T100842Z-20e4a7bbb1.json",
+      "sha256": "c1e003fe04b869e34586a1df700637ed3cd8c03e62971feb1f3ca080803265e9"
+    },
+    "dev_sql_params::COMBINED_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\ablation\\run-20260822T100650Z-5acae562a3.json",
+      "sha256": "78e13e7a74f44edf9983c69ae8bde0a81329132af478375e5f3533c65237960a"
+    },
+    "dev_sql_params::EXTRACTIVE_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100825Z-d60b5234a3.json",
+      "sha256": "4fbcccb5468bc424c7d9415da9bf1eca011113b3caf729f2f24a248a1f81a7fb"
+    },
+    "dev_sql_params::EXTRACTIVE_B768": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100701Z-bfc9d5c4ae.json",
+      "sha256": "7591c832718073e6e451ce192acd5c2f22394e02a79246a1c9433accc62be807"
+    },
+    "dev_sql_params::ORACLE_EVAL": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\oracle\\run-20260822T100753Z-e32227f35b.json",
+      "sha256": "5cb90d5273cc4d45257075242dade58516dc245d4ce23f1f4a499ec3644dbc47"
+    },
+    "dev_sql_params::PRUNING_ONLY": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\overretrieval\\run-20260822T100819Z-44a8d4a71f.json",
+      "sha256": "b25310d58d1024f93d427fbb4f9ccbdc851296f6e25639e0600552cdb3bf000d"
+    },
+    "dev_sql_params::V0": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\baseline\\run-20260822T100741Z-a6d366280f.json",
+      "sha256": "974f1284cdda0836b4c8f0889d497c43b95ca16dcd222ef37fbefd76fd2bd5ff"
+    },
+    "holdout_json_frames::COMBINED_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\ablation\\run-20260822T100752Z-8541e37ab3.json",
+      "sha256": "84799ef5d6f7b9df5a6a2226f0b6b1474b85e006020edeb575509c6681a07128"
+    },
+    "holdout_json_frames::EXTRACTIVE_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100639Z-7ad4ed7dbe.json",
+      "sha256": "05a8523e3848a973f983ec76a3ac4553b6226de25e787c20e69d734a9d7110be"
+    },
+    "holdout_json_frames::EXTRACTIVE_B768": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100810Z-b8fde6073d.json",
+      "sha256": "8182e0c2972780da17554dc9fc361cb146caf778a9102bf60e15b67d004a890c"
+    },
+    "holdout_json_frames::ORACLE_EVAL": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\oracle\\run-20260822T100759Z-2ddef196f7.json",
+      "sha256": "1d980e18b5f1e3e1d5c6b86d7935f8702fe811108293342c56a9f54d2150e297"
+    },
+    "holdout_json_frames::PRUNING_ONLY": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\overretrieval\\run-20260822T100914Z-21683b6687.json",
+      "sha256": "f8ea281acf433b5c331f976994b36eebc7d4dcb7bf73b3be929745d26deb4e04"
+    },
+    "holdout_json_frames::V0": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\baseline\\run-20260822T100721Z-ab6aa71f86.json",
+      "sha256": "8a71c1cba0414a4b869c9731fe55ecd1312b083c0e536819bda65ff3c0be328c"
+    },
+    "holdout_unknown_near::COMBINED_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\ablation\\run-20260822T100752Z-9d162d1284.json",
+      "sha256": "9b6670b1ffca03458b6704fe3ed6dcc43fc182f2c1fd0c24f7f1b4dd60af0dfa"
+    },
+    "holdout_unknown_near::EXTRACTIVE_B384": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100633Z-9c891bccaf.json",
+      "sha256": "87e476ba38e77e2b510e7131623cce697e7dec69a837faf7e33074f57ad13d5a"
+    },
+    "holdout_unknown_near::EXTRACTIVE_B768": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\budgets\\run-20260822T100844Z-2e725b7095.json",
+      "sha256": "8f2805fb383a30734111f48edafd55e5219f92f8bbddc3e91438477cc32b9637"
+    },
+    "holdout_unknown_near::ORACLE_EVAL": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\oracle\\run-20260822T100843Z-5b24ca3950.json",
+      "sha256": "79340457d9006b8b77be69f568c9633c27ae70473b19b78e04dc083ca5363417"
+    },
+    "holdout_unknown_near::PRUNING_ONLY": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\overretrieval\\run-20260822T100757Z-d057b5cd80.json",
+      "sha256": "6309b5f8611270bc17ea73e979f9cdec8b79c7e3aef53cbff50e539f53e749af"
+    },
+    "holdout_unknown_near::V0": {
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\baseline\\run-20260822T100844Z-33a7802eed.json",
+      "sha256": "9c0455ea7525a88c5987608f191e71afcc3fad418adb0693922461e70bf576e4"
+    }
+  },
+  "config_hash": "a80f2f9c7e7e5db0472d21930239403676467956cc7b432260bed1ba79be6520",
+  "configuration": {
+    "budgets": [
+      384,
+      768
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": true,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "experiment": "PHASE_4F_W",
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "matrix_id": "matrix-20260822T100617Z-ba998f9cc9",
+  "mode": "checkpoint",
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "quick": true,
+  "run_id": "matrix-20260822T100617Z-ba998f9cc9",
+  "schema_version": 1,
+  "summary": {
+    "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\results\\phase4fw\\summaries\\matrix-20260822T100617Z-ba998f9cc9.json",
+    "sha256": "1eaf335b3fa63c1831f51d2ce1865b62f26571968fa89b1541d4f858ba0e259a"
+  },
+  "timestamp_utc": "2026-08-22T10:06:18Z",
+  "updated_at_utc": "2026-08-22T10:09:14Z"
+}

@@ -1,0 +1,258 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 7254,
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 0.6725,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1814,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 9,
+        "record_id": "a23ef64e6ab99b7e5cf70644",
+        "section": "c abort rollback",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "sqlite-doc-3530400/c3ref/c_abort_rollback.html"
+      },
+      {
+        "page_id": 9,
+        "record_id": "7beea7ab14bd99427495aa87",
+        "section": "busy handler",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "sqlite-doc-3530400/c3ref/busy_handler.html"
+      },
+      {
+        "page_id": 9,
+        "record_id": "97513963f2bb867572d973f8",
+        "section": "busy handler",
+        "source_id": "sqlite-3.53.4-docs",
+        "title": "sqlite-doc-3530400/c3ref/busy_handler.html"
+      }
+    ],
+    "records_pruned": [
+      "af48c9abe99c8835b4cd8ed6",
+      "a2ab2aae207aa4c28b34122f",
+      "7c03eafd87a067c77e359d03",
+      "f516c7ac9199a3792c0af413",
+      "00596e4ad753b71a0bfe9ff9"
+    ],
+    "records_retained": [
+      "a23ef64e6ab99b7e5cf70644",
+      "7beea7ab14bd99427495aa87",
+      "97513963f2bb867572d973f8"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "a23ef64e6ab99b7e5cf70644",
+      "7beea7ab14bd99427495aa87",
+      "97513963f2bb867572d973f8"
+    ],
+    "text": "[SOURCE: a23ef64e6ab99b7e5cf70644] c abort rollback\n#define SQLITE_ERROR_MISSING_COLLSEQ (SQLITE_ERROR | (1<<8)) #define SQLITE_ERROR_RETRY (SQLITE_ERROR | (2<<8)) #define SQLITE_ERROR_SNAPSHOT (SQLITE_ERROR | (3<<8)) #define SQLITE_ERROR_RESERVESIZE (SQLITE_ERROR | (4<<8)) #define SQLITE_ERROR_KEY (SQLITE_ERROR | (5<<8)) #define SQLITE_ERROR_UNABLE (SQLITE_ERROR | (6<<8)) #define SQLITE_IOERR_READ (SQLITE_IOERR | (1<<8)) #define SQLITE_IOERR_SHORT_READ (SQLITE_IOERR | (2<<8)) #define SQLITE_IOERR_WRITE (SQLITE_IOERR | (3<<8)) #define SQLITE_IOERR_FSYNC (SQLITE_IOERR | (4<<8)) #define SQLITE_IOERR_DIR_FSYNC (SQLITE_IOERR | (5<<8)) #define SQLITE_IOERR_TRUNCATE (SQLITE_IOERR | (6<<8)) #define SQLITE_IOERR_FSTAT (SQLITE_IOERR | (7<<8)) #define SQLITE_IOERR_UNLOCK (SQLITE_IOERR | (8<<8)) #define SQLITE_IOERR_RDLOCK (SQLITE_IOERR | (9<<8)) #define SQLITE_IOERR_DELETE (SQLITE_IOERR | (10<<8)) #define SQLITE_IOERR_BLOCKED (SQLITE_IOERR | (11<<8)) #define SQLITE_IOERR_NOMEM (SQLITE_IOERR | (12<<8)) #define SQLITE_IOERR_ACCESS (SQLITE_IOERR | (13<<8)) #define SQLITE_IOERR_CHECKRESERVEDLOCK (SQLITE_IOERR | (14<<8)) #define SQLITE_IOERR_LOCK (SQLITE_IOERR | (15<<8)) #define SQLITE_IOERR_CLOSE (SQLITE_IOERR | (16<<8)) #define SQLITE_IOERR_DIR_CLOSE (SQLITE_IOERR | (17<<8)) #define SQLITE_IOERR_SHMOPEN (SQLITE_IOERR | (18<<8)) #define SQLITE_IOERR_SHMSIZE (SQLITE_IOERR | (19<<8)) #define SQLITE_IOERR_SHMLOCK (SQLITE_IOERR | (20<<8)) #define SQLITE_IOERR_SHMMAP (SQLITE_IOERR | (21<<8)) #define SQLITE_IOERR_SEEK (SQLITE_IOERR | (22<<8)) #define SQLITE_IOERR_DELETE_NOENT (SQLITE_IOERR | (23<<8)) #define SQLITE_IOERR_MMAP (SQLITE_IOERR | (24<<8)) #define SQLITE_IOERR_GETTEMPPATH (SQLITE_IOERR | (25<<8)) #define SQLITE_IOERR_CONVPATH (SQLITE_IOERR | (26<<8)) #define SQLITE_IOERR_VNODE (SQLITE_IOERR | (27<<8)) #define SQLITE_IOERR_AUTH (SQLITE_IOERR | (28<<8)) #define SQLITE_IOERR_BEGIN_ATOMIC (SQLITE_IOERR | (29<<8)) #define SQLITE_IOERR_COMMIT_ATOMIC (SQLITE_IOERR | (30<<8)) #define SQLITE_IOERR_ROLLBACK_ATOMIC (SQLITE_IOERR | (31<<8)) #define SQLITE_IOERR_DATA (SQLITE_IOERR | (32<<8)) #define SQLITE_IOERR_CORRUPTFS (SQLITE_IOERR | (33<<8)) #define SQLITE_IOERR_IN_PAGE (SQLITE_IOERR | (34<<8)) #define SQLITE_IOERR_BADKEY (SQLITE_IOERR | (35<<8)) #define SQLITE_IOERR_CODEC (SQLITE_IOERR | (36<<8)) #define SQLITE_LOCKED_SHAREDCACHE (SQLITE_LOCKED | (1<<8)) #define SQLITE_LOCKED_VTAB (SQLITE_LOCKED | (2<<8)) #define SQLITE_BUSY_RECOVERY (SQLITE_BUSY | (1<<8)) #define SQLITE_BUSY_SNAPSHOT (SQLITE_BUSY | (2<<8)) #define SQLITE_BUSY_TIMEOUT (SQLITE_BUSY | (3<<8)) #define SQLITE_CANTOPEN_NOTEMPDIR (SQLITE_CANTOPEN | (1<<8)) #define SQLITE_CANTOPEN_ISDIR (SQLITE_CANTOPEN | (2<<8)) #define SQLITE_CANTOPEN_FULLPATH (SQLITE_CANTOPEN | (3<<8)) #define SQLITE_CANTOPEN_CONVPATH (SQLITE_CANTOPEN | (4<<8)) #define SQLITE_CANTOPEN_DIRTYWAL (SQLITE_CANTOPEN | (5<<8)) /* Not Used */ #define SQLITE_CANTOPEN_SYMLINK (SQLITE_CANTOPEN | (6<<8)) #define SQLITE_CORRUPT_VTAB (SQLITE_CORRUPT | (1<<8)) #define SQLITE_CORRUPT_SEQUENCE (SQLITE_CORRUPT | (2<<8)) #define SQLITE_CORRUPT_INDEX (SQLITE_CORRUPT | (3<<8)) #define SQLITE_READONLY_RECOVERY (SQLITE_READONLY | (1<<8)) #define SQLITE_READONLY_CANTLOCK (SQLITE_READONLY | (2<<8)) #define SQLITE_READONLY_ROLLBACK (SQLITE_READONLY | (3<<8)) #define SQLITE_READONLY_DBMOVED (SQLITE_READONLY | (4<<8)) #define SQLITE_READONLY_CANTINIT (SQLITE_READONLY | (5<<8)) #define SQLITE_READONLY_DIRECTORY (SQLITE_READONLY | (6<<8)) #define SQLITE_ABORT_ROLLBACK (SQLITE_ABORT | (2<<8)) #define SQLITE_CONSTRAINT_CHECK (SQLITE_CONSTRAINT | (1<<8)) #define SQLITE_CONSTRAINT_COMMITHOOK (SQLITE_CONSTRAINT | (2<<8)) #define SQLITE_CONSTRAINT_FOREIGNKEY (SQLITE_CONSTRAINT | (3<<8)) #define SQLITE_CONSTRAINT_FUNCTION (SQLITE_CONSTRAINT | (4<<8)) #define SQLITE_CONSTRAINT_NOTNULL (SQLITE_CONSTRAINT | (5<<8)) #define SQLITE_CONSTRAINT_PRIMARYKEY (SQLITE_CONSTRAINT | (6<<8)) #define SQLITE_CONSTRAINT_TRIGGER (SQLITE_CONSTRAINT | (7<<8)) #define SQLITE_CONSTRAINT_UNIQUE (SQLITE_CONSTRAINT | (8<<8)) #define SQLITE_CONSTRAINT_VTAB (SQLITE_CONSTRAINT | (9<<8)) #define SQLITE_CONSTRAINT_ROWID (SQLITE_CONSTRAINT |(10<<8)) #define SQLITE_CONSTRAINT_PINNED (SQLITE_CONSTRAINT |(11<<8)) #define SQLITE_CONSTRAINT_DATATYPE (SQLITE_CONSTRAINT |(12<<8)) #define SQLITE_NOTICE_RECOVER_WAL (SQLITE_NOTICE | (1<<8)) #define SQLITE_NOTICE_RECOVER_ROLLBACK (SQLITE_NOTICE | (2<<8)) #define SQLITE_NOTICE_RBU (SQLITE_NOTICE | (3<<8)) #define SQLITE_WARNING_AUTOINDEX (SQLITE_WARNING | (1<<8)) #define SQLITE_AUTH_USER (SQLITE_AUTH | (1<<8)) #define SQLITE_OK_LOAD_PERMANENTLY (SQLITE_OK | (1<<8)) #define SQLITE_OK_SYMLINK (SQLITE_OK | (2<<8)) /* internal only */\n\n[SOURCE: 7beea7ab14bd99427495aa87] busy handler\nThe presence of a busy handler does not guarantee that it will be invoked when there is lock contention. If SQLite determines that invoking the busy handler could result in a deadlock, it will go ahead and return SQLITE_BUSY to the application instead of invoking the busy handler. Consider a scenario where one process is holding a read lock that it is trying to promote to a reserved lock and a second process is holding a reserved lock that it is trying to promote to an exclusive lock. The first process cannot proceed because it is blocked by the second and the second process cannot proceed because it is blocked by the first. If both processes invoke the busy handlers, neither will make any progress. Therefore, SQLite returns SQLITE_BUSY for the first process, hoping that this will induce the first process to release its read lock and allow the second process to proceed. There can only be a single busy handler defined for each database connection. Setting a new busy handler clears any previously set handler. Note that calling sqlite3_busy_timeout() or evaluating PRAGMA busy_timeout=N will change the busy handler and thus clear any previously set busy handler. The busy callback should not take any actions which modify the database connection that invoked the busy handler. In other words, the busy handler is not reentrant. Any such actions result in undefined behavior.\n\n[SOURCE: 97513963f2bb867572d973f8] busy handler\nThe sqlite3_busy_handler(D,X,P) routine sets a callback function X that might be invoked with argument P whenever an attempt is made to access a database table associated with database connection D when another thread or process has the table locked. The sqlite3_busy_handler() interface is used to implement sqlite3_busy_timeout() and PRAGMA busy_timeout. If the busy callback is NULL, then SQLITE_BUSY is returned immediately upon encountering the lock. If the busy callback is not NULL, then the callback might be invoked with two arguments. The first argument to the busy handler is a copy of the void* pointer which is the third argument to sqlite3_busy_handler(). The second argument to the busy handler callback is the number of times that the busy handler has been invoked previously for the same locking event. If the busy callback returns 0, then no additional attempts are made to access the database and SQLITE_BUSY is returned to the application. If the callback returns non-zero, then another attempt is made to access the database and the cycle repeats."
+  },
+  "context_metrics": {
+    "available_record_tokens": 4258,
+    "context_activation_rate": 0.4260216063879756,
+    "context_density": 0.03858875413450937,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 1814.0,
+    "useful_oracle_tokens": 70
+  },
+  "context_sha256": "a948fdd61947fb3609b0b8fd6e4b6b0e61d5323ae9909079158ce6802e15d155",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 2158,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 1,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        true
+      ],
+      "recall": 1.0,
+      "total": 1
+    },
+    "correctness": false,
+    "diagnostic": "RETRIEVAL_MISS",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 12775.133699993603,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 68.0,
+      "cpu_kernel_seconds": 1.5,
+      "cpu_percent_total_average": 398.1122718114916,
+      "cpu_percent_total_peak": 585.1603342804976,
+      "cpu_time_seconds": 50.859375,
+      "cpu_user_seconds": 49.359375,
+      "generated_tokens": 6,
+      "generation_eval_ms": 330.801,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 12775.133699993603,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621367296,
+      "private_bytes_min": 619536384,
+      "prompt_eval_ms": 12429.068,
+      "prompt_tokens": 2158,
+      "prompt_tokens_per_second": 173.62524688094072,
+      "queries_served": 68,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 67,
+      "system_available_ram_bytes_min": 3074019328,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 18.13779281199271,
+      "ttft_ms": 12443.262699991465,
+      "working_set_bytes_max": 1208299520,
+      "working_set_bytes_min": 1206472704,
+      "write_operations_delta": 24,
+      "write_transfer_bytes_delta": 930
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_busy_typo::V0",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 67,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1815,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 71,
+    "other_or_chat_envelope": 234,
+    "percent": {
+      "evidence": 84.10565338276182,
+      "instructions": 4.170528266913809,
+      "other_or_chat_envelope": 10.843373493975903,
+      "question": 0.8804448563484708
+    },
+    "question": 19,
+    "total": 2158
+  },
+  "prompt_sha256": "97235f95c88c4620df72f4048961c5c6adeb7937908200346d05c67e1e1b0901",
+  "query_spec": {
+    "category": "typo_noise",
+    "expected_record_ids": [
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "query": "sqllite is lokced -- wich C api changes the immediate SQLITE_BUSY behaviour?",
+    "query_id": "holdout_busy_typo",
+    "required_fact_groups": [
+      [
+        "sqlite3_busy_timeout",
+        "sqlite3_busy_handler"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      9,
+      10,
+      12,
+      13
+    ],
+    "record_bytes": 17015,
+    "records_retrieved": [
+      "af48c9abe99c8835b4cd8ed6",
+      "a2ab2aae207aa4c28b34122f",
+      "a23ef64e6ab99b7e5cf70644",
+      "7c03eafd87a067c77e359d03",
+      "f516c7ac9199a3792c0af413",
+      "7beea7ab14bd99427495aa87",
+      "00596e4ad753b71a0bfe9ff9",
+      "97513963f2bb867572d973f8"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102209Z-1bd23dcfd7",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:22:09Z",
+  "variant": "V0",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

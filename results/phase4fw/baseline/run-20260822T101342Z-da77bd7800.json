@@ -1,0 +1,288 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 8095,
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 0.4278,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 2026,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 1,
+        "record_id": "1698ac52a0f187de4a78f34d",
+        "section": "a-conceptual-overview-of-asyncio",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/howto/a-conceptual-overview-of-asyncio.txt"
+      },
+      {
+        "page_id": 1,
+        "record_id": "693c666d9a31431a1eeb0868",
+        "section": "a-conceptual-overview-of-asyncio",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/howto/a-conceptual-overview-of-asyncio.txt"
+      },
+      {
+        "page_id": 1,
+        "record_id": "706a262041baadcca089274e",
+        "section": "asyncio-dev",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-dev.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "c72c7a600a58acbbe5c14663",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-task.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "51f0e3fed62c12bb09a3582e",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-task.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "31bc7c14e6cb295c0fecb9ab",
+        "section": "asyncio-llapi-index",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-llapi-index.txt"
+      }
+    ],
+    "records_pruned": [
+      "31b2306d11480957f15ba104",
+      "5e32f7cf7f996d928bfe1fda"
+    ],
+    "records_retained": [
+      "1698ac52a0f187de4a78f34d",
+      "693c666d9a31431a1eeb0868",
+      "706a262041baadcca089274e",
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e",
+      "31bc7c14e6cb295c0fecb9ab"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "1698ac52a0f187de4a78f34d",
+      "693c666d9a31431a1eeb0868",
+      "706a262041baadcca089274e",
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e",
+      "31bc7c14e6cb295c0fecb9ab"
+    ],
+    "text": "[SOURCE: 1698ac52a0f187de4a78f34d] a-conceptual-overview-of-asyncio\nCreating a task automatically schedules it for execution (by adding a callback to run it in the event loop's to-do list, that is, collection of jobs). \"asyncio\" automatically associates tasks with the event loop for you. This automatic association was purposely designed into \"asyncio\" for the sake of simplicity. Without it, you'd have to keep track of the event loop object and pass it to any coroutine function that wants to create tasks, adding redundant clutter to your code. coroutine = loudmouth_penguin(magic_number=5) # This creates a Task object and schedules its execution via the event loop. task = asyncio.create_task(coroutine) Earlier, we manually created the event loop and set it to run forever. In practice, it's recommended to use (and common to see) \"asyncio.run()\", which takes care of managing the event loop and ensuring the provided coroutine finishes before advancing. For example, many async programs follow this setup: async def main(): # Perform all sorts of wacky, wild asynchronous things... ... if __name__ == \"__main__\": asyncio.run(main()) # The program will not reach the following print statement until the # coroutine main() finishes. print(\"coroutine main() is done!\")\n\n[SOURCE: 693c666d9a31431a1eeb0868] a-conceptual-overview-of-asyncio\n**Unlike tasks, awaiting a coroutine does not hand control back to the event loop!** Wrapping a coroutine in a task first, then awaiting that would cede control. The behavior of \"await coroutine\" is effectively the same as invoking a regular, synchronous Python function. Consider this program: async def coro_b(): print(\"I am coro_b(). I sure hope no one hogs the event loop...\") async def main(): task_b = asyncio.create_task(coro_b()) num_repeats = 3 for _ in range(num_repeats): await coro_a() await task_b The first statement in the coroutine \"main()\" creates \"task_b\" and schedules it for execution via the event loop. Then, \"coro_a()\" is repeatedly awaited. Control never cedes to the event loop, which is why we see the output of all three \"coro_a()\" invocations before \"coro_b()\"'s output: I am coro_a(). Hi! I am coro_a(). Hi! I am coro_a(). Hi! I am coro_b(). I sure hope no one hogs the event loop... If we change \"await coro_a()\" to \"await asyncio.create_task(coro_a())\", the behavior changes. The coroutine \"main()\" cedes control to the event loop with that statement. The event loop then proceeds through its backlog of work, calling \"task_b\" and then the task which wraps \"coro_a()\" before resuming the coroutine \"main()\". I am coro_b(). I sure hope no one hogs the event loop... I am coro_a(). Hi! I am coro_a(). Hi! I am coro_a(). Hi!\n\n[SOURCE: 706a262041baadcca089274e] asyncio-dev\nBlocking (CPU-bound) code should not be called directly. For example, if a function performs a CPU-intensive calculation for 1 second, all concurrent asyncio Tasks and IO operations would be delayed by 1 second. An executor can be used to run a task in a different thread, including in a different interpreter, or even in a different process to avoid blocking the OS thread with the event loop. See the \"loop.run_in_executor()\" method for more details. asyncio uses the \"logging\" module and all logging is performed via the \"\"asyncio\"\" logger. Network logging can block the event loop. It is recommended to use a separate thread for handling logs or use non-blocking IO. For example, see Dealing with handlers that block. When a coroutine function is called, but not awaited (e.g. \"coro()\" instead of \"await coro()\") or the coroutine is not scheduled with \"asyncio.create_task()\", asyncio will emit a \"RuntimeWarning\": test.py:7: RuntimeWarning: coroutine 'test' was never awaited Coroutine created at (most recent call last) File \"../t.py\", line 9, in <module> asyncio.run(main(), debug=True) The usual fix is to either await the coroutine or call the \"asyncio.create_task()\" function:\n\n[SOURCE: c72c7a600a58acbbe5c14663] asyncio-task\nWhen using this factory (via \"loop.set_task_factory(asyncio.eager_task_factory)\"), coroutines begin execution synchronously during \"Task\" construction. Tasks are only scheduled on the event loop if they block. This can be a performance improvement as the overhead of loop scheduling is avoided for coroutines that complete synchronously. A common example where this is beneficial is coroutines which employ caching or memoization to avoid actual I/O when possible. Immediate execution of the coroutine is a semantic change. If the coroutine returns or raises, the task is never scheduled to the event loop. If the coroutine execution blocks, the task is scheduled to the event loop. This change may introduce behavior changes to existing applications. For example, the application's task execution order is likely to change. Create an eager task factory, similar to \"eager_task_factory()\", using the provided *custom_task_constructor* when creating a new task instead of the default \"Task\". *custom_task_constructor* must be a *callable* with the signature matching the signature of \"Task.__init__\". The callable must return a \"asyncio.Task\"-compatible object. This function returns a *callable* intended to be used as a task factory of an event loop via \"loop.set_task_factory(factory)\").\n\n[SOURCE: 51f0e3fed62c12bb09a3582e] asyncio-task\n\"cancelled()\" can be used to check if the Task was cancelled. The method returns \"True\" if the wrapped coroutine did not suppress the \"CancelledError\" exception and was actually cancelled. \"asyncio.Task\" inherits from \"Future\" all of its APIs except \"Future.set_result()\" and \"Future.set_exception()\". An optional keyword-only *context* argument allows specifying a custom \"contextvars.Context\" for the *coro* to run in. If no *context* is provided, the Task copies the current context and later runs its coroutine in the copied context. An optional keyword-only *eager_start* argument allows eagerly starting the execution of the \"asyncio.Task\" at task creation time. If set to \"True\" and the event loop is running, the task will start executing the coroutine immediately, until the first time the coroutine blocks. If the coroutine returns or raises without blocking, the task will be finished eagerly and will skip scheduling to the event loop. Deprecated since version 3.10: Deprecation warning is emitted if *loop* is not specified and there is no running event loop. A Task is *done* when the wrapped coroutine either returned a value, raised an exception, or the Task was cancelled. If the Task is *done*, the result of the wrapped coroutine is returned (or if the coroutine raised an exception, that exception is re-raised.)\n\n[SOURCE: 31bc7c14e6cb295c0fecb9ab] asyncio-llapi-index\n+----------------------------------------------------+----------------------------------------------------+ | \"await\" \"loop.run_in_executor()\" | Run a CPU-bound or other blocking function in a | | | \"concurrent.futures\" executor. | +----------------------------------------------------+----------------------------------------------------+ | \"loop.set_default_executor()\" | Set the default executor for | | | \"loop.run_in_executor()\". | +----------------------------------------------------+----------------------------------------------------+ +----------------------------------------------------+----------------------------------------------------+ | \"loop.create_future()\" | Create a \"Future\" object. | +----------------------------------------------------+----------------------------------------------------+ | \"loop.create_task()\" | Schedule coroutine as a \"Task\". | +----------------------------------------------------+----------------------------------------------------+ | \"loop.set_task_factory()\" | Set a factory used by \"loop.create_task()\" to | | | create \"Tasks\". | +----------------------------------------------------+----------------------------------------------------+ | \"loop.get_task_factory()\" | Get the factory \"loop.create_task()\" uses to | | | create \"Tasks\". | +----------------------------------------------------+----------------------------------------------------+"
+  },
+  "context_metrics": {
+    "available_record_tokens": 2613,
+    "context_activation_rate": 0.7753539992345962,
+    "context_density": 0.04985192497532083,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 675.3333333333334,
+    "useful_oracle_tokens": 101
+  },
+  "context_sha256": "033466dfac99b6a7dfa56cc9e206d9a9950c5cea7c0a388e2d399caf21ae8e43",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1886,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "FALSE_NO_KNOWLEDGE",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 12385.245900019072,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 7.0,
+      "cpu_kernel_seconds": 1.96875,
+      "cpu_percent_total_average": 390.9641794025699,
+      "cpu_percent_total_peak": 527.7662626706647,
+      "cpu_time_seconds": 48.421875,
+      "cpu_user_seconds": 46.453125,
+      "generated_tokens": 6,
+      "generation_eval_ms": 341.58,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 12385.245900019072,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 620806144,
+      "private_bytes_min": 618975232,
+      "prompt_eval_ms": 12027.229,
+      "prompt_tokens": 1886,
+      "prompt_tokens_per_second": 156.8108497809429,
+      "queries_served": 7,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 6,
+      "system_available_ram_bytes_min": 3116302336,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 17.56543123133673,
+      "ttft_ms": 12042.538899986539,
+      "working_set_bytes_max": 1207119872,
+      "working_set_bytes_min": 1205293056,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 773
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_eager_paraphrase::V0",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 6,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 2027,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 164,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 107.4761399787911,
+      "instructions": 4.7720042417815485,
+      "other_or_chat_envelope": 0.0,
+      "question": 1.325556733828208
+    },
+    "question": 25,
+    "total": 1886
+  },
+  "prompt_sha256": "52001673a241b0a2d0ed09e532aa02044f6c57252a069b0ba8c28145768cd807",
+  "query_spec": {
+    "category": "paraphrase",
+    "expected_record_ids": [
+      "c72c7a600a58acbbe5c14663"
+    ],
+    "query": "Which asyncio task factory starts coroutine work immediately and schedules it only after blocking?",
+    "query_id": "holdout_eager_paraphrase",
+    "required_fact_groups": [
+      [
+        "eager_task_factory"
+      ],
+      [
+        "synchronously"
+      ],
+      [
+        "if they block",
+        "only scheduled"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      1,
+      2
+    ],
+    "record_bytes": 10439,
+    "records_retrieved": [
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e",
+      "1698ac52a0f187de4a78f34d",
+      "31bc7c14e6cb295c0fecb9ab",
+      "693c666d9a31431a1eeb0868",
+      "31b2306d11480957f15ba104",
+      "5e32f7cf7f996d928bfe1fda",
+      "706a262041baadcca089274e"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T101342Z-da77bd7800",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:13:42Z",
+  "variant": "V0",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

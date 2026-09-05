@@ -1,0 +1,259 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 68,
+    "context_fact_recall": 1.0,
+    "covered_fact_groups": [
+      0,
+      1,
+      2
+    ],
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 3646.3104,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 17,
+    "evaluation_only": true,
+    "metadata_bytes": 0,
+    "oracle_runtime_allowed": false,
+    "oracle_wall_ms": 3646.3104,
+    "provenance": [
+      {
+        "end": 21,
+        "kind": "sentence",
+        "page_id": 11,
+        "position": 0,
+        "record_id": "1e5c2dfc2e51ad3485a37333",
+        "section": "faq",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "SQLite is threadsafe.",
+        "title": "faq"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "1e5c2dfc2e51ad3485a37333"
+    ],
+    "required_fact_groups": 3,
+    "sentences_retained": 1,
+    "source_ids": [
+      "1e5c2dfc2e51ad3485a37333"
+    ],
+    "text": "[SOURCE: 1e5c2dfc2e51ad3485a37333] faq — faq\nSQLite is threadsafe."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2463,
+    "context_activation_rate": 0.006902151847340642,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 5.666666666666667,
+    "useful_oracle_tokens": 17
+  },
+  "context_sha256": "db44d8ba8effad119756dc2d066cd93aaa645ebfa483752227071ffb644d1599",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 140,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 0,
+      "matched": [
+        false,
+        false,
+        false
+      ],
+      "recall": 0.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "CONTEXT_DISTILLATION_MISS",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 783.6601000162773,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 81.0,
+      "cpu_kernel_seconds": 0.171875,
+      "cpu_percent_total_average": 398.76982379670613,
+      "cpu_percent_total_peak": 491.69623441617307,
+      "cpu_time_seconds": 3.125,
+      "cpu_user_seconds": 2.953125,
+      "generated_tokens": 6,
+      "generation_eval_ms": 143.275,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 783.6601000162773,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621395968,
+      "private_bytes_min": 619565056,
+      "prompt_eval_ms": 628.144,
+      "prompt_tokens": 140,
+      "prompt_tokens_per_second": 222.8788303318984,
+      "queries_served": 81,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 80,
+      "system_available_ram_bytes_min": 3427282944,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 41.87750828825685,
+      "ttft_ms": 639.3914999789558,
+      "working_set_bytes_max": 993677312,
+      "working_set_bytes_min": 991850496,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_thread_modes::ORACLE_EVAL",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 80,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 17,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 11,
+    "other_or_chat_envelope": 14,
+    "percent": {
+      "evidence": 12.142857142857142,
+      "instructions": 64.28571428571429,
+      "other_or_chat_envelope": 10.0,
+      "question": 13.571428571428571
+    },
+    "question": 19,
+    "total": 140
+  },
+  "prompt_sha256": "d98e52e557a087014e4164a4e3f76b3c72401d1138f3689f5e01e9d71b4d54d8",
+  "query_spec": {
+    "category": "multi_domain",
+    "expected_record_ids": [
+      "9123361d84e174851100ff2e"
+    ],
+    "query": "Map SQLITE_THREADSAFE values zero, one, and two to SQLite threading modes.",
+    "query_id": "holdout_thread_modes",
+    "required_fact_groups": [
+      [
+        "threadsafe=0",
+        "single-thread"
+      ],
+      [
+        "threadsafe=1",
+        "serialized"
+      ],
+      [
+        "threadsafe=2",
+        "multi-thread"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 3145728,
+    "active_pages": [
+      9,
+      10,
+      14
+    ],
+    "record_bytes": 9837,
+    "records_retrieved": [
+      "9123361d84e174851100ff2e",
+      "9df5eed704858ddff8cccd35",
+      "d660299e870f9680794da980",
+      "0ee4b1f6bcaf0d64344a3c93",
+      "fa1005bf9482a80e4da6ebde",
+      "775dfe0170d7c7b1f2f43edf",
+      "8556aee9b6e030630899d952",
+      "59e50001967c30e2b0a4ffc5"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102342Z-0a981ec24a",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:23:42Z",
+  "variant": "ORACLE_EVAL",
+  "variant_metadata": {
+    "evaluation_only": true,
+    "pruning": null
+  }
+}

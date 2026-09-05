@@ -1,0 +1,589 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4588,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 12.014299999999999,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1145,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 966,
+        "estimated_tokens": 81,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 4,
+        "record_id": "367d8201386fc06e850afecb",
+        "score": 0.4950285731819596,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 697,
+        "text": "Notice that \"?\" placeholders are used to bind \"data\" to the query. Always use placeholders instead of string formatting to bind Python values to SQL statements, to avoid SQL injection attacks (see How to use placeholders to bind values in SQL queries for more details).",
+        "title": "sqlite3"
+      },
+      {
+        "end": 240,
+        "estimated_tokens": 73,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 0,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.4368212158664222,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "* **parameters** (\"dict\" | *sequence*) -- Python values to bind to placeholders in *sql*. A \"dict\" if named placeholders are used. A *sequence* if unnamed placeholders are used. See How to use placeholders to bind values in SQL queries.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 410,
+        "estimated_tokens": 55,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 1,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.4243212158664222,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 242,
+        "text": "Raises: **ProgrammingError** -- When *sql* contains more than one SQL statement. When named placeholders are used and *parameters* is a sequence instead of a \"dict\".",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1295,
+        "estimated_tokens": 65,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 6,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.41539264443785073,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 1088,
+        "text": "Raises: **ProgrammingError** -- When *sql* contains more than one SQL statement or is not a DML statement, When named placeholders are used and the items in *parameters* are sequences instead of \"dict\"s.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 797,
+        "estimated_tokens": 48,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 3,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.3580712158664222,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 658,
+        "text": "Changed in version 3.14: \"ProgrammingError\" is emitted if named placeholders are used and *parameters* is a sequence instead of a \"dict\".",
+        "title": "sqlite3"
+      },
+      {
+        "end": 923,
+        "estimated_tokens": 45,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 4,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.35682121586642224,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 799,
+        "text": "For every item in *parameters*, repeatedly execute the parameterized DML (Data Manipulation Language) SQL statement *sql*.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1086,
+        "estimated_tokens": 54,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 5,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.3559878825330889,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 925,
+        "text": "* **parameters** (*iterable*) -- An *iterable* of parameters to bind with the placeholders in *sql*. See How to use placeholders to bind values in SQL queries.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 747,
+        "estimated_tokens": 93,
+        "kind": "paragraph",
+        "page_id": 7,
+        "position": 1,
+        "record_id": "eee646b530126e63f5437e2a",
+        "score": 0.34447627123649677,
+        "section": "2.0",
+        "source_id": "python-3.14.7-docs",
+        "start": 425,
+        "text": "The \"-X\" command-line option, which turned all standard exceptions into strings instead of classes, has been removed; the standard exceptions will now always be classes. The \"exceptions\" module containing the standard exceptions was translated from Python to a built-in C module, written by Barry Warsaw and Fredrik Lundh.",
+        "title": "2.0"
+      },
+      {
+        "end": 695,
+        "estimated_tokens": 88,
+        "kind": "code_block",
+        "page_id": 4,
+        "position": 3,
+        "record_id": "367d8201386fc06e850afecb",
+        "score": 0.3162785731819595,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 394,
+        "text": "data = [ (\"Monty Python Live at the Hollywood Bowl\", 1982, 7.9), (\"Monty Python's The Meaning of Life\", 1983, 7.5), (\"Monty Python's Life of Brian\", 1979, 8.0), ] cur.executemany(\"INSERT INTO movie VALUES(?, ?, ?)\", data) con.commit() # Remember to commit the transaction after executing INSERT.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 656,
+        "estimated_tokens": 74,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 2,
+        "record_id": "801c3ac239e928d776230cf8",
+        "score": 0.30015454919975554,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 412,
+        "text": "If \"autocommit\" is \"LEGACY_TRANSACTION_CONTROL\", \"isolation_level\" is not \"None\", *sql* is an \"INSERT\", \"UPDATE\", \"DELETE\", or \"REPLACE\" statement, and there is no open transaction, a transaction is implicitly opened before executing *sql*.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 423,
+        "estimated_tokens": 118,
+        "kind": "code_block",
+        "page_id": 7,
+        "position": 0,
+        "record_id": "eee646b530126e63f5437e2a",
+        "score": 0.2969762712364968,
+        "section": "2.0",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "Taking the \"repr()\" of a float now uses a different formatting precision than \"str()\". \"repr()\" uses \"%.17g\" format string for C's \"sprintf()\", while \"str()\" uses \"%.12g\" as before. The effect is that \"repr()\" may occasionally show more decimal places than \"str()\", for certain numbers. For example, the number 8.1 can't be represented exactly in binary, so \"repr(8.1)\" is \"'8.0999999999999996'\", while str(8.1) is \"'8.1'\".",
+        "title": "2.0"
+      },
+      {
+        "end": 990,
+        "estimated_tokens": 72,
+        "kind": "paragraph",
+        "page_id": 7,
+        "position": 2,
+        "record_id": "eee646b530126e63f5437e2a",
+        "score": 0.2803096045698301,
+        "section": "2.0",
+        "source_id": "python-3.14.7-docs",
+        "start": 749,
+        "text": "Some of the changes are under the covers, and will only be apparent to people writing C extension modules or embedding a Python interpreter in a larger application. If you aren't dealing with Python's C API, you can safely skip this section.",
+        "title": "2.0"
+      },
+      {
+        "end": 296,
+        "estimated_tokens": 35,
+        "kind": "code_block",
+        "page_id": 4,
+        "position": 1,
+        "record_id": "367d8201386fc06e850afecb",
+        "score": 0.2625285731819596,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 210,
+        "text": ">>> res = cur.execute(\"SELECT score FROM movie\") >>> res.fetchall() [(8.2,), (7.5,)]",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1320,
+        "estimated_tokens": 94,
+        "kind": "paragraph",
+        "page_id": 7,
+        "position": 3,
+        "record_id": "eee646b530126e63f5437e2a",
+        "score": 0.21822627123649677,
+        "section": "2.0",
+        "source_id": "python-3.14.7-docs",
+        "start": 992,
+        "text": "The version number of the Python C API was incremented, so C extensions compiled for 1.5.2 must be recompiled in order to work with 2.0. On Windows, it's not possible for Python 2.0 to import a third party extension built for Python 1.5.x due to how Windows DLLs work, so Python will raise an exception and the import will fail.",
+        "title": "2.0"
+      },
+      {
+        "end": 208,
+        "estimated_tokens": 66,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 0,
+        "record_id": "367d8201386fc06e850afecb",
+        "score": 0.21502857318195956,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "We can verify that the data was inserted correctly by executing a \"SELECT\" query. Use the now-familiar \"cur.execute(...)\" to assign the result to \"res\", and call \"res.fetchall()\" to return all resulting rows:",
+        "title": "sqlite3"
+      },
+      {
+        "end": 392,
+        "estimated_tokens": 38,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 2,
+        "record_id": "367d8201386fc06e850afecb",
+        "score": 0.1983619065152929,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 298,
+        "text": "The result is a \"list\" of two \"tuple\"s, one per row, each containing that row's \"score\" value.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1095,
+        "estimated_tokens": 46,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 5,
+        "record_id": "367d8201386fc06e850afecb",
+        "score": 0.19419523984862624,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 968,
+        "text": "We can verify that the new rows were inserted by executing a \"SELECT\" query, this time iterating over the results of the query:",
+        "title": "sqlite3"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "367d8201386fc06e850afecb",
+      "801c3ac239e928d776230cf8",
+      "eee646b530126e63f5437e2a"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 17,
+    "source_ids": [
+      "367d8201386fc06e850afecb",
+      "801c3ac239e928d776230cf8",
+      "eee646b530126e63f5437e2a"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 367d8201386fc06e850afecb] sqlite3 — sqlite3\nNotice that \"?\" placeholders are used to bind \"data\" to the query. Always use placeholders instead of string formatting to bind Python values to SQL statements, to avoid SQL injection attacks (see How to use placeholders to bind values in SQL queries for more details).\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\n* **parameters** (\"dict\" | *sequence*) -- Python values to bind to placeholders in *sql*. A \"dict\" if named placeholders are used. A *sequence* if unnamed placeholders are used. See How to use placeholders to bind values in SQL queries.\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\nRaises: **ProgrammingError** -- When *sql* contains more than one SQL statement. When named placeholders are used and *parameters* is a sequence instead of a \"dict\".\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\nRaises: **ProgrammingError** -- When *sql* contains more than one SQL statement or is not a DML statement, When named placeholders are used and the items in *parameters* are sequences instead of \"dict\"s.\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\nChanged in version 3.14: \"ProgrammingError\" is emitted if named placeholders are used and *parameters* is a sequence instead of a \"dict\".\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\nFor every item in *parameters*, repeatedly execute the parameterized DML (Data Manipulation Language) SQL statement *sql*.\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\n* **parameters** (*iterable*) -- An *iterable* of parameters to bind with the placeholders in *sql*. See How to use placeholders to bind values in SQL queries.\n\n[SOURCE: eee646b530126e63f5437e2a] 2.0 — 2.0\nThe \"-X\" command-line option, which turned all standard exceptions into strings instead of classes, has been removed; the standard exceptions will now always be classes. The \"exceptions\" module containing the standard exceptions was translated from Python to a built-in C module, written by Barry Warsaw and Fredrik Lundh.\n\n[SOURCE: 367d8201386fc06e850afecb] sqlite3 — sqlite3\ndata = [ (\"Monty Python Live at the Hollywood Bowl\", 1982, 7.9), (\"Monty Python's The Meaning of Life\", 1983, 7.5), (\"Monty Python's Life of Brian\", 1979, 8.0), ] cur.executemany(\"INSERT INTO movie VALUES(?, ?, ?)\", data) con.commit() # Remember to commit the transaction after executing INSERT.\n\n[SOURCE: 801c3ac239e928d776230cf8] sqlite3 — sqlite3\nIf \"autocommit\" is \"LEGACY_TRANSACTION_CONTROL\", \"isolation_level\" is not \"None\", *sql* is an \"INSERT\", \"UPDATE\", \"DELETE\", or \"REPLACE\" statement, and there is no open transaction, a transaction is implicitly opened before executing *sql*.\n\n[SOURCE: eee646b530126e63f5437e2a] 2.0 — 2.0\nTaking the \"repr()\" of a float now uses a different formatting precision than \"str()\". \"repr()\" uses \"%.17g\" format string for C's \"sprintf()\", while \"str()\" uses \"%.12g\" as before. The effect is that \"repr()\" may occasionally show more decimal places than \"str()\", for certain numbers. For example, the number 8.1 can't be represented exactly in binary, so \"repr(8.1)\" is \"'8.0999999999999996'\", while str(8.1) is \"'8.1'\".\n\n[SOURCE: eee646b530126e63f5437e2a] 2.0 — 2.0\nSome of the changes are under the covers, and will only be apparent to people writing C extension modules or embedding a Python interpreter in a larger application. If you aren't dealing with Python's C API, you can safely skip this section.\n\n[SOURCE: 367d8201386fc06e850afecb] sqlite3 — sqlite3\n>>> res = cur.execute(\"SELECT score FROM movie\") >>> res.fetchall() [(8.2,), (7.5,)]\n\n[SOURCE: eee646b530126e63f5437e2a] 2.0 — 2.0\nThe version number of the Python C API was incremented, so C extensions compiled for 1.5.2 must be recompiled in order to work with 2.0. On Windows, it's not possible for Python 2.0 to import a third party extension built for Python 1.5.x due to how Windows DLLs work, so Python will raise an exception and the import will fail.\n\n[SOURCE: 367d8201386fc06e850afecb] sqlite3 — sqlite3\nWe can verify that the data was inserted correctly by executing a \"SELECT\" query. Use the now-familiar \"cur.execute(...)\" to assign the result to \"res\", and call \"res.fetchall()\" to return all resulting rows:\n\n[SOURCE: 367d8201386fc06e850afecb] sqlite3 — sqlite3\nThe result is a \"list\" of two \"tuple\"s, one per row, each containing that row's \"score\" value.\n\n[SOURCE: 367d8201386fc06e850afecb] sqlite3 — sqlite3\nWe can verify that the new rows were inserted by executing a \"SELECT\" query, this time iterating over the results of the query:"
+  },
+  "context_metrics": {
+    "available_record_tokens": 2550,
+    "context_activation_rate": 0.44901960784313727,
+    "context_density": 0.04279475982532751,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 572.5,
+    "useful_oracle_tokens": 49
+  },
+  "context_sha256": "da3ea3f87798a411a43a7172da9d86632e475d9e7b3bc005212cc5ecf7281105",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1564,
+    "answer_quality": {
+      "cited_source_ids": [
+        "367d8201386fc06e850afecb"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.5,
+      "required_facts_found": 1,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The variables should be bound using placeholders instead of string formatting to avoid SQL injection attacks. \n\n[SOURCE: 367d8201386fc06e850afecb]",
+    "metrics": {
+      "backend_total_ms": 11167.88969998015,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 128.0,
+      "cpu_kernel_seconds": 2.046875,
+      "cpu_percent_total_average": 399.30328108522826,
+      "cpu_percent_total_peak": 587.4538649613088,
+      "cpu_time_seconds": 44.59375,
+      "cpu_user_seconds": 42.546875,
+      "generated_tokens": 45,
+      "generation_eval_ms": 2483.092,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 11167.88969998015,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621436928,
+      "private_bytes_min": 619606016,
+      "prompt_eval_ms": 8670.464,
+      "prompt_tokens": 1564,
+      "prompt_tokens_per_second": 180.3825031739939,
+      "queries_served": 128,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 127,
+      "system_available_ram_bytes_min": 3383918592,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 18.122566542037106,
+      "ttft_ms": 8683.705099974759,
+      "working_set_bytes_max": 993775616,
+      "working_set_bytes_min": 991948800,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 787
+    },
+    "output_sha256": "1271125a42bb7266faf40261585436207041ad28fc9f2e4829455a4a8e24389e",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_sql_params::COMBINED_B1536",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 127,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1147,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 213,
+    "other_or_chat_envelope": 302,
+    "percent": {
+      "evidence": 73.33759590792839,
+      "instructions": 5.754475703324808,
+      "other_or_chat_envelope": 19.309462915601024,
+      "question": 1.5984654731457801
+    },
+    "question": 25,
+    "total": 1564
+  },
+  "prompt_sha256": "2e8221015fda493178dad272851272aacac3edffd08cc5303bff21f878e19c66",
+  "query_spec": {
+    "category": "procedure",
+    "expected_record_ids": [
+      "0be5e11beaf36611325a42aa"
+    ],
+    "query": "How should variables be bound safely in Python sqlite3 execute instead of formatting SQL strings?",
+    "query_id": "dev_sql_params",
+    "required_fact_groups": [
+      [
+        "placeholder",
+        "parameter substitution"
+      ],
+      [
+        "tuple",
+        "dict",
+        "sequence"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      4,
+      7,
+      11,
+      13
+    ],
+    "record_bytes": 10191,
+    "records_retrieved": [
+      "801c3ac239e928d776230cf8",
+      "367d8201386fc06e850afecb",
+      "0fc79bc49ca725b41bb16b29",
+      "0be5e11beaf36611325a42aa",
+      "d7b9a4e28a517bf936a40571",
+      "812bf462a398609855d5300a",
+      "79991b001c7de5c74daed0b6",
+      "eee646b530126e63f5437e2a"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102809Z-3c39ab8634",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:28:09Z",
+  "variant": "COMBINED_B1536",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "execute",
+            "instead",
+            "parameter",
+            "python",
+            "sql"
+          ],
+          "record_id": "801c3ac239e928d776230cf8",
+          "score": 0.9242550661100926
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "formatting",
+            "instead",
+            "parameter",
+            "python",
+            "sql"
+          ],
+          "record_id": "367d8201386fc06e850afecb",
+          "score": 0.7501190549248316
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "execute",
+            "instead",
+            "parameter",
+            "python",
+            "sql",
+            "variables"
+          ],
+          "record_id": "0fc79bc49ca725b41bb16b29",
+          "score": 0.733187321610577
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "execute",
+            "instead",
+            "parameter",
+            "python",
+            "sql"
+          ],
+          "record_id": "0be5e11beaf36611325a42aa",
+          "score": 0.6785964687670789
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "execute",
+            "sql",
+            "sqlite3",
+            "variables"
+          ],
+          "record_id": "d7b9a4e28a517bf936a40571",
+          "score": 0.7235817555140044
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "execute",
+            "parameter",
+            "python",
+            "sql"
+          ],
+          "record_id": "812bf462a398609855d5300a",
+          "score": 0.6763586667199047
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "parameter",
+            "sql",
+            "sqlite3"
+          ],
+          "record_id": "79991b001c7de5c74daed0b6",
+          "score": 0.7228163295672478
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "formatting",
+            "instead",
+            "python",
+            "safely",
+            "strings"
+          ],
+          "record_id": "eee646b530126e63f5437e2a",
+          "score": 0.6332344634854032
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "0fc79bc49ca725b41bb16b29",
+        "0be5e11beaf36611325a42aa",
+        "d7b9a4e28a517bf936a40571",
+        "812bf462a398609855d5300a",
+        "79991b001c7de5c74daed0b6"
+      ],
+      "retained_record_ids": [
+        "801c3ac239e928d776230cf8",
+        "367d8201386fc06e850afecb",
+        "eee646b530126e63f5437e2a"
+      ],
+      "wall_ms": 1.6207
+    }
+  }
+}

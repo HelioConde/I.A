@@ -1,0 +1,324 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 1455,
+    "distiller_cpu_ms": 31.25,
+    "distiller_wall_ms": 28.3145,
+    "duplicate_tokens_removed": 59,
+    "estimated_tokens": 365,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 330,
+        "estimated_tokens": 54,
+        "kind": "sentence",
+        "page_id": 13,
+        "position": 1,
+        "record_id": "af48c9abe99c8835b4cd8ed6",
+        "score": 0.4436947723376021,
+        "section": "rescode",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 172,
+        "text": "To avoid encountering SQLITE_BUSY errors in the middle of a transaction, the application can use BEGIN IMMEDIATE instead of just BEGIN to start a transaction.",
+        "title": "rescode"
+      },
+      {
+        "end": 533,
+        "estimated_tokens": 65,
+        "kind": "sentence",
+        "page_id": 13,
+        "position": 2,
+        "record_id": "af48c9abe99c8835b4cd8ed6",
+        "score": 0.4395281056709354,
+        "section": "rescode",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 330,
+        "text": "The BEGIN IMMEDIATE command might itself return SQLITE_BUSY, but if it succeeds, then SQLite guarantees that no subsequent operations on the same database through the next COMMIT will return SQLITE_BUSY.",
+        "title": "rescode"
+      },
+      {
+        "end": 1272,
+        "estimated_tokens": 49,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 7,
+        "record_id": "7c03eafd87a067c77e359d03",
+        "score": 0.40123901478419793,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1138,
+        "text": "If the BEGIN IMMEDIATE operation succeeds, then no subsequent operations in that transaction will ever fail with an SQLITE_BUSY error.",
+        "title": "isolation"
+      },
+      {
+        "end": 172,
+        "estimated_tokens": 57,
+        "kind": "sentence",
+        "page_id": 13,
+        "position": 0,
+        "record_id": "af48c9abe99c8835b4cd8ed6",
+        "score": 0.39619477233760214,
+        "section": "rescode",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "An SQLITE_BUSY error can occur at any point in a transaction: when the transaction is first started, during any write or update operations, or when the transaction commits.",
+        "title": "rescode"
+      },
+      {
+        "end": 1019,
+        "estimated_tokens": 79,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 6,
+        "record_id": "f516c7ac9199a3792c0af413",
+        "score": 0.39552717434602674,
+        "section": "lang transaction",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 779,
+        "text": "IMMEDIATE causes the database connection to start a new write immediately, without waiting for a write statement. The BEGIN IMMEDIATE might fail with SQLITE_BUSY if another write transaction is already active on another database connection.",
+        "title": "lang transaction"
+      },
+      {
+        "end": 280,
+        "estimated_tokens": 61,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 1,
+        "record_id": "7beea7ab14bd99427495aa87",
+        "score": 0.35027079093375496,
+        "section": "busy handler",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 104,
+        "text": "If SQLite determines that invoking the busy handler could result in a deadlock, it will go ahead and return SQLITE_BUSY to the application instead of invoking the busy handler.",
+        "title": "busy handler"
+      }
+    ],
+    "records_pruned": [
+      "a2ab2aae207aa4c28b34122f",
+      "a23ef64e6ab99b7e5cf70644",
+      "00596e4ad753b71a0bfe9ff9",
+      "97513963f2bb867572d973f8"
+    ],
+    "records_retained": [
+      "af48c9abe99c8835b4cd8ed6",
+      "7c03eafd87a067c77e359d03",
+      "f516c7ac9199a3792c0af413",
+      "7beea7ab14bd99427495aa87"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 6,
+    "source_ids": [
+      "af48c9abe99c8835b4cd8ed6",
+      "7c03eafd87a067c77e359d03",
+      "f516c7ac9199a3792c0af413",
+      "7beea7ab14bd99427495aa87"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: af48c9abe99c8835b4cd8ed6] rescode — rescode\nTo avoid encountering SQLITE_BUSY errors in the middle of a transaction, the application can use BEGIN IMMEDIATE instead of just BEGIN to start a transaction.\n\n[SOURCE: af48c9abe99c8835b4cd8ed6] rescode — rescode\nThe BEGIN IMMEDIATE command might itself return SQLITE_BUSY, but if it succeeds, then SQLite guarantees that no subsequent operations on the same database through the next COMMIT will return SQLITE_BUSY.\n\n[SOURCE: 7c03eafd87a067c77e359d03] isolation — isolation\nIf the BEGIN IMMEDIATE operation succeeds, then no subsequent operations in that transaction will ever fail with an SQLITE_BUSY error.\n\n[SOURCE: af48c9abe99c8835b4cd8ed6] rescode — rescode\nAn SQLITE_BUSY error can occur at any point in a transaction: when the transaction is first started, during any write or update operations, or when the transaction commits.\n\n[SOURCE: f516c7ac9199a3792c0af413] lang transaction — lang transaction\nIMMEDIATE causes the database connection to start a new write immediately, without waiting for a write statement. The BEGIN IMMEDIATE might fail with SQLITE_BUSY if another write transaction is already active on another database connection.\n\n[SOURCE: 7beea7ab14bd99427495aa87] busy handler — busy handler\nIf SQLite determines that invoking the busy handler could result in a deadlock, it will go ahead and return SQLITE_BUSY to the application instead of invoking the busy handler."
+  },
+  "context_metrics": {
+    "available_record_tokens": 4258,
+    "context_activation_rate": 0.08572099577266322,
+    "context_density": 0.1917808219178082,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 365.0,
+    "useful_oracle_tokens": 70
+  },
+  "context_sha256": "c0316da0ebfbb92d6a482561b1b314a86f41aaab01be9f65248be829158ce146",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 479,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 1,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 0,
+      "matched": [
+        false
+      ],
+      "recall": 0.0,
+      "total": 1
+    },
+    "correctness": false,
+    "diagnostic": "RETRIEVAL_MISS",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 2688.269400037825,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 42.0,
+      "cpu_kernel_seconds": 0.5625,
+      "cpu_percent_total_average": 390.5858542247388,
+      "cpu_percent_total_peak": 598.7125288113025,
+      "cpu_time_seconds": 10.5,
+      "cpu_user_seconds": 9.9375,
+      "generated_tokens": 6,
+      "generation_eval_ms": 190.421,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 2688.269400037825,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621178880,
+      "private_bytes_min": 619347968,
+      "prompt_eval_ms": 2483.557,
+      "prompt_tokens": 479,
+      "prompt_tokens_per_second": 192.86853492792798,
+      "queries_served": 42,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 41,
+      "system_available_ram_bytes_min": 3109720064,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 31.50912977035096,
+      "ttft_ms": 2497.22349998774,
+      "working_set_bytes_max": 1208107008,
+      "working_set_bytes_min": 1206280192,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 822
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_busy_typo::EXTRACTIVE_B384",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 41,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 364,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 85,
+    "other_or_chat_envelope": 6,
+    "percent": {
+      "evidence": 75.99164926931107,
+      "instructions": 18.789144050104383,
+      "other_or_chat_envelope": 1.2526096033402923,
+      "question": 3.9665970772442587
+    },
+    "question": 19,
+    "total": 479
+  },
+  "prompt_sha256": "0ea78a716c420927e72c8ad0fb0b50a9fd2dacf8ca4f1767cef4d0c73538b3b0",
+  "query_spec": {
+    "category": "typo_noise",
+    "expected_record_ids": [
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "query": "sqllite is lokced -- wich C api changes the immediate SQLITE_BUSY behaviour?",
+    "query_id": "holdout_busy_typo",
+    "required_fact_groups": [
+      [
+        "sqlite3_busy_timeout",
+        "sqlite3_busy_handler"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      9,
+      10,
+      12,
+      13
+    ],
+    "record_bytes": 17015,
+    "records_retrieved": [
+      "af48c9abe99c8835b4cd8ed6",
+      "a2ab2aae207aa4c28b34122f",
+      "a23ef64e6ab99b7e5cf70644",
+      "7c03eafd87a067c77e359d03",
+      "f516c7ac9199a3792c0af413",
+      "7beea7ab14bd99427495aa87",
+      "00596e4ad753b71a0bfe9ff9",
+      "97513963f2bb867572d973f8"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T101815Z-088a301f06",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:18:15Z",
+  "variant": "EXTRACTIVE_B384",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

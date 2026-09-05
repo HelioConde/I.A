@@ -1,0 +1,594 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 5066,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 14.2735,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1264,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 1383,
+        "estimated_tokens": 257,
+        "kind": "code_block",
+        "page_id": 14,
+        "position": 3,
+        "record_id": "410994326670080c3fb5f32f",
+        "score": 0.8628480826492569,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 401,
+        "text": "By default, SQLite will automatically checkpoint whenever a COMMIT occurs that causes the WAL file to be 1000 pages or more in size, or when the last database connection on a database file closes. The default configuration is intended to work well for most applications. But programs that want more control can force a checkpoint using the wal_checkpoint pragma or by calling the sqlite3_wal_checkpoint() C interface. The automatic checkpoint threshold can be changed or automatic checkpointing can be completely disabled using the wal_autocheckpoint pragma or by calling the sqlite3_wal_autocheckpoint() C interface. A program can also use sqlite3_wal_hook() to register a callback to be invoked whenever any transaction commits to the WAL. This callback can then invoke sqlite3_wal_checkpoint() or sqlite3_wal_checkpoint_v2() based on whatever criteria it thinks is appropriate. (The automatic checkpoint mechanism is implemented as a simple wrapper around sqlite3_wal_hook().)",
+        "title": "wal"
+      },
+      {
+        "end": 283,
+        "estimated_tokens": 89,
+        "kind": "paragraph",
+        "page_id": 9,
+        "position": 0,
+        "record_id": "73fe07518d90c4474c0060de",
+        "score": 0.66067581101824,
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "int sqlite3_wal_checkpoint_v2( sqlite3 *db, /* Database handle */ const char *zDb, /* Name of attached database (or NULL) */ int eMode, /* SQLITE_CHECKPOINT_* value */ int *pnLog, /* OUT: Size of WAL log in frames */ int *pnCkpt /* OUT: Total number of frames checkpointed */ );",
+        "title": "wal checkpoint v2"
+      },
+      {
+        "end": 538,
+        "estimated_tokens": 66,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 2,
+        "record_id": "717669418865321c238768db",
+        "score": 0.6298458050403839,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 323,
+        "text": "In normal cases, new content is appended to the WAL file until the WAL file accumulates about 1000 pages (and is thus about 4MB in size) at which point a checkpoint is automatically run and the WAL file is recycled.",
+        "title": "wal"
+      },
+      {
+        "end": 639,
+        "estimated_tokens": 37,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 3,
+        "record_id": "717669418865321c238768db",
+        "score": 0.5277624717070506,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 538,
+        "text": "The checkpoint does not normally truncate the WAL file (unless the journal_size_limit pragma is set).",
+        "title": "wal"
+      },
+      {
+        "end": 1362,
+        "estimated_tokens": 104,
+        "kind": "paragraph",
+        "page_id": 14,
+        "position": 7,
+        "record_id": "717669418865321c238768db",
+        "score": 0.5246374717070507,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 993,
+        "text": "So in the vast majority of cases, applications need not worry about the WAL file at all. SQLite will automatically take care of it. But it is possible to get SQLite into a state where the WAL file will grow without bound, causing excess disk space usage and slow query speeds. The following bullets enumerate some of the ways that this can happen and how to avoid them.",
+        "title": "wal"
+      },
+      {
+        "end": 534,
+        "estimated_tokens": 81,
+        "kind": "paragraph",
+        "page_id": 9,
+        "position": 1,
+        "record_id": "73fe07518d90c4474c0060de",
+        "score": 0.44817581101824,
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 285,
+        "text": "The sqlite3_wal_checkpoint_v2(D,X,M,L,C) interface runs a checkpoint operation on database X of database connection D in mode M. Status information is written back into integers pointed to by L and C. The M parameter must be a valid checkpoint mode:",
+        "title": "wal checkpoint v2"
+      },
+      {
+        "end": 734,
+        "estimated_tokens": 69,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 2,
+        "record_id": "73fe07518d90c4474c0060de",
+        "score": 0.44400914435157335,
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 536,
+        "text": "SQLITE_CHECKPOINT_PASSIVE Checkpoint as many frames as possible without waiting for any database readers or writers to finish, then sync the database file if all frames in the log were checkpointed.",
+        "title": "wal checkpoint v2"
+      },
+      {
+        "end": 815,
+        "estimated_tokens": 39,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 3,
+        "record_id": "73fe07518d90c4474c0060de",
+        "score": 0.44192581101823997,
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 734,
+        "text": "The busy-handler callback is never invoked in the SQLITE_CHECKPOINT_PASSIVE mode.",
+        "title": "wal checkpoint v2"
+      },
+      {
+        "end": 1307,
+        "estimated_tokens": 113,
+        "kind": "paragraph",
+        "page_id": 9,
+        "position": 5,
+        "record_id": "73fe07518d90c4474c0060de",
+        "score": 0.43984247768490664,
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 932,
+        "text": "SQLITE_CHECKPOINT_FULL This mode blocks (it invokes the busy-handler callback) until there is no database writer and all readers are reading from the most recent database snapshot. It then checkpoints all frames in the log file and syncs the database file. This mode blocks new database writers while it is pending, but new database readers are allowed to continue unimpeded.",
+        "title": "wal checkpoint v2"
+      },
+      {
+        "end": 321,
+        "estimated_tokens": 63,
+        "kind": "paragraph",
+        "page_id": 14,
+        "position": 1,
+        "record_id": "717669418865321c238768db",
+        "score": 0.43401247170705054,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 117,
+        "text": "Even though it is possible to open a read-only WAL-mode database, it is good practice to convert the database to PRAGMA journal_mode=DELETE prior to burning an SQLite database image onto read-only media.",
+        "title": "wal"
+      },
+      {
+        "end": 725,
+        "estimated_tokens": 34,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 4,
+        "record_id": "717669418865321c238768db",
+        "score": 0.42651247170705053,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 639,
+        "text": "Instead, it merely causes SQLite to start overwriting the WAL file from the beginning.",
+        "title": "wal"
+      },
+      {
+        "end": 986,
+        "estimated_tokens": 55,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 6,
+        "record_id": "717669418865321c238768db",
+        "score": 0.4250839002784791,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 813,
+        "text": "When the last connection to a database closes, that connection does one last checkpoint and then deletes the WAL and its associated shared-memory file, to clean up the disk.",
+        "title": "wal"
+      },
+      {
+        "end": 124,
+        "estimated_tokens": 25,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 1,
+        "record_id": "410994326670080c3fb5f32f",
+        "score": 0.3690980826492569,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 72,
+        "text": "On success, the pragma will return the string \"wal\".",
+        "title": "wal"
+      },
+      {
+        "end": 397,
+        "estimated_tokens": 80,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 2,
+        "record_id": "410994326670080c3fb5f32f",
+        "score": 0.36493141598259027,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 124,
+        "text": "If the conversion to WAL could not be completed (for example, if the VFS does not support the necessary shared-memory primitives) then the journaling mode will be unchanged and the string returned from the primitive will be the prior journaling mode (for example \"delete\").",
+        "title": "wal"
+      },
+      {
+        "end": 115,
+        "estimated_tokens": 41,
+        "kind": "paragraph",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "717669418865321c238768db",
+        "score": 0.3465124717070506,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "There is write permission on the directory containing the database so that the -shm and -wal files can be created.",
+        "title": "wal"
+      },
+      {
+        "end": 928,
+        "estimated_tokens": 47,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 4,
+        "record_id": "73fe07518d90c4474c0060de",
+        "score": 0.34067581101824,
+        "section": "wal checkpoint v2",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 815,
+        "text": "On the other hand, passive mode might leave the checkpoint unfinished if there are concurrent readers or writers.",
+        "title": "wal checkpoint v2"
+      },
+      {
+        "end": 71,
+        "estimated_tokens": 30,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "410994326670080c3fb5f32f",
+        "score": 0.28159808264925695,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "The journal_mode pragma returns a string which is the new journal mode.",
+        "title": "wal"
+      },
+      {
+        "end": 813,
+        "estimated_tokens": 34,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 5,
+        "record_id": "717669418865321c238768db",
+        "score": 0.22567913837371723,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 725,
+        "text": "This is done because it is normally faster to overwrite an existing file than to append.",
+        "title": "wal"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "410994326670080c3fb5f32f",
+      "73fe07518d90c4474c0060de",
+      "717669418865321c238768db"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 18,
+    "source_ids": [
+      "410994326670080c3fb5f32f",
+      "73fe07518d90c4474c0060de",
+      "717669418865321c238768db"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 410994326670080c3fb5f32f] wal — wal\nBy default, SQLite will automatically checkpoint whenever a COMMIT occurs that causes the WAL file to be 1000 pages or more in size, or when the last database connection on a database file closes. The default configuration is intended to work well for most applications. But programs that want more control can force a checkpoint using the wal_checkpoint pragma or by calling the sqlite3_wal_checkpoint() C interface. The automatic checkpoint threshold can be changed or automatic checkpointing can be completely disabled using the wal_autocheckpoint pragma or by calling the sqlite3_wal_autocheckpoint() C interface. A program can also use sqlite3_wal_hook() to register a callback to be invoked whenever any transaction commits to the WAL. This callback can then invoke sqlite3_wal_checkpoint() or sqlite3_wal_checkpoint_v2() based on whatever criteria it thinks is appropriate. (The automatic checkpoint mechanism is implemented as a simple wrapper around sqlite3_wal_hook().)\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2 — wal checkpoint v2\nint sqlite3_wal_checkpoint_v2( sqlite3 *db, /* Database handle */ const char *zDb, /* Name of attached database (or NULL) */ int eMode, /* SQLITE_CHECKPOINT_* value */ int *pnLog, /* OUT: Size of WAL log in frames */ int *pnCkpt /* OUT: Total number of frames checkpointed */ );\n\n[SOURCE: 717669418865321c238768db] wal — wal\nIn normal cases, new content is appended to the WAL file until the WAL file accumulates about 1000 pages (and is thus about 4MB in size) at which point a checkpoint is automatically run and the WAL file is recycled.\n\n[SOURCE: 717669418865321c238768db] wal — wal\nThe checkpoint does not normally truncate the WAL file (unless the journal_size_limit pragma is set).\n\n[SOURCE: 717669418865321c238768db] wal — wal\nSo in the vast majority of cases, applications need not worry about the WAL file at all. SQLite will automatically take care of it. But it is possible to get SQLite into a state where the WAL file will grow without bound, causing excess disk space usage and slow query speeds. The following bullets enumerate some of the ways that this can happen and how to avoid them.\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2 — wal checkpoint v2\nThe sqlite3_wal_checkpoint_v2(D,X,M,L,C) interface runs a checkpoint operation on database X of database connection D in mode M. Status information is written back into integers pointed to by L and C. The M parameter must be a valid checkpoint mode:\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2 — wal checkpoint v2\nSQLITE_CHECKPOINT_PASSIVE Checkpoint as many frames as possible without waiting for any database readers or writers to finish, then sync the database file if all frames in the log were checkpointed.\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2 — wal checkpoint v2\nThe busy-handler callback is never invoked in the SQLITE_CHECKPOINT_PASSIVE mode.\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2 — wal checkpoint v2\nSQLITE_CHECKPOINT_FULL This mode blocks (it invokes the busy-handler callback) until there is no database writer and all readers are reading from the most recent database snapshot. It then checkpoints all frames in the log file and syncs the database file. This mode blocks new database writers while it is pending, but new database readers are allowed to continue unimpeded.\n\n[SOURCE: 717669418865321c238768db] wal — wal\nEven though it is possible to open a read-only WAL-mode database, it is good practice to convert the database to PRAGMA journal_mode=DELETE prior to burning an SQLite database image onto read-only media.\n\n[SOURCE: 717669418865321c238768db] wal — wal\nInstead, it merely causes SQLite to start overwriting the WAL file from the beginning.\n\n[SOURCE: 717669418865321c238768db] wal — wal\nWhen the last connection to a database closes, that connection does one last checkpoint and then deletes the WAL and its associated shared-memory file, to clean up the disk.\n\n[SOURCE: 410994326670080c3fb5f32f] wal — wal\nOn success, the pragma will return the string \"wal\".\n\n[SOURCE: 410994326670080c3fb5f32f] wal — wal\nIf the conversion to WAL could not be completed (for example, if the VFS does not support the necessary shared-memory primitives) then the journaling mode will be unchanged and the string returned from the primitive will be the prior journaling mode (for example \"delete\").\n\n[SOURCE: 717669418865321c238768db] wal — wal\nThere is write permission on the directory containing the database so that the -shm and -wal files can be created.\n\n[SOURCE: 73fe07518d90c4474c0060de] wal checkpoint v2 — wal checkpoint v2\nOn the other hand, passive mode might leave the checkpoint unfinished if there are concurrent readers or writers.\n\n[SOURCE: 410994326670080c3fb5f32f] wal — wal\nThe journal_mode pragma returns a string which is the new journal mode.\n\n[SOURCE: 717669418865321c238768db] wal — wal\nThis is done because it is normally faster to overwrite an existing file than to append."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2581,
+    "context_activation_rate": 0.48973266175900815,
+    "context_density": 0.06962025316455696,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 1264.0,
+    "useful_oracle_tokens": 88
+  },
+  "context_sha256": "96cc9eef9d7ff84c4ea87db2341f0b2443f17cecf3b244921054661f9396ffd3",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1527,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 1,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        true
+      ],
+      "recall": 1.0,
+      "total": 1
+    },
+    "correctness": false,
+    "diagnostic": "FALSE_NO_KNOWLEDGE",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 8559.915699996054,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 147.0,
+      "cpu_kernel_seconds": 1.125,
+      "cpu_percent_total_average": 396.2874891398246,
+      "cpu_percent_total_peak": 594.4040431452214,
+      "cpu_time_seconds": 33.921875,
+      "cpu_user_seconds": 32.796875,
+      "generated_tokens": 6,
+      "generation_eval_ms": 276.757,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 8559.915699996054,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621584384,
+      "private_bytes_min": 619753472,
+      "prompt_eval_ms": 8268.169,
+      "prompt_tokens": 1527,
+      "prompt_tokens_per_second": 184.68417856480679,
+      "queries_served": 147,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 146,
+      "system_available_ram_bytes_min": 3311964160,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 21.679668445603905,
+      "ttft_ms": 8281.6931999987,
+      "working_set_bytes_max": 993923072,
+      "working_set_bytes_min": 992096256,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 788
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_wal_checkpoint::COMBINED_B1536",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 146,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1267,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 240,
+    "other_or_chat_envelope": 153,
+    "percent": {
+      "evidence": 82.97314996725606,
+      "instructions": 5.893909626719057,
+      "other_or_chat_envelope": 10.019646365422396,
+      "question": 1.1132940406024885
+    },
+    "question": 17,
+    "total": 1527
+  },
+  "prompt_sha256": "18a69875b04a4deb3099e9e68514984105b289dae263891a9da7088ac964d073",
+  "query_spec": {
+    "category": "direct_fact",
+    "expected_record_ids": [
+      "c881b56dc9b63d07517c60ad"
+    ],
+    "query": "At what WAL size does SQLite automatically checkpoint by default?",
+    "query_id": "holdout_wal_checkpoint",
+    "required_fact_groups": [
+      [
+        "1000 pages"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      9,
+      14
+    ],
+    "record_bytes": 10311,
+    "records_retrieved": [
+      "410994326670080c3fb5f32f",
+      "717669418865321c238768db",
+      "8ac1d6d5f4b2febef24927d9",
+      "ec3d4f55b0862ac30c2cb167",
+      "1ccf3ab37263037dd48df2cd",
+      "73fe07518d90c4474c0060de",
+      "c881b56dc9b63d07517c60ad",
+      "91d2cf537ad180a4671b4a42"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T103030Z-932e4f1bb3",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:30:30Z",
+  "variant": "COMBINED_B1536",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "410994326670080c3fb5f32f",
+          "score": 0.9997142332607927
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "717669418865321c238768db",
+          "score": 0.8535241876682662
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "checkpoint",
+            "default",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "8ac1d6d5f4b2febef24927d9",
+          "score": 0.8229688052149982
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "size",
+            "wal"
+          ],
+          "record_id": "ec3d4f55b0862ac30c2cb167",
+          "score": 0.8007041716020958
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "1ccf3ab37263037dd48df2cd",
+          "score": 0.8305255644523168
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "checkpoint",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "73fe07518d90c4474c0060de",
+          "score": 0.8430936570204445
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "automatically",
+            "checkpoint",
+            "default",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "c881b56dc9b63d07517c60ad",
+          "score": 0.7738790983544622
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "checkpoint",
+            "size",
+            "sqlite",
+            "wal"
+          ],
+          "record_id": "91d2cf537ad180a4671b4a42",
+          "score": 0.7907913573492953
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "8ac1d6d5f4b2febef24927d9",
+        "ec3d4f55b0862ac30c2cb167",
+        "1ccf3ab37263037dd48df2cd",
+        "c881b56dc9b63d07517c60ad",
+        "91d2cf537ad180a4671b4a42"
+      ],
+      "retained_record_ids": [
+        "410994326670080c3fb5f32f",
+        "717669418865321c238768db",
+        "73fe07518d90c4474c0060de"
+      ],
+      "wall_ms": 1.7975
+    }
+  }
+}

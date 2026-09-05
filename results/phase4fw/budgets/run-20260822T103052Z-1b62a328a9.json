@@ -1,0 +1,313 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 1524,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 16.3537,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 382,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 750,
+        "estimated_tokens": 203,
+        "kind": "code_block",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "3a82718d432b9bfeca97b5a9",
+        "score": 0.5436769271741447,
+        "section": "unlock notify",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "/* ** This function is a wrapper around the SQLite function sqlite3_step(). ** It functions in the same way as step(), except that if a required ** shared-cache lock cannot be obtained, this function may block waiting for ** the lock to become available. In this scenario the normal API step() ** function always returns SQLITE_LOCKED. ** ** If this function returns SQLITE_LOCKED, the caller should rollback ** the current transaction (if any) and try again later. Otherwise, the ** system may become deadlocked. */ int sqlite3_blocking_step(sqlite3_stmt *pStmt){ int rc; while( SQLITE_LOCKED==(rc = sqlite3_step(pStmt)) ){ rc = wait_for_unlock_notify(sqlite3_db_handle(pStmt)); if( rc!=SQLITE_OK ) break; sqlite3_reset(pStmt); } return rc; }",
+        "title": "unlock notify"
+      },
+      {
+        "end": 449,
+        "estimated_tokens": 50,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 1,
+        "record_id": "a015bbdff6f2b4d2fbd62ba1",
+        "score": 0.4140592595752845,
+        "section": "tclsqlite",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 310,
+        "text": "When SQLite tries to open a database and finds that it is locked, it can optionally delay for a short while and try to open the file again.",
+        "title": "tclsqlite"
+      },
+      {
+        "end": 135,
+        "estimated_tokens": 51,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "faeef9990fba18110ad37f1b",
+        "score": 0.401894322242784,
+        "section": "unlock notify",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "/* ** This function assumes that an SQLite API call (either sqlite3_prepare_v2() ** or sqlite3_step()) has just returned SQLITE_LOCKED.",
+        "title": "unlock notify"
+      },
+      {
+        "end": 1052,
+        "estimated_tokens": 56,
+        "kind": "code_block",
+        "page_id": 14,
+        "position": 8,
+        "record_id": "faeef9990fba18110ad37f1b",
+        "score": 0.3646721000205618,
+        "section": "unlock notify",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 896,
+        "text": "/* Register for an unlock-notify callback. */ rc = sqlite3_unlock_notify(db, unlock_notify_cb, (void *)&un); assert( rc==SQLITE_LOCKED || rc==SQLITE_OK );",
+        "title": "unlock notify"
+      },
+      {
+        "end": 553,
+        "estimated_tokens": 22,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 3,
+        "record_id": "a015bbdff6f2b4d2fbd62ba1",
+        "score": 0.2578092595752845,
+        "section": "tclsqlite",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 527,
+        "text": "The timeout is adjustable.",
+        "title": "tclsqlite"
+      }
+    ],
+    "records_pruned": [
+      "8c671e81a6303e1163726a9b",
+      "5c15e30b29bd463ee772e2e1",
+      "f19257e9b571b264863da580",
+      "a2ab2aae207aa4c28b34122f",
+      "a23ef64e6ab99b7e5cf70644"
+    ],
+    "records_retained": [
+      "3a82718d432b9bfeca97b5a9",
+      "a015bbdff6f2b4d2fbd62ba1",
+      "faeef9990fba18110ad37f1b"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 5,
+    "source_ids": [
+      "3a82718d432b9bfeca97b5a9",
+      "a015bbdff6f2b4d2fbd62ba1",
+      "faeef9990fba18110ad37f1b"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 3a82718d432b9bfeca97b5a9] unlock notify — unlock notify\n/* ** This function is a wrapper around the SQLite function sqlite3_step(). ** It functions in the same way as step(), except that if a required ** shared-cache lock cannot be obtained, this function may block waiting for ** the lock to become available. In this scenario the normal API step() ** function always returns SQLITE_LOCKED. ** ** If this function returns SQLITE_LOCKED, the caller should rollback ** the current transaction (if any) and try again later. Otherwise, the ** system may become deadlocked. */ int sqlite3_blocking_step(sqlite3_stmt *pStmt){ int rc; while( SQLITE_LOCKED==(rc = sqlite3_step(pStmt)) ){ rc = wait_for_unlock_notify(sqlite3_db_handle(pStmt)); if( rc!=SQLITE_OK ) break; sqlite3_reset(pStmt); } return rc; }\n\n[SOURCE: a015bbdff6f2b4d2fbd62ba1] tclsqlite — tclsqlite\nWhen SQLite tries to open a database and finds that it is locked, it can optionally delay for a short while and try to open the file again.\n\n[SOURCE: faeef9990fba18110ad37f1b] unlock notify — unlock notify\n/* ** This function assumes that an SQLite API call (either sqlite3_prepare_v2() ** or sqlite3_step()) has just returned SQLITE_LOCKED.\n\n[SOURCE: faeef9990fba18110ad37f1b] unlock notify — unlock notify\n/* Register for an unlock-notify callback. */ rc = sqlite3_unlock_notify(db, unlock_notify_cb, (void *)&un); assert( rc==SQLITE_LOCKED || rc==SQLITE_OK );\n\n[SOURCE: a015bbdff6f2b4d2fbd62ba1] tclsqlite — tclsqlite\nThe timeout is adjustable."
+  },
+  "context_metrics": {
+    "available_record_tokens": 3924,
+    "context_activation_rate": 0.09734964322120285,
+    "context_density": 0.18324607329842932,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 191.0,
+    "useful_oracle_tokens": 70
+  },
+  "context_sha256": "4fb8eb452886902da2c6d58f36119ae17bee9020f37e7f87ee788ceb8f5bf87e",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 530,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 0,
+      "matched": [
+        false,
+        false
+      ],
+      "recall": 0.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "RETRIEVAL_MISS",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 2722.261500020977,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 151.0,
+      "cpu_kernel_seconds": 0.40625,
+      "cpu_percent_total_average": 400.05800324164596,
+      "cpu_percent_total_peak": 594.1008158832723,
+      "cpu_time_seconds": 10.890625,
+      "cpu_user_seconds": 10.484375,
+      "generated_tokens": 6,
+      "generation_eval_ms": 177.051,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 2722.261500020977,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621584384,
+      "private_bytes_min": 619753472,
+      "prompt_eval_ms": 2533.253,
+      "prompt_tokens": 530,
+      "prompt_tokens_per_second": 209.2171607020696,
+      "queries_served": 151,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 150,
+      "system_available_ram_bytes_min": 3495366656,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 33.888540589999494,
+      "ttft_ms": 2544.1949000232853,
+      "working_set_bytes_max": 993923072,
+      "working_set_bytes_min": 992096256,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_busy::EXTRACTIVE_B384",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 150,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 381,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 76,
+    "other_or_chat_envelope": 44,
+    "percent": {
+      "evidence": 71.88679245283019,
+      "instructions": 16.9811320754717,
+      "other_or_chat_envelope": 8.30188679245283,
+      "question": 2.830188679245283
+    },
+    "question": 15,
+    "total": 530
+  },
+  "prompt_sha256": "7a107b2a9883245a239f53d35054ebec85a1e49f2e9e5c63b8d9b858c910a8ff",
+  "query_spec": {
+    "category": "partial_terminology",
+    "expected_record_ids": [
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "query": "SQLite locked file default response and API to wait instead?",
+    "query_id": "dev_busy",
+    "required_fact_groups": [
+      [
+        "sqlite_busy"
+      ],
+      [
+        "sqlite3_busy_timeout",
+        "sqlite3_busy_handler"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      5,
+      9,
+      10,
+      14
+    ],
+    "record_bytes": 15685,
+    "records_retrieved": [
+      "a015bbdff6f2b4d2fbd62ba1",
+      "3a82718d432b9bfeca97b5a9",
+      "faeef9990fba18110ad37f1b",
+      "8c671e81a6303e1163726a9b",
+      "5c15e30b29bd463ee772e2e1",
+      "f19257e9b571b264863da580",
+      "a2ab2aae207aa4c28b34122f",
+      "a23ef64e6ab99b7e5cf70644"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T103052Z-1b62a328a9",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:30:52Z",
+  "variant": "EXTRACTIVE_B384",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

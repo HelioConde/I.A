@@ -1,0 +1,2127 @@
+{
+  "api_calibration": [
+    {
+      "advice_accepted": false,
+      "advice_us": 1.672,
+      "controller_stats": {
+        "controller": "kernel_only",
+        "intervention_us": {
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "interventions": 0
+      },
+      "initial_load_read_bytes": 1179648,
+      "initial_major_faults": 1,
+      "initial_minor_faults": 16,
+      "initial_resident": false,
+      "load_us": 559.83,
+      "mode": "kernel_only",
+      "post_advice_read_bytes": 0,
+      "reload_major_faults": 0,
+      "reload_minor_faults": 0,
+      "reload_read_bytes": 0,
+      "reload_us": 20.721,
+      "resident_after_100ms": true,
+      "resident_after_20ms": true,
+      "resident_after_load": true,
+      "resident_immediate": true,
+      "sink": 0
+    },
+    {
+      "advice_accepted": true,
+      "advice_us": 85.046,
+      "controller_stats": {
+        "controller": "madv_cold",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 81.07,
+          "p95": 81.07,
+          "p99": 81.07
+        },
+        "interventions": 1
+      },
+      "initial_load_read_bytes": 1179648,
+      "initial_major_faults": 1,
+      "initial_minor_faults": 16,
+      "initial_resident": false,
+      "load_us": 570.055,
+      "mode": "madv_cold",
+      "post_advice_read_bytes": 0,
+      "reload_major_faults": 0,
+      "reload_minor_faults": 0,
+      "reload_read_bytes": 0,
+      "reload_us": 64.175,
+      "resident_after_100ms": true,
+      "resident_after_20ms": true,
+      "resident_after_load": true,
+      "resident_immediate": true,
+      "sink": 0
+    },
+    {
+      "advice_accepted": true,
+      "advice_us": 50.235,
+      "controller_stats": {
+        "controller": "madv_dontneed",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 46.649,
+          "p95": 46.649,
+          "p99": 46.649
+        },
+        "interventions": 1
+      },
+      "initial_load_read_bytes": 1179648,
+      "initial_major_faults": 1,
+      "initial_minor_faults": 16,
+      "initial_resident": false,
+      "load_us": 560.612,
+      "mode": "madv_dontneed",
+      "post_advice_read_bytes": 0,
+      "reload_major_faults": 0,
+      "reload_minor_faults": 16,
+      "reload_read_bytes": 0,
+      "reload_us": 105.466,
+      "resident_after_100ms": true,
+      "resident_after_20ms": true,
+      "resident_after_load": true,
+      "resident_immediate": true,
+      "sink": 0
+    },
+    {
+      "advice_accepted": true,
+      "advice_us": 169.812,
+      "controller_stats": {
+        "controller": "fadv_dontneed",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 166.877,
+          "p95": 166.877,
+          "p99": 166.877
+        },
+        "interventions": 1
+      },
+      "initial_load_read_bytes": 1179648,
+      "initial_major_faults": 1,
+      "initial_minor_faults": 16,
+      "initial_resident": false,
+      "load_us": 671.076,
+      "mode": "fadv_dontneed",
+      "post_advice_read_bytes": 0,
+      "reload_major_faults": 0,
+      "reload_minor_faults": 0,
+      "reload_read_bytes": 0,
+      "reload_us": 19.478,
+      "resident_after_100ms": true,
+      "resident_after_20ms": true,
+      "resident_after_load": true,
+      "resident_immediate": true,
+      "sink": 0
+    },
+    {
+      "advice_accepted": true,
+      "advice_us": 355.567,
+      "controller_stats": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 352.804,
+          "p95": 352.804,
+          "p99": 352.804
+        },
+        "interventions": 1
+      },
+      "initial_load_read_bytes": 1179648,
+      "initial_major_faults": 1,
+      "initial_minor_faults": 16,
+      "initial_resident": false,
+      "load_us": 512.37,
+      "mode": "madv_pageout",
+      "post_advice_read_bytes": 0,
+      "reload_major_faults": 1,
+      "reload_minor_faults": 16,
+      "reload_read_bytes": 1048576,
+      "reload_us": 602.393,
+      "resident_after_100ms": false,
+      "resident_after_20ms": false,
+      "resident_after_load": true,
+      "resident_immediate": false,
+      "sink": 0
+    }
+  ],
+  "budget_64_aggregate": {
+    "cognitive_v0": {
+      "logical_miss_bytes_median": 953155584.0,
+      "major_faults_median": 680.0,
+      "minor_faults_median": 18276.5,
+      "physical_read_bytes_median": 1086324736.0
+    },
+    "kernel_only": {
+      "logical_miss_bytes_median": 1512046592.0,
+      "major_faults_median": 630.0,
+      "minor_faults_median": 16993.5,
+      "physical_read_bytes_median": 1012989952.0
+    },
+    "lfu": {
+      "logical_miss_bytes_median": 966787072.0,
+      "major_faults_median": 681.0,
+      "minor_faults_median": 18304.5,
+      "physical_read_bytes_median": 1099563008.0
+    },
+    "lrfu": {
+      "logical_miss_bytes_median": 966787072.0,
+      "major_faults_median": 681.0,
+      "minor_faults_median": 18307.5,
+      "physical_read_bytes_median": 1099560960.0
+    },
+    "lru": {
+      "logical_miss_bytes_median": 935329792.0,
+      "major_faults_median": 671.0,
+      "minor_faults_median": 17818.0,
+      "physical_read_bytes_median": 1068105728.0
+    }
+  },
+  "budget_64_by_workload": [
+    {
+      "budget_mib": 64,
+      "cognitive_vs_lru": {
+        "logical_saved_bytes": 3145728.0,
+        "physical_saved_bytes": 2621440.0,
+        "realized_savings_ratio": 0.8333333333333334
+      },
+      "policies": {
+        "cognitive_v0": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 258998272.0,
+          "major_faults_median": 177.0,
+          "minor_faults_median": 4019.0,
+          "physical_read_bytes_median": 287899648.0,
+          "policy_hit_rate_median": 0.09191176470588236,
+          "resident_hit_rate_median": 0.09191176470588236,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 287899648.0
+        },
+        "kernel_only": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 39.0,
+          "logical_miss_bytes_median": 285212672.0,
+          "major_faults_median": 164.0,
+          "minor_faults_median": 3735.0,
+          "physical_read_bytes_median": 272039936.0,
+          "policy_hit_rate_median": 0.0,
+          "resident_hit_rate_median": 0.14338235294117646,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 272039936.0
+        },
+        "lfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 260046848.0,
+          "major_faults_median": 174.0,
+          "minor_faults_median": 3983.0,
+          "physical_read_bytes_median": 288292864.0,
+          "policy_hit_rate_median": 0.08823529411764706,
+          "resident_hit_rate_median": 0.08823529411764706,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 288292864.0
+        },
+        "lrfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 260046848.0,
+          "major_faults_median": 174.0,
+          "minor_faults_median": 3983.0,
+          "physical_read_bytes_median": 288292864.0,
+          "policy_hit_rate_median": 0.08823529411764706,
+          "resident_hit_rate_median": 0.08823529411764706,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 288292864.0
+        },
+        "lru": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 262144000.0,
+          "major_faults_median": 176.0,
+          "minor_faults_median": 4014.0,
+          "physical_read_bytes_median": 290521088.0,
+          "policy_hit_rate_median": 0.08088235294117647,
+          "resident_hit_rate_median": 0.08088235294117647,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 290521088.0
+        }
+      },
+      "workload": "realistic_mix"
+    },
+    {
+      "budget_mib": 64,
+      "cognitive_vs_lru": {
+        "logical_saved_bytes": 16777216.0,
+        "physical_saved_bytes": 17432576.0,
+        "realized_savings_ratio": 1.0390625
+      },
+      "policies": {
+        "cognitive_v0": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 202375168.0,
+          "major_faults_median": 165.0,
+          "minor_faults_median": 3844.5,
+          "physical_read_bytes_median": 237502464.0,
+          "policy_hit_rate_median": 0.19583333333333333,
+          "resident_hit_rate_median": 0.19583333333333333,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 235012096.0
+        },
+        "kernel_only": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 51.0,
+          "logical_miss_bytes_median": 251658240.0,
+          "major_faults_median": 161.0,
+          "minor_faults_median": 3728.5,
+          "physical_read_bytes_median": 232914944.0,
+          "policy_hit_rate_median": 0.0,
+          "resident_hit_rate_median": 0.2125,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 230424576.0
+        },
+        "lfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 208666624.0,
+          "major_faults_median": 171.0,
+          "minor_faults_median": 3895.0,
+          "physical_read_bytes_median": 244383744.0,
+          "policy_hit_rate_median": 0.17083333333333334,
+          "resident_hit_rate_median": 0.17083333333333334,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 241893376.0
+        },
+        "lrfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 208666624.0,
+          "major_faults_median": 171.0,
+          "minor_faults_median": 3896.0,
+          "physical_read_bytes_median": 244383744.0,
+          "policy_hit_rate_median": 0.17083333333333334,
+          "resident_hit_rate_median": 0.17083333333333334,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 241893376.0
+        },
+        "lru": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 219152384.0,
+          "major_faults_median": 177.0,
+          "minor_faults_median": 4055.5,
+          "physical_read_bytes_median": 254935040.0,
+          "policy_hit_rate_median": 0.12916666666666668,
+          "resident_hit_rate_median": 0.12916666666666668,
+          "return_read_bytes_median": 10551296.0,
+          "transition_read_bytes_median": 252444672.0
+        }
+      },
+      "workload": "long_gap_return"
+    },
+    {
+      "budget_mib": 64,
+      "cognitive_vs_lru": {
+        "logical_saved_bytes": 0.0,
+        "physical_saved_bytes": 0.0,
+        "realized_savings_ratio": null
+      },
+      "policies": {
+        "cognitive_v0": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 67108864.0,
+          "major_faults_median": 35.0,
+          "minor_faults_median": 1734.0,
+          "physical_read_bytes_median": 71958528.0,
+          "policy_hit_rate_median": 0.7241379310344828,
+          "resident_hit_rate_median": 0.7241379310344828,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 69468160.0
+        },
+        "kernel_only": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 168.0,
+          "logical_miss_bytes_median": 243269632.0,
+          "major_faults_median": 35.0,
+          "minor_faults_median": 1729.5,
+          "physical_read_bytes_median": 71958528.0,
+          "policy_hit_rate_median": 0.0,
+          "resident_hit_rate_median": 0.7241379310344828,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 69468160.0
+        },
+        "lfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 67108864.0,
+          "major_faults_median": 35.0,
+          "minor_faults_median": 1728.5,
+          "physical_read_bytes_median": 71958528.0,
+          "policy_hit_rate_median": 0.7241379310344828,
+          "resident_hit_rate_median": 0.7241379310344828,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 69468160.0
+        },
+        "lrfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 67108864.0,
+          "major_faults_median": 35.0,
+          "minor_faults_median": 1728.0,
+          "physical_read_bytes_median": 71958528.0,
+          "policy_hit_rate_median": 0.7241379310344828,
+          "resident_hit_rate_median": 0.7241379310344828,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 69468160.0
+        },
+        "lru": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 67108864.0,
+          "major_faults_median": 35.0,
+          "minor_faults_median": 1729.5,
+          "physical_read_bytes_median": 71958528.0,
+          "policy_hit_rate_median": 0.7241379310344828,
+          "resident_hit_rate_median": 0.7241379310344828,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 69468160.0
+        }
+      },
+      "workload": "a_b_a"
+    },
+    {
+      "budget_mib": 64,
+      "cognitive_vs_lru": {
+        "logical_saved_bytes": 1048576.0,
+        "physical_saved_bytes": 524288.0,
+        "realized_savings_ratio": 0.5
+      },
+      "policies": {
+        "cognitive_v0": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 243269632.0,
+          "major_faults_median": 206.0,
+          "minor_faults_median": 4483.5,
+          "physical_read_bytes_median": 289341440.0,
+          "policy_hit_rate_median": 0.03333333333333333,
+          "resident_hit_rate_median": 0.03333333333333333,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 279379968.0
+        },
+        "kernel_only": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 20.0,
+          "logical_miss_bytes_median": 251658240.0,
+          "major_faults_median": 194.0,
+          "minor_faults_median": 4222.5,
+          "physical_read_bytes_median": 275251200.0,
+          "policy_hit_rate_median": 0.0,
+          "resident_hit_rate_median": 0.08333333333333333,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 265289728.0
+        },
+        "lfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 246415360.0,
+          "major_faults_median": 209.0,
+          "minor_faults_median": 4477.5,
+          "physical_read_bytes_median": 292159488.0,
+          "policy_hit_rate_median": 0.020833333333333332,
+          "resident_hit_rate_median": 0.020833333333333332,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 282198016.0
+        },
+        "lrfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 246415360.0,
+          "major_faults_median": 209.0,
+          "minor_faults_median": 4479.0,
+          "physical_read_bytes_median": 292159488.0,
+          "policy_hit_rate_median": 0.020833333333333332,
+          "resident_hit_rate_median": 0.020833333333333332,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 282198016.0
+        },
+        "lru": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 244318208.0,
+          "major_faults_median": 207.0,
+          "minor_faults_median": 4440.5,
+          "physical_read_bytes_median": 289865728.0,
+          "policy_hit_rate_median": 0.029166666666666667,
+          "resident_hit_rate_median": 0.029166666666666667,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 279904256.0
+        }
+      },
+      "workload": "random_topics"
+    },
+    {
+      "budget_mib": 64,
+      "cognitive_vs_lru": {
+        "logical_saved_bytes": 0.0,
+        "physical_saved_bytes": 0.0,
+        "realized_savings_ratio": null
+      },
+      "policies": {
+        "cognitive_v0": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 48234496.0,
+          "major_faults_median": 40.0,
+          "minor_faults_median": 1441.5,
+          "physical_read_bytes_median": 57147392.0,
+          "policy_hit_rate_median": 0.7788461538461539,
+          "resident_hit_rate_median": 0.7788461538461539,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 49283072.0
+        },
+        "kernel_only": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 162.0,
+          "logical_miss_bytes_median": 218103808.0,
+          "major_faults_median": 40.0,
+          "minor_faults_median": 1435.5,
+          "physical_read_bytes_median": 57147392.0,
+          "policy_hit_rate_median": 0.0,
+          "resident_hit_rate_median": 0.7788461538461539,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 49283072.0
+        },
+        "lfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 48234496.0,
+          "major_faults_median": 40.0,
+          "minor_faults_median": 1435.5,
+          "physical_read_bytes_median": 57147392.0,
+          "policy_hit_rate_median": 0.7788461538461539,
+          "resident_hit_rate_median": 0.7788461538461539,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 49283072.0
+        },
+        "lrfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 48234496.0,
+          "major_faults_median": 40.0,
+          "minor_faults_median": 1435.5,
+          "physical_read_bytes_median": 57147392.0,
+          "policy_hit_rate_median": 0.7788461538461539,
+          "resident_hit_rate_median": 0.7788461538461539,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 49283072.0
+        },
+        "lru": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 48234496.0,
+          "major_faults_median": 40.0,
+          "minor_faults_median": 1435.0,
+          "physical_read_bytes_median": 57147392.0,
+          "policy_hit_rate_median": 0.7788461538461539,
+          "resident_hit_rate_median": 0.7788461538461539,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 49283072.0
+        }
+      },
+      "workload": "zipf_topic_popularity"
+    },
+    {
+      "budget_mib": 64,
+      "cognitive_vs_lru": {
+        "logical_saved_bytes": -38797312.0,
+        "physical_saved_bytes": -38797312.0,
+        "realized_savings_ratio": null
+      },
+      "policies": {
+        "cognitive_v0": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 133169152.0,
+          "major_faults_median": 57.0,
+          "minor_faults_median": 2754.0,
+          "physical_read_bytes_median": 142475264.0,
+          "policy_hit_rate_median": 0.492,
+          "resident_hit_rate_median": 0.492,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 139984896.0
+        },
+        "kernel_only": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 160.0,
+          "logical_miss_bytes_median": 262144000.0,
+          "major_faults_median": 36.0,
+          "minor_faults_median": 2142.5,
+          "physical_read_bytes_median": 103677952.0,
+          "policy_hit_rate_median": 0.0,
+          "resident_hit_rate_median": 0.64,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 101187584.0
+        },
+        "lfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 136314880.0,
+          "major_faults_median": 52.0,
+          "minor_faults_median": 2785.0,
+          "physical_read_bytes_median": 145620992.0,
+          "policy_hit_rate_median": 0.48,
+          "resident_hit_rate_median": 0.48,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 143130624.0
+        },
+        "lrfu": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 136314880.0,
+          "major_faults_median": 52.0,
+          "minor_faults_median": 2786.0,
+          "physical_read_bytes_median": 145618944.0,
+          "policy_hit_rate_median": 0.48,
+          "resident_hit_rate_median": 0.48,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 143128576.0
+        },
+        "lru": {
+          "false_hot_median": 0.0,
+          "ghost_hits_median": 0.0,
+          "logical_miss_bytes_median": 94371840.0,
+          "major_faults_median": 36.0,
+          "minor_faults_median": 2143.5,
+          "physical_read_bytes_median": 103677952.0,
+          "policy_hit_rate_median": 0.64,
+          "resident_hit_rate_median": 0.64,
+          "return_read_bytes_median": 0.0,
+          "transition_read_bytes_median": 101187584.0
+        }
+      },
+      "workload": "stable_topic"
+    }
+  ],
+  "cardinality": [
+    {
+      "access_latency_us": {
+        "p50": 530.4465,
+        "p95": 621.4803499999998,
+        "p99": 694.2946800000002
+      },
+      "anonymous_rss_growth_bytes": 2076672,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 186,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 186,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 343.74,
+          "p95": 366.604,
+          "p99": 374.736
+        },
+        "interventions": 186
+      },
+      "logical_miss_bytes": 262144000,
+      "major_faults": 176,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 19343,
+      "minor_faults": 4017,
+      "mode": "observability",
+      "order_index": 63,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 0,
+        "2": 0,
+        "4": 0,
+        "8": 0
+      },
+      "physical_read_amplification": 1.10825,
+      "physical_read_bytes": 290521088,
+      "policy": "lru",
+      "policy_hit_rate": 0.08088235294117647,
+      "policy_latency_us": {
+        "p50": 12.138,
+        "p95": 14.124500000000001,
+        "p99": 16.536800000000007
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13332480,
+        "private_clean_bytes": 67538944,
+        "private_dirty_bytes": 13332480,
+        "pss_anon_bytes": 13332480,
+        "pss_bytes": 83915776,
+        "pss_file_bytes": 70583296,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13328384,
+        "rss_bytes": 88928256,
+        "rss_file_bytes_status": 75595776,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8056832,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11255808,
+        "private_clean_bytes": 430080,
+        "private_dirty_bytes": 11255808,
+        "pss_anon_bytes": 11255808,
+        "pss_bytes": 14730240,
+        "pss_file_bytes": 3474432,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11251712,
+        "rss_bytes": 19742720,
+        "rss_file_bytes_status": 8486912,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8056832,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 250,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 22
+      },
+      "resident_hit_rate": 0.08088235294117647,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 5454442328567064064,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 176,
+      "transition_physical_read_bytes": 290521088,
+      "universe_pages": 1024,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 43.334,
+        "p95": 567.95245,
+        "p99": 581.32919
+      },
+      "anonymous_rss_growth_bytes": 2011136,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "kernel_only",
+      "effective_immediate_evictions": 0,
+      "events": 272,
+      "eviction_effectiveness_immediate": null,
+      "eviction_requests": 0,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 100,
+      "final_hot_pages": 0,
+      "final_resident_pages": 100,
+      "ghost_hit_count": 172,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "kernel_only",
+        "intervention_us": {
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "interventions": 0
+      },
+      "logical_miss_bytes": 285212672,
+      "major_faults": 46,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 104857600,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 104857600,
+        "rss_bytes": 104857600,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 1547,
+      "minor_faults": 1609,
+      "mode": "observability",
+      "order_index": 86,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 0,
+        "2": 0,
+        "4": 0,
+        "8": 0
+      },
+      "physical_read_amplification": 0.37109375,
+      "physical_read_bytes": 105840640,
+      "policy": "kernel_only",
+      "policy_hit_rate": 0.0,
+      "policy_latency_us": {
+        "p50": 2.784,
+        "p95": 4.912449999999999,
+        "p99": 5.566000000000004
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13262848,
+        "private_clean_bytes": 105353216,
+        "private_dirty_bytes": 13262848,
+        "pss_anon_bytes": 13262848,
+        "pss_bytes": 121622528,
+        "pss_file_bytes": 108359680,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13254656,
+        "rss_bytes": 126648320,
+        "rss_file_bytes_status": 113385472,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8032256,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11251712,
+        "private_clean_bytes": 491520,
+        "private_dirty_bytes": 11251712,
+        "pss_anon_bytes": 11251712,
+        "pss_bytes": 14747648,
+        "pss_file_bytes": 3495936,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11239424,
+        "rss_bytes": 19779584,
+        "rss_file_bytes_status": 8527872,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8036352,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 100,
+        "cold_resident": 172,
+        "hot_nonresident": 0,
+        "hot_resident": 0
+      },
+      "resident_hit_rate": 0.6323529411764706,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 71461060038530560,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 46,
+      "transition_physical_read_bytes": 105840640,
+      "universe_pages": 128,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 42.563500000000005,
+        "p95": 611.5164,
+        "p99": 732.1470300000005
+      },
+      "anonymous_rss_growth_bytes": 2052096,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 59,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 59,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 354.315,
+          "p95": 378.531,
+          "p99": 463.688
+        },
+        "interventions": 59
+      },
+      "logical_miss_bytes": 128974848,
+      "major_faults": 68,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 19343,
+      "minor_faults": 1982,
+      "mode": "observability",
+      "order_index": 87,
+      "physical_eviction_regret": {
+        "1": 7,
+        "16": 16,
+        "2": 7,
+        "4": 12,
+        "8": 13
+      },
+      "physical_read_amplification": 1.0121951219512195,
+      "physical_read_bytes": 130547712,
+      "policy": "lru",
+      "policy_hit_rate": 0.5477941176470589,
+      "policy_latency_us": {
+        "p50": 4.036,
+        "p95": 14.212999999999997,
+        "p99": 18.060260000000046
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13299712,
+        "private_clean_bytes": 67645440,
+        "private_dirty_bytes": 13299712,
+        "pss_anon_bytes": 13299712,
+        "pss_bytes": 83964928,
+        "pss_file_bytes": 70665216,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13287424,
+        "rss_bytes": 88952832,
+        "rss_file_bytes_status": 75653120,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8007680,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11247616,
+        "private_clean_bytes": 536576,
+        "private_dirty_bytes": 11247616,
+        "pss_anon_bytes": 11247616,
+        "pss_bytes": 14803968,
+        "pss_file_bytes": 3556352,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11235328,
+        "rss_bytes": 19791872,
+        "rss_file_bytes_status": 8544256,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8007680,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 123,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 149
+      },
+      "resident_hit_rate": 0.5477941176470589,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 71461060038530560,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 68,
+      "transition_physical_read_bytes": 130547712,
+      "universe_pages": 128,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 534.3125,
+        "p95": 653.1163999999999,
+        "p99": 679.3639300000001
+      },
+      "anonymous_rss_growth_bytes": 2326528,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 169,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 169,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 349.719,
+          "p95": 380.435,
+          "p99": 396.198
+        },
+        "interventions": 169
+      },
+      "logical_miss_bytes": 244318208,
+      "major_faults": 152,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 120652,
+      "minor_faults": 3791,
+      "mode": "observability",
+      "order_index": 132,
+      "physical_eviction_regret": {
+        "1": 1,
+        "16": 8,
+        "2": 7,
+        "4": 8,
+        "8": 8
+      },
+      "physical_read_amplification": 1.083422746781116,
+      "physical_read_bytes": 264699904,
+      "policy": "cognitive_v0",
+      "policy_hit_rate": 0.14338235294117646,
+      "policy_latency_us": {
+        "p50": 407.82050000000004,
+        "p95": 451.97509999999994,
+        "p99": 499.97738
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13582336,
+        "private_clean_bytes": 67596288,
+        "private_dirty_bytes": 13582336,
+        "pss_anon_bytes": 13582336,
+        "pss_bytes": 84224000,
+        "pss_file_bytes": 70641664,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13570048,
+        "rss_bytes": 89255936,
+        "rss_file_bytes_status": 75673600,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8077312,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11255808,
+        "private_clean_bytes": 487424,
+        "private_dirty_bytes": 11255808,
+        "pss_anon_bytes": 11255808,
+        "pss_bytes": 14788608,
+        "pss_file_bytes": 3532800,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11239424,
+        "rss_bytes": 19820544,
+        "rss_file_bytes_status": 8564736,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8077312,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 233,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 39
+      },
+      "resident_hit_rate": 0.14338235294117646,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 3880150769766724352,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 152,
+      "transition_physical_read_bytes": 264699904,
+      "universe_pages": 512,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 589.309,
+        "p95": 769.62485,
+        "p99": 842.0538900000001
+      },
+      "anonymous_rss_growth_bytes": 2068480,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 152,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 152,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 360.395,
+          "p95": 376.899,
+          "p99": 379.543
+        },
+        "interventions": 152
+      },
+      "logical_miss_bytes": 226492416,
+      "major_faults": 137,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 19343,
+      "minor_faults": 3471,
+      "mode": "observability",
+      "order_index": 156,
+      "physical_eviction_regret": {
+        "1": 8,
+        "16": 33,
+        "2": 13,
+        "4": 16,
+        "8": 22
+      },
+      "physical_read_amplification": 1.0445601851851851,
+      "physical_read_bytes": 236584960,
+      "policy": "lru",
+      "policy_hit_rate": 0.20588235294117646,
+      "policy_latency_us": {
+        "p50": 13.22,
+        "p95": 17.10345,
+        "p99": 27.552120000000116
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13316096,
+        "private_clean_bytes": 67489792,
+        "private_dirty_bytes": 13316096,
+        "pss_anon_bytes": 13316096,
+        "pss_bytes": 83847168,
+        "pss_file_bytes": 70531072,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13303808,
+        "rss_bytes": 88858624,
+        "rss_file_bytes_status": 75542528,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8052736,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11247616,
+        "private_clean_bytes": 380928,
+        "private_dirty_bytes": 11247616,
+        "pss_anon_bytes": 11247616,
+        "pss_bytes": 14669824,
+        "pss_file_bytes": 3422208,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11235328,
+        "rss_bytes": 19681280,
+        "rss_file_bytes_status": 8433664,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8052736,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 216,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 56
+      },
+      "resident_hit_rate": 0.20588235294117646,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 4977718819716554496,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 137,
+      "transition_physical_read_bytes": 236584960,
+      "universe_pages": 256,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 459.6465,
+        "p95": 617.1877499999999,
+        "p99": 735.140050000001
+      },
+      "anonymous_rss_growth_bytes": 2015232,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "kernel_only",
+      "effective_immediate_evictions": 0,
+      "events": 272,
+      "eviction_effectiveness_immediate": null,
+      "eviction_requests": 0,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 206,
+      "final_hot_pages": 0,
+      "final_resident_pages": 206,
+      "ghost_hit_count": 66,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "kernel_only",
+        "intervention_us": {
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "interventions": 0
+      },
+      "logical_miss_bytes": 285212672,
+      "major_faults": 126,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 216006656,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 216006656,
+        "rss_bytes": 216006656,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 1547,
+      "minor_faults": 3304,
+      "mode": "observability",
+      "order_index": 161,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 0,
+        "2": 0,
+        "4": 0,
+        "8": 0
+      },
+      "physical_read_amplification": 0.8205422794117647,
+      "physical_read_bytes": 234029056,
+      "policy": "kernel_only",
+      "policy_hit_rate": 0.0,
+      "policy_latency_us": {
+        "p50": 4.4415,
+        "p95": 6.406999999999999,
+        "p99": 10.742700000000005
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13271040,
+        "private_clean_bytes": 216453120,
+        "private_dirty_bytes": 13271040,
+        "pss_anon_bytes": 13271040,
+        "pss_bytes": 232774656,
+        "pss_file_bytes": 219503616,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13258752,
+        "rss_bytes": 237821952,
+        "rss_file_bytes_status": 224550912,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8097792,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11255808,
+        "private_clean_bytes": 446464,
+        "private_dirty_bytes": 11255808,
+        "pss_anon_bytes": 11255808,
+        "pss_bytes": 14754816,
+        "pss_file_bytes": 3499008,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11243520,
+        "rss_bytes": 19800064,
+        "rss_file_bytes_status": 8544256,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8097792,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 206,
+        "cold_resident": 66,
+        "hot_nonresident": 0,
+        "hot_resident": 0
+      },
+      "resident_hit_rate": 0.2426470588235294,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 3880150769766724352,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 126,
+      "transition_physical_read_bytes": 234029056,
+      "universe_pages": 512,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 544.057,
+        "p95": 755.97785,
+        "p99": 793.9408500000003
+      },
+      "anonymous_rss_growth_bytes": 2355200,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 183,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 183,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 351.392,
+          "p95": 451.84,
+          "p99": 477.128
+        },
+        "interventions": 183
+      },
+      "logical_miss_bytes": 258998272,
+      "major_faults": 177,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67125248,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67125248,
+        "rss_bytes": 67125248,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 123404,
+      "minor_faults": 4020,
+      "mode": "observability",
+      "order_index": 185,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 8,
+        "2": 7,
+        "4": 8,
+        "8": 8
+      },
+      "physical_read_amplification": 1.111589068825911,
+      "physical_read_bytes": 287899648,
+      "policy": "cognitive_v0",
+      "policy_hit_rate": 0.09191176470588236,
+      "policy_latency_us": {
+        "p50": 413.25800000000004,
+        "p95": 644.1738499999999,
+        "p99": 669.7446100000001
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13611008,
+        "private_clean_bytes": 67571712,
+        "private_dirty_bytes": 13611008,
+        "pss_anon_bytes": 13611008,
+        "pss_bytes": 84233216,
+        "pss_file_bytes": 70622208,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13594624,
+        "rss_bytes": 89280512,
+        "rss_file_bytes_status": 75669504,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8097792,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11255808,
+        "private_clean_bytes": 446464,
+        "private_dirty_bytes": 11255808,
+        "pss_anon_bytes": 11255808,
+        "pss_bytes": 14754816,
+        "pss_file_bytes": 3499008,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11243520,
+        "rss_bytes": 19800064,
+        "rss_file_bytes_status": 8544256,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8097792,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 247,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 25
+      },
+      "resident_hit_rate": 0.09191176470588236,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 5454442328567064064,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 177,
+      "transition_physical_read_bytes": 287899648,
+      "universe_pages": 1024,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 572.3135,
+        "p95": 667.56395,
+        "p99": 725.8563300000005
+      },
+      "anonymous_rss_growth_bytes": 2068480,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 186,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 186,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 360.214,
+          "p95": 387.745,
+          "p99": 445.121
+        },
+        "interventions": 186
+      },
+      "logical_miss_bytes": 262144000,
+      "major_faults": 165,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 19343,
+      "minor_faults": 4016,
+      "mode": "observability",
+      "order_index": 256,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 27,
+        "2": 4,
+        "4": 14,
+        "8": 22
+      },
+      "physical_read_amplification": 1.07975,
+      "physical_read_bytes": 283049984,
+      "policy": "lru",
+      "policy_hit_rate": 0.08088235294117647,
+      "policy_latency_us": {
+        "p50": 11.887,
+        "p95": 15.613449999999998,
+        "p99": 25.63479000000002
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13320192,
+        "private_clean_bytes": 67584000,
+        "private_dirty_bytes": 13320192,
+        "pss_anon_bytes": 13320192,
+        "pss_bytes": 83969024,
+        "pss_file_bytes": 70648832,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13312000,
+        "rss_bytes": 88997888,
+        "rss_file_bytes_status": 75677696,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8093696,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11251712,
+        "private_clean_bytes": 475136,
+        "private_dirty_bytes": 11251712,
+        "pss_anon_bytes": 11251712,
+        "pss_bytes": 14765056,
+        "pss_file_bytes": 3513344,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11239424,
+        "rss_bytes": 19820544,
+        "rss_file_bytes_status": 8568832,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8093696,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 250,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 22
+      },
+      "resident_hit_rate": 0.08088235294117647,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 3880150769766724352,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 165,
+      "transition_physical_read_bytes": 283049984,
+      "universe_pages": 512,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 524.9335000000001,
+        "p95": 657.0913499999999,
+        "p99": 744.937
+      },
+      "anonymous_rss_growth_bytes": 2273280,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 149,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 149,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 347.145,
+          "p95": 379.002,
+          "p99": 421.515
+        },
+        "interventions": 149
+      },
+      "logical_miss_bytes": 223346688,
+      "major_faults": 142,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 105004,
+      "minor_faults": 3463,
+      "mode": "observability",
+      "order_index": 295,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 27,
+        "2": 3,
+        "4": 6,
+        "8": 12
+      },
+      "physical_read_amplification": 1.0501760563380282,
+      "physical_read_bytes": 234553344,
+      "policy": "cognitive_v0",
+      "policy_hit_rate": 0.21691176470588236,
+      "policy_latency_us": {
+        "p50": 408.08050000000003,
+        "p95": 437.21349999999995,
+        "p99": 500.06468000000007
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13524992,
+        "private_clean_bytes": 67514368,
+        "private_dirty_bytes": 13524992,
+        "pss_anon_bytes": 13524992,
+        "pss_bytes": 84077568,
+        "pss_file_bytes": 70552576,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13512704,
+        "rss_bytes": 89108480,
+        "rss_file_bytes_status": 75583488,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8069120,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11251712,
+        "private_clean_bytes": 405504,
+        "private_dirty_bytes": 11251712,
+        "pss_anon_bytes": 11251712,
+        "pss_bytes": 14695424,
+        "pss_file_bytes": 3443712,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11235328,
+        "rss_bytes": 19726336,
+        "rss_file_bytes_status": 8474624,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8069120,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 213,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 59
+      },
+      "resident_hit_rate": 0.21691176470588236,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 4977718819716554496,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 142,
+      "transition_physical_read_bytes": 234553344,
+      "universe_pages": 256,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 540.1610000000001,
+        "p95": 655.9023,
+        "p99": 1397.7522200000183
+      },
+      "anonymous_rss_growth_bytes": 2015232,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "kernel_only",
+      "effective_immediate_evictions": 0,
+      "events": 272,
+      "eviction_effectiveness_immediate": null,
+      "eviction_requests": 0,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 233,
+      "final_hot_pages": 0,
+      "final_resident_pages": 233,
+      "ghost_hit_count": 39,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "kernel_only",
+        "intervention_us": {
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "interventions": 0
+      },
+      "logical_miss_bytes": 285212672,
+      "major_faults": 164,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 244318208,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 244318208,
+        "rss_bytes": 244318208,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 1547,
+      "minor_faults": 3737,
+      "mode": "observability",
+      "order_index": 304,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 0,
+        "2": 0,
+        "4": 0,
+        "8": 0
+      },
+      "physical_read_amplification": 0.9538143382352942,
+      "physical_read_bytes": 272039936,
+      "policy": "kernel_only",
+      "policy_hit_rate": 0.0,
+      "policy_latency_us": {
+        "p50": 3.966,
+        "p95": 5.153449999999999,
+        "p99": 12.430610000000119
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13271040,
+        "private_clean_bytes": 244822016,
+        "private_dirty_bytes": 13271040,
+        "pss_anon_bytes": 13271040,
+        "pss_bytes": 261135360,
+        "pss_file_bytes": 247864320,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13258752,
+        "rss_bytes": 266149888,
+        "rss_file_bytes_status": 252878848,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8056832,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11255808,
+        "private_clean_bytes": 503808,
+        "private_dirty_bytes": 11255808,
+        "pss_anon_bytes": 11255808,
+        "pss_bytes": 14804992,
+        "pss_file_bytes": 3549184,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11247616,
+        "rss_bytes": 19816448,
+        "rss_file_bytes_status": 8560640,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8056832,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 233,
+        "cold_resident": 39,
+        "hot_nonresident": 0,
+        "hot_resident": 0
+      },
+      "resident_hit_rate": 0.14338235294117646,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 5454442328567064064,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 164,
+      "transition_physical_read_bytes": 272039936,
+      "universe_pages": 1024,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 471.6405,
+        "p95": 785.8889,
+        "p99": 833.4581500000006
+      },
+      "anonymous_rss_growth_bytes": 2007040,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "kernel_only",
+      "effective_immediate_evictions": 0,
+      "events": 272,
+      "eviction_effectiveness_immediate": null,
+      "eviction_requests": 0,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 161,
+      "final_hot_pages": 0,
+      "final_resident_pages": 161,
+      "ghost_hit_count": 111,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "kernel_only",
+        "intervention_us": {
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "interventions": 0
+      },
+      "logical_miss_bytes": 285212672,
+      "major_faults": 93,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 168820736,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 168820736,
+        "rss_bytes": 168820736,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 1547,
+      "minor_faults": 2583,
+      "mode": "observability",
+      "order_index": 337,
+      "physical_eviction_regret": {
+        "1": 0,
+        "16": 0,
+        "2": 0,
+        "4": 0,
+        "8": 0
+      },
+      "physical_read_amplification": 0.6201746323529411,
+      "physical_read_bytes": 176881664,
+      "policy": "kernel_only",
+      "policy_hit_rate": 0.0,
+      "policy_latency_us": {
+        "p50": 4.281000000000001,
+        "p95": 6.98,
+        "p99": 7.448400000000001
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13254656,
+        "private_clean_bytes": 169259008,
+        "private_dirty_bytes": 13254656,
+        "pss_anon_bytes": 13254656,
+        "pss_bytes": 185552896,
+        "pss_file_bytes": 172298240,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13242368,
+        "rss_bytes": 190599168,
+        "rss_file_bytes_status": 177344512,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8085504,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11247616,
+        "private_clean_bytes": 438272,
+        "private_dirty_bytes": 11247616,
+        "pss_anon_bytes": 11247616,
+        "pss_bytes": 14723072,
+        "pss_file_bytes": 3475456,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11235328,
+        "rss_bytes": 19771392,
+        "rss_file_bytes_status": 8523776,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8085504,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 161,
+        "cold_resident": 111,
+        "hot_nonresident": 0,
+        "hot_resident": 0
+      },
+      "resident_hit_rate": 0.40808823529411764,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 4977718819716554496,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 93,
+      "transition_physical_read_bytes": 176881664,
+      "universe_pages": 256,
+      "workload": "realistic_mix"
+    },
+    {
+      "access_latency_us": {
+        "p50": 403.85900000000004,
+        "p95": 602.0572999999999,
+        "p99": 657.414
+      },
+      "anonymous_rss_growth_bytes": 2232320,
+      "budget_mib": 64,
+      "budget_overshoot_bytes": {
+        "max": null,
+        "median": null,
+        "p95": null
+      },
+      "cold_classification": "COLD",
+      "controller": "madv_pageout",
+      "effective_immediate_evictions": 86,
+      "events": 272,
+      "eviction_effectiveness_immediate": 1.0,
+      "eviction_requests": 86,
+      "false_hot_count": 0,
+      "final_false_hot_pages": 0,
+      "final_ghost_pages": 0,
+      "final_hot_pages": 64,
+      "final_resident_pages": 64,
+      "ghost_hit_count": 0,
+      "initial_resident_pages": 0,
+      "intervention": {
+        "controller": "madv_pageout",
+        "failures": 0,
+        "intervention_us": {
+          "p50": 346.954,
+          "p95": 377.831,
+          "p99": 379.683
+        },
+        "interventions": 86
+      },
+      "logical_miss_bytes": 157286400,
+      "major_faults": 93,
+      "mapped_file_memory_after": {
+        "anonymous_bytes": 0,
+        "available": true,
+        "mapping_count": 1,
+        "private_clean_bytes": 67108864,
+        "private_dirty_bytes": 0,
+        "pss_bytes": 67108864,
+        "rss_bytes": 67108864,
+        "shared_clean_bytes": 0,
+        "shared_dirty_bytes": 0,
+        "size_bytes": 1073741824
+      },
+      "metadata_bytes": 97428,
+      "minor_faults": 2444,
+      "mode": "observability",
+      "order_index": 342,
+      "physical_eviction_regret": {
+        "1": 2,
+        "16": 30,
+        "2": 6,
+        "4": 12,
+        "8": 19
+      },
+      "physical_read_amplification": 1.0158333333333334,
+      "physical_read_bytes": 159776768,
+      "policy": "cognitive_v0",
+      "policy_hit_rate": 0.4485294117647059,
+      "policy_latency_us": {
+        "p50": 9.69,
+        "p95": 428.841,
+        "p99": 439.87247
+      },
+      "process_memory_after": {
+        "anonymous_bytes": 13484032,
+        "private_clean_bytes": 67588096,
+        "private_dirty_bytes": 13484032,
+        "pss_anon_bytes": 13484032,
+        "pss_bytes": 84133888,
+        "pss_file_bytes": 70649856,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 13471744,
+        "rss_bytes": 89157632,
+        "rss_file_bytes_status": 75673600,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8085504,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "process_memory_before": {
+        "anonymous_bytes": 11251712,
+        "private_clean_bytes": 479232,
+        "private_dirty_bytes": 11251712,
+        "pss_anon_bytes": 11251712,
+        "pss_bytes": 14792704,
+        "pss_file_bytes": 3540992,
+        "pss_shmem_bytes": 0,
+        "rss_anon_bytes_status": 11235328,
+        "rss_bytes": 19816448,
+        "rss_file_bytes_status": 8564736,
+        "rss_shmem_bytes_status": 0,
+        "shared_clean_bytes": 8085504,
+        "shared_dirty_bytes": 0,
+        "swap_bytes": 0
+      },
+      "repetition": 0,
+      "residency_matrix": {
+        "cold_nonresident": 150,
+        "cold_resident": 0,
+        "hot_nonresident": 0,
+        "hot_resident": 122
+      },
+      "resident_hit_rate": 0.4485294117647059,
+      "resident_snapshots": [],
+      "return_major_faults": 0,
+      "return_physical_read_bytes": 0,
+      "sink": 71461060038530560,
+      "trace": "/workspaces/Pal-Server/Brain-SSD/results/phase4a/traces/holdout/realistic_mix-100.jsonl.gz",
+      "track": "cardinality",
+      "transition_major_faults": 93,
+      "transition_physical_read_bytes": 159776768,
+      "universe_pages": 128,
+      "workload": "realistic_mix"
+    }
+  ],
+  "child_cgroup": {
+    "memory_max": "max",
+    "path": "0::/init",
+    "subtree_control": "cpuset cpu io memory hugetlb pids rdma misc",
+    "v2": true,
+    "writable": false
+  },
+  "cognitive_vs_lru_aggregate": {
+    "logical_saved_bytes": -17825792.0,
+    "physical_saved_bytes": -18219008.0,
+    "realized_savings_ratio": null
+  },
+  "corpus_bytes": 1073741824,
+  "four_gib_materialized": false,
+  "logical_page_bytes": 1048576,
+  "metadata_100g_estimate": {
+    "caveat": "linear extrapolation of Phase 4A Python-object measurements, not a production representation",
+    "cognitive_python_bytes": 26559488,
+    "lru_python_bytes": 3831808,
+    "pages": 102400
+  },
+  "no_duplication": {
+    "anonymous_rss_growth_bytes_max": 2359296,
+    "anonymous_rss_growth_bytes_median": 2031616.0,
+    "passed": true,
+    "threshold_bytes": 8388608
+  },
+  "order_seed": 20260807,
+  "pageout": {
+    "budget_overshoot_p95_bytes_median": 0.0,
+    "eviction_effectiveness_median": 1.0,
+    "intervention_p50_us_median": 350.9805,
+    "intervention_p95_us_median": 377.42449999999997,
+    "intervention_p99_us_median": 391.105,
+    "physical_regret_8_total": 4708
+  },
+  "performance": {
+    "cognitive_v0": {
+      "access_p50_us_median": 466.13175,
+      "access_p95_us_median": 633.2106249999999,
+      "physical_read_bytes_median": 189988864.0
+    },
+    "kernel_only": {
+      "access_p50_us_median": 268.17275,
+      "access_p95_us_median": 620.4036,
+      "physical_read_bytes_median": 168296448.0
+    },
+    "lru": {
+      "access_p50_us_median": 284.322,
+      "access_p95_us_median": 599.1755499999999,
+      "physical_read_bytes_median": 179306496.0
+    }
+  },
+  "quality_invariant": "Router and trace content/order are frozen; residency runs consume the trace and cannot alter Recall/Precision.",
+  "repetitions": 2,
+  "runs": 356,
+  "schema_version": 1,
+  "shadow": {
+    "false_hot_median": 0.0,
+    "ghost_hits_median": 11.0,
+    "physical_read_bytes_median": 168296448.0,
+    "resident_hit_rate_median": 0.42625,
+    "runs": 48
+  }
+}

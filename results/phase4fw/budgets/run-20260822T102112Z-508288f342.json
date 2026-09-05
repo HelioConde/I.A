@@ -1,0 +1,342 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 2016,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 28.4831,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 505,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 365,
+        "estimated_tokens": 104,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 0,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.5646422451833143,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "* **check_same_thread** (*bool*) -- If \"True\" (default), \"ProgrammingError\" will be raised if the database connection is used by a thread other than the one that created it. If \"False\", the connection may be accessed in multiple threads; write operations may need to be serialized by the user to avoid data corruption. See \"threadsafety\" for more information.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 422,
+        "estimated_tokens": 74,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 2,
+        "record_id": "1c0af7eacc3877bdb1335e96",
+        "score": 0.4514540018780939,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 181,
+        "text": "Changed in version 3.13: Positional use of the parameters *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements*, and *uri* is deprecated. They will become keyword-only parameters in Python 3.15.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1369,
+        "estimated_tokens": 69,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 5,
+        "record_id": "986a75c75cde83776823fb18",
+        "score": 0.38310492547852987,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 1151,
+        "text": "sqlite3.connect(database, timeout=5.0, detect_types=0, isolation_level='DEFERRED', check_same_thread=True, factory=sqlite3.Connection, cached_statements=128, uri=False, *, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)",
+        "title": "sqlite3"
+      },
+      {
+        "end": 682,
+        "estimated_tokens": 58,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 2,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.32979376033482954,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 506,
+        "text": "* **cached_statements** (*int*) -- The number of statements that \"sqlite3\" should internally cache for this connection, to avoid parsing overhead. By default, 128 statements.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1338,
+        "estimated_tokens": 92,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 4,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.3264604270014962,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 1022,
+        "text": "* **autocommit** (*bool*) -- Control **PEP 249** transaction handling behaviour. See \"Connection.autocommit\" and Transaction control via the autocommit attribute for more information. *autocommit* currently defaults to \"LEGACY_TRANSACTION_CONTROL\". The default will change to \"False\" in a future Python release.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 714,
+        "estimated_tokens": 60,
+        "kind": "sentence",
+        "page_id": 0,
+        "position": 4,
+        "record_id": "4b64abfa66f5631bd8fb7e85",
+        "score": 0.31309663815276617,
+        "section": "threads",
+        "source_id": "python-3.14.7-docs",
+        "start": 530,
+        "text": "However, even on builds with the GIL disabled, it is still required to have an attached thread state, as the interpreter needs to keep track of which threads may access Python objects.",
+        "title": "threads"
+      },
+      {
+        "end": 504,
+        "estimated_tokens": 48,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 1,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.27941497245604163,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 367,
+        "text": "* **factory** (*Connection*) -- A custom subclass of \"Connection\" to create the connection with, if not the default \"Connection\" class.",
+        "title": "sqlite3"
+      }
+    ],
+    "records_pruned": [
+      "41d8d7a86ee2fba05c85ec2a",
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "records_retained": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 7,
+    "source_ids": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **check_same_thread** (*bool*) -- If \"True\" (default), \"ProgrammingError\" will be raised if the database connection is used by a thread other than the one that created it. If \"False\", the connection may be accessed in multiple threads; write operations may need to be serialized by the user to avoid data corruption. See \"threadsafety\" for more information.\n\n[SOURCE: 1c0af7eacc3877bdb1335e96] sqlite3 — sqlite3\nChanged in version 3.13: Positional use of the parameters *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements*, and *uri* is deprecated. They will become keyword-only parameters in Python 3.15.\n\n[SOURCE: 986a75c75cde83776823fb18] sqlite3 — sqlite3\nsqlite3.connect(database, timeout=5.0, detect_types=0, isolation_level='DEFERRED', check_same_thread=True, factory=sqlite3.Connection, cached_statements=128, uri=False, *, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **cached_statements** (*int*) -- The number of statements that \"sqlite3\" should internally cache for this connection, to avoid parsing overhead. By default, 128 statements.\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **autocommit** (*bool*) -- Control **PEP 249** transaction handling behaviour. See \"Connection.autocommit\" and Transaction control via the autocommit attribute for more information. *autocommit* currently defaults to \"LEGACY_TRANSACTION_CONTROL\". The default will change to \"False\" in a future Python release.\n\n[SOURCE: 4b64abfa66f5631bd8fb7e85] threads — threads\nHowever, even on builds with the GIL disabled, it is still required to have an attached thread state, as the interpreter needs to keep track of which threads may access Python objects.\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **factory** (*Connection*) -- A custom subclass of \"Connection\" to create the connection with, if not the default \"Connection\" class."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2693,
+    "context_activation_rate": 0.18752320831786112,
+    "context_density": 0.11287128712871287,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 252.5,
+    "useful_oracle_tokens": 57
+  },
+  "context_sha256": "a779a3e1c2f35c4629754cfbbddd742b2f61ce2a821623f67107b9454fb96630",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 713,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.5,
+      "required_facts_found": 1,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "- **By default**, `check_same_thread` is set to `True`, which raises a `ProgrammingError` if the database connection is used by a different thread.  \n- **If `check_same_thread` is disabled**, the user must ensure that the database connection is used in a thread-safe manner, possibly by serializing writes or using a thread-safe library.  \n\nSOURCE: [d1218136e7c0557a25",
+    "metrics": {
+      "backend_total_ms": 7044.003100018017,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 62.0,
+      "cpu_kernel_seconds": 1.078125,
+      "cpu_percent_total_average": 399.7194436204604,
+      "cpu_percent_total_peak": 593.4934132139327,
+      "cpu_time_seconds": 28.15625,
+      "cpu_user_seconds": 27.078125,
+      "generated_tokens": 96,
+      "generation_eval_ms": 3624.124,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 7044.003100018017,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621289472,
+      "private_bytes_min": 619458560,
+      "prompt_eval_ms": 3406.692,
+      "prompt_tokens": 713,
+      "prompt_tokens_per_second": 209.2939426282153,
+      "queries_served": 62,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 61,
+      "system_available_ram_bytes_min": 3187773440,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 26.489159863183488,
+      "ttft_ms": 3418.9036999596283,
+      "working_set_bytes_max": 1208233984,
+      "working_set_bytes_min": 1206407168,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 779
+    },
+    "output_sha256": "7f8139fa945c71fae929aa942db0dbdc4608f3be771c1d5d8202fa18b6fa4630",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_thread_connection::EXTRACTIVE_B512",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 61,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 504,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 91,
+    "other_or_chat_envelope": 91,
+    "percent": {
+      "evidence": 70.68723702664796,
+      "instructions": 12.622720897615709,
+      "other_or_chat_envelope": 12.762973352033661,
+      "question": 3.9270687237026647
+    },
+    "question": 28,
+    "total": 713
+  },
+  "prompt_sha256": "a2faedb9a4ae70079223114f4d526738183b9492ac07b06796483cabf55ce8a6",
+  "query_spec": {
+    "category": "multi_record",
+    "expected_record_ids": [
+      "1c0af7eacc3877bdb1335e96"
+    ],
+    "query": "In Python sqlite3, what happens with check_same_thread by default and what must the user do if it is disabled?",
+    "query_id": "holdout_thread_connection",
+    "required_fact_groups": [
+      [
+        "programmingerror"
+      ],
+      [
+        "serialized",
+        "serialize"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      0,
+      4,
+      5,
+      6
+    ],
+    "record_bytes": 10757,
+    "records_retrieved": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85",
+      "41d8d7a86ee2fba05c85ec2a",
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102112Z-508288f342",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:21:12Z",
+  "variant": "EXTRACTIVE_B512",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

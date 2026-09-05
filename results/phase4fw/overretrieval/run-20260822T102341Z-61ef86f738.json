@@ -1,0 +1,374 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4093,
+    "distiller_cpu_ms": 0.0,
+    "distiller_wall_ms": 1.7596,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1025,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 5,
+        "record_id": "d1218136e7c0557a257511f4",
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "title": "sqlite3"
+      },
+      {
+        "page_id": 4,
+        "record_id": "1c0af7eacc3877bdb1335e96",
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "title": "sqlite3"
+      },
+      {
+        "page_id": 0,
+        "record_id": "4b64abfa66f5631bd8fb7e85",
+        "section": "threads",
+        "source_id": "python-3.14.7-docs",
+        "title": "threads"
+      }
+    ],
+    "records_pruned": [
+      "986a75c75cde83776823fb18",
+      "41d8d7a86ee2fba05c85ec2a",
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "records_retained": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "4b64abfa66f5631bd8fb7e85"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "4b64abfa66f5631bd8fb7e85"
+    ],
+    "text": "[SOURCE: d1218136e7c0557a257511f4] sqlite3\n* **check_same_thread** (*bool*) -- If \"True\" (default), \"ProgrammingError\" will be raised if the database connection is used by a thread other than the one that created it. If \"False\", the connection may be accessed in multiple threads; write operations may need to be serialized by the user to avoid data corruption. See \"threadsafety\" for more information. * **factory** (*Connection*) -- A custom subclass of \"Connection\" to create the connection with, if not the default \"Connection\" class. * **cached_statements** (*int*) -- The number of statements that \"sqlite3\" should internally cache for this connection, to avoid parsing overhead. By default, 128 statements. * **uri** (*bool*) -- If set to \"True\", *database* is interpreted as a URI (Uniform Resource Identifier) with a file path and an optional query string. The scheme part *must* be \"\"file:\"\", and the path can be relative or absolute. The query string allows passing parameters to SQLite, enabling various How to work with SQLite URIs. * **autocommit** (*bool*) -- Control **PEP 249** transaction handling behaviour. See \"Connection.autocommit\" and Transaction control via the autocommit attribute for more information. *autocommit* currently defaults to \"LEGACY_TRANSACTION_CONTROL\". The default will change to \"False\" in a future Python release.\n\n[SOURCE: 1c0af7eacc3877bdb1335e96] sqlite3\nRaises an auditing event \"sqlite3.connect/handle\" with argument \"connection_handle\". Changed in version 3.7: *database* can now also be a *path-like object*, not only a string. Changed in version 3.13: Positional use of the parameters *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements*, and *uri* is deprecated. They will become keyword-only parameters in Python 3.15. Return \"True\" if the string *statement* appears to contain one or more complete SQL statements. No syntactic verification or parsing of any kind is performed, other than checking that there are no unclosed string literals and the statement is terminated by a semicolon. >>> sqlite3.complete_statement(\"SELECT foo FROM bar;\") True >>> sqlite3.complete_statement(\"SELECT foo\") False This function may be useful during command-line input to determine if the entered text seems to form a complete SQL statement, or if additional input is needed before calling \"execute()\". Enable or disable callback tracebacks. By default you will not get any tracebacks in user-defined functions, aggregates, converters, authorizer callbacks etc. If you want to debug them, you can call this function with *flag* set to \"True\". Afterwards, you will get tracebacks from callbacks on \"sys.stderr\". Use \"False\" to disable the feature again.\n\n[SOURCE: 4b64abfa66f5631bd8fb7e85] threads\nThe Python interpreter keeps some thread-local information inside a data structure called \"PyThreadState\", known as a *thread state*. Each thread has a thread-local pointer to a \"PyThreadState\"; a thread state referenced by this pointer is considered to be *attached*. A thread can only have one *attached thread state* at a time. An attached thread state is typically analogous with holding the GIL, except on free-threaded builds. On builds with the GIL enabled, attaching a thread state will block until the GIL can be acquired. However, even on builds with the GIL disabled, it is still required to have an attached thread state, as the interpreter needs to keep track of which threads may access Python objects. Even on the free-threaded build, attaching a thread state may block, as the GIL can be re-enabled or threads might be temporarily suspended (such as during a garbage collection). Generally, there will always be an attached thread state when using Python's C API, including during embedding and when implementing methods, so it's uncommon to need to set up a thread state on your own. Only in some specific cases, such as in a \"Py_BEGIN_ALLOW_THREADS\" block or in a fresh thread, will the thread not have an attached thread state. If uncertain, check if \"PyThreadState_GetUnchecked()\" returns \"NULL\"."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2693,
+    "context_activation_rate": 0.3806164129223914,
+    "context_density": 0.055609756097560976,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 512.5,
+    "useful_oracle_tokens": 57
+  },
+  "context_sha256": "d408ba61ad1314382a42abe9f2b530626805f454c82531dffd0ba3c74d7aa4fb",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1053,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "FALSE_NO_KNOWLEDGE",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 5931.591899949126,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 79.0,
+      "cpu_kernel_seconds": 0.984375,
+      "cpu_percent_total_average": 395.3934356171933,
+      "cpu_percent_total_peak": 594.1554118095632,
+      "cpu_time_seconds": 23.453125,
+      "cpu_user_seconds": 22.46875,
+      "generated_tokens": 6,
+      "generation_eval_ms": 227.158,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 5931.591899949126,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621395968,
+      "private_bytes_min": 619565056,
+      "prompt_eval_ms": 5689.849,
+      "prompt_tokens": 1053,
+      "prompt_tokens_per_second": 185.06642267659475,
+      "queries_served": 79,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 78,
+      "system_available_ram_bytes_min": 3073785856,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 26.41333345072593,
+      "ttft_ms": 5703.276099986397,
+      "working_set_bytes_max": 1208328192,
+      "working_set_bytes_min": 991731712,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 787
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_thread_connection::PRUNING_ONLY",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 78,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1025,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 39,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 97.340930674264,
+      "instructions": 8.547008547008547,
+      "other_or_chat_envelope": 0.0,
+      "question": 2.6590693257359925
+    },
+    "question": 28,
+    "total": 1053
+  },
+  "prompt_sha256": "54ff2a95e108fcafb0eb9ba3bb5d0cb9e19b7053bf56a600dfad1423f06aeeb2",
+  "query_spec": {
+    "category": "multi_record",
+    "expected_record_ids": [
+      "1c0af7eacc3877bdb1335e96"
+    ],
+    "query": "In Python sqlite3, what happens with check_same_thread by default and what must the user do if it is disabled?",
+    "query_id": "holdout_thread_connection",
+    "required_fact_groups": [
+      [
+        "programmingerror"
+      ],
+      [
+        "serialized",
+        "serialize"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      0,
+      4,
+      5,
+      6
+    ],
+    "record_bytes": 10757,
+    "records_retrieved": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85",
+      "41d8d7a86ee2fba05c85ec2a",
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102341Z-61ef86f738",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:23:41Z",
+  "variant": "PRUNING_ONLY",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "check",
+            "check_same_thread",
+            "default",
+            "must",
+            "python",
+            "same",
+            "sqlite3",
+            "thread",
+            "user"
+          ],
+          "record_id": "d1218136e7c0557a257511f4",
+          "score": 0.8469942034153249
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "check",
+            "check_same_thread",
+            "default",
+            "python",
+            "same",
+            "thread",
+            "user"
+          ],
+          "record_id": "1c0af7eacc3877bdb1335e96",
+          "score": 0.6720936946940783
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "check",
+            "check_same_thread",
+            "python",
+            "same",
+            "sqlite3",
+            "thread"
+          ],
+          "record_id": "986a75c75cde83776823fb18",
+          "score": 0.6319397147464
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "check",
+            "disabled",
+            "python",
+            "thread"
+          ],
+          "record_id": "4b64abfa66f5631bd8fb7e85",
+          "score": 0.6019178104850107
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "python",
+            "same",
+            "thread"
+          ],
+          "record_id": "41d8d7a86ee2fba05c85ec2a",
+          "score": 0.6276914689871129
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "check",
+            "python",
+            "same",
+            "thread"
+          ],
+          "record_id": "849a3a2e63a5f9c97c9d0239",
+          "score": 0.4726515159898259
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "check",
+            "python",
+            "thread"
+          ],
+          "record_id": "b670f20db7a5b7cdec8ffa75",
+          "score": 0.4784111539762798
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "must",
+            "same",
+            "thread"
+          ],
+          "record_id": "eb7fb534e0d4dbe48d372841",
+          "score": 0.4590714175650866
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "986a75c75cde83776823fb18",
+        "41d8d7a86ee2fba05c85ec2a",
+        "849a3a2e63a5f9c97c9d0239",
+        "b670f20db7a5b7cdec8ffa75",
+        "eb7fb534e0d4dbe48d372841"
+      ],
+      "retained_record_ids": [
+        "d1218136e7c0557a257511f4",
+        "1c0af7eacc3877bdb1335e96",
+        "4b64abfa66f5631bd8fb7e85"
+      ],
+      "wall_ms": 1.7596
+    }
+  }
+}

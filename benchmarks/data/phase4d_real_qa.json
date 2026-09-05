@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "ground_truth_policy": "Record identifiers and required facts were selected from the frozen source snapshot before retrieval evaluation. They are never provided to the runtime router.",
+  "queries": [
+    {
+      "query_id": "dev_json_ascii",
+      "split": "development",
+      "category": "direct_fact",
+      "query": "What does Python json.dumps do with non-ASCII characters when ensure_ascii is true?",
+      "expected_record_ids": ["2b0a025ac1549a6b04ae5a17"],
+      "required_fact_groups": [["escaped"], ["non-ascii"]]
+    },
+    {
+      "query_id": "dev_sql_params",
+      "split": "development",
+      "category": "procedure",
+      "query": "How should variables be bound safely in Python sqlite3 execute instead of formatting SQL strings?",
+      "expected_record_ids": ["0be5e11beaf36611325a42aa"],
+      "required_fact_groups": [["placeholder", "parameter substitution"], ["tuple", "dict", "sequence"]]
+    },
+    {
+      "query_id": "dev_wal_concurrency",
+      "split": "development",
+      "category": "paraphrase",
+      "query": "Can SQLite readers and a writer operate at the same time in write-ahead logging mode, and why?",
+      "expected_record_ids": ["d43d637b9c5311cd0567076e"],
+      "required_fact_groups": [["simultaneous", "same time"], ["write-ahead log", "wal"], ["original database", "snapshot"]]
+    },
+    {
+      "query_id": "dev_busy",
+      "split": "development",
+      "category": "partial_terminology",
+      "query": "SQLite locked file default response and API to wait instead?",
+      "expected_record_ids": ["f58b2c4d54169ef7d0eda88e"],
+      "required_fact_groups": [["sqlite_busy"], ["sqlite3_busy_timeout", "sqlite3_busy_handler"]]
+    },
+    {
+      "query_id": "dev_eager",
+      "split": "development",
+      "category": "procedure",
+      "query": "When does asyncio eager_task_factory avoid event-loop scheduling and what semantic risk does it introduce?",
+      "expected_record_ids": ["c72c7a600a58acbbe5c14663"],
+      "required_fact_groups": [["synchronously"], ["only scheduled", "if they block"], ["execution order", "semantic change"]]
+    },
+    {
+      "query_id": "dev_unknown",
+      "split": "development",
+      "category": "unknown",
+      "query": "Which reed strength does the Zephyr ZX-9 saxophone require?",
+      "expected_record_ids": [],
+      "required_fact_groups": []
+    },
+    {
+      "query_id": "holdout_json_frames",
+      "split": "holdout",
+      "category": "distractor",
+      "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+      "expected_record_ids": ["2b0a025ac1549a6b04ae5a17"],
+      "required_fact_groups": [["not a framed protocol"], ["invalid json"]]
+    },
+    {
+      "query_id": "holdout_wal_checkpoint",
+      "split": "holdout",
+      "category": "direct_fact",
+      "query": "At what WAL size does SQLite automatically checkpoint by default?",
+      "expected_record_ids": ["c881b56dc9b63d07517c60ad"],
+      "required_fact_groups": [["1000 pages"]]
+    },
+    {
+      "query_id": "holdout_thread_connection",
+      "split": "holdout",
+      "category": "multi_record",
+      "query": "In Python sqlite3, what happens with check_same_thread by default and what must the user do if it is disabled?",
+      "expected_record_ids": ["1c0af7eacc3877bdb1335e96"],
+      "required_fact_groups": [["programmingerror"], ["serialized", "serialize"]]
+    },
+    {
+      "query_id": "holdout_thread_modes",
+      "split": "holdout",
+      "category": "multi_domain",
+      "query": "Map SQLITE_THREADSAFE values zero, one, and two to SQLite threading modes.",
+      "expected_record_ids": ["9123361d84e174851100ff2e"],
+      "required_fact_groups": [["threadsafe=0", "single-thread"], ["threadsafe=1", "serialized"], ["threadsafe=2", "multi-thread"]]
+    },
+    {
+      "query_id": "holdout_busy_typo",
+      "split": "holdout",
+      "category": "typo_noise",
+      "query": "sqllite is lokced -- wich C api changes the immediate SQLITE_BUSY behaviour?",
+      "expected_record_ids": ["f58b2c4d54169ef7d0eda88e"],
+      "required_fact_groups": [["sqlite3_busy_timeout", "sqlite3_busy_handler"]]
+    },
+    {
+      "query_id": "holdout_eager_paraphrase",
+      "split": "holdout",
+      "category": "paraphrase",
+      "query": "Which asyncio task factory starts coroutine work immediately and schedules it only after blocking?",
+      "expected_record_ids": ["c72c7a600a58acbbe5c14663"],
+      "required_fact_groups": [["eager_task_factory"], ["synchronously"], ["if they block", "only scheduled"]]
+    },
+    {
+      "query_id": "holdout_python_sqlite",
+      "split": "holdout",
+      "category": "multi_document",
+      "query": "How do I bind a year value with a question-mark placeholder using Python sqlite3, and what does SQLite return by default if another process locks the file?",
+      "expected_record_ids": ["0be5e11beaf36611325a42aa", "f58b2c4d54169ef7d0eda88e"],
+      "required_fact_groups": [["placeholder", "parameter substitution"], ["sqlite_busy"]]
+    },
+    {
+      "query_id": "holdout_unknown_near",
+      "split": "holdout",
+      "category": "unknown_not_in_corpus",
+      "query": "What is the exact default cache size of the Python OrionDB driver?",
+      "expected_record_ids": [],
+      "required_fact_groups": []
+    }
+  ]
+}

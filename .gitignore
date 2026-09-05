@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+build/
+launcher/**/bin/
+launcher/**/obj/
+models/*.gguf
+third_party/
+brain_data/**/brain.dat
+brain_data/**/*.tmp

@@ -1,0 +1,107 @@
+{
+  "canonical": false,
+  "checks": {
+    "llama_commit": true,
+    "model_bytes": true,
+    "model_hash": true,
+    "qa_split": true,
+    "server_hash": true
+  },
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context_builder_v0_modified": false,
+  "default_changed": false,
+  "dev_queries": 6,
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "experiment": "PHASE_4F_W",
+  "frozen_before": {
+    "results/phase4d": {
+      "exists": true,
+      "files": 5,
+      "sha256": "2778243cf0bf1c1e2bf09df3544adbb1e85337624b7549370cd435b78796e395"
+    },
+    "results/phase4e": {
+      "exists": true,
+      "files": 8,
+      "sha256": "d7acce5c22c88ee12b2cb69670c4f5e0318792230738c107633d482edd4b495a"
+    },
+    "results/phase4ew": {
+      "exists": true,
+      "files": 22,
+      "sha256": "baf5863a00ab6895204caabd841a154c6b96f0ad42bd0fbd9b6c7596e11a8713"
+    },
+    "results/windows_core_runtime": {
+      "exists": true,
+      "files": 28,
+      "sha256": "241eb6b3a9209acfa44ee73bad2dc3874a82a432c7514b95291f6b41c8a1e1ce"
+    },
+    "results/windows_core_runtime_1b": {
+      "exists": true,
+      "files": 16,
+      "sha256": "b517a7b36300b3d1ed3354ae2d645a5945ea85204c4585f5fe7dd1f62cc59e4c"
+    },
+    "results/windows_native": {
+      "exists": true,
+      "files": 9,
+      "sha256": "cf086341ae84fa993b1e2d35dcd08b1accf33b1b313285f3ea55fecbea5b60b1"
+    }
+  },
+  "holdout_queries": 8,
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "audit",
+  "oracle_runtime_allowed": false,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "quick": false,
+  "run_id": "audit-20260822T101157Z-abbb4e9f47",
+  "schema_version": 1,
+  "second_llm_used": false,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:11:57Z"
+}

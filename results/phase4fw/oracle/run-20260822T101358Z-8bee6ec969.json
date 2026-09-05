@@ -1,0 +1,253 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 382,
+    "context_fact_recall": 1.0,
+    "covered_fact_groups": [
+      0,
+      1
+    ],
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 2891.3832,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 96,
+    "evaluation_only": true,
+    "metadata_bytes": 0,
+    "oracle_runtime_allowed": false,
+    "oracle_wall_ms": 2891.3832,
+    "provenance": [
+      {
+        "end": 920,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 3,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 582,
+        "text": "* **ensure_ascii** (*bool*) -- If \"True\" (the default), the output is guaranteed to have all incoming non-ASCII and non- printable characters escaped. If \"False\", all characters will be outputted as-is, except for the characters that must be escaped: quotation mark, reverse solidus, and the control characters U+0000 through U+001F.",
+        "title": "json"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "required_fact_groups": 2,
+    "sentences_retained": 1,
+    "source_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "text": "[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\n* **ensure_ascii** (*bool*) -- If \"True\" (the default), the output is guaranteed to have all incoming non-ASCII and non- printable characters escaped. If \"False\", all characters will be outputted as-is, except for the characters that must be escaped: quotation mark, reverse solidus, and the control characters U+0000 through U+001F."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2394,
+    "context_activation_rate": 0.040100250626566414,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 48.0,
+    "useful_oracle_tokens": 96
+  },
+  "context_sha256": "a6622b0b85708fcf31b6e3c2f0379756fcf794c2555409894e1df26c23f19d5e",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 216,
+    "answer_quality": {
+      "cited_source_ids": [
+        "2b0a025ac1549a6b04ae5a17"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 2,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": true,
+    "diagnostic": "PASS",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "[SOURCE: 2b0a025ac1549a6b04ae5a17]  \nWhen `ensure_ascii` is set to `True`, Python `json.dumps` ensures that non-ASCII characters are escaped, preserving their original form.",
+    "metrics": {
+      "backend_total_ms": 3208.5490999743342,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 11.0,
+      "cpu_kernel_seconds": 0.671875,
+      "cpu_percent_total_average": 380.3315648215455,
+      "cpu_percent_total_peak": 573.69098966208,
+      "cpu_time_seconds": 12.203125,
+      "cpu_user_seconds": 11.53125,
+      "generated_tokens": 59,
+      "generation_eval_ms": 2080.415,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 3208.5490999743342,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621137920,
+      "private_bytes_min": 619307008,
+      "prompt_eval_ms": 1115.615,
+      "prompt_tokens": 216,
+      "prompt_tokens_per_second": 193.61518086436627,
+      "queries_served": 11,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 10,
+      "system_available_ram_bytes_min": 3122597888,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 28.359726304607495,
+      "ttft_ms": 1126.8974000122398,
+      "working_set_bytes_max": 1207468032,
+      "working_set_bytes_min": 1205641216,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 816
+    },
+    "output_sha256": "b41ca423a18ec25826ff0b4d2d214a01c4055544b36c27d5a5792c77f355172d",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_json_ascii::ORACLE_EVAL",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 10,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 96,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 11,
+    "other_or_chat_envelope": 9,
+    "percent": {
+      "evidence": 44.44444444444444,
+      "instructions": 41.666666666666664,
+      "other_or_chat_envelope": 4.166666666666667,
+      "question": 9.722222222222221
+    },
+    "question": 21,
+    "total": 216
+  },
+  "prompt_sha256": "3b966dcdd675c65e4964045be5923d8cec86f5a7575fbad71a1b1fb3a3df010c",
+  "query_spec": {
+    "category": "direct_fact",
+    "expected_record_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "query": "What does Python json.dumps do with non-ASCII characters when ensure_ascii is true?",
+    "query_id": "dev_json_ascii",
+    "required_fact_groups": [
+      [
+        "escaped"
+      ],
+      [
+        "non-ascii"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 3145728,
+    "active_pages": [
+      3,
+      5,
+      8
+    ],
+    "record_bytes": 9558,
+    "records_retrieved": [
+      "35fdf925a73a3db9729f9e4e",
+      "2b0a025ac1549a6b04ae5a17",
+      "80d355dfa010679d9bcf5003",
+      "8117a1f94e896a38a7bb3cd1",
+      "53a7154eabc3c72a8b34ba0b",
+      "632edc999ae3e5e9afacf4ed",
+      "c6ae94d95f7eeb7c61813b15",
+      "e7dadca6ac19517261d3450b"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T101358Z-8bee6ec969",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:13:58Z",
+  "variant": "ORACLE_EVAL",
+  "variant_metadata": {
+    "evaluation_only": true,
+    "pruning": null
+  }
+}

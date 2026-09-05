@@ -1,0 +1,373 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4096,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 1.5345,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1025,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 2,
+        "record_id": "c72c7a600a58acbbe5c14663",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "asyncio-task"
+      },
+      {
+        "page_id": 1,
+        "record_id": "693c666d9a31431a1eeb0868",
+        "section": "a-conceptual-overview-of-asyncio",
+        "source_id": "python-3.14.7-docs",
+        "title": "a-conceptual-overview-of-asyncio"
+      },
+      {
+        "page_id": 2,
+        "record_id": "31b2306d11480957f15ba104",
+        "section": "asyncio-future",
+        "source_id": "python-3.14.7-docs",
+        "title": "asyncio-future"
+      }
+    ],
+    "records_pruned": [
+      "51f0e3fed62c12bb09a3582e",
+      "1698ac52a0f187de4a78f34d",
+      "31bc7c14e6cb295c0fecb9ab",
+      "5e32f7cf7f996d928bfe1fda",
+      "706a262041baadcca089274e"
+    ],
+    "records_retained": [
+      "c72c7a600a58acbbe5c14663",
+      "693c666d9a31431a1eeb0868",
+      "31b2306d11480957f15ba104"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "c72c7a600a58acbbe5c14663",
+      "693c666d9a31431a1eeb0868",
+      "31b2306d11480957f15ba104"
+    ],
+    "text": "[SOURCE: c72c7a600a58acbbe5c14663] asyncio-task\nWhen using this factory (via \"loop.set_task_factory(asyncio.eager_task_factory)\"), coroutines begin execution synchronously during \"Task\" construction. Tasks are only scheduled on the event loop if they block. This can be a performance improvement as the overhead of loop scheduling is avoided for coroutines that complete synchronously. A common example where this is beneficial is coroutines which employ caching or memoization to avoid actual I/O when possible. Immediate execution of the coroutine is a semantic change. If the coroutine returns or raises, the task is never scheduled to the event loop. If the coroutine execution blocks, the task is scheduled to the event loop. This change may introduce behavior changes to existing applications. For example, the application's task execution order is likely to change. Create an eager task factory, similar to \"eager_task_factory()\", using the provided *custom_task_constructor* when creating a new task instead of the default \"Task\". *custom_task_constructor* must be a *callable* with the signature matching the signature of \"Task.__init__\". The callable must return a \"asyncio.Task\"-compatible object. This function returns a *callable* intended to be used as a task factory of an event loop via \"loop.set_task_factory(factory)\").\n\n[SOURCE: 693c666d9a31431a1eeb0868] a-conceptual-overview-of-asyncio\n**Unlike tasks, awaiting a coroutine does not hand control back to the event loop!** Wrapping a coroutine in a task first, then awaiting that would cede control. The behavior of \"await coroutine\" is effectively the same as invoking a regular, synchronous Python function. Consider this program: async def coro_b(): print(\"I am coro_b(). I sure hope no one hogs the event loop...\") async def main(): task_b = asyncio.create_task(coro_b()) num_repeats = 3 for _ in range(num_repeats): await coro_a() await task_b The first statement in the coroutine \"main()\" creates \"task_b\" and schedules it for execution via the event loop. Then, \"coro_a()\" is repeatedly awaited. Control never cedes to the event loop, which is why we see the output of all three \"coro_a()\" invocations before \"coro_b()\"'s output: I am coro_a(). Hi! I am coro_a(). Hi! I am coro_a(). Hi! I am coro_b(). I sure hope no one hogs the event loop... If we change \"await coro_a()\" to \"await asyncio.create_task(coro_a())\", the behavior changes. The coroutine \"main()\" cedes control to the event loop with that statement. The event loop then proceeds through its backlog of work, calling \"task_b\" and then the task which wraps \"coro_a()\" before resuming the coroutine \"main()\". I am coro_b(). I sure hope no one hogs the event loop... I am coro_a(). Hi! I am coro_a(). Hi! I am coro_a(). Hi!\n\n[SOURCE: 31b2306d11480957f15ba104] asyncio-future\nThis example creates a Future object, creates and schedules an asynchronous Task to set result for the Future, and waits until the Future has a result: async def set_after(fut, delay, value): # Sleep for *delay* seconds. await asyncio.sleep(delay) async def main(): # Get the current event loop. loop = asyncio.get_running_loop() # Run \"set_after()\" coroutine in a parallel Task. # We are using the low-level \"loop.create_task()\" API here because # we already have a reference to the event loop at hand. # Otherwise we could have just used \"asyncio.create_task()\". loop.create_task( set_after(fut, 1, '... world')) The Future object was designed to mimic \"concurrent.futures.Future\". Key differences include: * unlike asyncio Futures, \"concurrent.futures.Future\" instances cannot be awaited. * \"asyncio.Future.result()\" and \"asyncio.Future.exception()\" do not accept the *timeout* argument. * \"asyncio.Future.result()\" and \"asyncio.Future.exception()\" raise an \"InvalidStateError\" exception when the Future is not *done*. * Callbacks registered with \"asyncio.Future.add_done_callback()\" are not called immediately. They are scheduled with \"loop.call_soon()\" instead. * asyncio Future is not compatible with the \"concurrent.futures.wait()\" and \"concurrent.futures.as_completed()\" functions."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2613,
+    "context_activation_rate": 0.3922694221201684,
+    "context_density": 0.09853658536585366,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 341.6666666666667,
+    "useful_oracle_tokens": 101
+  },
+  "context_sha256": "f407891ebcd30ee82e0f0c05918502cc92445b04ad2ca3ffab0d2853082125bb",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1089,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "FALSE_NO_KNOWLEDGE",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 5705.858699977398,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 134.0,
+      "cpu_kernel_seconds": 1.015625,
+      "cpu_percent_total_average": 397.0699449688396,
+      "cpu_percent_total_peak": 592.3702701988491,
+      "cpu_time_seconds": 22.65625,
+      "cpu_user_seconds": 21.640625,
+      "generated_tokens": 6,
+      "generation_eval_ms": 224.873,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 5705.858699977398,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621436928,
+      "private_bytes_min": 619606016,
+      "prompt_eval_ms": 5466.703,
+      "prompt_tokens": 1089,
+      "prompt_tokens_per_second": 199.20599308211914,
+      "queries_served": 134,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 133,
+      "system_available_ram_bytes_min": 3412013056,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 26.68172701925087,
+      "ttft_ms": 5479.857199999969,
+      "working_set_bytes_max": 993775616,
+      "working_set_bytes_min": 991948800,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 787
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_eager_paraphrase::PRUNING_ONLY",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 133,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1025,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 56,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 94.12304866850322,
+      "instructions": 8.264462809917354,
+      "other_or_chat_envelope": 0.0,
+      "question": 2.295684113865932
+    },
+    "question": 25,
+    "total": 1089
+  },
+  "prompt_sha256": "18d10af8a6c41983f70493df66421bed63b9224f5eb4ce3150427c39a169ca24",
+  "query_spec": {
+    "category": "paraphrase",
+    "expected_record_ids": [
+      "c72c7a600a58acbbe5c14663"
+    ],
+    "query": "Which asyncio task factory starts coroutine work immediately and schedules it only after blocking?",
+    "query_id": "holdout_eager_paraphrase",
+    "required_fact_groups": [
+      [
+        "eager_task_factory"
+      ],
+      [
+        "synchronously"
+      ],
+      [
+        "if they block",
+        "only scheduled"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      1,
+      2
+    ],
+    "record_bytes": 10439,
+    "records_retrieved": [
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e",
+      "1698ac52a0f187de4a78f34d",
+      "31bc7c14e6cb295c0fecb9ab",
+      "693c666d9a31431a1eeb0868",
+      "31b2306d11480957f15ba104",
+      "5e32f7cf7f996d928bfe1fda",
+      "706a262041baadcca089274e"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102858Z-1f19a1e03e",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:28:58Z",
+  "variant": "PRUNING_ONLY",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "coroutine",
+            "factory",
+            "only",
+            "task"
+          ],
+          "record_id": "c72c7a600a58acbbe5c14663",
+          "score": 0.9455360268521732
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "blocking",
+            "coroutine",
+            "immediately",
+            "only",
+            "task"
+          ],
+          "record_id": "51f0e3fed62c12bb09a3582e",
+          "score": 0.8523005388639338
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "coroutine",
+            "schedules",
+            "task"
+          ],
+          "record_id": "1698ac52a0f187de4a78f34d",
+          "score": 0.8307258701086466
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "blocking",
+            "coroutine",
+            "factory",
+            "task"
+          ],
+          "record_id": "31bc7c14e6cb295c0fecb9ab",
+          "score": 0.8008123223721482
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "coroutine",
+            "schedules",
+            "task",
+            "work"
+          ],
+          "record_id": "693c666d9a31431a1eeb0868",
+          "score": 0.7813285219322825
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "after",
+            "asyncio",
+            "coroutine",
+            "immediately",
+            "schedules",
+            "task"
+          ],
+          "record_id": "31b2306d11480957f15ba104",
+          "score": 0.7592359113273779
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "coroutine",
+            "factory",
+            "only",
+            "task"
+          ],
+          "record_id": "5e32f7cf7f996d928bfe1fda",
+          "score": 0.7310745850241864
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "blocking",
+            "coroutine",
+            "task"
+          ],
+          "record_id": "706a262041baadcca089274e",
+          "score": 0.728808786255839
+        }
+      ],
+      "cpu_ms": 15.625,
+      "pruned_record_ids": [
+        "51f0e3fed62c12bb09a3582e",
+        "1698ac52a0f187de4a78f34d",
+        "31bc7c14e6cb295c0fecb9ab",
+        "5e32f7cf7f996d928bfe1fda",
+        "706a262041baadcca089274e"
+      ],
+      "retained_record_ids": [
+        "c72c7a600a58acbbe5c14663",
+        "693c666d9a31431a1eeb0868",
+        "31b2306d11480957f15ba104"
+      ],
+      "wall_ms": 1.5345
+    }
+  }
+}

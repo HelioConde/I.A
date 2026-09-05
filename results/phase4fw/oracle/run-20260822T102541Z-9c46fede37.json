@@ -1,0 +1,268 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 351,
+    "context_fact_recall": 1.0,
+    "covered_fact_groups": [
+      0,
+      1
+    ],
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 5681.0367,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 88,
+    "evaluation_only": true,
+    "metadata_bytes": 0,
+    "oracle_runtime_allowed": false,
+    "oracle_wall_ms": 5681.0367,
+    "provenance": [
+      {
+        "end": 390,
+        "kind": "sentence",
+        "page_id": 7,
+        "position": 1,
+        "record_id": "9f4b065c828566abea546457",
+        "section": "grammar",
+        "source_id": "python-3.14.7-docs",
+        "start": 374,
+        "text": "# One parameter.",
+        "title": "grammar"
+      },
+      {
+        "end": 1395,
+        "kind": "code_block",
+        "page_id": 11,
+        "position": 10,
+        "record_id": "f58b2c4d54169ef7d0eda88e",
+        "section": "faq",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1160,
+        "text": "When SQLite tries to access a file that is locked by another process, the default behavior is to return SQLITE_BUSY. You can adjust this behavior from C code using the sqlite3_busy_handler() or sqlite3_busy_timeout() API functions.",
+        "title": "faq"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "9f4b065c828566abea546457",
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "required_fact_groups": 2,
+    "sentences_retained": 2,
+    "source_ids": [
+      "9f4b065c828566abea546457",
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "text": "[SOURCE: 9f4b065c828566abea546457] grammar — grammar\n# One parameter.\n\n[SOURCE: f58b2c4d54169ef7d0eda88e] faq — faq\nWhen SQLite tries to access a file that is locked by another process, the default behavior is to return SQLITE_BUSY. You can adjust this behavior from C code using the sqlite3_busy_handler() or sqlite3_busy_timeout() API functions."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2520,
+    "context_activation_rate": 0.03492063492063492,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 44.0,
+    "useful_oracle_tokens": 88
+  },
+  "context_sha256": "afb8fbf9e07cb8aee6462c98f3d05d6207eaa33a833d48c5fd938dab6150eb04",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 230,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        false,
+        true
+      ],
+      "recall": 0.5,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CONTEXT_DISTILLATION_MISS",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 1118.5014999937266,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 103.0,
+      "cpu_kernel_seconds": 0.21875,
+      "cpu_percent_total_average": 398.1331272264701,
+      "cpu_percent_total_peak": 684.1667395122621,
+      "cpu_time_seconds": 4.453125,
+      "cpu_user_seconds": 4.234375,
+      "generated_tokens": 6,
+      "generation_eval_ms": 169.999,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 1118.5014999937266,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621436928,
+      "private_bytes_min": 619606016,
+      "prompt_eval_ms": 936.012,
+      "prompt_tokens": 230,
+      "prompt_tokens_per_second": 245.7233454271954,
+      "queries_served": 103,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 102,
+      "system_available_ram_bytes_min": 3544403968,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 35.29432526073683,
+      "ttft_ms": 947.5204999907874,
+      "working_set_bytes_max": 993763328,
+      "working_set_bytes_min": 991936512,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_python_sqlite::ORACLE_EVAL",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 102,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 88,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 24,
+    "other_or_chat_envelope": 13,
+    "percent": {
+      "evidence": 38.26086956521739,
+      "instructions": 39.130434782608695,
+      "other_or_chat_envelope": 5.6521739130434785,
+      "question": 16.956521739130434
+    },
+    "question": 39,
+    "total": 230
+  },
+  "prompt_sha256": "4ab4e18198732b54a05db823bea8e6f38da931210c01f52111dba1db3549166f",
+  "query_spec": {
+    "category": "multi_document",
+    "expected_record_ids": [
+      "0be5e11beaf36611325a42aa",
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "query": "How do I bind a year value with a question-mark placeholder using Python sqlite3, and what does SQLite return by default if another process locks the file?",
+    "query_id": "holdout_python_sqlite",
+    "required_fact_groups": [
+      [
+        "placeholder",
+        "parameter substitution"
+      ],
+      [
+        "sqlite_busy"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      2,
+      4,
+      12,
+      14
+    ],
+    "record_bytes": 10071,
+    "records_retrieved": [
+      "bfdc468a8ef07d73294704ca",
+      "a4cfdfd3ccd30e1c9f741e15",
+      "0be5e11beaf36611325a42aa",
+      "aa511378075f626734bde81d",
+      "1dd8a418051e0eeceb4b9386",
+      "57beca14df21b646a57ca164",
+      "a9597f0ce2d83c76fefc6f08",
+      "7bde415bf27ff68ca7f31828"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102541Z-9c46fede37",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:25:41Z",
+  "variant": "ORACLE_EVAL",
+  "variant_metadata": {
+    "evaluation_only": true,
+    "pruning": null
+  }
+}

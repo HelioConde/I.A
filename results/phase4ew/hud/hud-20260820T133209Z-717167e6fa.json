@@ -1,0 +1,1220 @@
+{
+  "answer_equivalent": true,
+  "canonical": false,
+  "cognitive_selection_equivalent": true,
+  "config_hash": "66fa396c28065d183f9b0b36228735b34091a598897957500e3b0a94454c2b00",
+  "configuration": {
+    "context_size": 4096,
+    "device": "none",
+    "duration_minutes": null,
+    "index_reuse_within_session": false,
+    "max_tokens": 96,
+    "mode": "hud_overhead",
+    "model_reuse": false,
+    "quick": true,
+    "reasoning": "off",
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "environment_fingerprint": "05a828cd900d5a27b5c98ac962f447a7b70cf24b3e2102979425ff9331e3d5ac",
+  "errors": [],
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model_bytes": 639446688,
+    "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "runtime_sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+  },
+  "interpretation": "Selection equivalence is required. Answer equality is reported separately because output execution may vary; no run is discarded.",
+  "matrix_id": "matrix-20260820T132749Z-33a606824e",
+  "mode": "hud_overhead",
+  "overhead": {
+    "HUD_LIVE": {
+      "cpu_percent_total_average": 364.9625373666487,
+      "delta_vs_hud_off_ms": -412.1365000000005,
+      "latency_ms": 25332.2569,
+      "private_bytes_max": 914485248,
+      "ttft_ms": 16060.780200001318,
+      "working_set_bytes_max": 1202651136
+    },
+    "HUD_OFF": {
+      "cpu_percent_total_average": 355.69357472588746,
+      "delta_vs_hud_off_ms": 0.0,
+      "latency_ms": 25744.3934,
+      "private_bytes_max": 914800640,
+      "ttft_ms": 16608.016700018197,
+      "working_set_bytes_max": 1202749440
+    },
+    "TELEMETRY_ONLY": {
+      "cpu_percent_total_average": 364.91650126557465,
+      "delta_vs_hud_off_ms": -686.5200000000004,
+      "latency_ms": 25057.8734,
+      "private_bytes_max": 914534400,
+      "ttft_ms": 16054.904600023292,
+      "working_set_bytes_max": 1202524160
+    }
+  },
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux native environment.",
+  "phase4e_valid": false,
+  "phase4ew_canonical": false,
+  "query_id": "holdout_json_frames",
+  "run_id": "hud-20260820T133209Z-717167e6fa",
+  "schema_version": 1,
+  "status": "PASS",
+  "target_8gb": "NOT_TESTED",
+  "timestamp_utc": "2026-08-20T13:32:09Z",
+  "validation_track": "PHASE_4E_W",
+  "variants": [
+    {
+      "error": null,
+      "generation_metrics": {
+        "anonymous_bytes_max": null,
+        "backend_total_ms": 24498.72,
+        "cpu_kernel_seconds": 5.765625,
+        "cpu_percent_normalized_average": 29.641131227157288,
+        "cpu_percent_normalized_peak": 70.69777463336088,
+        "cpu_percent_total_average": 355.69357472588746,
+        "cpu_percent_total_peak": 848.3732956003305,
+        "cpu_user_seconds": 85.59375,
+        "generated_tokens": 95,
+        "generation_eval_ms": 8852.31,
+        "handle_count_max": 121,
+        "latency_ms": 25684.85389999114,
+        "model_load_ms": 15604.41,
+        "page_fault_count_delta": 328893,
+        "peak_working_set_bytes_max": 1202757632,
+        "physical_read_bytes": null,
+        "private_bytes_max": 914800640,
+        "prompt_eval_ms": 15599.07,
+        "prompt_tokens": 2086,
+        "prompt_tokens_per_second": 133.73,
+        "pss_bytes_max": null,
+        "read_operations_delta": 2906,
+        "read_transfer_bytes_delta": 11902976,
+        "rss_file_bytes_max": null,
+        "system_available_ram_bytes_min": 6021799936,
+        "system_total_ram_bytes": 16957431808,
+        "temperature_c": null,
+        "thread_count_max": 8,
+        "tokens_per_second": 10.73,
+        "ttft_ms": 16608.016700018197,
+        "working_set_bytes_max": 1202749440,
+        "write_operations_delta": 163,
+        "write_transfer_bytes_delta": 2776
+      },
+      "hud_event_count": 0,
+      "hud_poll_count": 0,
+      "hud_state": null,
+      "signature": {
+        "activated_pages": [
+          3,
+          4
+        ],
+        "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+        "context_source_ids": [
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5"
+        ],
+        "record_ids": [
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5",
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "b83cccde7b72abcccc6e5c93",
+          "dcc841948e6ec5fbcb6b8043"
+        ],
+        "retrieval_status": "OK"
+      },
+      "startup_ms": 1123.0169,
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.5585,
+        "qwen_core": 25684.85389999114,
+        "routing_and_gate": 30.4743,
+        "storage": 2.2474,
+        "total": 25744.3934
+      },
+      "variant": "HUD_OFF"
+    },
+    {
+      "error": null,
+      "generation_metrics": {
+        "anonymous_bytes_max": null,
+        "backend_total_ms": 23712.6,
+        "cpu_kernel_seconds": 5.6875,
+        "cpu_percent_normalized_average": 30.40970843879789,
+        "cpu_percent_normalized_peak": 57.366456145476235,
+        "cpu_percent_total_average": 364.91650126557465,
+        "cpu_percent_total_peak": 688.3974737457148,
+        "cpu_user_seconds": 85.5625,
+        "generated_tokens": 95,
+        "generation_eval_ms": 8685.44,
+        "handle_count_max": 121,
+        "latency_ms": 25005.720400018618,
+        "model_load_ms": 14987.76,
+        "page_fault_count_delta": 328937,
+        "peak_working_set_bytes_max": 1202532352,
+        "physical_read_bytes": null,
+        "private_bytes_max": 914534400,
+        "prompt_eval_ms": 14982.89,
+        "prompt_tokens": 2086,
+        "prompt_tokens_per_second": 139.23,
+        "pss_bytes_max": null,
+        "read_operations_delta": 2906,
+        "read_transfer_bytes_delta": 11902976,
+        "rss_file_bytes_max": null,
+        "system_available_ram_bytes_min": 6014562304,
+        "system_total_ram_bytes": 16957431808,
+        "temperature_c": null,
+        "thread_count_max": 8,
+        "tokens_per_second": 10.94,
+        "ttft_ms": 16054.904600023292,
+        "working_set_bytes_max": 1202524160,
+        "write_operations_delta": 163,
+        "write_transfer_bytes_delta": 2776
+      },
+      "hud_event_count": 25,
+      "hud_poll_count": 0,
+      "hud_state": {
+        "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+        "bottleneck": {
+          "component": "CORE",
+          "duration_ms": 25005.720400018618,
+          "label": "Processamento do Core",
+          "share_percent": 99.87376806680099
+        },
+        "brain": {
+          "active_bytes": 2097152,
+          "active_pages": 2,
+          "active_rate": 0.13333333333333333,
+          "pages": [
+            {
+              "domain": "python",
+              "page_id": 3,
+              "provenance": [],
+              "reasons": [
+                "frozen Phase 4D retrieval selected this page"
+              ],
+              "resident": null,
+              "scores": {},
+              "state": "ACTIVE",
+              "topic": "json"
+            },
+            {
+              "domain": "python",
+              "page_id": 4,
+              "provenance": [],
+              "reasons": [
+                "frozen Phase 4D retrieval selected this page"
+              ],
+              "resident": null,
+              "scores": {},
+              "state": "ACTIVE",
+              "topic": "pickle"
+            }
+          ],
+          "total_bytes": 15728640,
+          "total_pages": 15
+        },
+        "components": {
+          "sleeping": [
+            "PREFETCH",
+            "HIPPOCAMPUS",
+            "SKILLS",
+            "CONNECTIVITY"
+          ],
+          "worked": [
+            "ROUTER",
+            "GATE",
+            "BRAIN",
+            "CONTEXT",
+            "CORE"
+          ]
+        },
+        "context": {
+          "bytes": 7874,
+          "records_discarded": 2,
+          "records_used": 6,
+          "token_budget": 2048,
+          "tokens": 1971
+        },
+        "core": {
+          "input_tokens": 2086,
+          "mode": "CPU ONLY",
+          "model": "Qwen3-0.6B Q8_0",
+          "output_tokens": 95,
+          "status": "IDLE",
+          "tokens_per_second": 10.94,
+          "total_latency_ms": 25005.720400018618,
+          "ttft_ms": 16054.904600023292
+        },
+        "current_component": "ANSWER",
+        "current_event": "ANSWER_READY",
+        "current_message": "A resposta está pronta.",
+        "data_source": "PHASE 4E-W WINDOWS LIVE",
+        "demo_data": false,
+        "errors": [],
+        "knowledge": {
+          "expected": null,
+          "records": [
+            {
+              "excerpt": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file. * **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"j",
+              "reason": "Selected by retrieval",
+              "record_id": "2b0a025ac1549a6b04ae5a17",
+              "score": 0.7800709623355986,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "JSON (JavaScript Object Notation), specified by **RFC 7159** (which obsoletes **RFC 4627**) and by ECMA-404, is a lightweight data interchange format inspired by JavaScript object literal syntax (although it is not a strict subset of JavaScript [1] ). The term \"object\" in the con",
+              "reason": "Selected by retrieval",
+              "record_id": "7409230c3d31263ba576b2d1",
+              "score": 0.765384575349431,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": ">>> import json >>> class ComplexEncoder(json.JSONEncoder): ... def default(self, obj): ... if isinstance(obj, complex): ... return [obj.real, obj.imag] ... # Let the base class default method raise the TypeError ... return super().default(obj) ... >>> json.dumps(2 + 1j, cls=Comp",
+              "reason": "Selected by retrieval",
+              "record_id": "859fda16a4d715b5f6c73141",
+              "score": 0.6952911181625963,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "The RFC does not permit the representation of infinite or NaN number values. Despite that, by default, this module accepts and outputs \"Infinity\", \"-Infinity\", and \"NaN\" as if they were valid JSON number literal values: >>> # Neither of these calls raises an exception, but the re",
+              "reason": "Selected by retrieval",
+              "record_id": "b227a6f4bc64f5797a340f22",
+              "score": 0.6383523652303589,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by i",
+              "reason": "Selected by retrieval",
+              "record_id": "18893306b3c2b47f6463001c",
+              "score": 0.7286381851137593,
+              "section": "pickle",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "* \"marshal\" cannot be used to serialize user-defined classes and their instances. \"pickle\" can save and restore class instances transparently, however the class definition must be importable and live in the same module as when the object was pickled. * The \"marshal\" serialization",
+              "reason": "Selected by retrieval",
+              "record_id": "224d71d9f13fc0d43000d9c5",
+              "score": 0.6924300523502601,
+              "section": "pickle",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "\"pickle\" --- Python object serialization **************************************** The \"pickle\" module implements binary protocols for serializing and de-serializing a Python object structure. *\"Pickling\"* is the process whereby a Python object hierarchy is converted into a byte s",
+              "reason": "Selected by retrieval",
+              "record_id": "b83cccde7b72abcccc6e5c93",
+              "score": 0.620119864642654,
+              "section": "pickle",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "\"pickletools\" --- Tools for pickle developers ********************************************* This module contains various constants relating to the intimate details of the \"pickle\" module, some lengthy comments about the implementation, and a few useful functions for analyzing pic",
+              "reason": "Selected by retrieval",
+              "record_id": "dcc841948e6ec5fbcb6b8043",
+              "score": 0.5807228518773234,
+              "section": "pickletools",
+              "source": "python-3.14.7-docs"
+            }
+          ],
+          "retrieved": 8,
+          "selected": 8
+        },
+        "mode": "COMPLETE",
+        "phases": [],
+        "pipeline": {
+          "ANSWER": {
+            "duration_ms": 25057.8734,
+            "status": "SUCCESS"
+          },
+          "BRAIN": {
+            "duration_ms": 2.1169,
+            "status": "SUCCESS"
+          },
+          "CONTEXT": {
+            "duration_ms": 0.4576,
+            "status": "SUCCESS"
+          },
+          "CORE": {
+            "duration_ms": 25005.720400018618,
+            "status": "SUCCESS"
+          },
+          "GATE": {
+            "duration_ms": null,
+            "status": "SUCCESS"
+          },
+          "INPUT": {
+            "duration_ms": null,
+            "status": "SUCCESS"
+          },
+          "ROUTER": {
+            "duration_ms": 29.0306,
+            "status": "SUCCESS"
+          }
+        },
+        "quality": {
+          "required_fact_score": null,
+          "source_correct": null,
+          "status": "NOT_SCORED"
+        },
+        "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+        "query_id": "1ddbf9985e41",
+        "resources": {
+          "anonymous_bytes": null,
+          "available_system_ram_bytes": 6014562304,
+          "cpu_average_percent": 364.91650126557465,
+          "cpu_current_percent": null,
+          "cpu_peak_percent": 688.3974737457148,
+          "file_backed_bytes": null,
+          "memory_growth_bytes": null,
+          "pressure": "UNKNOWN",
+          "private_bytes": 914534400,
+          "pss_bytes": null,
+          "ram_bytes": 1202524160,
+          "temperature_c": null,
+          "threads_total": 12,
+          "threads_used": 8,
+          "working_set_peak_bytes": 1202524160
+        },
+        "run_id": "win-a128ccb5ae0f",
+        "schema_version": 1,
+        "storage": {
+          "cache_state": "NOT_MEASURED",
+          "kernel_bonus_pages": null,
+          "logical_bytes": 2097152,
+          "major_faults": null,
+          "minor_faults": null,
+          "nonresident_pages": null,
+          "physical_bytes": null,
+          "resident_pages": null
+        },
+        "timeline": [
+          {
+            "component": "INPUT",
+            "duration_ms": null,
+            "event_type": "QUERY_RECEIVED",
+            "message": "Recebi a pergunta e vou decidir quais partes do cérebro precisam trabalhar.",
+            "sequence": 1,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.2802284
+          },
+          {
+            "component": "ROUTER",
+            "duration_ms": null,
+            "event_type": "ROUTER_STARTED",
+            "message": "Estou descobrindo quais áreas do conhecimento podem responder à pergunta.",
+            "sequence": 2,
+            "status": "RUNNING",
+            "timestamp": 1787232757.2804167
+          },
+          {
+            "component": "ROUTER",
+            "duration_ms": null,
+            "event_type": "ROUTER_CANDIDATES",
+            "message": "Encontrei áreas candidatas e estou avaliando sua relevância.",
+            "sequence": 3,
+            "status": "INFO",
+            "timestamp": 1787232757.3095837
+          },
+          {
+            "component": "ROUTER",
+            "duration_ms": 29.0306,
+            "event_type": "ROUTER_COMPLETED",
+            "message": "As áreas mais promissoras foram identificadas.",
+            "sequence": 4,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3097286
+          },
+          {
+            "component": "GATE",
+            "duration_ms": null,
+            "event_type": "GATE_STARTED",
+            "message": "Estou decidindo quais áreas realmente podem acordar.",
+            "sequence": 5,
+            "status": "RUNNING",
+            "timestamp": 1787232757.3097541
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "PAGE_ACTIVATED",
+            "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta.",
+            "sequence": 6,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.309778
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "PAGE_ACTIVATED",
+            "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta.",
+            "sequence": 7,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3098102
+          },
+          {
+            "component": "GATE",
+            "duration_ms": null,
+            "event_type": "GATE_COMPLETED",
+            "message": "O conjunto de conhecimento ativo foi limitado ao necessário.",
+            "sequence": 8,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.309839
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "STORAGE_READ_STARTED",
+            "message": "Estou acessando as páginas de conhecimento selecionadas.",
+            "sequence": 9,
+            "status": "RUNNING",
+            "timestamp": 1787232757.3142471
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": 2.1169,
+            "event_type": "STORAGE_READ_COMPLETED",
+            "message": "O acesso ao conhecimento terminou.",
+            "sequence": 10,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3252928
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 11,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3254144
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 12,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.325472
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 13,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3255188
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 14,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3255732
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 15,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3256133
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 16,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3256514
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 17,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.32569
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 18,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.325727
+          },
+          {
+            "component": "CONTEXT",
+            "duration_ms": null,
+            "event_type": "CONTEXT_BUILD_STARTED",
+            "message": "Estou organizando o conhecimento antes de entregá-lo ao Core.",
+            "sequence": 19,
+            "status": "RUNNING",
+            "timestamp": 1787232757.3257494
+          },
+          {
+            "component": "CONTEXT",
+            "duration_ms": 0.4576,
+            "event_type": "CONTEXT_BUILD_COMPLETED",
+            "message": "O contexto do Core está pronto.",
+            "sequence": 20,
+            "status": "SUCCESS",
+            "timestamp": 1787232757.3262296
+          },
+          {
+            "component": "CORE",
+            "duration_ms": null,
+            "event_type": "CORE_STARTED",
+            "message": "O Core foi iniciado em modo CPU-only.",
+            "sequence": 21,
+            "status": "RUNNING",
+            "timestamp": 1787232757.3264053
+          },
+          {
+            "component": "CORE",
+            "duration_ms": null,
+            "event_type": "CORE_PROMPT_PROCESSING",
+            "message": "O modelo está lendo a pergunta e o conhecimento selecionado.",
+            "sequence": 22,
+            "status": "RUNNING",
+            "timestamp": 1787232757.3264325
+          },
+          {
+            "component": "CORE",
+            "duration_ms": null,
+            "event_type": "CORE_GENERATING",
+            "message": "O modelo está gerando a resposta.",
+            "sequence": 23,
+            "status": "RUNNING",
+            "timestamp": 1787232773.397233
+          },
+          {
+            "component": "CORE",
+            "duration_ms": 25005.720400018618,
+            "event_type": "CORE_COMPLETED",
+            "message": "O Core terminou o processamento.",
+            "sequence": 24,
+            "status": "SUCCESS",
+            "timestamp": 1787232782.338006
+          },
+          {
+            "component": "ANSWER",
+            "duration_ms": 25057.8734,
+            "event_type": "ANSWER_READY",
+            "message": "A resposta está pronta.",
+            "sequence": 25,
+            "status": "SUCCESS",
+            "timestamp": 1787232782.3380852
+          }
+        ],
+        "updated_at": 1787232782.338104,
+        "validation": {
+          "canonical_phase4e": false,
+          "platform": "Windows Native",
+          "target_8gb": "NOT_TESTED",
+          "track": "PHASE 4E-W"
+        },
+        "warnings": [],
+        "work_avoided": {
+          "inhibited_candidates": 0,
+          "semantic_rescue_skipped": false,
+          "sleeping_pages": 13,
+          "sleeping_rate": 0.8666666666666667
+        }
+      },
+      "signature": {
+        "activated_pages": [
+          3,
+          4
+        ],
+        "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+        "context_source_ids": [
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5"
+        ],
+        "record_ids": [
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5",
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "b83cccde7b72abcccc6e5c93",
+          "dcc841948e6ec5fbcb6b8043"
+        ],
+        "retrieval_status": "OK"
+      },
+      "startup_ms": 1149.9256,
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.4576,
+        "qwen_core": 25005.720400018618,
+        "routing_and_gate": 29.0306,
+        "storage": 2.1169,
+        "total": 25057.8734
+      },
+      "variant": "TELEMETRY_ONLY"
+    },
+    {
+      "error": null,
+      "generation_metrics": {
+        "anonymous_bytes_max": null,
+        "backend_total_ms": 24066.7,
+        "cpu_kernel_seconds": 5.34375,
+        "cpu_percent_normalized_average": 30.41354478055406,
+        "cpu_percent_normalized_peak": 59.39023240110808,
+        "cpu_percent_total_average": 364.9625373666487,
+        "cpu_percent_total_peak": 712.682788813297,
+        "cpu_user_seconds": 86.875,
+        "generated_tokens": 95,
+        "generation_eval_ms": 8974.88,
+        "handle_count_max": 121,
+        "latency_ms": 25268.004399957135,
+        "model_load_ms": 15046.2,
+        "page_fault_count_delta": 328658,
+        "peak_working_set_bytes_max": 1202659328,
+        "physical_read_bytes": null,
+        "private_bytes_max": 914485248,
+        "prompt_eval_ms": 15041.24,
+        "prompt_tokens": 2086,
+        "prompt_tokens_per_second": 138.69,
+        "pss_bytes_max": null,
+        "read_operations_delta": 2906,
+        "read_transfer_bytes_delta": 11902976,
+        "rss_file_bytes_max": null,
+        "system_available_ram_bytes_min": 5776048128,
+        "system_total_ram_bytes": 16957431808,
+        "temperature_c": null,
+        "thread_count_max": 8,
+        "tokens_per_second": 10.59,
+        "ttft_ms": 16060.780200001318,
+        "working_set_bytes_max": 1202651136,
+        "write_operations_delta": 163,
+        "write_transfer_bytes_delta": 2776
+      },
+      "hud_event_count": 25,
+      "hud_poll_count": 26,
+      "hud_state": {
+        "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+        "bottleneck": {
+          "component": "CORE",
+          "duration_ms": 25268.004399957135,
+          "label": "Processamento do Core",
+          "share_percent": 99.8807751523141
+        },
+        "brain": {
+          "active_bytes": 2097152,
+          "active_pages": 2,
+          "active_rate": 0.13333333333333333,
+          "pages": [
+            {
+              "domain": "python",
+              "page_id": 3,
+              "provenance": [],
+              "reasons": [
+                "frozen Phase 4D retrieval selected this page"
+              ],
+              "resident": null,
+              "scores": {},
+              "state": "ACTIVE",
+              "topic": "json"
+            },
+            {
+              "domain": "python",
+              "page_id": 4,
+              "provenance": [],
+              "reasons": [
+                "frozen Phase 4D retrieval selected this page"
+              ],
+              "resident": null,
+              "scores": {},
+              "state": "ACTIVE",
+              "topic": "pickle"
+            }
+          ],
+          "total_bytes": 15728640,
+          "total_pages": 15
+        },
+        "components": {
+          "sleeping": [
+            "PREFETCH",
+            "HIPPOCAMPUS",
+            "SKILLS",
+            "CONNECTIVITY"
+          ],
+          "worked": [
+            "ROUTER",
+            "GATE",
+            "BRAIN",
+            "CONTEXT",
+            "CORE"
+          ]
+        },
+        "context": {
+          "bytes": 7874,
+          "records_discarded": 2,
+          "records_used": 6,
+          "token_budget": 2048,
+          "tokens": 1971
+        },
+        "core": {
+          "input_tokens": 2086,
+          "mode": "CPU ONLY",
+          "model": "Qwen3-0.6B Q8_0",
+          "output_tokens": 95,
+          "status": "IDLE",
+          "tokens_per_second": 10.59,
+          "total_latency_ms": 25268.004399957135,
+          "ttft_ms": 16060.780200001318
+        },
+        "current_component": "ANSWER",
+        "current_event": "ANSWER_READY",
+        "current_message": "A resposta está pronta.",
+        "data_source": "PHASE 4E-W WINDOWS LIVE",
+        "demo_data": false,
+        "errors": [],
+        "knowledge": {
+          "expected": null,
+          "records": [
+            {
+              "excerpt": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file. * **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"j",
+              "reason": "Selected by retrieval",
+              "record_id": "2b0a025ac1549a6b04ae5a17",
+              "score": 0.7800709623355986,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "JSON (JavaScript Object Notation), specified by **RFC 7159** (which obsoletes **RFC 4627**) and by ECMA-404, is a lightweight data interchange format inspired by JavaScript object literal syntax (although it is not a strict subset of JavaScript [1] ). The term \"object\" in the con",
+              "reason": "Selected by retrieval",
+              "record_id": "7409230c3d31263ba576b2d1",
+              "score": 0.765384575349431,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": ">>> import json >>> class ComplexEncoder(json.JSONEncoder): ... def default(self, obj): ... if isinstance(obj, complex): ... return [obj.real, obj.imag] ... # Let the base class default method raise the TypeError ... return super().default(obj) ... >>> json.dumps(2 + 1j, cls=Comp",
+              "reason": "Selected by retrieval",
+              "record_id": "859fda16a4d715b5f6c73141",
+              "score": 0.6952911181625963,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "The RFC does not permit the representation of infinite or NaN number values. Despite that, by default, this module accepts and outputs \"Infinity\", \"-Infinity\", and \"NaN\" as if they were valid JSON number literal values: >>> # Neither of these calls raises an exception, but the re",
+              "reason": "Selected by retrieval",
+              "record_id": "b227a6f4bc64f5797a340f22",
+              "score": 0.6383523652303589,
+              "section": "json",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by i",
+              "reason": "Selected by retrieval",
+              "record_id": "18893306b3c2b47f6463001c",
+              "score": 0.7286381851137593,
+              "section": "pickle",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "* \"marshal\" cannot be used to serialize user-defined classes and their instances. \"pickle\" can save and restore class instances transparently, however the class definition must be importable and live in the same module as when the object was pickled. * The \"marshal\" serialization",
+              "reason": "Selected by retrieval",
+              "record_id": "224d71d9f13fc0d43000d9c5",
+              "score": 0.6924300523502601,
+              "section": "pickle",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "\"pickle\" --- Python object serialization **************************************** The \"pickle\" module implements binary protocols for serializing and de-serializing a Python object structure. *\"Pickling\"* is the process whereby a Python object hierarchy is converted into a byte s",
+              "reason": "Selected by retrieval",
+              "record_id": "b83cccde7b72abcccc6e5c93",
+              "score": 0.620119864642654,
+              "section": "pickle",
+              "source": "python-3.14.7-docs"
+            },
+            {
+              "excerpt": "\"pickletools\" --- Tools for pickle developers ********************************************* This module contains various constants relating to the intimate details of the \"pickle\" module, some lengthy comments about the implementation, and a few useful functions for analyzing pic",
+              "reason": "Selected by retrieval",
+              "record_id": "dcc841948e6ec5fbcb6b8043",
+              "score": 0.5807228518773234,
+              "section": "pickletools",
+              "source": "python-3.14.7-docs"
+            }
+          ],
+          "retrieved": 8,
+          "selected": 8
+        },
+        "mode": "COMPLETE",
+        "phases": [],
+        "pipeline": {
+          "ANSWER": {
+            "duration_ms": 25332.2569,
+            "status": "SUCCESS"
+          },
+          "BRAIN": {
+            "duration_ms": 2.1112,
+            "status": "SUCCESS"
+          },
+          "CONTEXT": {
+            "duration_ms": 0.4456,
+            "status": "SUCCESS"
+          },
+          "CORE": {
+            "duration_ms": 25268.004399957135,
+            "status": "SUCCESS"
+          },
+          "GATE": {
+            "duration_ms": null,
+            "status": "SUCCESS"
+          },
+          "INPUT": {
+            "duration_ms": null,
+            "status": "SUCCESS"
+          },
+          "ROUTER": {
+            "duration_ms": 27.6049,
+            "status": "SUCCESS"
+          }
+        },
+        "quality": {
+          "required_fact_score": null,
+          "source_correct": null,
+          "status": "NOT_SCORED"
+        },
+        "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+        "query_id": "3f25882cb55e",
+        "resources": {
+          "anonymous_bytes": null,
+          "available_system_ram_bytes": 5776048128,
+          "cpu_average_percent": 364.9625373666487,
+          "cpu_current_percent": null,
+          "cpu_peak_percent": 712.682788813297,
+          "file_backed_bytes": null,
+          "memory_growth_bytes": null,
+          "pressure": "UNKNOWN",
+          "private_bytes": 914485248,
+          "pss_bytes": null,
+          "ram_bytes": 1202651136,
+          "temperature_c": null,
+          "threads_total": 12,
+          "threads_used": 8,
+          "working_set_peak_bytes": 1202651136
+        },
+        "run_id": "win-493bb907b7a1",
+        "schema_version": 1,
+        "storage": {
+          "cache_state": "NOT_MEASURED",
+          "kernel_bonus_pages": null,
+          "logical_bytes": 2097152,
+          "major_faults": null,
+          "minor_faults": null,
+          "nonresident_pages": null,
+          "physical_bytes": null,
+          "resident_pages": null
+        },
+        "timeline": [
+          {
+            "component": "INPUT",
+            "duration_ms": null,
+            "event_type": "QUERY_RECEIVED",
+            "message": "Recebi a pergunta e vou decidir quais partes do cérebro precisam trabalhar.",
+            "sequence": 1,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.5816567
+          },
+          {
+            "component": "ROUTER",
+            "duration_ms": null,
+            "event_type": "ROUTER_STARTED",
+            "message": "Estou descobrindo quais áreas do conhecimento podem responder à pergunta.",
+            "sequence": 2,
+            "status": "RUNNING",
+            "timestamp": 1787232783.5817354
+          },
+          {
+            "component": "ROUTER",
+            "duration_ms": null,
+            "event_type": "ROUTER_CANDIDATES",
+            "message": "Encontrei áreas candidatas e estou avaliando sua relevância.",
+            "sequence": 3,
+            "status": "INFO",
+            "timestamp": 1787232783.6093822
+          },
+          {
+            "component": "ROUTER",
+            "duration_ms": 27.6049,
+            "event_type": "ROUTER_COMPLETED",
+            "message": "As áreas mais promissoras foram identificadas.",
+            "sequence": 4,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6095376
+          },
+          {
+            "component": "GATE",
+            "duration_ms": null,
+            "event_type": "GATE_STARTED",
+            "message": "Estou decidindo quais áreas realmente podem acordar.",
+            "sequence": 5,
+            "status": "RUNNING",
+            "timestamp": 1787232783.6095629
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "PAGE_ACTIVATED",
+            "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta.",
+            "sequence": 6,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6095855
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "PAGE_ACTIVATED",
+            "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta.",
+            "sequence": 7,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6096137
+          },
+          {
+            "component": "GATE",
+            "duration_ms": null,
+            "event_type": "GATE_COMPLETED",
+            "message": "O conjunto de conhecimento ativo foi limitado ao necessário.",
+            "sequence": 8,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6096401
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "STORAGE_READ_STARTED",
+            "message": "Estou acessando as páginas de conhecimento selecionadas.",
+            "sequence": 9,
+            "status": "RUNNING",
+            "timestamp": 1787232783.614044
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": 2.1112,
+            "event_type": "STORAGE_READ_COMPLETED",
+            "message": "O acesso ao conhecimento terminou.",
+            "sequence": 10,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6384027
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 11,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6385186
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 12,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.638572
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 13,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.638616
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 14,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6386576
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 15,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6386964
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 16,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.638734
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 17,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6387722
+          },
+          {
+            "component": "BRAIN",
+            "duration_ms": null,
+            "event_type": "KNOWLEDGE_RECORD_SELECTED",
+            "message": "Um trecho de conhecimento relevante foi selecionado.",
+            "sequence": 18,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6388078
+          },
+          {
+            "component": "CONTEXT",
+            "duration_ms": null,
+            "event_type": "CONTEXT_BUILD_STARTED",
+            "message": "Estou organizando o conhecimento antes de entregá-lo ao Core.",
+            "sequence": 19,
+            "status": "RUNNING",
+            "timestamp": 1787232783.6388302
+          },
+          {
+            "component": "CONTEXT",
+            "duration_ms": 0.4456,
+            "event_type": "CONTEXT_BUILD_COMPLETED",
+            "message": "O contexto do Core está pronto.",
+            "sequence": 20,
+            "status": "SUCCESS",
+            "timestamp": 1787232783.6393018
+          },
+          {
+            "component": "CORE",
+            "duration_ms": null,
+            "event_type": "CORE_STARTED",
+            "message": "O Core foi iniciado em modo CPU-only.",
+            "sequence": 21,
+            "status": "RUNNING",
+            "timestamp": 1787232783.6394985
+          },
+          {
+            "component": "CORE",
+            "duration_ms": null,
+            "event_type": "CORE_PROMPT_PROCESSING",
+            "message": "O modelo está lendo a pergunta e o conhecimento selecionado.",
+            "sequence": 22,
+            "status": "RUNNING",
+            "timestamp": 1787232783.6395338
+          },
+          {
+            "component": "CORE",
+            "duration_ms": null,
+            "event_type": "CORE_GENERATING",
+            "message": "O modelo está gerando a resposta.",
+            "sequence": 23,
+            "status": "RUNNING",
+            "timestamp": 1787232799.715391
+          },
+          {
+            "component": "CORE",
+            "duration_ms": 25268.004399957135,
+            "event_type": "CORE_COMPLETED",
+            "message": "O Core terminou o processamento.",
+            "sequence": 24,
+            "status": "SUCCESS",
+            "timestamp": 1787232808.9138188
+          },
+          {
+            "component": "ANSWER",
+            "duration_ms": 25332.2569,
+            "event_type": "ANSWER_READY",
+            "message": "A resposta está pronta.",
+            "sequence": 25,
+            "status": "SUCCESS",
+            "timestamp": 1787232808.913907
+          }
+        ],
+        "updated_at": 1787232808.9139268,
+        "validation": {
+          "canonical_phase4e": false,
+          "platform": "Windows Native",
+          "target_8gb": "NOT_TESTED",
+          "track": "PHASE 4E-W"
+        },
+        "warnings": [],
+        "work_avoided": {
+          "inhibited_candidates": 0,
+          "semantic_rescue_skipped": false,
+          "sleeping_pages": 13,
+          "sleeping_rate": 0.8666666666666667
+        }
+      },
+      "signature": {
+        "activated_pages": [
+          3,
+          4
+        ],
+        "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+        "context_source_ids": [
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5"
+        ],
+        "record_ids": [
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5",
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "b83cccde7b72abcccc6e5c93",
+          "dcc841948e6ec5fbcb6b8043"
+        ],
+        "retrieval_status": "OK"
+      },
+      "startup_ms": 1100.1917,
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.4456,
+        "qwen_core": 25268.004399957135,
+        "routing_and_gate": 27.6049,
+        "storage": 2.1112,
+        "total": 25332.2569
+      },
+      "variant": "HUD_LIVE"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+  "environment_type": "WINDOWS_NATIVE_FUNCTIONAL",
+  "generated_at": 1787231023.8557281,
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux environment.",
+  "phase4e_valid": false,
+  "schema_version": 1,
+  "status": "PASS",
+  "tests": {
+    "qwen_cpu": {
+      "answer": "OK",
+      "latency_ms": 2522.582500008866,
+      "return_code": 0,
+      "status": "PASS",
+      "stderr_sha256": "ead073239ffba69ae8ff437baec3d8da45f802791fe417ca3d9a63e3277c8ca3",
+      "tokens_per_second": 17.77,
+      "working_set_bytes_max": 1175740416
+    },
+    "real_retrieval": {
+      "activated_pages": [
+        3,
+        12
+      ],
+      "checksum_errors": 0,
+      "logical_page_bytes": 2097152,
+      "query": "Why can repeated json.dump calls create invalid JSON?",
+      "record_ids": [
+        "2b0a025ac1549a6b04ae5a17",
+        "6172e03c5f032f0029f8f3c0",
+        "7409230c3d31263ba576b2d1",
+        "79d74627d0984758b189dced",
+        "859fda16a4d715b5f6c73141",
+        "b227a6f4bc64f5797a340f22",
+        "b7b6d1e1c4dfe25479b8e65b",
+        "bb6c5918b088c5b2ff7a4e68"
+      ],
+      "retrieval_status": "OK",
+      "status": "PASS"
+    },
+    "storage_mmap": {
+      "checksum_errors": 0,
+      "logical_bytes": 1048576,
+      "page_id": 0,
+      "sink": 18432842212346155038,
+      "status": "PASS"
+    }
+  }
+}

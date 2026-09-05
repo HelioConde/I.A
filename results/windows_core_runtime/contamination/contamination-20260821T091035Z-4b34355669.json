@@ -1,0 +1,1204 @@
+{
+  "config_hash": "dd11b6b57f70849759dc77039a088e80d470a7841731dd735cb320b41ad6a77c",
+  "configuration": {
+    "context_size": 4096,
+    "device": "none",
+    "duration_minutes": null,
+    "max_tokens": 96,
+    "mode": "contamination",
+    "quick": true,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context_reset": "cache_prompt=false for every HTTP completion request",
+  "cross_query_context_leak": false,
+  "errors": [],
+  "expected": false,
+  "experiment": "WINDOWS_CORE_RUNTIME_EXPERIMENT",
+  "experiment_alias": "WCRE-1",
+  "hypothesis": "ENG-CORE-001",
+  "hypothesis_status": "UNTESTED",
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model_bytes": 639446688,
+    "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "persistent_runtime": {
+      "bytes": 18535936,
+      "experimental_runtime": true,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "subprocess_runtime": {
+      "bytes": 5949440,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+      "sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+    }
+  },
+  "matrix_id": "matrix-20260821T090759Z-4587dd5b6b",
+  "mode": "contamination",
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux native environment.",
+  "phase4e_valid": false,
+  "phase4ew_modified": false,
+  "phase4f_started": false,
+  "phase5_or_prefetch_started": false,
+  "run_id": "contamination-20260821T091035Z-4b34355669",
+  "runs": [
+    {
+      "answer": "Ignoring pickle, repeated json.dump calls to the same Python file produce invalid JSON because JSON is not a framed protocol, and multiple object serializations using the same file-like object *fp* will result in invalid JSON. [SOURCE: 2b0a025ac1549a6b04ae5a17]",
+      "answer_status": "ANSWER",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 18317.486600019038
+      },
+      "context_sha256": "6e036d8c657b67ca2791514478303d03993b981c5f3c82f00de54d9ac0947428",
+      "generation": {
+        "backend": "llama.cpp-persistent-server",
+        "configuration": {
+          "context_size": 4096,
+          "device": "none",
+          "max_tokens": 96,
+          "reasoning": "off",
+          "sampling": "greedy_when_temperature_zero",
+          "seed": null,
+          "stop_sequences": [],
+          "temperature": 0.0,
+          "threads": 4
+        },
+        "configuration_hash": "66efdde1900f7a3825951edd562eb0f7cd86eea2b38f264b4dd58e237a777890",
+        "core_mode": "PERSISTENT_CORE",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+        "measurement_semantics": {
+          "model_load_ms": "Zero per request; one-time startup is reported separately.",
+          "physical_read_bytes": "NOT_MEASURED on Windows.",
+          "private_bytes_max": "Maximum sampled private commit of the persistent llama-server process during this request.",
+          "ttft_ms": "Elapsed from HTTP request start to first non-empty streamed token.",
+          "working_set_bytes_max": "Maximum sampled resident working set of the persistent llama-server process during this request."
+        },
+        "metrics": {
+          "backend_total_ms": 18317.486600019038,
+          "core_mode": "PERSISTENT_CORE",
+          "core_reuse_ratio": 1.0,
+          "cpu_kernel_seconds": null,
+          "cpu_percent_total_average": 394.3465420628446,
+          "cpu_percent_total_peak": null,
+          "cpu_time_seconds": 72.234375,
+          "cpu_user_seconds": null,
+          "generated_tokens": 71,
+          "generation_eval_ms": 4736.284,
+          "handle_count_max": 156,
+          "handle_count_min": 152,
+          "latency_ms": 18317.486600019038,
+          "model_load_ms": 0.0,
+          "model_loads": 1,
+          "one_time_startup_cost_ms": 1122.0792999956757,
+          "persistent_reserved_memory": 1175175168,
+          "private_bytes_max": 620036096,
+          "private_bytes_min": 615813120,
+          "prompt_eval_ms": 13565.155,
+          "prompt_tokens": 2090,
+          "prompt_tokens_per_second": 154.07122144936787,
+          "queries_served": 1,
+          "reload_avoidance_rate": 0.0,
+          "reloads_avoided": 0,
+          "system_available_ram_bytes_min": 5956476928,
+          "thread_count_max": null,
+          "thread_count_min": null,
+          "tokens_per_second": 14.990655121187835,
+          "ttft_ms": 13579.868000000715,
+          "working_set_bytes_max": 1206235136,
+          "working_set_bytes_min": 1175175168
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "host": "127.0.0.1",
+          "port": 62019,
+          "server": true,
+          "startup": {
+            "cpu_time_seconds_after_load": 1.6875,
+            "handles_after_load": 152,
+            "host": "127.0.0.1",
+            "model_load_measurement": "ready_time_minus_first_process_log; includes server initialization after first log",
+            "model_load_ms": 1089.1480999998748,
+            "model_loads": 1,
+            "persistent_core_ready_ms": 1122.0792999956757,
+            "pid": 20348,
+            "port": 62019,
+            "private_bytes_after_load": 615813120,
+            "process_startup_ms": 32.93119999580085,
+            "threads_after_load": null,
+            "working_set_bytes_after_load": 1175175168
+          }
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "index": 1,
+      "quality": {
+        "cited_source_ids": [
+          "2b0a025ac1549a6b04ae5a17"
+        ],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 1.0,
+        "required_facts_found": 2,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": true,
+        "source_correct": true
+      },
+      "query_spec": {
+        "category": "distractor",
+        "expected_record_ids": [
+          "2b0a025ac1549a6b04ae5a17"
+        ],
+        "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+        "query_id": "holdout_json_frames",
+        "required_fact_groups": [
+          [
+            "not a framed protocol"
+          ],
+          [
+            "invalid json"
+          ]
+        ],
+        "split": "holdout"
+      },
+      "retrieval": {
+        "activated_pages": [
+          3,
+          4
+        ],
+        "active_brain_bytes": 2097152,
+        "candidates": [
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "calls",
+              "file",
+              "invalid",
+              "json",
+              "pickle",
+              "repeated",
+              "same"
+            ],
+            "query_coverage": 0.6363636363636364,
+            "record_id": "2b0a025ac1549a6b04ae5a17",
+            "score": 0.7800709623355986,
+            "tfidf_score": 0.4212393745673646
+          },
+          {
+            "lexical_score": 0.8407683407172079,
+            "matched_terms": [
+              "json",
+              "json.dump",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "7409230c3d31263ba576b2d1",
+            "score": 0.765384575349431,
+            "tfidf_score": 0.6423900108020059
+          },
+          {
+            "lexical_score": 0.6855563109400244,
+            "matched_terms": [
+              "json",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.2727272727272727,
+            "record_id": "18893306b3c2b47f6463001c",
+            "score": 0.7286381851137593,
+            "tfidf_score": 0.7989296640288003
+          },
+          {
+            "lexical_score": 0.7083154058720793,
+            "matched_terms": [
+              "file",
+              "json",
+              "json.dump",
+              "python"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "859fda16a4d715b5f6c73141",
+            "score": 0.6952911181625963,
+            "tfidf_score": 0.6740409645313347
+          },
+          {
+            "lexical_score": 0.713756599929492,
+            "matched_terms": [
+              "json",
+              "pickle",
+              "python",
+              "same"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "224d71d9f13fc0d43000d9c5",
+            "score": 0.6924300523502601,
+            "tfidf_score": 0.6576341062999344
+          },
+          {
+            "lexical_score": 0.6516765434242732,
+            "matched_terms": [
+              "calls",
+              "json",
+              "python",
+              "repeated",
+              "same"
+            ],
+            "query_coverage": 0.45454545454545453,
+            "record_id": "b227a6f4bc64f5797a340f22",
+            "score": 0.6383523652303589,
+            "tfidf_score": 0.6166129165981831
+          },
+          {
+            "lexical_score": 0.6646371805908327,
+            "matched_terms": [
+              "file",
+              "json",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "b83cccde7b72abcccc6e5c93",
+            "score": 0.620119864642654,
+            "tfidf_score": 0.547486349148257
+          },
+          {
+            "lexical_score": 0.5079362339494969,
+            "matched_terms": [
+              "file",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.2727272727272727,
+            "record_id": "dcc841948e6ec5fbcb6b8043",
+            "score": 0.5807228518773234,
+            "tfidf_score": 0.699479965338514
+          }
+        ],
+        "context": {
+          "bytes": 7874,
+          "estimated_tokens": 1971,
+          "source_ids": [
+            "2b0a025ac1549a6b04ae5a17",
+            "7409230c3d31263ba576b2d1",
+            "859fda16a4d715b5f6c73141",
+            "b227a6f4bc64f5797a340f22",
+            "18893306b3c2b47f6463001c",
+            "224d71d9f13fc0d43000d9c5"
+          ]
+        },
+        "record_ids": [
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5",
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "b83cccde7b72abcccc6e5c93",
+          "dcc841948e6ec5fbcb6b8043"
+        ],
+        "selected_record_bytes": 10286,
+        "sources": [
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file. * **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"j",
+            "page_id": 3,
+            "record_id": "2b0a025ac1549a6b04ae5a17",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": "JSON (JavaScript Object Notation), specified by **RFC 7159** (which obsoletes **RFC 4627**) and by ECMA-404, is a lightweight data interchange format inspired by JavaScript object literal syntax (although it is not a strict subset of JavaScript [1] ). The term \"object\" in the con",
+            "page_id": 3,
+            "record_id": "7409230c3d31263ba576b2d1",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": ">>> import json >>> class ComplexEncoder(json.JSONEncoder): ... def default(self, obj): ... if isinstance(obj, complex): ... return [obj.real, obj.imag] ... # Let the base class default method raise the TypeError ... return super().default(obj) ... >>> json.dumps(2 + 1j, cls=Comp",
+            "page_id": 3,
+            "record_id": "859fda16a4d715b5f6c73141",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": "The RFC does not permit the representation of infinite or NaN number values. Despite that, by default, this module accepts and outputs \"Infinity\", \"-Infinity\", and \"NaN\" as if they were valid JSON number literal values: >>> # Neither of these calls raises an exception, but the re",
+            "page_id": 3,
+            "record_id": "b227a6f4bc64f5797a340f22",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/pickle.txt",
+            "excerpt": "* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by i",
+            "page_id": 4,
+            "record_id": "18893306b3c2b47f6463001c",
+            "section": "pickle",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/pickle.txt",
+            "excerpt": "* \"marshal\" cannot be used to serialize user-defined classes and their instances. \"pickle\" can save and restore class instances transparently, however the class definition must be importable and live in the same module as when the object was pickled. * The \"marshal\" serialization",
+            "page_id": 4,
+            "record_id": "224d71d9f13fc0d43000d9c5",
+            "section": "pickle",
+            "source_id": "python-3.14.7-docs"
+          }
+        ],
+        "status": "OK",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 2097152,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 751366505037806985
+        },
+        "timing_ms": {
+          "context_build": 0.4515,
+          "gate_separate": null,
+          "retrieval_total": 30.53,
+          "routing_and_gate": 27.0564,
+          "storage": 2.0224
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.4515,
+        "qwen_core": 18317.486600019038,
+        "routing_and_gate": 27.0564,
+        "storage": 2.0224,
+        "total": 19474.8492
+      }
+    },
+    {
+      "answer": "NO_KNOWLEDGE.",
+      "answer_status": "NO_KNOWLEDGE",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 634.1478999820538
+      },
+      "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "generation": {
+        "backend": "llama.cpp-persistent-server",
+        "configuration": {
+          "context_size": 4096,
+          "device": "none",
+          "max_tokens": 96,
+          "reasoning": "off",
+          "sampling": "greedy_when_temperature_zero",
+          "seed": null,
+          "stop_sequences": [],
+          "temperature": 0.0,
+          "threads": 4
+        },
+        "configuration_hash": "66efdde1900f7a3825951edd562eb0f7cd86eea2b38f264b4dd58e237a777890",
+        "core_mode": "PERSISTENT_CORE",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+        "measurement_semantics": {
+          "model_load_ms": "Zero per request; one-time startup is reported separately.",
+          "physical_read_bytes": "NOT_MEASURED on Windows.",
+          "private_bytes_max": "Maximum sampled private commit of the persistent llama-server process during this request.",
+          "ttft_ms": "Elapsed from HTTP request start to first non-empty streamed token.",
+          "working_set_bytes_max": "Maximum sampled resident working set of the persistent llama-server process during this request."
+        },
+        "metrics": {
+          "backend_total_ms": 634.1478999820538,
+          "core_mode": "PERSISTENT_CORE",
+          "core_reuse_ratio": 2.0,
+          "cpu_kernel_seconds": null,
+          "cpu_percent_total_average": 386.8379915898835,
+          "cpu_percent_total_peak": null,
+          "cpu_time_seconds": 2.453125,
+          "cpu_user_seconds": null,
+          "generated_tokens": 6,
+          "generation_eval_ms": 159.724,
+          "handle_count_max": 158,
+          "handle_count_min": 155,
+          "latency_ms": 634.1478999820538,
+          "model_load_ms": 0.0,
+          "model_loads": 1,
+          "one_time_startup_cost_ms": 1122.0792999956757,
+          "persistent_reserved_memory": 1175175168,
+          "private_bytes_max": 620134400,
+          "private_bytes_min": 618307584,
+          "prompt_eval_ms": 462.685,
+          "prompt_tokens": 109,
+          "prompt_tokens_per_second": 235.5814430984363,
+          "queries_served": 2,
+          "reload_avoidance_rate": 1.0,
+          "reloads_avoided": 1,
+          "system_available_ram_bytes_min": 6038765568,
+          "thread_count_max": null,
+          "thread_count_min": null,
+          "tokens_per_second": 37.56479927875586,
+          "ttft_ms": 473.4726999886334,
+          "working_set_bytes_max": 1206345728,
+          "working_set_bytes_min": 1204518912
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "host": "127.0.0.1",
+          "port": 62019,
+          "server": true,
+          "startup": {
+            "cpu_time_seconds_after_load": 1.6875,
+            "handles_after_load": 152,
+            "host": "127.0.0.1",
+            "model_load_measurement": "ready_time_minus_first_process_log; includes server initialization after first log",
+            "model_load_ms": 1089.1480999998748,
+            "model_loads": 1,
+            "persistent_core_ready_ms": 1122.0792999956757,
+            "pid": 20348,
+            "port": 62019,
+            "private_bytes_after_load": 615813120,
+            "process_startup_ms": 32.93119999580085,
+            "threads_after_load": null,
+            "working_set_bytes_after_load": 1175175168
+          }
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "index": 2,
+      "quality": {
+        "cited_source_ids": [],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 1.0,
+        "required_facts_found": 0,
+        "required_facts_total": 0,
+        "retrieval_supports_expected": true,
+        "source_correct": true
+      },
+      "query_spec": {
+        "category": "unknown_not_in_corpus",
+        "expected_record_ids": [],
+        "query": "What is the exact default cache size of the Python OrionDB driver?",
+        "query_id": "holdout_unknown_near",
+        "required_fact_groups": [],
+        "split": "holdout"
+      },
+      "retrieval": {
+        "activated_pages": [],
+        "active_brain_bytes": 0,
+        "candidates": [
+          {
+            "lexical_score": 0.7561457528421821,
+            "matched_terms": [
+              "cache",
+              "default",
+              "size"
+            ],
+            "query_coverage": 0.42857142857142855,
+            "record_id": "a1378f7e3a96b327b62e8ae1",
+            "score": 0.8488103667621529,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "cache",
+              "default",
+              "driver",
+              "size"
+            ],
+            "query_coverage": 0.5714285714285714,
+            "record_id": "42d6ad3641d8de3c561e29b0",
+            "score": 0.8414180022138691,
+            "tfidf_score": 0.5826789531943923
+          },
+          {
+            "lexical_score": 0.7786985233742104,
+            "matched_terms": [
+              "cache",
+              "default",
+              "size"
+            ],
+            "query_coverage": 0.42857142857142855,
+            "record_id": "dd987381ed04ec89bf12146f",
+            "score": 0.7593743469721536,
+            "tfidf_score": 0.7278454275793239
+          },
+          {
+            "lexical_score": 0.8021959556136375,
+            "matched_terms": [
+              "cache",
+              "default",
+              "size"
+            ],
+            "query_coverage": 0.42857142857142855,
+            "record_id": "90c7f33e191e5417bcad03a6",
+            "score": 0.7374989226560735,
+            "tfidf_score": 0.6319406057253111
+          },
+          {
+            "lexical_score": 0.6508552165054491,
+            "matched_terms": [
+              "driver"
+            ],
+            "query_coverage": 0.14285714285714285,
+            "record_id": "e33b334a500e0e8610a521d4",
+            "score": 0.6973166347897839,
+            "tfidf_score": 0.7731221067273828
+          },
+          {
+            "lexical_score": 0.6936280075129844,
+            "matched_terms": [
+              "cache",
+              "default",
+              "size"
+            ],
+            "query_coverage": 0.42857142857142855,
+            "record_id": "05e316b35ae19291d6d40e50",
+            "score": 0.6707780361158222,
+            "tfidf_score": 0.6334965038362419
+          },
+          {
+            "lexical_score": 0.6329857249094257,
+            "matched_terms": [
+              "cache",
+              "default",
+              "size"
+            ],
+            "query_coverage": 0.42857142857142855,
+            "record_id": "727feef70b1eb003b91db75d",
+            "score": 0.6121277335633539,
+            "tfidf_score": 0.5780962739987104
+          },
+          {
+            "lexical_score": 0.7517888432505503,
+            "matched_terms": [
+              "cache",
+              "default",
+              "size"
+            ],
+            "query_coverage": 0.42857142857142855,
+            "record_id": "9c2e8a5d7244c06513308b79",
+            "score": 0.6120539974497484,
+            "tfidf_score": 0.38406556482738746
+          }
+        ],
+        "context": {
+          "bytes": 0,
+          "estimated_tokens": 0,
+          "source_ids": []
+        },
+        "record_ids": [],
+        "selected_record_bytes": 0,
+        "sources": [],
+        "status": "NO_KNOWLEDGE",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 0,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 0
+        },
+        "timing_ms": {
+          "context_build": 0.0041,
+          "gate_separate": null,
+          "retrieval_total": 28.988,
+          "routing_and_gate": 28.2835,
+          "storage": 0.0124
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.0041,
+        "qwen_core": 634.1478999820538,
+        "routing_and_gate": 28.2835,
+        "storage": 0.0124,
+        "total": 663.5718
+      }
+    },
+    {
+      "answer": "To safely bind variables in Python to SQLite3 execute statements, use placeholders instead of string formatting. For example:  \n```python\ncur.execute(\"INSERT INTO movie VALUES(?, ?, ?)\", data)\n```  \nThis approach avoids SQL injection and ensures secure data binding.  \n\nSOURCE: 801c3ac239e928d776230cf8",
+      "answer_status": "ANSWER",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 17529.332200007048
+      },
+      "context_sha256": "46c111a487283b47ed934741899882497eb402db5223e6b59ef1992143a5d254",
+      "generation": {
+        "backend": "llama.cpp-persistent-server",
+        "configuration": {
+          "context_size": 4096,
+          "device": "none",
+          "max_tokens": 96,
+          "reasoning": "off",
+          "sampling": "greedy_when_temperature_zero",
+          "seed": null,
+          "stop_sequences": [],
+          "temperature": 0.0,
+          "threads": 4
+        },
+        "configuration_hash": "66efdde1900f7a3825951edd562eb0f7cd86eea2b38f264b4dd58e237a777890",
+        "core_mode": "PERSISTENT_CORE",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+        "measurement_semantics": {
+          "model_load_ms": "Zero per request; one-time startup is reported separately.",
+          "physical_read_bytes": "NOT_MEASURED on Windows.",
+          "private_bytes_max": "Maximum sampled private commit of the persistent llama-server process during this request.",
+          "ttft_ms": "Elapsed from HTTP request start to first non-empty streamed token.",
+          "working_set_bytes_max": "Maximum sampled resident working set of the persistent llama-server process during this request."
+        },
+        "metrics": {
+          "backend_total_ms": 17529.332200007048,
+          "core_mode": "PERSISTENT_CORE",
+          "core_reuse_ratio": 3.0,
+          "cpu_kernel_seconds": null,
+          "cpu_percent_total_average": 396.8348548952255,
+          "cpu_percent_total_peak": null,
+          "cpu_time_seconds": 69.5625,
+          "cpu_user_seconds": null,
+          "generated_tokens": 80,
+          "generation_eval_ms": 5660.506,
+          "handle_count_max": 160,
+          "handle_count_min": 157,
+          "latency_ms": 17529.332200007048,
+          "model_load_ms": 0.0,
+          "model_loads": 1,
+          "one_time_startup_cost_ms": 1122.0792999956757,
+          "persistent_reserved_memory": 1175175168,
+          "private_bytes_max": 620171264,
+          "private_bytes_min": 618340352,
+          "prompt_eval_ms": 11853.203,
+          "prompt_tokens": 2087,
+          "prompt_tokens_per_second": 176.07055240680515,
+          "queries_served": 3,
+          "reload_avoidance_rate": 1.0,
+          "reloads_avoided": 2,
+          "system_available_ram_bytes_min": 5968355328,
+          "thread_count_max": null,
+          "thread_count_min": null,
+          "tokens_per_second": 14.133012137077497,
+          "ttft_ms": 11867.683299991768,
+          "working_set_bytes_max": 1206517760,
+          "working_set_bytes_min": 1204686848
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "host": "127.0.0.1",
+          "port": 62019,
+          "server": true,
+          "startup": {
+            "cpu_time_seconds_after_load": 1.6875,
+            "handles_after_load": 152,
+            "host": "127.0.0.1",
+            "model_load_measurement": "ready_time_minus_first_process_log; includes server initialization after first log",
+            "model_load_ms": 1089.1480999998748,
+            "model_loads": 1,
+            "persistent_core_ready_ms": 1122.0792999956757,
+            "pid": 20348,
+            "port": 62019,
+            "private_bytes_after_load": 615813120,
+            "process_startup_ms": 32.93119999580085,
+            "threads_after_load": null,
+            "working_set_bytes_after_load": 1175175168
+          }
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "index": 3,
+      "quality": {
+        "cited_source_ids": [],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 0.5,
+        "required_facts_found": 1,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": true,
+        "source_correct": false
+      },
+      "query_spec": {
+        "category": "procedure",
+        "expected_record_ids": [
+          "0be5e11beaf36611325a42aa"
+        ],
+        "query": "How should variables be bound safely in Python sqlite3 execute instead of formatting SQL strings?",
+        "query_id": "dev_sql_params",
+        "required_fact_groups": [
+          [
+            "placeholder",
+            "parameter substitution"
+          ],
+          [
+            "tuple",
+            "dict",
+            "sequence"
+          ]
+        ],
+        "split": "development"
+      },
+      "retrieval": {
+        "activated_pages": [
+          4,
+          7,
+          11,
+          13
+        ],
+        "active_brain_bytes": 4194304,
+        "candidates": [
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "execute",
+              "instead",
+              "parameter",
+              "python",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.6,
+            "record_id": "801c3ac239e928d776230cf8",
+            "score": 0.9242550661100926,
+            "tfidf_score": 0.8006712266055069
+          },
+          {
+            "lexical_score": 0.9651248814248867,
+            "matched_terms": [
+              "formatting",
+              "instead",
+              "parameter",
+              "python",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.6,
+            "record_id": "367d8201386fc06e850afecb",
+            "score": 0.7501190549248316,
+            "tfidf_score": 0.3993200748457941
+          },
+          {
+            "lexical_score": 0.9854160361458261,
+            "matched_terms": [
+              "execute",
+              "instead",
+              "parameter",
+              "python",
+              "sql",
+              "variables"
+            ],
+            "query_coverage": 0.6,
+            "record_id": "0fc79bc49ca725b41bb16b29",
+            "score": 0.733187321610577,
+            "tfidf_score": 0.3216562610530655
+          },
+          {
+            "lexical_score": 0.8440740605216913,
+            "matched_terms": [
+              "execute",
+              "sql",
+              "sqlite3",
+              "variables"
+            ],
+            "query_coverage": 0.4,
+            "record_id": "d7b9a4e28a517bf936a40571",
+            "score": 0.7235817555140044,
+            "tfidf_score": 0.5269890473435678
+          },
+          {
+            "lexical_score": 0.5971303969903098,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "79991b001c7de5c74daed0b6",
+            "score": 0.7228163295672478,
+            "tfidf_score": 0.9278828511401466
+          },
+          {
+            "lexical_score": 0.5308909759023535,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "14a1d46c897c0a65a56945a1",
+            "score": 0.7091524050594591,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 0.5958168900028349,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "220a4b4b6ab78b746663e2e5",
+            "score": 0.6943294122041561,
+            "tfidf_score": 0.8550603694799961
+          },
+          {
+            "lexical_score": 0.5293781136553545,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "e38b6d377e1ff99d283f55f8",
+            "score": 0.6931381122241402,
+            "tfidf_score": 0.9603254783100538
+          }
+        ],
+        "context": {
+          "bytes": 7605,
+          "estimated_tokens": 1903,
+          "source_ids": [
+            "801c3ac239e928d776230cf8",
+            "367d8201386fc06e850afecb",
+            "0be5e11beaf36611325a42aa",
+            "812bf462a398609855d5300a",
+            "0fc79bc49ca725b41bb16b29",
+            "eee646b530126e63f5437e2a"
+          ]
+        },
+        "record_ids": [
+          "0be5e11beaf36611325a42aa",
+          "0fc79bc49ca725b41bb16b29",
+          "367d8201386fc06e850afecb",
+          "79991b001c7de5c74daed0b6",
+          "801c3ac239e928d776230cf8",
+          "812bf462a398609855d5300a",
+          "d7b9a4e28a517bf936a40571",
+          "eee646b530126e63f5437e2a"
+        ],
+        "selected_record_bytes": 10191,
+        "sources": [
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": "* **parameters** (\"dict\" | *sequence*) -- Python values to bind to placeholders in *sql*. A \"dict\" if named placeholders are used. A *sequence* if unnamed placeholders are used. See How to use placeholders to bind values in SQL queries. Raises: **ProgrammingError** -- When *sql* ",
+            "page_id": 4,
+            "record_id": "801c3ac239e928d776230cf8",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": "We can verify that the data was inserted correctly by executing a \"SELECT\" query. Use the now-familiar \"cur.execute(...)\" to assign the result to \"res\", and call \"res.fetchall()\" to return all resulting rows: >>> res = cur.execute(\"SELECT score FROM movie\") >>> res.fetchall() [(8",
+            "page_id": 4,
+            "record_id": "367d8201386fc06e850afecb",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": ">>> # Never do this -- insecure! >>> symbol = input() ' OR TRUE; -- >>> sql = \"SELECT * FROM stocks WHERE symbol = '%s'\" % symbol >>> print(sql) SELECT * FROM stocks WHERE symbol = '' OR TRUE; --' >>> cur.execute(sql) Instead, use the DB-API's parameter substitution. To insert a ",
+            "page_id": 4,
+            "record_id": "0be5e11beaf36611325a42aa",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": "The initial \"row_factory\" for \"Cursor\" objects created from this connection. Assigning to this attribute does not affect the \"row_factory\" of existing cursors belonging to this connection, only new ones. Is \"None\" by default, meaning each row is returned as a \"tuple\". Changed in ",
+            "page_id": 4,
+            "record_id": "812bf462a398609855d5300a",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/whatsnew/2.5.txt",
+            "excerpt": "Usually your SQL operations will need to use values from Python variables. You shouldn't assemble your query using Python's string operations because doing so is insecure; it makes your program vulnerable to an SQL injection attack. Instead, use the DB-API's parameter substitutio",
+            "page_id": 7,
+            "record_id": "0fc79bc49ca725b41bb16b29",
+            "section": "2.5",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/whatsnew/2.0.txt",
+            "excerpt": "Taking the \"repr()\" of a float now uses a different formatting precision than \"str()\". \"repr()\" uses \"%.17g\" format string for C's \"sprintf()\", while \"str()\" uses \"%.12g\" as before. The effect is that \"repr()\" may occasionally show more decimal places than \"str()\", for certain nu",
+            "page_id": 7,
+            "record_id": "eee646b530126e63f5437e2a",
+            "section": "2.0",
+            "source_id": "python-3.14.7-docs"
+          }
+        ],
+        "status": "OK",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 4194304,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 105663580654018306
+        },
+        "timing_ms": {
+          "context_build": 0.4617,
+          "gate_separate": null,
+          "retrieval_total": 31.5292,
+          "routing_and_gate": 26.9458,
+          "storage": 3.0505
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.4617,
+        "qwen_core": 17529.332200007048,
+        "routing_and_gate": 26.9458,
+        "storage": 3.0505,
+        "total": 17565.0461
+      }
+    },
+    {
+      "answer": "NO_KNOWLEDGE.",
+      "answer_status": "NO_KNOWLEDGE",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 834.9493999849074
+      },
+      "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "generation": {
+        "backend": "llama.cpp-persistent-server",
+        "configuration": {
+          "context_size": 4096,
+          "device": "none",
+          "max_tokens": 96,
+          "reasoning": "off",
+          "sampling": "greedy_when_temperature_zero",
+          "seed": null,
+          "stop_sequences": [],
+          "temperature": 0.0,
+          "threads": 4
+        },
+        "configuration_hash": "66efdde1900f7a3825951edd562eb0f7cd86eea2b38f264b4dd58e237a777890",
+        "core_mode": "PERSISTENT_CORE",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+        "measurement_semantics": {
+          "model_load_ms": "Zero per request; one-time startup is reported separately.",
+          "physical_read_bytes": "NOT_MEASURED on Windows.",
+          "private_bytes_max": "Maximum sampled private commit of the persistent llama-server process during this request.",
+          "ttft_ms": "Elapsed from HTTP request start to first non-empty streamed token.",
+          "working_set_bytes_max": "Maximum sampled resident working set of the persistent llama-server process during this request."
+        },
+        "metrics": {
+          "backend_total_ms": 834.9493999849074,
+          "core_mode": "PERSISTENT_CORE",
+          "core_reuse_ratio": 4.0,
+          "cpu_kernel_seconds": null,
+          "cpu_percent_total_average": 374.2741775796818,
+          "cpu_percent_total_peak": null,
+          "cpu_time_seconds": 3.125,
+          "cpu_user_seconds": null,
+          "generated_tokens": 6,
+          "generation_eval_ms": 210.166,
+          "handle_count_max": 162,
+          "handle_count_min": 159,
+          "latency_ms": 834.9493999849074,
+          "model_load_ms": 0.0,
+          "model_loads": 1,
+          "one_time_startup_cost_ms": 1122.0792999956757,
+          "persistent_reserved_memory": 1175175168,
+          "private_bytes_max": 620269568,
+          "private_bytes_min": 618442752,
+          "prompt_eval_ms": 611.691,
+          "prompt_tokens": 111,
+          "prompt_tokens_per_second": 181.46417063517362,
+          "queries_served": 4,
+          "reload_avoidance_rate": 1.0,
+          "reloads_avoided": 3,
+          "system_available_ram_bytes_min": 5913124864,
+          "thread_count_max": null,
+          "thread_count_min": null,
+          "tokens_per_second": 28.548861376245448,
+          "ttft_ms": 623.1570999952964,
+          "working_set_bytes_max": 1206616064,
+          "working_set_bytes_min": 1204789248
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "host": "127.0.0.1",
+          "port": 62019,
+          "server": true,
+          "startup": {
+            "cpu_time_seconds_after_load": 1.6875,
+            "handles_after_load": 152,
+            "host": "127.0.0.1",
+            "model_load_measurement": "ready_time_minus_first_process_log; includes server initialization after first log",
+            "model_load_ms": 1089.1480999998748,
+            "model_loads": 1,
+            "persistent_core_ready_ms": 1122.0792999956757,
+            "pid": 20348,
+            "port": 62019,
+            "private_bytes_after_load": 615813120,
+            "process_startup_ms": 32.93119999580085,
+            "threads_after_load": null,
+            "working_set_bytes_after_load": 1175175168
+          }
+        },
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "index": 4,
+      "quality": {
+        "cited_source_ids": [],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 1.0,
+        "required_facts_found": 0,
+        "required_facts_total": 0,
+        "retrieval_supports_expected": true,
+        "source_correct": true
+      },
+      "query_spec": {
+        "category": "unknown",
+        "expected_record_ids": [],
+        "query": "Which reed strength does the Zephyr ZX-9 saxophone require?",
+        "query_id": "dev_unknown",
+        "required_fact_groups": [],
+        "split": "development"
+      },
+      "retrieval": {
+        "activated_pages": [],
+        "active_brain_bytes": 0,
+        "candidates": [
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "19a5f2e12fa0206b6e10fdf7",
+            "score": 1.0,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "2da0e2d2c1aa03e59a4b6fc7",
+            "score": 1.0,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "e0b9862f96fef4692b6616dc",
+            "score": 1.0,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 0.9965766177606854,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "fefe9fb2265b6116259da6cc",
+            "score": 0.9978775030116251,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 0.9588285947690713,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "5a8d0c9e2a640ecc77bc83c6",
+            "score": 0.9744737287568244,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 0.906944898023928,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "7c4b2b91cd835ca8e7fbcc8a",
+            "score": 0.8156391701081686,
+            "tfidf_score": 0.6666666666666666
+          },
+          {
+            "lexical_score": 0.8964713629693712,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "55d5ac7bdc77ec840b63e211",
+            "score": 0.8091455783743435,
+            "tfidf_score": 0.6666666666666666
+          },
+          {
+            "lexical_score": 0.8493887938222764,
+            "matched_terms": [
+              "strength"
+            ],
+            "query_coverage": 0.16666666666666666,
+            "record_id": "6c8fb5c82d08aec53568e9b3",
+            "score": 0.7799543855031447,
+            "tfidf_score": 0.6666666666666666
+          }
+        ],
+        "context": {
+          "bytes": 0,
+          "estimated_tokens": 0,
+          "source_ids": []
+        },
+        "record_ids": [],
+        "selected_record_bytes": 0,
+        "sources": [],
+        "status": "NO_KNOWLEDGE",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 0,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 0
+        },
+        "timing_ms": {
+          "context_build": 0.0043,
+          "gate_separate": null,
+          "retrieval_total": 27.1344,
+          "routing_and_gate": 26.3152,
+          "storage": 0.0202
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "status": "PASS",
+      "timing_ms": {
+        "context_build": 0.0043,
+        "qwen_core": 834.9493999849074,
+        "routing_and_gate": 26.3152,
+        "storage": 0.0202,
+        "total": 862.6654
+      }
+    }
+  ],
+  "schema_version": 1,
+  "standard_rag": "NOT_RUN",
+  "status": "PASS",
+  "timestamp_utc": "2026-08-21T09:10:35Z"
+}

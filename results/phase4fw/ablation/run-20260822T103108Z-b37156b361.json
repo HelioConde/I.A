@@ -1,0 +1,752 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 5544,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 20.022299999999998,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1383,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 362,
+        "estimated_tokens": 61,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 2,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.5951612628958756,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 179,
+        "text": "That means that readers can continue to read the old, original, unaltered content from the original database file at the same time that the writer is appending to the write-ahead log.",
+        "title": "isolation"
+      },
+      {
+        "end": 1105,
+        "estimated_tokens": 54,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 8,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.4505397476750449,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 954,
+        "text": "The information in this article applies only when SQLite is operating in \"rollback mode\", or in other words when SQLite is not using a write-ahead log.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 1276,
+        "estimated_tokens": 59,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 9,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.45026196989726713,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1105,
+        "text": "SQLite still supports atomic commit when write-ahead logging is enabled, but it accomplishes atomic commit by a different mechanism from the one described in this article.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 262,
+        "estimated_tokens": 78,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 0,
+        "record_id": "54295977f935d3e92d41aa5d",
+        "score": 0.4493706192154857,
+        "section": "pragma",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "If the write-ahead log is enabled (via the journal_mode pragma), this pragma causes a checkpoint operation to run on database database, or on all attached databases if database is omitted. If write-ahead log mode is disabled, this pragma is a harmless no-op.",
+        "title": "pragma"
+      },
+      {
+        "end": 1394,
+        "estimated_tokens": 46,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 10,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.3954892426245398,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1276,
+        "text": "See the write-ahead log documentation for additional information on how SQLite supports atomic commit in that context.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 179,
+        "estimated_tokens": 47,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 1,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.3811461113807241,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 50,
+        "text": "It can do this because changes do not overwrite the original database file, but rather go into the separate write-ahead log file.",
+        "title": "isolation"
+      },
+      {
+        "end": 846,
+        "estimated_tokens": 89,
+        "kind": "code_block",
+        "page_id": 12,
+        "position": 3,
+        "record_id": "54295977f935d3e92d41aa5d",
+        "score": 0.3760751646700311,
+        "section": "pragma",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 539,
+        "text": "PASSIVE Checkpoint as many frames as possible without waiting for any database readers or writers to finish. Sync the db file if all frames in the log are checkpointed. This mode is the same as calling the sqlite3_wal_checkpoint() C interface. The busy-handler callback is never invoked in this mode.",
+        "title": "pragma"
+      },
+      {
+        "end": 1168,
+        "estimated_tokens": 92,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 4,
+        "record_id": "54295977f935d3e92d41aa5d",
+        "score": 0.37482516467003113,
+        "section": "pragma",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 848,
+        "text": "FULL This mode blocks (invokes the busy-handler callback) until there is no database writer and all readers are reading from the most recent database snapshot. It then checkpoints all frames in the log file and syncs the database file. FULL blocks concurrent writers while it is running, but readers can proceed.",
+        "title": "pragma"
+      },
+      {
+        "end": 50,
+        "estimated_tokens": 28,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 0,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.3391006568352696,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "WAL mode permits simultaneous readers and writers.",
+        "title": "isolation"
+      },
+      {
+        "end": 415,
+        "estimated_tokens": 28,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 3,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.32035065683526953,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 365,
+        "text": "In WAL mode, SQLite exhibits \"snapshot isolation\".",
+        "title": "isolation"
+      },
+      {
+        "end": 794,
+        "estimated_tokens": 66,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 5,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.3182673235019362,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 592,
+        "text": "Any write transactions that commit while the read transaction is active are still invisible to the read transaction, because the reader is seeing a snapshot of database file from a prior moment in time.",
+        "title": "isolation"
+      },
+      {
+        "end": 592,
+        "estimated_tokens": 59,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 4,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.264555202289815,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 415,
+        "text": "When a read transaction starts, that reader continues to see an unchanging \"snapshot\" of the database file as it existed at the moment in time when the read transaction started.",
+        "title": "isolation"
+      },
+      {
+        "end": 79,
+        "estimated_tokens": 36,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 0,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.25458015171544895,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "An important feature of transactional databases like SQLite is \"atomic commit\".",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 433,
+        "estimated_tokens": 43,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 3,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.23583015171544897,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 326,
+        "text": "Real hardware serializes writes to mass storage, and writing a single sector takes a finite amount of time.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 548,
+        "estimated_tokens": 45,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 4,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.23458015171544896,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 433,
+        "text": "So it is impossible to truly write many different sectors of a database file simultaneously and/or instantaneously.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 693,
+        "estimated_tokens": 53,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 5,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.23374681838211564,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 548,
+        "text": "But the atomic commit logic within SQLite makes it appear as if the changes for a transaction are all written instantaneously and simultaneously.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 857,
+        "estimated_tokens": 56,
+        "kind": "paragraph",
+        "page_id": 9,
+        "position": 6,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.23315158028687752,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 700,
+        "text": "SQLite has the important property that transactions appear to be atomic even if the transaction is interrupted by an operating system crash or power failure.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 952,
+        "estimated_tokens": 40,
+        "kind": "paragraph",
+        "page_id": 9,
+        "position": 7,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.23270515171544895,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 859,
+        "text": "This article describes the techniques used by SQLite to create the illusion of atomic commit.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 373,
+        "estimated_tokens": 40,
+        "kind": "code_block",
+        "page_id": 12,
+        "position": 1,
+        "record_id": "54295977f935d3e92d41aa5d",
+        "score": 0.21868880103366753,
+        "section": "pragma",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 264,
+        "text": "Invoking this pragma without an argument is equivalent to calling the sqlite3_wal_checkpoint() C interface.",
+        "title": "pragma"
+      },
+      {
+        "end": 537,
+        "estimated_tokens": 53,
+        "kind": "code_block",
+        "page_id": 12,
+        "position": 2,
+        "record_id": "54295977f935d3e92d41aa5d",
+        "score": 0.21452213436700085,
+        "section": "pragma",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 375,
+        "text": "Invoking this pragma with an argument is equivalent to calling the sqlite3_wal_checkpoint_v2() C interface with a 3rd parameter corresponding to the argument:",
+        "title": "pragma"
+      },
+      {
+        "end": 861,
+        "estimated_tokens": 31,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 6,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.208581176315789,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 798,
+        "text": "An example: Suppose there are two database connections X and Y.",
+        "title": "isolation"
+      },
+      {
+        "end": 943,
+        "estimated_tokens": 36,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 7,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.20813474774436044,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 861,
+        "text": "X starts a read transaction using BEGIN followed by one or more SELECT statements.",
+        "title": "isolation"
+      },
+      {
+        "end": 1016,
+        "estimated_tokens": 33,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 8,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.20778752552213822,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 945,
+        "text": "Then Y comes along and runs an UPDATE statement to modify the database.",
+        "title": "isolation"
+      },
+      {
+        "end": 1208,
+        "estimated_tokens": 63,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 9,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.20750974774436046,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1016,
+        "text": "X can subsequently do a SELECT against the records that Y modified but X will see the older unmodified entries because Y's changes are all invisible to X while X is holding a read transaction.",
+        "title": "isolation"
+      },
+      {
+        "end": 1354,
+        "estimated_tokens": 52,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 10,
+        "record_id": "d43d637b9c5311cd0567076e",
+        "score": 0.20728247501708771,
+        "section": "isolation",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1208,
+        "text": "If X wants to see the changes that Y made, then X must end its read transaction and start a new one (by running COMMIT followed by another BEGIN.)",
+        "title": "isolation"
+      },
+      {
+        "end": 188,
+        "estimated_tokens": 44,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 1,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.18753469716999444,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 79,
+        "text": "Atomic commit means that either all database changes within a single transaction occur or none of them occur.",
+        "title": "atomiccommit"
+      },
+      {
+        "end": 326,
+        "estimated_tokens": 51,
+        "kind": "sentence",
+        "page_id": 9,
+        "position": 2,
+        "record_id": "0dc19137b796270a8d2ec298",
+        "score": 0.18336803050332776,
+        "section": "atomiccommit",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 188,
+        "text": "With atomic commit, it is as if many different writes to different sections of the database file occur instantaneously and simultaneously.",
+        "title": "atomiccommit"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "d43d637b9c5311cd0567076e",
+      "0dc19137b796270a8d2ec298",
+      "54295977f935d3e92d41aa5d"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 27,
+    "source_ids": [
+      "d43d637b9c5311cd0567076e",
+      "0dc19137b796270a8d2ec298",
+      "54295977f935d3e92d41aa5d"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nThat means that readers can continue to read the old, original, unaltered content from the original database file at the same time that the writer is appending to the write-ahead log.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nThe information in this article applies only when SQLite is operating in \"rollback mode\", or in other words when SQLite is not using a write-ahead log.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nSQLite still supports atomic commit when write-ahead logging is enabled, but it accomplishes atomic commit by a different mechanism from the one described in this article.\n\n[SOURCE: 54295977f935d3e92d41aa5d] pragma — pragma\nIf the write-ahead log is enabled (via the journal_mode pragma), this pragma causes a checkpoint operation to run on database database, or on all attached databases if database is omitted. If write-ahead log mode is disabled, this pragma is a harmless no-op.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nSee the write-ahead log documentation for additional information on how SQLite supports atomic commit in that context.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nIt can do this because changes do not overwrite the original database file, but rather go into the separate write-ahead log file.\n\n[SOURCE: 54295977f935d3e92d41aa5d] pragma — pragma\nPASSIVE Checkpoint as many frames as possible without waiting for any database readers or writers to finish. Sync the db file if all frames in the log are checkpointed. This mode is the same as calling the sqlite3_wal_checkpoint() C interface. The busy-handler callback is never invoked in this mode.\n\n[SOURCE: 54295977f935d3e92d41aa5d] pragma — pragma\nFULL This mode blocks (invokes the busy-handler callback) until there is no database writer and all readers are reading from the most recent database snapshot. It then checkpoints all frames in the log file and syncs the database file. FULL blocks concurrent writers while it is running, but readers can proceed.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nWAL mode permits simultaneous readers and writers.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nIn WAL mode, SQLite exhibits \"snapshot isolation\".\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nAny write transactions that commit while the read transaction is active are still invisible to the read transaction, because the reader is seeing a snapshot of database file from a prior moment in time.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nWhen a read transaction starts, that reader continues to see an unchanging \"snapshot\" of the database file as it existed at the moment in time when the read transaction started.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nAn important feature of transactional databases like SQLite is \"atomic commit\".\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nReal hardware serializes writes to mass storage, and writing a single sector takes a finite amount of time.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nSo it is impossible to truly write many different sectors of a database file simultaneously and/or instantaneously.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nBut the atomic commit logic within SQLite makes it appear as if the changes for a transaction are all written instantaneously and simultaneously.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nSQLite has the important property that transactions appear to be atomic even if the transaction is interrupted by an operating system crash or power failure.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nThis article describes the techniques used by SQLite to create the illusion of atomic commit.\n\n[SOURCE: 54295977f935d3e92d41aa5d] pragma — pragma\nInvoking this pragma without an argument is equivalent to calling the sqlite3_wal_checkpoint() C interface.\n\n[SOURCE: 54295977f935d3e92d41aa5d] pragma — pragma\nInvoking this pragma with an argument is equivalent to calling the sqlite3_wal_checkpoint_v2() C interface with a 3rd parameter corresponding to the argument:\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nAn example: Suppose there are two database connections X and Y.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nX starts a read transaction using BEGIN followed by one or more SELECT statements.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nThen Y comes along and runs an UPDATE statement to modify the database.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nX can subsequently do a SELECT against the records that Y modified but X will see the older unmodified entries because Y's changes are all invisible to X while X is holding a read transaction.\n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation\nIf X wants to see the changes that Y made, then X must end its read transaction and start a new one (by running COMMIT followed by another BEGIN.)\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nAtomic commit means that either all database changes within a single transaction occur or none of them occur.\n\n[SOURCE: 0dc19137b796270a8d2ec298] atomiccommit — atomiccommit\nWith atomic commit, it is as if many different writes to different sections of the database file occur instantaneously and simultaneously."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2462,
+    "context_activation_rate": 0.5617384240454915,
+    "context_density": 0.03976861894432393,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 461.0,
+    "useful_oracle_tokens": 55
+  },
+  "context_sha256": "d65ba0199cbcb30f82e9e141f893305b2be8a0d97587d25ab76c4ad660a88fd6",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1706,
+    "answer_quality": {
+      "cited_source_ids": [
+        "d43d637b9c5311cd0567076e"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.6666666666666666,
+      "required_facts_found": 2,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "Yes, SQLite readers and writers can operate at the same time in write-ahead logging mode. This is because WAL (Write-Ahead Logging) mode allows for simultaneous access to the database file, enabling both readers and writers to perform operations concurrently. \n\n[SOURCE: d43d637b9c5311cd0567076e] isolation — isolation [SOURCE: d43d637b9c5311",
+    "metrics": {
+      "backend_total_ms": 14896.506600023713,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 153.0,
+      "cpu_kernel_seconds": 2.171875,
+      "cpu_percent_total_average": 397.8491507526044,
+      "cpu_percent_total_peak": 600.4207747278042,
+      "cpu_time_seconds": 59.265625,
+      "cpu_user_seconds": 57.09375,
+      "generated_tokens": 96,
+      "generation_eval_ms": 5607.335,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 14896.506600023713,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621584384,
+      "private_bytes_min": 619753472,
+      "prompt_eval_ms": 9274.522,
+      "prompt_tokens": 1706,
+      "prompt_tokens_per_second": 183.9447898231305,
+      "queries_served": 153,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 152,
+      "system_available_ram_bytes_min": 3428335616,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 17.12043243358922,
+      "ttft_ms": 9288.215700013097,
+      "working_set_bytes_max": 993923072,
+      "working_set_bytes_min": 992096256,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 788
+    },
+    "output_sha256": "ae8bd50c46c42d77bd7338e06f4ecc0cccd8f64b0cac491b838bee319ba8cb4b",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_wal_concurrency::COMBINED_B1536",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 152,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1386,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 379,
+    "other_or_chat_envelope": 206,
+    "percent": {
+      "evidence": 81.24267291910903,
+      "instructions": 5.275498241500586,
+      "other_or_chat_envelope": 12.075029308323565,
+      "question": 1.4067995310668229
+    },
+    "question": 24,
+    "total": 1706
+  },
+  "prompt_sha256": "1405e641851c37a75fd51fb384f79f9a5c3a8de9f826a8027566abe938c9cabc",
+  "query_spec": {
+    "category": "paraphrase",
+    "expected_record_ids": [
+      "d43d637b9c5311cd0567076e"
+    ],
+    "query": "Can SQLite readers and a writer operate at the same time in write-ahead logging mode, and why?",
+    "query_id": "dev_wal_concurrency",
+    "required_fact_groups": [
+      [
+        "simultaneous",
+        "same time"
+      ],
+      [
+        "write-ahead log",
+        "wal"
+      ],
+      [
+        "original database",
+        "snapshot"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      9,
+      11,
+      12,
+      14
+    ],
+    "record_bytes": 9838,
+    "records_retrieved": [
+      "d43d637b9c5311cd0567076e",
+      "54295977f935d3e92d41aa5d",
+      "a91aae524418f2c55306061a",
+      "0dc19137b796270a8d2ec298",
+      "4dd1cf18bd40b4e647cbd8fb",
+      "fefb03e1e3da0dd0e4ebdb80",
+      "0ae87f7578f62e508e800622",
+      "86c2f2aecc202302f11dbd80"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T103108Z-b37156b361",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:31:08Z",
+  "variant": "COMBINED_B1536",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "same",
+            "sqlite",
+            "time",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "d43d637b9c5311cd0567076e",
+          "score": 0.8542072822681686
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "same",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "54295977f935d3e92d41aa5d",
+          "score": 0.859120004306948
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "readers",
+            "same",
+            "time",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "a91aae524418f2c55306061a",
+          "score": 0.7624650058809739
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "ahead",
+            "logging",
+            "mode",
+            "sqlite",
+            "time",
+            "write",
+            "write-ahead"
+          ],
+          "record_id": "0dc19137b796270a8d2ec298",
+          "score": 0.7293112382083101
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "sqlite",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "4dd1cf18bd40b4e647cbd8fb",
+          "score": 0.6725605465722535
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "sqlite",
+            "time",
+            "write",
+            "write-ahead"
+          ],
+          "record_id": "fefb03e1e3da0dd0e4ebdb80",
+          "score": 0.678576309172373
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "readers",
+            "same",
+            "sqlite",
+            "write",
+            "write-ahead",
+            "writer"
+          ],
+          "record_id": "0ae87f7578f62e508e800622",
+          "score": 0.6456555013319861
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ahead",
+            "mode",
+            "sqlite",
+            "write",
+            "write-ahead"
+          ],
+          "record_id": "86c2f2aecc202302f11dbd80",
+          "score": 0.7051939247603876
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "a91aae524418f2c55306061a",
+        "4dd1cf18bd40b4e647cbd8fb",
+        "fefb03e1e3da0dd0e4ebdb80",
+        "0ae87f7578f62e508e800622",
+        "86c2f2aecc202302f11dbd80"
+      ],
+      "retained_record_ids": [
+        "d43d637b9c5311cd0567076e",
+        "54295977f935d3e92d41aa5d",
+        "0dc19137b796270a8d2ec298"
+      ],
+      "wall_ms": 1.7152
+    }
+  }
+}

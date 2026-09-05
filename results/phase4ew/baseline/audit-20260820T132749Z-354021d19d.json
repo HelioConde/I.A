@@ -1,0 +1,407 @@
+{
+  "canonical": false,
+  "canonical_checksums": {
+    "entries": 102,
+    "failures": []
+  },
+  "capabilities": {
+    "capabilities": {
+      "cgroups_v2": {
+        "details": null,
+        "reason": "unsupported_on_windows",
+        "status": "UNSUPPORTED"
+      },
+      "hud": {
+        "details": null,
+        "reason": "Existing in-process HUD event bus.",
+        "status": "SUPPORTED"
+      },
+      "madvise_cold": {
+        "details": null,
+        "reason": "unsupported_on_windows",
+        "status": "UNSUPPORTED"
+      },
+      "madvise_pageout": {
+        "details": null,
+        "reason": "unsupported_on_windows",
+        "status": "UNSUPPORTED"
+      },
+      "memory_mapped_brain": {
+        "details": null,
+        "reason": "Python mmap uses the native Windows file mapping API.",
+        "status": "SUPPORTED"
+      },
+      "mincore_residency": {
+        "details": null,
+        "reason": "unsupported_on_windows",
+        "status": "UNSUPPORTED"
+      },
+      "physical_ssd_io": {
+        "details": null,
+        "reason": "Windows process I/O counters do not prove physical SSD reads or cache residency.",
+        "status": "DEGRADED"
+      },
+      "process_cpu": {
+        "details": null,
+        "reason": "Measured with GetProcessTimes.",
+        "status": "SUPPORTED"
+      },
+      "process_io_transfer": {
+        "details": null,
+        "reason": "Measured with GetProcessIoCounters; values are process transfer counters, not physical disk reads.",
+        "status": "SUPPORTED"
+      },
+      "process_memory": {
+        "details": null,
+        "reason": "Measured with GetProcessMemoryInfo.",
+        "status": "SUPPORTED"
+      },
+      "procfs_metrics": {
+        "details": null,
+        "reason": "unsupported_on_windows",
+        "status": "UNSUPPORTED"
+      },
+      "psi_pressure": {
+        "details": null,
+        "reason": "unsupported_on_windows",
+        "status": "UNSUPPORTED"
+      },
+      "temperature": {
+        "details": null,
+        "reason": "No stable standard-library Windows sensor API is used.",
+        "status": "NOT_MEASURED"
+      },
+      "windows_working_set": {
+        "details": null,
+        "reason": "Working set and peak working set are available.",
+        "status": "SUPPORTED"
+      }
+    },
+    "environment_type": "WINDOWS_NATIVE_FUNCTIONAL",
+    "host": {
+      "logical_cpu_count": 12,
+      "machine": "AMD64",
+      "memory": {
+        "available_bytes": 7679029248,
+        "total_bytes": 16957431808
+      },
+      "processor": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+      "python": "3.14.3",
+      "release": "11",
+      "system": "Windows",
+      "version": "10.0.26200"
+    },
+    "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux environment.",
+    "phase4e_valid": false
+  },
+  "config_hash": "0453e68857d57327719406577f6e67e75c2c7329c68c625f38f74af3364798b2",
+  "configuration": {
+    "context_size": 4096,
+    "device": "none",
+    "duration_minutes": null,
+    "index_reuse_within_session": false,
+    "max_tokens": 96,
+    "mode": "audit",
+    "model_reuse": false,
+    "quick": true,
+    "reasoning": "off",
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "environment_fingerprint": "05a828cd900d5a27b5c98ac962f447a7b70cf24b3e2102979425ff9331e3d5ac",
+  "freeze_files": {
+    "count": 31,
+    "details": {
+      "benchmarks/data/phase4d_real_qa.json": {
+        "actual": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d",
+        "canonical_lf": "832140da38f0402c7396e815e7f7040add2ee104662169d71a72dd005e7bb24e",
+        "expected": "832140da38f0402c7396e815e7f7040add2ee104662169d71a72dd005e7bb24e",
+        "ok": true
+      },
+      "models/Qwen3-0.6B-Q8_0.gguf": {
+        "actual": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+        "canonical_lf": null,
+        "expected": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+        "ok": true
+      },
+      "results/phase4d-checksums.sha256": {
+        "actual": "70559221fbf568097df04edb8ce8b0b9e23526d8259b0eeef7272a998965f245",
+        "canonical_lf": "530453ed2b534a8fd37a394e529aefbfb7df454719d5a26bd0c3ad828e496618",
+        "expected": "530453ed2b534a8fd37a394e529aefbfb7df454719d5a26bd0c3ad828e496618",
+        "ok": true
+      },
+      "src/brain_ssd/__init__.py": {
+        "actual": "e75a0edc125b0affd82c5b0961fdd167cb3ada46d0c4658d00dbc5400993d0cb",
+        "canonical_lf": "bbd698385a8d3431d05d4a1cb276166ca6392c18c28326e2c9ab9ebafff31ea6",
+        "expected": "bbd698385a8d3431d05d4a1cb276166ca6392c18c28326e2c9ab9ebafff31ea6",
+        "ok": true
+      },
+      "src/brain_ssd/backend.py": {
+        "actual": "bbe1da22ee600908e135407f3bf265f60f5fa59958c3845e7aba3b60b1e05181",
+        "canonical_lf": "217e96b7718f1fc52e26f538a080a866f18e7f11621b5f2ca540bc6ed0d0d0c5",
+        "expected": "217e96b7718f1fc52e26f538a080a866f18e7f11621b5f2ca540bc6ed0d0d0c5",
+        "ok": true
+      },
+      "src/brain_ssd/cache_policy.py": {
+        "actual": "8c617678b4bd7b07802b26e49e131cbb50385f42a28eb0425a9fe817933f439e",
+        "canonical_lf": "a1e72c91a9f32f472d04b15260b46e118499595b737eab13e1f68b004e390695",
+        "expected": "a1e72c91a9f32f472d04b15260b46e118499595b737eab13e1f68b004e390695",
+        "ok": true
+      },
+      "src/brain_ssd/cache_simulator.py": {
+        "actual": "f30ad875f84a6f11fc6828bf190ff289dfeaacceedb2a2498d66e4568c8cee34",
+        "canonical_lf": "5fbed775ed05e9302c7bc9131e4d39beddfa9132b15b334ec81ac67fc936e621",
+        "expected": "5fbed775ed05e9302c7bc9131e4d39beddfa9132b15b334ec81ac67fc936e621",
+        "ok": true
+      },
+      "src/brain_ssd/cache_trace.py": {
+        "actual": "4f6bad77fc43695436d41e9113cdde9b22684f90898aca80f00cb0ce06a39a53",
+        "canonical_lf": "021e323106e1837ef0ae7af1cc3107e59a20af4b279355ed2293d4b0aa10d315",
+        "expected": "021e323106e1837ef0ae7af1cc3107e59a20af4b279355ed2293d4b0aa10d315",
+        "ok": true
+      },
+      "src/brain_ssd/cold_hint.py": {
+        "actual": "14fc2a8dcb361da42cb86ab22a852303eb75a0c584bc283bb1c6682b489c3993",
+        "canonical_lf": "a9791f6c816e2674d8c18630d7e3d6b19560c55b93f3996729e91df155f27b52",
+        "expected": "a9791f6c816e2674d8c18630d7e3d6b19560c55b93f3996729e91df155f27b52",
+        "ok": true
+      },
+      "src/brain_ssd/corpus.py": {
+        "actual": "b200be1757ec4d04d9ea7d90bd77caa7390d84ef532867140ceff0efdc44decf",
+        "canonical_lf": "1322ed79222459b6e54f3804343d6d6b524e05efa307175438b340e89b43754f",
+        "expected": "1322ed79222459b6e54f3804343d6d6b524e05efa307175438b340e89b43754f",
+        "ok": true
+      },
+      "src/brain_ssd/gating.py": {
+        "actual": "2c74b67bbd31582c53d7329ec1ce5ce7d51a9b8f30e560eafe67bbb2a453db7a",
+        "canonical_lf": "cebed14999d2ae028f69553f6566ac46ca102a6062984fbcb948104a25d1c9bf",
+        "expected": "cebed14999d2ae028f69553f6566ac46ca102a6062984fbcb948104a25d1c9bf",
+        "ok": true
+      },
+      "src/brain_ssd/hardware.py": {
+        "actual": "3c9d66736f52a9cfe1bb7e01905dfeece4c3365fc392c0a46898f14d772940b7",
+        "canonical_lf": "2a673adbe016a01d497c52925b37db5330f1fe2d89e624d39fe3bc45d0acd872",
+        "expected": "2a673adbe016a01d497c52925b37db5330f1fe2d89e624d39fe3bc45d0acd872",
+        "ok": true
+      },
+      "src/brain_ssd/hybrid.py": {
+        "actual": "7869825a6be6358f4059dfcdd2d5ba3ff55d0a9ba4eae611187619ca1d94747f",
+        "canonical_lf": "896d396a9d3d6e17e5f4f767171cf6fed2742fb196793f55858c8888de2d5e7d",
+        "expected": "896d396a9d3d6e17e5f4f767171cf6fed2742fb196793f55858c8888de2d5e7d",
+        "ok": true
+      },
+      "src/brain_ssd/physical_replay.py": {
+        "actual": "dc63be0a44c1277284733333f378625b2684100c0bfb691220992394595a75af",
+        "canonical_lf": "1ddb2d6f541b2be87c83cd302deae20f4b7de8323aafee4f3b9d9557d2157a02",
+        "expected": "1ddb2d6f541b2be87c83cd302deae20f4b7de8323aafee4f3b9d9557d2157a02",
+        "ok": true
+      },
+      "src/brain_ssd/physical_validation.py": {
+        "actual": "5cef202fdf20a9308d5c52c8470eb2d98c34003cba729ce67877cd4a3a38556d",
+        "canonical_lf": "bf6289af2aa8ec59a1f9cab2493c5bede58e0a96e78f3609d3d6c6b518765c47",
+        "expected": "bf6289af2aa8ec59a1f9cab2493c5bede58e0a96e78f3609d3d6c6b518765c47",
+        "ok": true
+      },
+      "src/brain_ssd/progressive.py": {
+        "actual": "2510165e81baed8e3a2d5d34af1a77cfa2631fdf5896b3fe2370ee63be088891",
+        "canonical_lf": "842d884df86d007ffc77fbbf14bb9fc232092853ae72cada8ea0c4f2b730b621",
+        "expected": "842d884df86d007ffc77fbbf14bb9fc232092853ae72cada8ea0c4f2b730b621",
+        "ok": true
+      },
+      "src/brain_ssd/real_knowledge.py": {
+        "actual": "1d470c276fbc1370f8ad55787beb082a57bec2d4803a81eed69259a43ffcdeb3",
+        "canonical_lf": "4e95817e963cc803541a47d05c9bf32b486d6a042e4a22d90060c5e14f93e5bc",
+        "expected": "4e95817e963cc803541a47d05c9bf32b486d6a042e4a22d90060c5e14f93e5bc",
+        "ok": true
+      },
+      "src/brain_ssd/recall_dataset.py": {
+        "actual": "c4b45417ce563299de25cc4454ff5abe74fb0debc3ab14f0548f2919184c9f67",
+        "canonical_lf": "31d272b4a71f80cf655030c96e9ccc5a096a4231fd7d36cf94c7ff5c27166f13",
+        "expected": "31d272b4a71f80cf655030c96e9ccc5a096a4231fd7d36cf94c7ff5c27166f13",
+        "ok": true
+      },
+      "src/brain_ssd/record_retrieval.py": {
+        "actual": "62ad0c823f326a9832e327260ad60ad6e1439b39450dbe118ba1d1ff6c8b727a",
+        "canonical_lf": "93314de6521a5b5e417aa263bf5ca0577d3b3a70bd60fbfb0cb3fdac0048e676",
+        "expected": "93314de6521a5b5e417aa263bf5ca0577d3b3a70bd60fbfb0cb3fdac0048e676",
+        "ok": true
+      },
+      "src/brain_ssd/residency.py": {
+        "actual": "098f49e0b99d792215e8f92a8c3c441d9d2fa581c74aee352ce1eaef646e9969",
+        "canonical_lf": "bb198d46636b3a578139ca6478804917b61f6b526a58019651fb5b036f05813e",
+        "expected": "bb198d46636b3a578139ca6478804917b61f6b526a58019651fb5b036f05813e",
+        "ok": true
+      },
+      "src/brain_ssd/resource_pressure.py": {
+        "actual": "db8395f6514a22416c80a98f63a777aabb40b9a81dc3f69b2d8684a0f9e7f243",
+        "canonical_lf": "b9573f0798dc3e3eefae4ace9fa5f17224d412651fcfe324013df9560ad115cd",
+        "expected": "b9573f0798dc3e3eefae4ace9fa5f17224d412651fcfe324013df9560ad115cd",
+        "ok": true
+      },
+      "src/brain_ssd/router.py": {
+        "actual": "1f882c97d1fc86c1a69b4e3453e052658271378b8ff19232cbc670a72b1c5f6f",
+        "canonical_lf": "feb29738e0df7c7f922eb641eda0df22d78a9cc7d51b2c4a8960fa06ea0f2da7",
+        "expected": "feb29738e0df7c7f922eb641eda0df22d78a9cc7d51b2c4a8960fa06ea0f2da7",
+        "ok": true
+      },
+      "src/brain_ssd/semantic.py": {
+        "actual": "ba6aa66f70db5b02418560379373575fbbaac627b462be4d53376624fb271a1c",
+        "canonical_lf": "dba2e3b52e778ac2345d08491046dd66fd5914b9551f46bf957613d7ab59590e",
+        "expected": "dba2e3b52e778ac2345d08491046dd66fd5914b9551f46bf957613d7ab59590e",
+        "ok": true
+      },
+      "src/brain_ssd/semantic_rescue_dataset.py": {
+        "actual": "4484452d261c941186d38eba8cab529625203042bb55a35170f5058d1c35d23e",
+        "canonical_lf": "4d6bee89f2cf92b52698799664e10d3e7363df7b6e6a94a65e38d718228c62d8",
+        "expected": "4d6bee89f2cf92b52698799664e10d3e7363df7b6e6a94a65e38d718228c62d8",
+        "ok": true
+      },
+      "src/brain_ssd/storage.py": {
+        "actual": "ad3f56b4cc1d1e874367a36823cd59234524313bd16c7bc9aef8ea00c9a480d9",
+        "canonical_lf": "2757ef2f948d39adc56455dd3bd75303faccb5530a55cab2e5483ce3da79b01d",
+        "expected": "2757ef2f948d39adc56455dd3bd75303faccb5530a55cab2e5483ce3da79b01d",
+        "ok": true
+      },
+      "src/brain_ssd/system_metrics.py": {
+        "actual": "33ae9a25dc048524f1bed16354a18a6784fac60a3f0aaaeb3d4116203b648426",
+        "canonical_lf": "a3430454134befe8b14794e872317dbbd955c51f4abbf89154b320e259f3ce18",
+        "expected": "a3430454134befe8b14794e872317dbbd955c51f4abbf89154b320e259f3ce18",
+        "ok": true
+      },
+      "src/brain_ssd/telemetry.py": {
+        "actual": "a76d12320cdfd018f629a22873e3b8ee543c1e5d2539af5fa991561e49c38df8",
+        "canonical_lf": "9cf0baf73af2ab1504060643056d53c88c56bce9c8ffdfb0f5dc97e0bcfa5ba9",
+        "expected": "9cf0baf73af2ab1504060643056d53c88c56bce9c8ffdfb0f5dc97e0bcfa5ba9",
+        "ok": true
+      },
+      "src/brain_ssd/workloads.py": {
+        "actual": "b28d2ed02f19706bcfe4b99252cc5aefe28c83330d4c0fde6b833f897faee51d",
+        "canonical_lf": "7db4b2f894243f509f3d247c9b9ad0884359eba4dddedba345cf9b92981db7f3",
+        "expected": "7db4b2f894243f509f3d247c9b9ad0884359eba4dddedba345cf9b92981db7f3",
+        "ok": true
+      },
+      "tools/build_real_index.py": {
+        "actual": "3e96376c6176abd382747e5249f948ac2361388f8b4d3b38d774f5a8354f303b",
+        "canonical_lf": "fbe9c9d82fbdeef650eb0ba4c14b4b9249d0ef6bd8d427785992f574e35c5736",
+        "expected": "fbe9c9d82fbdeef650eb0ba4c14b4b9249d0ef6bd8d427785992f574e35c5736",
+        "ok": true
+      },
+      "tools/ingest_real_knowledge.py": {
+        "actual": "b811e014224898609d22c290a5d00e5fcaaa5ef63a981df7ba9cf10e456badc4",
+        "canonical_lf": "6d00f50cf1fcc3d7ce33c255dc273db5bd69e72ae2fcf37e1568ba714eff70f5",
+        "expected": "6d00f50cf1fcc3d7ce33c255dc273db5bd69e72ae2fcf37e1568ba714eff70f5",
+        "ok": true
+      },
+      "tools/run_phase4d.py": {
+        "actual": "98816267f53809a6488fbbc30369b568f2cb1c3fcdded9825ff0b19bff6b4189",
+        "canonical_lf": "5dba8d13af0c36699ad3fbc1968343a3d4cafc14bd2f9975594b4fb50903501e",
+        "expected": "5dba8d13af0c36699ad3fbc1968343a3d4cafc14bd2f9975594b4fb50903501e",
+        "ok": true
+      }
+    },
+    "failures": []
+  },
+  "freeze_id": "BRAIN_SSD_PHASE4D_FROZEN_2026-08-07",
+  "host": {
+    "active_power_scheme": "GUID do Esquema de Energia: 381b4222-f694-41f0-9685-ff5bb260df2e  (Equilibrado)",
+    "architecture": "AMD64",
+    "cmake": {
+      "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+      "version": "cmake version 3.31.6-msvc6"
+    },
+    "compiler_from_runtime": "version: 1 (217df17ac)\nbuilt with MSVC 19.44.35222.0 for Windows AMD64",
+    "current_process": {
+      "HandleCount": 178,
+      "PriorityClass": "Normal",
+      "ProcessorAffinity": 4095,
+      "ThreadCount": 9
+    },
+    "logical_cpu_count_python": 12,
+    "page_file": {
+      "AllocatedBaseSize": 23552,
+      "CurrentUsage": 2097,
+      "Name": "C:\\pagefile.sys",
+      "PeakUsage": 4123
+    },
+    "physical_disks": {
+      "BusType": "NVMe",
+      "FriendlyName": "ADATA LEGEND 850 LITE",
+      "HealthStatus": "Healthy",
+      "MediaType": "SSD",
+      "Size": 1000204886016
+    },
+    "processor": {
+      "CurrentClockSpeed": 2500,
+      "MaxClockSpeed": 2500,
+      "Name": "12th Gen Intel(R) Core(TM) i5-12400",
+      "NumberOfCores": 6,
+      "NumberOfLogicalProcessors": 12
+    },
+    "project_path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD",
+    "project_volume": {
+      "DriveLetter": "C",
+      "FileSystem": "NTFS",
+      "FileSystemLabel": "",
+      "HealthStatus": "Healthy",
+      "Size": 999194357760,
+      "SizeRemaining": 79335010304
+    },
+    "python": {
+      "executable": "C:\\Python314\\python.exe",
+      "version": "3.14.3"
+    },
+    "settings_changed_automatically": false,
+    "windows": {
+      "BuildNumber": "26200",
+      "Caption": "Microsoft Windows 11 Pro",
+      "FreePhysicalMemory": 7490004,
+      "FreeVirtualMemory": 15318680,
+      "OSArchitecture": "64 bits",
+      "TotalVirtualMemorySize": 40677240,
+      "TotalVisibleMemorySize": 16559992,
+      "Version": "10.0.26200"
+    }
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model_bytes": 639446688,
+    "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "runtime_sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+  },
+  "limitations": {
+    "cgroup": "UNSUPPORTED",
+    "linux_page_cache": "UNSUPPORTED",
+    "linux_pss": "UNSUPPORTED",
+    "madv_cold": "UNSUPPORTED",
+    "madv_pageout": "UNSUPPORTED",
+    "mincore_linux": "UNSUPPORTED",
+    "pgscan": "NOT_MEASURED",
+    "pgsteal": "NOT_MEASURED",
+    "physical_ssd_bytes": "NOT_MEASURED",
+    "psi": "UNSUPPORTED",
+    "temperature": "NOT_MEASURED"
+  },
+  "matrix_id": "matrix-20260820T132749Z-33a606824e",
+  "mode": "audit",
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux native environment.",
+  "phase4e_valid": false,
+  "phase4ew_canonical": false,
+  "run_id": "audit-20260820T132749Z-354021d19d",
+  "runtime": {
+    "cpu_only_build": true,
+    "devices_output": "Available devices:\n  (none)",
+    "devices_return_code": 0,
+    "frozen_commit_match": true,
+    "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+    "version_output": "version: 1 (217df17ac)\nbuilt with MSVC 19.44.35222.0 for Windows AMD64",
+    "version_return_code": 0
+  },
+  "schema_version": 1,
+  "status": "PASS",
+  "target_8gb": "NOT_TESTED",
+  "timestamp_utc": "2026-08-20T13:27:49Z",
+  "validation_track": "PHASE_4E_W"
+}

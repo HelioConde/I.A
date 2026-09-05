@@ -1,0 +1,775 @@
+{
+  "amortized_latency_ms": {
+    "1": {
+      "PERSISTENT_CORE": 1494.621100020595,
+      "SUBPROCESS_PER_QUERY": 1614.0983999939635,
+      "measurement": "median per-query estimate plus measured one-time startup"
+    },
+    "10": {
+      "PERSISTENT_CORE": 459.20106999692507,
+      "SUBPROCESS_PER_QUERY": 1614.0983999939635,
+      "measurement": "median per-query estimate plus measured one-time startup"
+    },
+    "2": {
+      "PERSISTENT_CORE": 919.387750007445,
+      "SUBPROCESS_PER_QUERY": 1614.0983999939635,
+      "measurement": "median per-query estimate plus measured one-time startup"
+    },
+    "20": {
+      "PERSISTENT_CORE": 401.6777349956101,
+      "SUBPROCESS_PER_QUERY": 1614.0983999939635,
+      "measurement": "median per-query estimate plus measured one-time startup"
+    },
+    "5": {
+      "PERSISTENT_CORE": 574.247739999555,
+      "SUBPROCESS_PER_QUERY": 1614.0983999939635,
+      "measurement": "median per-query estimate plus measured one-time startup"
+    }
+  },
+  "brain_equivalence": {
+    "active_brain": true,
+    "context_hash": true,
+    "quality": true,
+    "retrieval": true
+  },
+  "brain_ssd_ab": {
+    "PERSISTENT_CORE": {
+      "active_brain_bytes": {
+        "coefficient_of_variation": 0.6236095644623236,
+        "count": 5,
+        "max": 4194304.0,
+        "mean": 2516582.4,
+        "median": 2097152.0,
+        "min": 0.0,
+        "p95": 4194304.0
+      },
+      "context_tokens": {
+        "coefficient_of_variation": 0.5006144653331698,
+        "count": 5,
+        "max": 2026.0,
+        "mean": 1572.6,
+        "median": 1963.0,
+        "min": 0.0,
+        "p95": 2026.0
+      },
+      "generation_tokens_per_second": {
+        "coefficient_of_variation": 0.4535483892235945,
+        "count": 5,
+        "max": 38.965846435599204,
+        "mean": 20.57052686286519,
+        "median": 17.151923159384246,
+        "min": 14.223898745754386,
+        "p95": 38.965846435599204
+      },
+      "private_bytes": {
+        "coefficient_of_variation": 0.00016770497462996473,
+        "count": 5,
+        "max": 620269568.0,
+        "mean": 620115558.4,
+        "median": 620118016.0,
+        "min": 619986944.0,
+        "p95": 620269568.0
+      },
+      "prompt_tokens_per_second": {
+        "coefficient_of_variation": 0.11701047612911764,
+        "count": 5,
+        "max": 207.8221195186916,
+        "mean": 169.7161699230952,
+        "median": 166.341231760347,
+        "min": 153.38663751390936,
+        "p95": 207.8221195186916
+      },
+      "total_latency_ms": {
+        "coefficient_of_variation": 0.5321705709561914,
+        "count": 5,
+        "max": 19783.135,
+        "mean": 12926.20722,
+        "median": 13208.5695,
+        "min": 732.6155,
+        "p95": 19783.135
+      },
+      "ttft_ms": {
+        "coefficient_of_variation": 0.4805736081434005,
+        "count": 5,
+        "max": 13643.481600040104,
+        "mean": 10366.747300012503,
+        "median": 12780.615299998317,
+        "min": 538.7086000409909,
+        "p95": 13643.481600040104
+      },
+      "working_set_bytes": {
+        "coefficient_of_variation": 0.00032829299196767813,
+        "count": 5,
+        "max": 1207336960.0,
+        "mean": 1206941286.4,
+        "median": 1207164928.0,
+        "min": 1206317056.0,
+        "p95": 1207336960.0
+      }
+    },
+    "SUBPROCESS_PER_QUERY": {
+      "active_brain_bytes": {
+        "coefficient_of_variation": 0.6236095644623236,
+        "count": 5,
+        "max": 4194304.0,
+        "mean": 2516582.4,
+        "median": 2097152.0,
+        "min": 0.0,
+        "p95": 4194304.0
+      },
+      "context_tokens": {
+        "coefficient_of_variation": 0.5006144653331698,
+        "count": 5,
+        "max": 2026.0,
+        "mean": 1572.6,
+        "median": 1963.0,
+        "min": 0.0,
+        "p95": 2026.0
+      },
+      "generation_tokens_per_second": {
+        "coefficient_of_variation": 0.4025895083940583,
+        "count": 5,
+        "max": 33.02,
+        "mean": 18.346,
+        "median": 15.43,
+        "min": 13.65,
+        "p95": 33.02
+      },
+      "private_bytes": {
+        "coefficient_of_variation": 0.0006437123017111767,
+        "count": 5,
+        "max": 914735104.0,
+        "mean": 914282086.4,
+        "median": 914530304.0,
+        "min": 913117184.0,
+        "p95": 914735104.0
+      },
+      "prompt_tokens_per_second": {
+        "coefficient_of_variation": 0.06320913739626276,
+        "count": 5,
+        "max": 185.99,
+        "mean": 168.51,
+        "median": 166.5,
+        "min": 157.67,
+        "p95": 185.99
+      },
+      "total_latency_ms": {
+        "coefficient_of_variation": 0.49539087780558616,
+        "count": 5,
+        "max": 21292.5374,
+        "mean": 14127.18052,
+        "median": 14486.7044,
+        "min": 1898.8153,
+        "p95": 21292.5374
+      },
+      "ttft_ms": {
+        "coefficient_of_variation": 0.4432459507427755,
+        "count": 5,
+        "max": 14136.993299995083,
+        "mean": 10986.75624000607,
+        "median": 13652.07690000534,
+        "min": 1417.7301000454463,
+        "p95": 14136.993299995083
+      },
+      "working_set_bytes": {
+        "coefficient_of_variation": 0.006078470767745775,
+        "count": 5,
+        "max": 1202716672.0,
+        "mean": 1198886092.8,
+        "median": 1202634752.0,
+        "min": 1184317440.0,
+        "p95": 1202716672.0
+      }
+    }
+  },
+  "canonical_experiment": true,
+  "completed_at_utc": "2026-08-21T09:40:15Z",
+  "config_hash": "2cc16eb84866a89e3f0a4e3fe29c076133390fb69427cc83b0bb5abe5752c195",
+  "configuration": {
+    "context_size": 4096,
+    "device": "none",
+    "duration_minutes": null,
+    "max_tokens": 96,
+    "mode": "all",
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "core_only": {
+    "PERSISTENT_CORE": {
+      "cpu_time_seconds": 174.9375,
+      "generation_tokens_per_second": {
+        "coefficient_of_variation": 0.2952317432544297,
+        "count": 15,
+        "max": 53.58291062370508,
+        "mean": 38.73002000912501,
+        "median": 40.270010419865194,
+        "min": 23.151631611237804,
+        "p95": 52.805745265084845
+      },
+      "handle_count": {
+        "coefficient_of_variation": 0.0,
+        "count": 15,
+        "max": 162.0,
+        "mean": 162.0,
+        "median": 162.0,
+        "min": 162.0,
+        "p95": 162.0
+      },
+      "model_loads": 1,
+      "private_bytes": {
+        "coefficient_of_variation": 0.0020729014657925953,
+        "count": 15,
+        "max": 621109248.0,
+        "mean": 619322026.6666666,
+        "median": 618770432.0,
+        "min": 617889792.0,
+        "p95": 621109248.0
+      },
+      "prompt_tokens_per_second": {
+        "coefficient_of_variation": 0.0943893781180523,
+        "count": 15,
+        "max": 234.79077533131587,
+        "mean": 192.11288719486853,
+        "median": 185.84629325295046,
+        "min": 170.6314769987129,
+        "p95": 218.75987457767192
+      },
+      "queries": 15,
+      "startup": {
+        "cpu_time_seconds_after_load": 1.71875,
+        "handles_after_load": 161,
+        "host": "127.0.0.1",
+        "model_load_measurement": "ready_time_minus_first_process_log; includes server initialization after first log",
+        "model_load_ms": 1118.0015000281855,
+        "model_loads": 1,
+        "persistent_core_ready_ms": 1150.4667000262998,
+        "pid": 14456,
+        "port": 50944,
+        "private_bytes_after_load": 615964672,
+        "process_startup_ms": 32.46519999811426,
+        "threads_after_load": 21,
+        "working_set_bytes_after_load": 1175486464
+      },
+      "thread_count": {
+        "coefficient_of_variation": 0.023908353909098668,
+        "count": 15,
+        "max": 21.0,
+        "mean": 20.866666666666667,
+        "median": 21.0,
+        "min": 19.0,
+        "p95": 21.0
+      },
+      "total_latency_ms": {
+        "coefficient_of_variation": 1.2843898602452148,
+        "count": 15,
+        "max": 8728.867699974217,
+        "mean": 2956.774659998094,
+        "median": 344.1543999942951,
+        "min": 184.01409999933094,
+        "p95": 8335.797999985516
+      },
+      "ttft_ms": {
+        "coefficient_of_variation": 1.3443591622156477,
+        "count": 15,
+        "max": 8559.85810002312,
+        "mean": 2812.1904866731106,
+        "median": 143.5222000000067,
+        "min": 121.51740002445877,
+        "p95": 8166.348300001118
+      },
+      "working_set_bytes": {
+        "coefficient_of_variation": 0.010308882748235442,
+        "count": 15,
+        "max": 1206751232.0,
+        "mean": 1189384465.0666666,
+        "median": 1181274112.0,
+        "min": 1179906048.0,
+        "p95": 1206751232.0
+      }
+    },
+    "SUBPROCESS_PER_QUERY": {
+      "cpu_time_seconds": 204.484375,
+      "generation_tokens_per_second": {
+        "coefficient_of_variation": 0.26874327186213565,
+        "count": 15,
+        "max": 35.61,
+        "mean": 28.244,
+        "median": 31.43,
+        "min": 15.07,
+        "p95": 35.29
+      },
+      "handle_count": {
+        "coefficient_of_variation": 0.003662755152242297,
+        "count": 15,
+        "max": 121.0,
+        "mean": 120.73333333333333,
+        "median": 121.0,
+        "min": 120.0,
+        "p95": 121.0
+      },
+      "model_loads": 15,
+      "private_bytes": {
+        "coefficient_of_variation": 0.0007163451366202715,
+        "count": 15,
+        "max": 914800640.0,
+        "mean": 913611434.6666666,
+        "median": 913309696.0,
+        "min": 912957440.0,
+        "p95": 914571264.0
+      },
+      "prompt_tokens_per_second": {
+        "coefficient_of_variation": 0.26996225369985644,
+        "count": 15,
+        "max": 189.74,
+        "mean": 131.30733333333333,
+        "median": 111.47,
+        "min": 100.65,
+        "p95": 183.81
+      },
+      "queries": 15,
+      "startup": {
+        "persistent_core_ready_ms": 0.0
+      },
+      "thread_count": {
+        "coefficient_of_variation": 0.0,
+        "count": 15,
+        "max": 8.0,
+        "mean": 8.0,
+        "median": 8.0,
+        "min": 8.0,
+        "p95": 8.0
+      },
+      "total_latency_ms": {
+        "coefficient_of_variation": 0.9012429030571589,
+        "count": 15,
+        "max": 9888.17890000064,
+        "mean": 4171.630719994816,
+        "median": 1614.0983999939635,
+        "min": 1375.4545000265352,
+        "p95": 9584.321499976795
+      },
+      "ttft_ms": {
+        "coefficient_of_variation": 1.0020060736581065,
+        "count": 15,
+        "max": 9321.567899954971,
+        "mean": 3690.671153331641,
+        "median": 1105.8195999939926,
+        "min": 1039.1962999710813,
+        "p95": 9013.551699987147
+      },
+      "working_set_bytes": {
+        "coefficient_of_variation": 0.010287626537808422,
+        "count": 15,
+        "max": 1201864704.0,
+        "mean": 1184509678.9333334,
+        "median": 1176113152.0,
+        "min": 1175654400.0,
+        "p95": 1201770496.0
+      }
+    }
+  },
+  "core_reuse_ratio": 10.0,
+  "criteria": {
+    "canonical_counts": true,
+    "cleanup": true,
+    "cognitive_selection_equivalent": true,
+    "context_hash_equivalent": true,
+    "cross_query_context_leak": false,
+    "memory_stable_or_bounded": true,
+    "quality_equivalent": true,
+    "significant_gain": true
+  },
+  "default_core_mode_changed": false,
+  "estimated_load_time_avoided_ms": 15652.021000394598,
+  "experiment": "WINDOWS_CORE_RUNTIME_EXPERIMENT",
+  "experiment_alias": "WCRE-1",
+  "first_query": {
+    "PERSISTENT_CORE": {
+      "backend_total_ms": 196.66259997757152,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 1.0,
+      "cpu_kernel_seconds": null,
+      "cpu_percent_total_average": 365.47365898852667,
+      "cpu_percent_total_peak": null,
+      "cpu_time_seconds": 0.71875,
+      "cpu_user_seconds": null,
+      "generated_tokens": 3,
+      "generation_eval_ms": 57.902,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 196.66259997757152,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1150.4667000262998,
+      "persistent_reserved_memory": 1175486464,
+      "private_bytes_max": 617889792,
+      "private_bytes_min": 615964672,
+      "prompt_eval_ms": 121.262,
+      "prompt_tokens": 23,
+      "prompt_tokens_per_second": 189.67194999257805,
+      "queries_served": 1,
+      "reload_avoidance_rate": 0.0,
+      "reloads_avoided": 0,
+      "system_available_ram_bytes_min": 6552465408,
+      "thread_count_max": 21,
+      "thread_count_min": 21,
+      "tokens_per_second": 51.81168180719146,
+      "ttft_ms": 134.64869995368645,
+      "working_set_bytes_max": 1179906048,
+      "working_set_bytes_min": 1175486464
+    },
+    "SUBPROCESS_PER_QUERY": {
+      "anonymous_bytes_max": null,
+      "backend_total_ms": 358.89,
+      "core_mode": "SUBPROCESS_PER_QUERY",
+      "core_reuse_ratio": 1.0,
+      "cpu_kernel_seconds": 0.8125,
+      "cpu_percent_normalized_average": 16.377162360683027,
+      "cpu_percent_normalized_peak": 36.19185271296366,
+      "cpu_percent_total_average": 196.52594832819634,
+      "cpu_percent_total_peak": 434.3022325555639,
+      "cpu_user_seconds": 1.890625,
+      "generated_tokens": 6,
+      "generation_eval_ms": 175.07,
+      "handle_count_max": 120,
+      "latency_ms": 1375.4545000265352,
+      "model_load_ms": 180.75,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 0.0,
+      "page_fault_count_delta": 322158,
+      "peak_working_set_bytes_max": 1175707648,
+      "physical_read_bytes": null,
+      "private_bytes_max": 913031168,
+      "prompt_eval_ms": 180.46,
+      "prompt_tokens": 19,
+      "prompt_tokens_per_second": 105.29,
+      "pss_bytes_max": null,
+      "queries_served": 1,
+      "read_operations_delta": 2906,
+      "read_transfer_bytes_delta": 11902976,
+      "reload_avoidance_rate": 0.0,
+      "reloads_avoided": 0,
+      "rss_file_bytes_max": null,
+      "system_available_ram_bytes_min": 6487281664,
+      "system_total_ram_bytes": 16957431808,
+      "temperature_c": null,
+      "thread_count_max": 8,
+      "tokens_per_second": 34.27,
+      "ttft_ms": 1043.1866000290029,
+      "working_set_bytes_max": 1175699456,
+      "write_operations_delta": 74,
+      "write_transfer_bytes_delta": 2533
+    }
+  },
+  "gain": {
+    "absolute_total_latency_ms": 1269.9439999996684,
+    "absolute_ttft_ms": 955.6759499828331,
+    "criterion": "median warm TTFT or median total latency improves by at least 10 percent; threshold is reported, not a hidden adoption rule",
+    "percentage_total_latency": 78.67822680478575,
+    "percentage_ttft": 86.42241012801951,
+    "wall_time_saved_per_query_ms": 1269.9439999996684
+  },
+  "hud_behavior": {
+    "core": {
+      "core_reuse_ratio": 1.0,
+      "input_tokens": 2090,
+      "mode": "CPU ONLY",
+      "model": "Qwen3-0.6B Q8_0",
+      "model_loads": 1,
+      "output_tokens": 71,
+      "persistent_core_ready_ms": 1124.0470000193454,
+      "queries_served": 1,
+      "reloads_avoided": 0,
+      "residency": "RESIDENT",
+      "status": "IDLE",
+      "tokens_per_second": 14.302828757066052,
+      "total_latency_ms": 18615.324199956376,
+      "ttft_ms": 13643.481600040104
+    },
+    "events_integrated": true,
+    "intelligence_claimed": false,
+    "knowledge_active_brain_separate_from_core_resident_memory": true
+  },
+  "hypothesis": "ENG-CORE-001",
+  "hypothesis_status": "SUPPORTED",
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model_bytes": 639446688,
+    "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "persistent_runtime": {
+      "bytes": 18535936,
+      "experimental_runtime": true,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "subprocess_runtime": {
+      "bytes": 5949440,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+      "sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+    }
+  },
+  "matrix_id": "matrix-20260821T091306Z-95bf26ce26",
+  "mode": "all",
+  "model_loads": {
+    "PERSISTENT_CORE": 1,
+    "SUBPROCESS_PER_QUERY": 15
+  },
+  "no_knowledge": {
+    "cross_query_context_leak": false,
+    "preserved": true
+  },
+  "operational_status": "PASS",
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux native environment.",
+  "phase4e_valid": false,
+  "phase4ew_after": {
+    "exists": true,
+    "files": 22,
+    "sha256": "baf5863a00ab6895204caabd841a154c6b96f0ad42bd0fbd9b6c7596e11a8713"
+  },
+  "phase4ew_before": {
+    "exists": true,
+    "files": 22,
+    "sha256": "baf5863a00ab6895204caabd841a154c6b96f0ad42bd0fbd9b6c7596e11a8713"
+  },
+  "phase4ew_modified": false,
+  "phase4f_started": false,
+  "phase5_or_prefetch_started": false,
+  "recommendation": "KEEP",
+  "reloads_avoided": 14,
+  "required_sets": {
+    "audit": "PASS",
+    "brain_ssd_ab": "PASS",
+    "contamination": "PASS",
+    "core_only": "PASS",
+    "session": "PASS",
+    "sustained": "PASS"
+  },
+  "resource_tradeoff": {
+    "persistent_private_bytes": {
+      "coefficient_of_variation": 0.0020729014657925953,
+      "count": 15,
+      "max": 621109248.0,
+      "mean": 619322026.6666666,
+      "median": 618770432.0,
+      "min": 617889792.0,
+      "p95": 621109248.0
+    },
+    "persistent_reserved_memory": 1175224320,
+    "persistent_working_set_bytes": {
+      "coefficient_of_variation": 0.010308882748235442,
+      "count": 15,
+      "max": 1206751232.0,
+      "mean": 1189384465.0666666,
+      "median": 1181274112.0,
+      "min": 1179906048.0,
+      "p95": 1206751232.0
+    },
+    "subprocess_private_bytes": {
+      "coefficient_of_variation": 0.0007163451366202715,
+      "count": 15,
+      "max": 914800640.0,
+      "mean": 913611434.6666666,
+      "median": 913309696.0,
+      "min": 912957440.0,
+      "p95": 914571264.0
+    },
+    "subprocess_working_set_bytes": {
+      "coefficient_of_variation": 0.010287626537808422,
+      "count": 15,
+      "max": 1201864704.0,
+      "mean": 1184509678.9333334,
+      "median": 1176113152.0,
+      "min": 1175654400.0,
+      "p95": 1201770496.0
+    },
+    "target_8gb": "NOT_TESTED"
+  },
+  "result_run_ids": {
+    "audit": "audit-20260821T091306Z-ae52daad80",
+    "brain_ssd_ab": "brain-ab-20260821T091455Z-1cfcbcba47",
+    "contamination": "contamination-20260821T091928Z-f94a6df93d",
+    "core_only": "core-only-20260821T091307Z-149835bb1b",
+    "session": "session-20260821T091713Z-f1f8e8e8a5",
+    "sustained": "sustained-20260821T092009Z-29afab28dc"
+  },
+  "run_id": "matrix-20260821T091306Z-95bf26ce26",
+  "runtime_hashes": {
+    "persistent": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0",
+    "subprocess": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+  },
+  "schema_version": 1,
+  "session": {
+    "cleanup": {
+      "clean": true,
+      "llama_server_after": 0,
+      "llama_server_before": 0
+    },
+    "first_query_ttft_ms": 13953.17019999493,
+    "memory": {
+      "classification": "STABLE",
+      "handle_growth": 6,
+      "handles": {
+        "coefficient_of_variation": 0.012684128143265633,
+        "count": 10,
+        "max": 162.0,
+        "mean": 160.8,
+        "median": 162.0,
+        "min": 156.0,
+        "p95": 162.0
+      },
+      "private_bytes": {
+        "coefficient_of_variation": 0.0003916802662065185,
+        "count": 10,
+        "max": 620834816.0,
+        "mean": 620443238.4,
+        "median": 620431360.0,
+        "min": 620097536.0,
+        "p95": 620834816.0
+      },
+      "private_bytes_growth_bytes": 737280,
+      "thread_growth": -3,
+      "threads": {
+        "coefficient_of_variation": 0.06203140313665213,
+        "count": 10,
+        "max": 21.0,
+        "mean": 18.8,
+        "median": 18.0,
+        "min": 18.0,
+        "p95": 21.0
+      },
+      "working_set_bytes": {
+        "coefficient_of_variation": 0.000354389045957015,
+        "count": 10,
+        "max": 1207894016.0,
+        "mean": 1207282073.6,
+        "median": 1207277568.0,
+        "min": 1206468608.0,
+        "p95": 1207894016.0
+      },
+      "working_set_growth_bytes": 1425408
+    },
+    "queries": 10,
+    "total_latency_ms": {
+      "coefficient_of_variation": 0.5228287741583572,
+      "count": 10,
+      "max": 20178.098,
+      "mean": 13316.38961,
+      "median": 14006.99955,
+      "min": 741.7737,
+      "p95": 20178.098
+    },
+    "warm_session_ttft_ms": {
+      "coefficient_of_variation": 0.5105162671187595,
+      "count": 9,
+      "max": 13876.370800018776,
+      "mean": 10377.454711098431,
+      "median": 13520.621199975722,
+      "min": 554.6719999983907,
+      "p95": 13876.370800018776
+    }
+  },
+  "standard_rag": "NOT_RUN",
+  "startup": {
+    "cpu_time_seconds_after_load": 1.71875,
+    "handles_after_load": 161,
+    "host": "127.0.0.1",
+    "model_load_measurement": "ready_time_minus_first_process_log; includes server initialization after first log",
+    "model_load_ms": 1118.0015000281855,
+    "model_loads": 1,
+    "persistent_core_ready_ms": 1150.4667000262998,
+    "pid": 14456,
+    "port": 50944,
+    "private_bytes_after_load": 615964672,
+    "process_startup_ms": 32.46519999811426,
+    "threads_after_load": 21,
+    "working_set_bytes_after_load": 1175486464
+  },
+  "status": "PASS",
+  "sustained": {
+    "actual_duration_seconds": 1205.0044745999621,
+    "cleanup": {
+      "clean": true,
+      "llama_server_after": 0,
+      "llama_server_before": 0
+    },
+    "latency_ms": {
+      "coefficient_of_variation": 0.5102547540183197,
+      "count": 93,
+      "max": 20114.0955,
+      "mean": 12939.614633333333,
+      "median": 13717.9209,
+      "min": 632.2607,
+      "p95": 19479.299
+    },
+    "memory": {
+      "classification": "STABLE",
+      "handle_growth": 7,
+      "handles": {
+        "coefficient_of_variation": 0.005848268593427755,
+        "count": 93,
+        "max": 163.0,
+        "mean": 162.21505376344086,
+        "median": 162.0,
+        "min": 156.0,
+        "p95": 163.0
+      },
+      "private_bytes": {
+        "coefficient_of_variation": 0.0006190240250659939,
+        "count": 93,
+        "max": 621899776.0,
+        "mean": 621522503.5698925,
+        "median": 621690880.0,
+        "min": 620298240.0,
+        "p95": 621899776.0
+      },
+      "private_bytes_growth_bytes": 1601536,
+      "thread_growth": -3,
+      "threads": {
+        "coefficient_of_variation": 0.03100694129820538,
+        "count": 93,
+        "max": 21.0,
+        "mean": 18.258064516129032,
+        "median": 18.0,
+        "min": 18.0,
+        "p95": 19.0
+      },
+      "working_set_bytes": {
+        "coefficient_of_variation": 0.09982798136415458,
+        "count": 93,
+        "max": 1208623104.0,
+        "mean": 1061617928.2580645,
+        "median": 984883200.0,
+        "min": 984608768.0,
+        "p95": 1208500224.0
+      },
+      "working_set_growth_bytes": -221368320
+    },
+    "persistent_reserved_memory": 1175224320,
+    "queries": 93,
+    "ttft_ms": {
+      "coefficient_of_variation": 0.4699997257418016,
+      "count": 93,
+      "max": 14550.612499995623,
+      "mean": 10483.472035484268,
+      "median": 12742.693899956066,
+      "min": 452.5671000010334,
+      "p95": 13905.65400000196
+    }
+  },
+  "timestamp_utc": "2026-08-21T09:40:15Z",
+  "warm_session_ttft_ms": {
+    "coefficient_of_variation": 1.2793795931181764,
+    "count": 14,
+    "max": 8559.85810002312,
+    "mean": 3003.4434714387835,
+    "median": 150.14365001115948,
+    "min": 121.51740002445877,
+    "p95": 8166.348300001118
+  }
+}

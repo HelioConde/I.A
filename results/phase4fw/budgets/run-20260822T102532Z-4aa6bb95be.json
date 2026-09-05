@@ -1,0 +1,288 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 918,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 14.0336,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 229,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 342,
+        "estimated_tokens": 101,
+        "kind": "paragraph",
+        "page_id": 2,
+        "position": 0,
+        "record_id": "c72c7a600a58acbbe5c14663",
+        "score": 0.4337468282627034,
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "When using this factory (via \"loop.set_task_factory(asyncio.eager_task_factory)\"), coroutines begin execution synchronously during \"Task\" construction. Tasks are only scheduled on the event loop if they block. This can be a performance improvement as the overhead of loop scheduling is avoided for coroutines that complete synchronously.",
+        "title": "asyncio-task"
+      },
+      {
+        "end": 545,
+        "estimated_tokens": 75,
+        "kind": "paragraph",
+        "page_id": 2,
+        "position": 2,
+        "record_id": "51f0e3fed62c12bb09a3582e",
+        "score": 0.39470364447885925,
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "start": 307,
+        "text": "An optional keyword-only *context* argument allows specifying a custom \"contextvars.Context\" for the *coro* to run in. If no *context* is provided, the Task copies the current context and later runs its coroutine in the copied context.",
+        "title": "asyncio-task"
+      },
+      {
+        "end": 824,
+        "estimated_tokens": 53,
+        "kind": "sentence",
+        "page_id": 2,
+        "position": 4,
+        "record_id": "51f0e3fed62c12bb09a3582e",
+        "score": 0.3913703111455259,
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "start": 677,
+        "text": "If set to \"True\" and the event loop is running, the task will start executing the coroutine immediately, until the first time the coroutine blocks.",
+        "title": "asyncio-task"
+      }
+    ],
+    "records_pruned": [
+      "1698ac52a0f187de4a78f34d",
+      "31bc7c14e6cb295c0fecb9ab",
+      "693c666d9a31431a1eeb0868",
+      "31b2306d11480957f15ba104",
+      "5e32f7cf7f996d928bfe1fda",
+      "706a262041baadcca089274e"
+    ],
+    "records_retained": [
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 3,
+    "source_ids": [
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: c72c7a600a58acbbe5c14663] asyncio-task — asyncio-task\nWhen using this factory (via \"loop.set_task_factory(asyncio.eager_task_factory)\"), coroutines begin execution synchronously during \"Task\" construction. Tasks are only scheduled on the event loop if they block. This can be a performance improvement as the overhead of loop scheduling is avoided for coroutines that complete synchronously.\n\n[SOURCE: 51f0e3fed62c12bb09a3582e] asyncio-task — asyncio-task\nAn optional keyword-only *context* argument allows specifying a custom \"contextvars.Context\" for the *coro* to run in. If no *context* is provided, the Task copies the current context and later runs its coroutine in the copied context.\n\n[SOURCE: 51f0e3fed62c12bb09a3582e] asyncio-task — asyncio-task\nIf set to \"True\" and the event loop is running, the task will start executing the coroutine immediately, until the first time the coroutine blocks."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2613,
+    "context_activation_rate": 0.0876387294297742,
+    "context_density": 0.4410480349344978,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 76.33333333333333,
+    "useful_oracle_tokens": 101
+  },
+  "context_sha256": "9de690b59ba1d653d4387c155cc4dda3b9c9c44f8c98e381c6362a2237dcd063",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 342,
+    "answer_quality": {
+      "cited_source_ids": [
+        "c72c7a600a58acbbe5c14663"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.3333333333333333,
+      "required_facts_found": 1,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The asyncio task factory that starts coroutine work immediately and schedules it only after blocking is the **eager_task_factory**. \n\n[SOURCE: c72c7a600a58acbbe5c14663]",
+    "metrics": {
+      "backend_total_ms": 3151.573400013149,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 101.0,
+      "cpu_kernel_seconds": 0.421875,
+      "cpu_percent_total_average": 395.63571643129046,
+      "cpu_percent_total_peak": 587.7632394461118,
+      "cpu_time_seconds": 12.46875,
+      "cpu_user_seconds": 12.046875,
+      "generated_tokens": 51,
+      "generation_eval_ms": 1584.396,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 3151.573400013149,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621436928,
+      "private_bytes_min": 619606016,
+      "prompt_eval_ms": 1554.591,
+      "prompt_tokens": 342,
+      "prompt_tokens_per_second": 219.9935545748046,
+      "queries_served": 101,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 100,
+      "system_available_ram_bytes_min": 3533205504,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 32.188922466353105,
+      "ttft_ms": 1566.0266000195406,
+      "working_set_bytes_max": 993763328,
+      "working_set_bytes_min": 991936512,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "a381f43962e83e4f8e129c224d195ae72fcfe39269ae86d392be1534ab80ffc8",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_eager_paraphrase::EXTRACTIVE_B256",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 100,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 230,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 45,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 67.25146198830409,
+      "instructions": 26.31578947368421,
+      "other_or_chat_envelope": 0.0,
+      "question": 7.309941520467836
+    },
+    "question": 25,
+    "total": 342
+  },
+  "prompt_sha256": "aeb21bb7a2ea500c44c28645546de13b899db2680e9cbf4e9d50b1919789018e",
+  "query_spec": {
+    "category": "paraphrase",
+    "expected_record_ids": [
+      "c72c7a600a58acbbe5c14663"
+    ],
+    "query": "Which asyncio task factory starts coroutine work immediately and schedules it only after blocking?",
+    "query_id": "holdout_eager_paraphrase",
+    "required_fact_groups": [
+      [
+        "eager_task_factory"
+      ],
+      [
+        "synchronously"
+      ],
+      [
+        "if they block",
+        "only scheduled"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      1,
+      2
+    ],
+    "record_bytes": 10439,
+    "records_retrieved": [
+      "c72c7a600a58acbbe5c14663",
+      "51f0e3fed62c12bb09a3582e",
+      "1698ac52a0f187de4a78f34d",
+      "31bc7c14e6cb295c0fecb9ab",
+      "693c666d9a31431a1eeb0868",
+      "31b2306d11480957f15ba104",
+      "5e32f7cf7f996d928bfe1fda",
+      "706a262041baadcca089274e"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102532Z-4aa6bb95be",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:25:32Z",
+  "variant": "EXTRACTIVE_B256",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

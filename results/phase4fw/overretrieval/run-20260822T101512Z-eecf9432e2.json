@@ -1,0 +1,391 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 3793,
+    "distiller_cpu_ms": 0.0,
+    "distiller_wall_ms": 1.7991,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 950,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 2,
+        "record_id": "c72c7a600a58acbbe5c14663",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "asyncio-task"
+      },
+      {
+        "page_id": 1,
+        "record_id": "985222a842c2827f4983bc07",
+        "section": "asyncio-eventloop",
+        "source_id": "python-3.14.7-docs",
+        "title": "asyncio-eventloop"
+      },
+      {
+        "page_id": 8,
+        "record_id": "aab8e914ebb9de519727e32d",
+        "section": "3.12",
+        "source_id": "python-3.14.7-docs",
+        "title": "3.12"
+      }
+    ],
+    "records_pruned": [
+      "50f8b2f1b567372268b26a25",
+      "51f0e3fed62c12bb09a3582e",
+      "06727e61aa6bd91de0e09002",
+      "3991c499b6d7daaf3922b5c6",
+      "5a3b4e1c52ff37bdde96f856"
+    ],
+    "records_retained": [
+      "c72c7a600a58acbbe5c14663",
+      "985222a842c2827f4983bc07",
+      "aab8e914ebb9de519727e32d"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "c72c7a600a58acbbe5c14663",
+      "985222a842c2827f4983bc07",
+      "aab8e914ebb9de519727e32d"
+    ],
+    "text": "[SOURCE: c72c7a600a58acbbe5c14663] asyncio-task\nWhen using this factory (via \"loop.set_task_factory(asyncio.eager_task_factory)\"), coroutines begin execution synchronously during \"Task\" construction. Tasks are only scheduled on the event loop if they block. This can be a performance improvement as the overhead of loop scheduling is avoided for coroutines that complete synchronously. A common example where this is beneficial is coroutines which employ caching or memoization to avoid actual I/O when possible. Immediate execution of the coroutine is a semantic change. If the coroutine returns or raises, the task is never scheduled to the event loop. If the coroutine execution blocks, the task is scheduled to the event loop. This change may introduce behavior changes to existing applications. For example, the application's task execution order is likely to change. Create an eager task factory, similar to \"eager_task_factory()\", using the provided *custom_task_constructor* when creating a new task instead of the default \"Task\". *custom_task_constructor* must be a *callable* with the signature matching the signature of \"Task.__init__\". The callable must return a \"asyncio.Task\"-compatible object. This function returns a *callable* intended to be used as a task factory of an event loop via \"loop.set_task_factory(factory)\").\n\n[SOURCE: 985222a842c2827f4983bc07] asyncio-eventloop\nChanged in version 3.13.3: Added \"kwargs\" which passes on arbitrary extra parameters, including \"name\" and \"context\". Changed in version 3.13.4: Rolled back the change that passes on *name* and *context* (if it is None), while still passing on other arbitrary keyword arguments (to avoid breaking backwards compatibility with 3.13.3). Changed in version 3.14: All *kwargs* are now passed on. The *eager_start* parameter works with eager task factories. If *factory* is \"None\" the default task factory will be set. Otherwise, *factory* must be a *callable* with the signature matching \"(loop, coro, **kwargs)\", where *loop* is a reference to the active event loop, and *coro* is a coroutine object. The callable must pass on all *kwargs*, and return a \"asyncio.Task\"-compatible object. Changed in version 3.13.3: Required that all *kwargs* are passed on to \"asyncio.Task\". Changed in version 3.13.4: *name* is no longer passed to task factories. *context* is no longer passed to task factories if it is \"None\". Changed in version 3.14: *name* and *context* are now unconditionally passed on to task factories again.\n\n[SOURCE: aab8e914ebb9de519727e32d] 3.12\n* The \"array.array\" class now supports subscripting, making it a *generic type*. (Contributed by Jelle Zijlstra in gh-98658.) * The performance of writing to sockets in \"asyncio\" has been significantly improved. \"asyncio\" now avoids unnecessary copying when writing to sockets and uses \"sendmsg()\" if the platform supports it. (Contributed by Kumar Aditya in gh-91166.) * Add \"asyncio.eager_task_factory()\" and \"asyncio.create_eager_task_factory()\" functions to allow opting an event loop in to eager task execution, making some use-cases 2x to 5x faster. (Contributed by Jacob Bower & Itamar Oren in gh-102853, gh-104140, and gh-104138) * On Linux, \"asyncio\" uses \"asyncio.PidfdChildWatcher\" by default if \"os.pidfd_open()\" is available and functional instead of \"asyncio.ThreadedChildWatcher\". (Contributed by Kumar Aditya in gh-98024.) * The event loop now uses the best available child watcher for each platform (\"asyncio.PidfdChildWatcher\" if supported and \"asyncio.ThreadedChildWatcher\" otherwise), so manually configuring a child watcher is not recommended. (Contributed by Kumar Aditya in gh-94597.) * Add *loop_factory* parameter to \"asyncio.run()\" to allow specifying a custom event loop factory. (Contributed by Kumar Aditya in gh-99388.)"
+  },
+  "context_metrics": {
+    "available_record_tokens": 2571,
+    "context_activation_rate": 0.3695060287825749,
+    "context_density": 0.21789473684210525,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 316.6666666666667,
+    "useful_oracle_tokens": 207
+  },
+  "context_sha256": "3d8f27df229e719affbb47d717af1d58ccf4a5de767536107b975920e9d16a0c",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1081,
+    "answer_quality": {
+      "cited_source_ids": [
+        "c72c7a600a58acbbe5c14663"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.6666666666666666,
+      "required_facts_found": 2,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "When asyncio eager_task_factory avoids event-loop scheduling, it is used when coroutines are executed synchronously. This can lead to a semantic risk as the execution order of tasks may change in existing applications. \n\n[SOURCE: c72c7a600a58acbbe5c14663]",
+    "metrics": {
+      "backend_total_ms": 9729.570200026501,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 19.0,
+      "cpu_kernel_seconds": 1.9375,
+      "cpu_percent_total_average": 387.18950812336385,
+      "cpu_percent_total_peak": 587.225726513681,
+      "cpu_time_seconds": 37.671875,
+      "cpu_user_seconds": 35.734375,
+      "generated_tokens": 67,
+      "generation_eval_ms": 3377.072,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 9729.570200026501,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621142016,
+      "private_bytes_min": 619311104,
+      "prompt_eval_ms": 6338.347,
+      "prompt_tokens": 1081,
+      "prompt_tokens_per_second": 170.54919839510208,
+      "queries_served": 19,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 18,
+      "system_available_ram_bytes_min": 3147890688,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 19.83967176299469,
+      "ttft_ms": 6351.358700019773,
+      "working_set_bytes_max": 1208000512,
+      "working_set_bytes_min": 1206173696,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 774
+    },
+    "output_sha256": "50d88777be936636f6aa2e1dddce25874887a33f2ccb77c76ddbad2181944b78",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_eager::PRUNING_ONLY",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 18,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 950,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 44,
+    "other_or_chat_envelope": 14,
+    "percent": {
+      "evidence": 87.88159111933395,
+      "instructions": 8.325624421831638,
+      "other_or_chat_envelope": 1.2950971322849214,
+      "question": 2.497687326549491
+    },
+    "question": 27,
+    "total": 1081
+  },
+  "prompt_sha256": "d834a21f8127e5861a1d204dd3decf6e2aaeb4c3b392a364b0879aef8c1a4132",
+  "query_spec": {
+    "category": "procedure",
+    "expected_record_ids": [
+      "c72c7a600a58acbbe5c14663"
+    ],
+    "query": "When does asyncio eager_task_factory avoid event-loop scheduling and what semantic risk does it introduce?",
+    "query_id": "dev_eager",
+    "required_fact_groups": [
+      [
+        "synchronously"
+      ],
+      [
+        "only scheduled",
+        "if they block"
+      ],
+      [
+        "execution order",
+        "semantic change"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 3145728,
+    "active_pages": [
+      1,
+      2,
+      8
+    ],
+    "record_bytes": 10272,
+    "records_retrieved": [
+      "c72c7a600a58acbbe5c14663",
+      "50f8b2f1b567372268b26a25",
+      "985222a842c2827f4983bc07",
+      "51f0e3fed62c12bb09a3582e",
+      "06727e61aa6bd91de0e09002",
+      "aab8e914ebb9de519727e32d",
+      "3991c499b6d7daaf3922b5c6",
+      "5a3b4e1c52ff37bdde96f856"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T101512Z-eecf9432e2",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:15:12Z",
+  "variant": "PRUNING_ONLY",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "avoid",
+            "eager",
+            "eager_task_factory",
+            "event",
+            "factory",
+            "introduce",
+            "loop",
+            "scheduling",
+            "semantic",
+            "task"
+          ],
+          "record_id": "c72c7a600a58acbbe5c14663",
+          "score": 1.0
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "eager",
+            "event",
+            "loop",
+            "scheduling",
+            "task"
+          ],
+          "record_id": "50f8b2f1b567372268b26a25",
+          "score": 0.49268749836758713
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "avoid",
+            "eager",
+            "event",
+            "factory",
+            "loop",
+            "task"
+          ],
+          "record_id": "985222a842c2827f4983bc07",
+          "score": 0.5041427739380301
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "eager",
+            "event",
+            "loop",
+            "scheduling",
+            "task"
+          ],
+          "record_id": "51f0e3fed62c12bb09a3582e",
+          "score": 0.47551199592989934
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "eager",
+            "event",
+            "factory",
+            "loop",
+            "task"
+          ],
+          "record_id": "06727e61aa6bd91de0e09002",
+          "score": 0.4663197353769012
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "eager",
+            "event",
+            "factory",
+            "loop",
+            "task"
+          ],
+          "record_id": "aab8e914ebb9de519727e32d",
+          "score": 0.4990475321385543
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "asyncio",
+            "eager",
+            "event",
+            "factory",
+            "loop",
+            "task"
+          ],
+          "record_id": "3991c499b6d7daaf3922b5c6",
+          "score": 0.45984290374327647
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "avoid",
+            "eager",
+            "event",
+            "loop",
+            "task"
+          ],
+          "record_id": "5a3b4e1c52ff37bdde96f856",
+          "score": 0.4266448736859647
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "50f8b2f1b567372268b26a25",
+        "51f0e3fed62c12bb09a3582e",
+        "06727e61aa6bd91de0e09002",
+        "3991c499b6d7daaf3922b5c6",
+        "5a3b4e1c52ff37bdde96f856"
+      ],
+      "retained_record_ids": [
+        "c72c7a600a58acbbe5c14663",
+        "985222a842c2827f4983bc07",
+        "aab8e914ebb9de519727e32d"
+      ],
+      "wall_ms": 1.7991
+    }
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 8164,
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 0.4556,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 2044,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 0,
+        "record_id": "4b64abfa66f5631bd8fb7e85",
+        "section": "threads",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/c-api/threads.txt"
+      },
+      {
+        "page_id": 0,
+        "record_id": "b670f20db7a5b7cdec8ffa75",
+        "section": "threads",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/c-api/threads.txt"
+      },
+      {
+        "page_id": 4,
+        "record_id": "1c0af7eacc3877bdb1335e96",
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/sqlite3.txt"
+      },
+      {
+        "page_id": 4,
+        "record_id": "849a3a2e63a5f9c97c9d0239",
+        "section": "signal",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/signal.txt"
+      },
+      {
+        "page_id": 5,
+        "record_id": "d1218136e7c0557a257511f4",
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/sqlite3.txt"
+      },
+      {
+        "page_id": 5,
+        "record_id": "eb7fb534e0d4dbe48d372841",
+        "section": "threading",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/threading.txt"
+      }
+    ],
+    "records_pruned": [
+      "986a75c75cde83776823fb18",
+      "41d8d7a86ee2fba05c85ec2a"
+    ],
+    "records_retained": [
+      "4b64abfa66f5631bd8fb7e85",
+      "b670f20db7a5b7cdec8ffa75",
+      "1c0af7eacc3877bdb1335e96",
+      "849a3a2e63a5f9c97c9d0239",
+      "d1218136e7c0557a257511f4",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "4b64abfa66f5631bd8fb7e85",
+      "b670f20db7a5b7cdec8ffa75",
+      "1c0af7eacc3877bdb1335e96",
+      "849a3a2e63a5f9c97c9d0239",
+      "d1218136e7c0557a257511f4",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "text": "[SOURCE: 4b64abfa66f5631bd8fb7e85] threads\nThe Python interpreter keeps some thread-local information inside a data structure called \"PyThreadState\", known as a *thread state*. Each thread has a thread-local pointer to a \"PyThreadState\"; a thread state referenced by this pointer is considered to be *attached*. A thread can only have one *attached thread state* at a time. An attached thread state is typically analogous with holding the GIL, except on free-threaded builds. On builds with the GIL enabled, attaching a thread state will block until the GIL can be acquired. However, even on builds with the GIL disabled, it is still required to have an attached thread state, as the interpreter needs to keep track of which threads may access Python objects. Even on the free-threaded build, attaching a thread state may block, as the GIL can be re-enabled or threads might be temporarily suspended (such as during a garbage collection). Generally, there will always be an attached thread state when using Python's C API, including during embedding and when implementing methods, so it's uncommon to need to set up a thread state on your own. Only in some specific cases, such as in a \"Py_BEGIN_ALLOW_THREADS\" block or in a fresh thread, will the thread not have an attached thread state. If uncertain, check if \"PyThreadState_GetUnchecked()\" returns \"NULL\".\n\n[SOURCE: b670f20db7a5b7cdec8ffa75] threads\nCalling this function from a thread when the runtime is finalizing will hang the thread until the program exits, even if the thread was not created by Python. Refer to Cautions regarding runtime finalization for more details. Changed in version 3.14: Hangs the current thread, rather than terminating it, if called while the interpreter is finalizing. Return the *attached thread state*. If the thread has no attached thread state, (such as when inside of \"Py_BEGIN_ALLOW_THREADS\" block), then this issues a fatal error (so that the caller needn't check for \"NULL\"). Similar to \"PyThreadState_Get()\", but don't kill the process with a fatal error if it is NULL. The caller is responsible to check if the result is NULL. Added in version 3.13: In Python 3.5 to 3.12, the function was private and known as \"_PyThreadState_UncheckedGet()\". PyThreadState *PyThreadState_Swap(PyThreadState *tstate) * Part of the Stable ABI.* Set the *attached thread state* to *tstate*, and return the *thread state* that was attached prior to calling. This function is safe to call without an *attached thread state*; it will simply return \"NULL\" indicating that there was no prior thread state. Similar to \"PyGILState_Ensure()\", this function will hang the thread if the runtime is finalizing. The following functions use thread-local storage, and are not compatible with sub-interpreters:\n\n[SOURCE: 1c0af7eacc3877bdb1335e96] sqlite3\nRaises an auditing event \"sqlite3.connect/handle\" with argument \"connection_handle\". Changed in version 3.7: *database* can now also be a *path-like object*, not only a string. Changed in version 3.13: Positional use of the parameters *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements*, and *uri* is deprecated. They will become keyword-only parameters in Python 3.15. Return \"True\" if the string *statement* appears to contain one or more complete SQL statements. No syntactic verification or parsing of any kind is performed, other than checking that there are no unclosed string literals and the statement is terminated by a semicolon. >>> sqlite3.complete_statement(\"SELECT foo FROM bar;\") True >>> sqlite3.complete_statement(\"SELECT foo\") False This function may be useful during command-line input to determine if the entered text seems to form a complete SQL statement, or if additional input is needed before calling \"execute()\". Enable or disable callback tracebacks. By default you will not get any tracebacks in user-defined functions, aggregates, converters, authorizer callbacks etc. If you want to debug them, you can call this function with *flag* set to \"True\". Afterwards, you will get tracebacks from callbacks on \"sys.stderr\". Use \"False\" to disable the feature again.\n\n[SOURCE: 849a3a2e63a5f9c97c9d0239] signal\nSend the signal *signalnum* to the thread *thread_id*, another thread in the same process as the caller. The target thread can be executing any code (Python or not). However, if the target thread is executing the Python interpreter, the Python signal handlers will be executed by the main thread of the main interpreter. Therefore, the only point of sending a signal to a particular Python thread would be to force a running system call to fail with \"InterruptedError\". Use \"threading.get_ident()\" or the \"ident\" attribute of \"threading.Thread\" objects to get a suitable value for *thread_id*. If *signalnum* is 0, then no signal is sent, but error checking is still performed; this can be used to check if the target thread is still running. Raises an auditing event \"signal.pthread_kill\" with arguments \"thread_id\", \"signalnum\". Fetch and/or change the signal mask of the calling thread. The signal mask is the set of signals whose delivery is currently blocked for the caller. Return the old signal mask as a set of signals. * \"SIG_BLOCK\": The set of blocked signals is the union of the current set and the *mask* argument. * \"SIG_UNBLOCK\": The signals in *mask* are removed from the current set of blocked signals. It is permissible to attempt to unblock a signal which is not blocked.\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3\n* **check_same_thread** (*bool*) -- If \"True\" (default), \"ProgrammingError\" will be raised if the database connection is used by a thread other than the one that created it. If \"False\", the connection may be accessed in multiple threads; write operations may need to be serialized by the user to avoid data corruption. See \"threadsafety\" for more information. * **factory** (*Connection*) -- A custom subclass of \"Connection\" to create the connection with, if not the default \"Connection\" class. * **cached_statements** (*int*) -- The number of statements that \"sqlite3\" should internally cache for this connection, to avoid parsing overhead. By default, 128 statements. * **uri** (*bool*) -- If set to \"True\", *database* is interpreted as a URI (Uniform Resource Identifier) with a file path and an optional query string. The scheme part *must* be \"\"file:\"\", and the path can be relative or absolute. The query string allows passing parameters to SQLite, enabling various How to work with SQLite URIs. * **autocommit** (*bool*) -- Control **PEP 249** transaction handling behaviour. See \"Connection.autocommit\" and Transaction control via the autocommit attribute for more information. *autocommit* currently defaults to \"LEGACY_TRANSACTION_CONTROL\". The default will change to \"False\" in a future Python release.\n\n[SOURCE: eb7fb534e0d4dbe48d372841] threading\nIf the subclass overrides the constructor, it must make sure to invoke the base class constructor (\"Thread.__init__()\") before doing anything else to the thread. It must be called at most once per thread object. It arranges for the object's \"run()\" method to be invoked in a separate thread of control. This method will raise a \"RuntimeError\" if called more than once on the same thread object. If supported, set the operating system thread name to \"threading.Thread.name\". The name can be truncated depending on the operating system thread name limits. You may override this method in a subclass. The standard \"run()\" method invokes the callable object passed to the object's constructor as the *target* argument, if any, with positional and keyword arguments taken from the *args* and *kwargs* arguments, respectively. Using list or tuple as the *args* argument which passed to the \"Thread\" could achieve the same effect. >>> from threading import Thread >>> t = Thread(target=print, args=[1]) >>> t.run() 1 >>> t = Thread(target=print, args=(1,)) >>> t.run() 1 Wait until the thread terminates. This blocks the calling thread until the thread whose \"join()\" method is called terminates -- either normally or through an unhandled exception -- or until the optional timeout occurs."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2693,
+    "context_activation_rate": 0.7590048273301151,
+    "context_density": 0.027886497064579255,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 1022.0,
+    "useful_oracle_tokens": 57
+  },
+  "context_sha256": "1c46fd97690f766356637ad0f65075e1b40e71e0427af2c0c53ec8d234b78fcc",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 2003,
+    "answer_quality": {
+      "cited_source_ids": [
+        "849a3a2e63a5f9c97c9d0239"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.5,
+      "required_facts_found": 1,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The default value of `check_same_thread` is `True`, which raises a `ProgrammingError` if the database connection is used by a thread other than the one that created it. If `check_same_thread` is disabled, the user must ensure that the database connection is used by only one thread at a time. \n\n[SOURCE: 849a3a2e63a5f9c97c9d0239]",
+    "metrics": {
+      "backend_total_ms": 20235.518699977547,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 12.0,
+      "cpu_kernel_seconds": 3.796875,
+      "cpu_percent_total_average": 385.3836225116707,
+      "cpu_percent_total_peak": 600.5169255499853,
+      "cpu_time_seconds": 77.984375,
+      "cpu_user_seconds": 74.1875,
+      "generated_tokens": 95,
+      "generation_eval_ms": 7195.794,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 20235.518699977547,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621137920,
+      "private_bytes_min": 619307008,
+      "prompt_eval_ms": 13021.662,
+      "prompt_tokens": 2003,
+      "prompt_tokens_per_second": 153.8206106102278,
+      "queries_served": 12,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 11,
+      "system_available_ram_bytes_min": 3063894016,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 13.202156704319217,
+      "ttft_ms": 13038.552900019567,
+      "working_set_bytes_max": 1207799808,
+      "working_set_bytes_min": 1205645312,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 773
+    },
+    "output_sha256": "99c7e521f16f8429f42242157a9582ab0231218559bcd1c66bb71a7946fcf83a",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_thread_connection::V0",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 11,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 2044,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 127,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 102.04692960559161,
+      "instructions": 4.493260109835247,
+      "other_or_chat_envelope": 0.0,
+      "question": 1.397903145282077
+    },
+    "question": 28,
+    "total": 2003
+  },
+  "prompt_sha256": "c5cfd4b88621101cc968172268c33919314e9af7a8b11cafc254a0ed753b34d4",
+  "query_spec": {
+    "category": "multi_record",
+    "expected_record_ids": [
+      "1c0af7eacc3877bdb1335e96"
+    ],
+    "query": "In Python sqlite3, what happens with check_same_thread by default and what must the user do if it is disabled?",
+    "query_id": "holdout_thread_connection",
+    "required_fact_groups": [
+      [
+        "programmingerror"
+      ],
+      [
+        "serialized",
+        "serialize"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      0,
+      4,
+      5,
+      6
+    ],
+    "record_bytes": 10757,
+    "records_retrieved": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85",
+      "41d8d7a86ee2fba05c85ec2a",
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T101418Z-4363d15e20",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:14:18Z",
+  "variant": "V0",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

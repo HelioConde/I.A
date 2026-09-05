@@ -1,0 +1,115 @@
+{
+  "brain": {
+    "corpus_bytes": 15728640,
+    "index": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\brain_data\\real_knowledge\\index\\record-index.json.gz",
+    "manifest": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\brain_data\\real_knowledge\\semantic\\manifest.json",
+    "page_count": 15,
+    "page_size_bytes": 1048576,
+    "record_count": 12521
+  },
+  "capabilities": {
+    "cgroups_v2": {
+      "details": null,
+      "reason": "unsupported_on_windows",
+      "status": "UNSUPPORTED"
+    },
+    "hud": {
+      "details": null,
+      "reason": "Existing in-process HUD event bus.",
+      "status": "SUPPORTED"
+    },
+    "madvise_cold": {
+      "details": null,
+      "reason": "unsupported_on_windows",
+      "status": "UNSUPPORTED"
+    },
+    "madvise_pageout": {
+      "details": null,
+      "reason": "unsupported_on_windows",
+      "status": "UNSUPPORTED"
+    },
+    "memory_mapped_brain": {
+      "details": null,
+      "reason": "Python mmap uses the native Windows file mapping API.",
+      "status": "SUPPORTED"
+    },
+    "mincore_residency": {
+      "details": null,
+      "reason": "unsupported_on_windows",
+      "status": "UNSUPPORTED"
+    },
+    "physical_ssd_io": {
+      "details": null,
+      "reason": "Windows process I/O counters do not prove physical SSD reads or cache residency.",
+      "status": "DEGRADED"
+    },
+    "process_cpu": {
+      "details": null,
+      "reason": "Measured with GetProcessTimes.",
+      "status": "SUPPORTED"
+    },
+    "process_io_transfer": {
+      "details": null,
+      "reason": "Measured with GetProcessIoCounters; values are process transfer counters, not physical disk reads.",
+      "status": "SUPPORTED"
+    },
+    "process_memory": {
+      "details": null,
+      "reason": "Measured with GetProcessMemoryInfo.",
+      "status": "SUPPORTED"
+    },
+    "procfs_metrics": {
+      "details": null,
+      "reason": "unsupported_on_windows",
+      "status": "UNSUPPORTED"
+    },
+    "psi_pressure": {
+      "details": null,
+      "reason": "unsupported_on_windows",
+      "status": "UNSUPPORTED"
+    },
+    "temperature": {
+      "details": null,
+      "reason": "No stable standard-library Windows sensor API is used.",
+      "status": "NOT_MEASURED"
+    },
+    "windows_working_set": {
+      "details": null,
+      "reason": "Working set and peak working set are available.",
+      "status": "SUPPORTED"
+    }
+  },
+  "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+  "environment_type": "WINDOWS_NATIVE_FUNCTIONAL",
+  "generated_at": 1787230278.220785,
+  "host": {
+    "logical_cpu_count": 12,
+    "machine": "AMD64",
+    "memory": {
+      "available_bytes": 5203836928,
+      "total_bytes": 16957431808
+    },
+    "processor": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "python": "3.14.3",
+    "release": "11",
+    "system": "Windows",
+    "version": "10.0.26200"
+  },
+  "model": {
+    "bytes": 639446688,
+    "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+    "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+  },
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux environment.",
+  "phase4e_valid": false,
+  "runtime": {
+    "cpu_only_build": true,
+    "devices_output": "Available devices:\n  (none)",
+    "devices_return_code": 0,
+    "frozen_commit_match": true,
+    "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+    "version_output": "version: 1 (217df17ac)\nbuilt with MSVC 19.44.35222.0 for Windows AMD64",
+    "version_return_code": 0
+  },
+  "schema_version": 1
+}

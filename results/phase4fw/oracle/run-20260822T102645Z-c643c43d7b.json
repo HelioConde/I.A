@@ -1,0 +1,252 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 239,
+    "context_fact_recall": 1.0,
+    "covered_fact_groups": [
+      0,
+      1
+    ],
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 3061.7631,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 60,
+    "evaluation_only": true,
+    "metadata_bytes": 0,
+    "oracle_runtime_allowed": false,
+    "oracle_wall_ms": 3061.7631,
+    "provenance": [
+      {
+        "end": 192,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 0,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.",
+        "title": "json"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "required_fact_groups": 2,
+    "sentences_retained": 1,
+    "source_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "text": "[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\nUnlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2574,
+    "context_activation_rate": 0.023310023310023312,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 30.0,
+    "useful_oracle_tokens": 60
+  },
+  "context_sha256": "bf7ea1fc1925969778398e1bcf17e19e408afb861179b52cdb2434970ccb5f04",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 177,
+    "answer_quality": {
+      "cited_source_ids": [
+        "2b0a025ac1549a6b04ae5a17"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The answer is [SOURCE: 2b0a025ac1549a6b04ae5a17].",
+    "metrics": {
+      "backend_total_ms": 1726.6019000089727,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 115.0,
+      "cpu_kernel_seconds": 0.328125,
+      "cpu_percent_total_average": 398.1809587933543,
+      "cpu_percent_total_peak": 544.5165008595591,
+      "cpu_time_seconds": 6.875,
+      "cpu_user_seconds": 6.546875,
+      "generated_tokens": 31,
+      "generation_eval_ms": 923.671,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 1726.6019000089727,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621436928,
+      "private_bytes_min": 619606016,
+      "prompt_eval_ms": 791.371,
+      "prompt_tokens": 177,
+      "prompt_tokens_per_second": 223.66247941862918,
+      "queries_served": 115,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 114,
+      "system_available_ram_bytes_min": 3490676736,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 33.56173356097571,
+      "ttft_ms": 801.8115000450052,
+      "working_set_bytes_max": 993775616,
+      "working_set_bytes_min": 991948800,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "5a8d6128e1f0aa429bf4727e7aafdc1a97cbd8d7f74eb1e60009591c884b68d0",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_json_frames::ORACLE_EVAL",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 114,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 60,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 11,
+    "other_or_chat_envelope": 3,
+    "percent": {
+      "evidence": 33.898305084745765,
+      "instructions": 50.847457627118644,
+      "other_or_chat_envelope": 1.694915254237288,
+      "question": 13.559322033898304
+    },
+    "question": 24,
+    "total": 177
+  },
+  "prompt_sha256": "f65e3e3d4c2f1ea9a6e0a714889482375131d7d0df9f4a56b8e489f4f07b1c8a",
+  "query_spec": {
+    "category": "distractor",
+    "expected_record_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+    "query_id": "holdout_json_frames",
+    "required_fact_groups": [
+      [
+        "not a framed protocol"
+      ],
+      [
+        "invalid json"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      3,
+      4
+    ],
+    "record_bytes": 10286,
+    "records_retrieved": [
+      "2b0a025ac1549a6b04ae5a17",
+      "7409230c3d31263ba576b2d1",
+      "859fda16a4d715b5f6c73141",
+      "18893306b3c2b47f6463001c",
+      "224d71d9f13fc0d43000d9c5",
+      "b227a6f4bc64f5797a340f22",
+      "b83cccde7b72abcccc6e5c93",
+      "dcc841948e6ec5fbcb6b8043"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102645Z-c643c43d7b",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:26:45Z",
+  "variant": "ORACLE_EVAL",
+  "variant_metadata": {
+    "evaluation_only": true,
+    "pruning": null
+  }
+}

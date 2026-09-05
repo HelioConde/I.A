@@ -1,0 +1,24 @@
+{
+  "retrieval_date": "2026-08-07",
+  "schema_version": 1,
+  "sources": [
+    {
+      "archive": "sources/python-3.14-docs-text.zip",
+      "license": "Python Software Foundation License Version 2; documentation examples additionally 0BSD",
+      "name": "Python 3.14 documentation",
+      "origin": "https://docs.python.org/3/archives/python-3.14-docs-text.zip",
+      "sha256": "3711ce2e47a010c9f79453695844ea174d0634349fa7e475bbdbc5cf26cc143e",
+      "source_id": "python-3.14.7-docs",
+      "version": "3.14.7"
+    },
+    {
+      "archive": "sources/sqlite-doc-3530400.zip",
+      "license": "Public Domain",
+      "name": "SQLite documentation bundle",
+      "origin": "https://www.sqlite.org/2026/sqlite-doc-3530400.zip",
+      "sha256": "a1d0f5de57485d062796ed7e67daff0758b50d00001a0f233a2c15aaf40bbdc8",
+      "source_id": "sqlite-3.53.4-docs",
+      "version": "3.53.4"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Brain-SSD · Cognitive Observatory</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Pular para o observatório</a>
+  <header class="topbar">
+    <div class="brand-block">
+      <span class="eyebrow">COGNITIVE OBSERVATORY / READ-ONLY</span>
+      <h1>BRAIN<span>-SSD</span></h1>
+      <p>Visual HUD para inferência esparsa em CPU</p>
+    </div>
+    <div class="top-actions">
+      <span id="validationBadge" class="source-badge waiting">VALIDATION: NONE</span>
+      <span id="platformBadge" class="source-badge waiting">PLATFORM: N/D</span>
+      <span id="canonicalBadge" class="source-badge waiting">CANONICAL 4E: NO</span>
+      <span id="sourceBadge" class="source-badge waiting">WAITING</span>
+      <div class="segmented" aria-label="Nível de detalhe">
+        <button id="simpleMode" class="active" type="button">Simples</button>
+        <button id="technicalMode" type="button">Técnico</button>
+      </div>
+      <button id="motionToggle" class="quiet-button" type="button" aria-pressed="true">Animação: ON</button>
+      <a class="quiet-button" href="/api/export">Exportar JSON</a>
+    </div>
+  </header>
+
+  <main id="main" class="dashboard">
+    <section class="query-strip panel">
+      <div>
+        <span class="label">PERGUNTA ATUAL</span>
+        <h2 id="query">Aguardando uma consulta ou replay.</h2>
+      </div>
+      <div class="query-status">
+        <span id="modePill" class="mode-pill">IDLE</span>
+        <span id="streamStatus" class="stream-status"><i></i> conectando</span>
+      </div>
+    </section>
+
+    <section class="panel pipeline-panel" aria-labelledby="pipelineTitle">
+      <div class="section-heading">
+        <div><span class="label">FLUXO COGNITIVO</span><h2 id="pipelineTitle">Pipeline vivo</h2></div>
+        <p id="currentMessage">O HUD está pronto e não altera o Brain-SSD.</p>
+      </div>
+      <div id="pipeline" class="pipeline"></div>
+    </section>
+
+    <section class="hero-grid">
+      <article class="panel awake-panel">
+        <div class="section-heading compact">
+          <div><span class="label">SPARSE AWAKENING</span><h2>Cérebro acordado</h2></div>
+          <span id="pageRatio" class="mono">0 / 0 pages</span>
+        </div>
+        <div class="awake-readout"><strong id="activeRate">0,000%</strong><span>do Brain ativo</span></div>
+        <div class="meter" aria-label="Percentual do cérebro ativo"><i id="brainMeter"></i></div>
+        <div class="work-row">
+          <div><span class="label">ATIVO</span><strong id="activeBytes">0 B</strong></div>
+          <div><span class="label">DORMINDO</span><strong id="sleepingRate">0%</strong></div>
+          <div><span class="label">TRABALHO EVITADO</span><strong id="workAvoided">0 páginas</strong></div>
+        </div>
+      </article>
+
+      <article class="panel core-panel">
+        <div class="section-heading compact">
+          <div><span class="label">CPU CORE</span><h2 id="coreModel">Qwen3-0.6B Q8_0</h2></div>
+          <span id="coreStatus" class="status-chip waiting">IDLE</span>
+        </div>
+        <div class="core-metrics">
+          <div><strong id="ttft">—</strong><span>TTFT</span></div>
+          <div><strong id="tokSec">—</strong><span>tokens/s</span></div>
+          <div><strong id="latency">—</strong><span>latência</span></div>
+        </div>
+        <div class="technical-only tech-line" id="tokenDetail">input — · output — · CPU ONLY</div>
+        <div class="technical-only tech-line" id="coreResidency">Core Residency: NOT_RESIDENT · Model loads: 0 · Queries: 0 · Reloads avoided: 0</div>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel brain-map-panel">
+        <div class="section-heading compact"><div><span class="label">MEMORY MAP</span><h2>Mapa do Brain</h2></div><span id="mapLegend" class="mono">ACTIVE / INHIBITED</span></div>
+        <div id="brainMap" class="brain-map empty-state">Nenhuma página ativada.</div>
+      </article>
+
+      <article class="panel metric-stack">
+        <div class="section-heading compact"><div><span class="label">CONTEXT WINDOW</span><h2>Contexto</h2></div><span id="contextTokens" class="mono">0 / 4096</span></div>
+        <div class="meter context"><i id="contextMeter"></i></div>
+        <div class="stat-pairs">
+          <span>Registros usados <strong id="recordsUsed">0</strong></span>
+          <span>Descartados <strong id="recordsDiscarded">0</strong></span>
+        </div>
+        <div class="context-funnel" aria-label="Funil de contexto">
+          <div><span>Brain</span><strong id="funnelBrain">0 B</strong></div><b>↓</b>
+          <div><span>Records</span><strong id="funnelRecords">0 / 0</strong></div><b>↓</b>
+          <div><span>Evidence</span><strong id="funnelEvidence">0 B</strong></div><b>↓</b>
+          <div><span>Core Context</span><strong id="funnelCore">0 tokens</strong></div>
+        </div>
+        <div class="stat-pairs">
+          <span>Tokens não enviados <strong id="tokensAvoided">—</strong></span>
+          <span>Qualidade <strong id="contextQuality">—</strong></span>
+        </div>
+        <hr>
+        <div class="section-heading compact"><div><span class="label">PRESSURE</span><h2>Recursos</h2></div><span id="pressure" class="status-chip">UNKNOWN</span></div>
+        <div class="resource-grid">
+          <div><span>CPU avg</span><strong id="cpu">—</strong></div>
+          <div><span>RAM RSS</span><strong id="ram">—</strong></div>
+          <div><span>Working Set pico</span><strong id="workingPeak">—</strong></div>
+          <div><span>Private Bytes</span><strong id="privateBytes">—</strong></div>
+          <div><span>RAM disponível</span><strong id="availableRam">—</strong></div>
+          <div><span>Crescimento</span><strong id="memoryGrowth">—</strong></div>
+          <div><span>SSD físico</span><strong id="ssd">—</strong></div>
+          <div class="technical-only"><span>PSS</span><strong id="pss">—</strong></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="content-grid lower-grid">
+      <article class="panel">
+        <div class="section-heading compact"><div><span class="label">KNOWLEDGE RECORDS</span><h2>Conhecimento selecionado</h2></div><span id="recordCount" class="mono">0 records</span></div>
+        <div id="records" class="records empty-state">Nenhum registro selecionado.</div>
+      </article>
+      <article class="panel">
+        <div class="section-heading compact"><div><span class="label">BOTTLENECK</span><h2>Onde o tempo foi gasto</h2></div><strong id="bottleneckShare" class="accent">—</strong></div>
+        <div id="bottleneck" class="bottleneck">Aguardando dados.</div>
+        <div class="meter context" aria-label="Participação do gargalo"><i id="bottleneckMeter"></i></div>
+        <div class="technical-only storage-detail" id="storageDetail">faults — / — · cache UNKNOWN</div>
+        <hr>
+        <div class="who-worked"><div><span class="label">TRABALHOU</span><p id="worked">—</p></div><div><span class="label">FICOU DORMINDO</span><p id="sleeping">—</p></div></div>
+      </article>
+    </section>
+
+    <section class="panel timeline-panel">
+      <div class="section-heading"><div><span class="label">EVENT STREAM</span><h2>Linha do tempo</h2></div><span id="eventStats" class="mono">seq 0 · dropped 0</span></div>
+      <div id="timeline" class="timeline empty-state">Os eventos aparecerão aqui.</div>
+    </section>
+
+    <section class="panel phase-panel">
+      <div class="section-heading"><div><span class="label">EXPERIMENTAL PROOF</span><h2>Fases e evidências</h2></div><p>Estado lido dos artefatos do repositório.</p></div>
+      <div id="phases" class="phases"></div>
+    </section>
+
+    <section class="panel answer-panel">
+      <div class="section-heading compact"><div><span class="label">ANSWER</span><h2>Resposta</h2></div><span id="quality" class="status-chip">UNKNOWN</span></div>
+      <p id="answer">Aguardando resposta.</p>
+    </section>
+  </main>
+
+  <footer><span>Brain-SSD Visual HUD</span><span id="privacy">privacy: conteúdo visível</span></footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>

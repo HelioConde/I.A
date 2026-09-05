@@ -1,0 +1,292 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 8011,
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 0.443,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 2005,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "page_id": 1,
+        "record_id": "985222a842c2827f4983bc07",
+        "section": "asyncio-eventloop",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-eventloop.txt"
+      },
+      {
+        "page_id": 1,
+        "record_id": "06727e61aa6bd91de0e09002",
+        "section": "asyncio-eventloop",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-eventloop.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "c72c7a600a58acbbe5c14663",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-task.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "50f8b2f1b567372268b26a25",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-task.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "51f0e3fed62c12bb09a3582e",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-task.txt"
+      },
+      {
+        "page_id": 2,
+        "record_id": "3991c499b6d7daaf3922b5c6",
+        "section": "asyncio-task",
+        "source_id": "python-3.14.7-docs",
+        "title": "python-3.14-docs-text/library/asyncio-task.txt"
+      }
+    ],
+    "records_pruned": [
+      "aab8e914ebb9de519727e32d",
+      "5a3b4e1c52ff37bdde96f856"
+    ],
+    "records_retained": [
+      "985222a842c2827f4983bc07",
+      "06727e61aa6bd91de0e09002",
+      "c72c7a600a58acbbe5c14663",
+      "50f8b2f1b567372268b26a25",
+      "51f0e3fed62c12bb09a3582e",
+      "3991c499b6d7daaf3922b5c6"
+    ],
+    "sentences_retained": null,
+    "source_ids": [
+      "985222a842c2827f4983bc07",
+      "06727e61aa6bd91de0e09002",
+      "c72c7a600a58acbbe5c14663",
+      "50f8b2f1b567372268b26a25",
+      "51f0e3fed62c12bb09a3582e",
+      "3991c499b6d7daaf3922b5c6"
+    ],
+    "text": "[SOURCE: 985222a842c2827f4983bc07] asyncio-eventloop\nChanged in version 3.13.3: Added \"kwargs\" which passes on arbitrary extra parameters, including \"name\" and \"context\". Changed in version 3.13.4: Rolled back the change that passes on *name* and *context* (if it is None), while still passing on other arbitrary keyword arguments (to avoid breaking backwards compatibility with 3.13.3). Changed in version 3.14: All *kwargs* are now passed on. The *eager_start* parameter works with eager task factories. If *factory* is \"None\" the default task factory will be set. Otherwise, *factory* must be a *callable* with the signature matching \"(loop, coro, **kwargs)\", where *loop* is a reference to the active event loop, and *coro* is a coroutine object. The callable must pass on all *kwargs*, and return a \"asyncio.Task\"-compatible object. Changed in version 3.13.3: Required that all *kwargs* are passed on to \"asyncio.Task\". Changed in version 3.13.4: *name* is no longer passed to task factories. *context* is no longer passed to task factories if it is \"None\". Changed in version 3.14: *name* and *context* are now unconditionally passed on to task factories again.\n\n[SOURCE: 06727e61aa6bd91de0e09002] asyncio-eventloop\nReturn the current time, as a \"float\" value, according to the event loop's internal monotonic clock. Changed in version 3.8: In Python 3.7 and earlier timeouts (relative *delay* or absolute *when*) should not exceed one day. This has been fixed in Python 3.8. This is the preferred way to create Futures in asyncio. This lets third-party event loops provide alternative implementations of the Future object (with better performance or instrumentation). Third-party event loops can use their own subclass of \"Task\" for interoperability. In this case, the result type is a subclass of \"Task\". The full function signature is largely the same as that of the \"Task\" constructor (or factory) - all of the keyword arguments to this function are passed through to that interface. If the *name* argument is provided and not \"None\", it is set as the name of the task using \"Task.set_name()\". An optional keyword-only *context* argument allows specifying a custom \"contextvars.Context\" for the *coro* to run in. The current context copy is created when no *context* is provided. An optional keyword-only *eager_start* argument allows specifying if the task should execute eagerly during the call to create_task, or be scheduled later. If *eager_start* is not passed the mode set by \"loop.set_task_factory()\" will be used.\n\n[SOURCE: c72c7a600a58acbbe5c14663] asyncio-task\nWhen using this factory (via \"loop.set_task_factory(asyncio.eager_task_factory)\"), coroutines begin execution synchronously during \"Task\" construction. Tasks are only scheduled on the event loop if they block. This can be a performance improvement as the overhead of loop scheduling is avoided for coroutines that complete synchronously. A common example where this is beneficial is coroutines which employ caching or memoization to avoid actual I/O when possible. Immediate execution of the coroutine is a semantic change. If the coroutine returns or raises, the task is never scheduled to the event loop. If the coroutine execution blocks, the task is scheduled to the event loop. This change may introduce behavior changes to existing applications. For example, the application's task execution order is likely to change. Create an eager task factory, similar to \"eager_task_factory()\", using the provided *custom_task_constructor* when creating a new task instead of the default \"Task\". *custom_task_constructor* must be a *callable* with the signature matching the signature of \"Task.__init__\". The callable must return a \"asyncio.Task\"-compatible object. This function returns a *callable* intended to be used as a task factory of an event loop via \"loop.set_task_factory(factory)\").\n\n[SOURCE: 50f8b2f1b567372268b26a25] asyncio-task\ntry: result = future.result(timeout) except TimeoutError: print('The coroutine took too long, cancelling the task...') future.cancel() except Exception as exc: print(f'The coroutine raised an exception: {exc!r}') else: print(f'The coroutine returned: {result!r}') Unlike other asyncio functions this function requires the *loop* argument to be passed explicitly. class asyncio.Task(coro, *, loop=None, name=None, context=None, eager_start=False) Tasks are used to run coroutines in event loops. If a coroutine awaits on a Future, the Task suspends the execution of the coroutine and waits for the completion of the Future. When the Future is *done*, the execution of the wrapped coroutine resumes. Event loops use cooperative scheduling: an event loop runs one Task at a time. While a Task awaits for the completion of a Future, the event loop runs other Tasks, callbacks, or performs IO operations. Use the high-level \"asyncio.create_task()\" function to create Tasks, or the low-level \"loop.create_task()\" or \"ensure_future()\" functions. Manual instantiation of Tasks is discouraged. To cancel a running Task use the \"cancel()\" method. Calling it will cause the Task to throw a \"CancelledError\" exception into the wrapped coroutine. If a coroutine is awaiting on a Future object during cancellation, the Future object will be cancelled.\n\n[SOURCE: 51f0e3fed62c12bb09a3582e] asyncio-task\n\"cancelled()\" can be used to check if the Task was cancelled. The method returns \"True\" if the wrapped coroutine did not suppress the \"CancelledError\" exception and was actually cancelled. \"asyncio.Task\" inherits from \"Future\" all of its APIs except \"Future.set_result()\" and \"Future.set_exception()\". An optional keyword-only *context* argument allows specifying a custom \"contextvars.Context\" for the *coro* to run in. If no *context* is provided, the Task copies the current context and later runs its coroutine in the copied context. An optional keyword-only *eager_start* argument allows eagerly starting the execution of the \"asyncio.Task\" at task creation time. If set to \"True\" and the event loop is running, the task will start executing the coroutine immediately, until the first time the coroutine blocks. If the coroutine returns or raises without blocking, the task will be finished eagerly and will skip scheduling to the event loop. Deprecated since version 3.10: Deprecation warning is emitted if *loop* is not specified and there is no running event loop. A Task is *done* when the wrapped coroutine either returned a value, raised an exception, or the Task was cancelled. If the Task is *done*, the result of the wrapped coroutine is returned (or if the coroutine raised an exception, that exception is re-raised.)\n\n[SOURCE: 3991c499b6d7daaf3922b5c6] asyncio-task\nThis will return \"None\" for Tasks which have already completed eagerly. See the Eager Task Factory. Changed in version 3.12: Newly added eager task execution means result may be \"None\". If no name has been explicitly assigned to the Task, the default asyncio Task implementation generates a default name during instantiation. In the default Task implementation, the name will be visible in the \"repr()\" output of a task object. If the Task is already *done* or *cancelled*, return \"False\", otherwise, return \"True\". The method arranges for a \"CancelledError\" exception to be thrown into the wrapped coroutine on the next cycle of the event loop. The coroutine then has a chance to clean up or even deny the request by suppressing the exception with a \"try\" ... ... \"except CancelledError\" ... \"finally\" block. Therefore, unlike \"Future.cancel()\", \"Task.cancel()\" does not guarantee that the Task will be cancelled, although suppressing cancellation completely is not common and is actively discouraged. Should the coroutine nevertheless decide to suppress the cancellation, it needs to call \"Task.uncancel()\" in addition to catching the exception. Changed in version 3.11: The \"msg\" parameter is propagated from cancelled task to its awaiter. The following example illustrates how coroutines can intercept the cancellation request:"
+  },
+  "context_metrics": {
+    "available_record_tokens": 2571,
+    "context_activation_rate": 0.779852197588487,
+    "context_density": 0.10324189526184539,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 668.3333333333334,
+    "useful_oracle_tokens": 207
+  },
+  "context_sha256": "81f9d94bdd4de53b8f9ae945f6f9d711b12aaeadfd773d41eda3aff045f2c391",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1948,
+    "answer_quality": {
+      "cited_source_ids": [
+        "50f8b2f1b567372268b26a25"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.3333333333333333,
+      "required_facts_found": 1,
+      "required_facts_total": 3,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 3,
+      "matched": [
+        true,
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 3
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The asyncio eager_task_factory avoids event-loop scheduling by executing coroutines immediately during task creation. This introduces a semantic risk, as the execution order of tasks may change, potentially affecting application behavior. \n\n[SOURCE: 50f8b2f1b567372268b26a25]",
+    "metrics": {
+      "backend_total_ms": 15123.46080003772,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 97.0,
+      "cpu_kernel_seconds": 1.9375,
+      "cpu_percent_total_average": 397.8710679757237,
+      "cpu_percent_total_peak": 593.0353923418742,
+      "cpu_time_seconds": 60.171875,
+      "cpu_user_seconds": 58.234375,
+      "generated_tokens": 69,
+      "generation_eval_ms": 4302.96,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 15123.46080003772,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621436928,
+      "private_bytes_min": 619606016,
+      "prompt_eval_ms": 10804.111,
+      "prompt_tokens": 1948,
+      "prompt_tokens_per_second": 180.30173884737022,
+      "queries_served": 97,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 96,
+      "system_available_ram_bytes_min": 3392454656,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 16.035473255619387,
+      "ttft_ms": 10819.160600018222,
+      "working_set_bytes_max": 993759232,
+      "working_set_bytes_min": 991932416,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 787
+    },
+    "output_sha256": "be2b18047eb5119b57b57d5df06a77604acbd736f869df55f139fce4a8795ebc",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_eager::V0",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 96,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 2006,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 148,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 102.97741273100615,
+      "instructions": 4.620123203285421,
+      "other_or_chat_envelope": 0.0,
+      "question": 1.3860369609856262
+    },
+    "question": 27,
+    "total": 1948
+  },
+  "prompt_sha256": "661cc92d324275cf11e021629fd03aa2ad7b299b2fb34371a1aef2b27713d572",
+  "query_spec": {
+    "category": "procedure",
+    "expected_record_ids": [
+      "c72c7a600a58acbbe5c14663"
+    ],
+    "query": "When does asyncio eager_task_factory avoid event-loop scheduling and what semantic risk does it introduce?",
+    "query_id": "dev_eager",
+    "required_fact_groups": [
+      [
+        "synchronously"
+      ],
+      [
+        "only scheduled",
+        "if they block"
+      ],
+      [
+        "execution order",
+        "semantic change"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 3145728,
+    "active_pages": [
+      1,
+      2,
+      8
+    ],
+    "record_bytes": 10272,
+    "records_retrieved": [
+      "c72c7a600a58acbbe5c14663",
+      "50f8b2f1b567372268b26a25",
+      "985222a842c2827f4983bc07",
+      "51f0e3fed62c12bb09a3582e",
+      "06727e61aa6bd91de0e09002",
+      "aab8e914ebb9de519727e32d",
+      "3991c499b6d7daaf3922b5c6",
+      "5a3b4e1c52ff37bdde96f856"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102519Z-8f70008b95",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:25:19Z",
+  "variant": "V0",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

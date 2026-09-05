@@ -1,0 +1,190 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 0,
+    "distiller_cpu_ms": null,
+    "distiller_wall_ms": 0.0049,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 0,
+    "metadata_bytes": 0,
+    "provenance": [],
+    "records_pruned": [],
+    "records_retained": [],
+    "sentences_retained": null,
+    "source_ids": [],
+    "text": ""
+  },
+  "context_metrics": {
+    "available_record_tokens": 0,
+    "context_activation_rate": 0.0,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": null,
+    "useful_oracle_tokens": 0
+  },
+  "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 111,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 0,
+      "required_facts_total": 0,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 0,
+      "matched": [],
+      "recall": 1.0,
+      "total": 0
+    },
+    "correctness": true,
+    "diagnostic": "SAFE_NO_KNOWLEDGE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": true
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 639.6276999730617,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 89.0,
+      "cpu_kernel_seconds": 0.171875,
+      "cpu_percent_total_average": 390.8523661663322,
+      "cpu_percent_total_peak": 589.9918498724896,
+      "cpu_time_seconds": 2.5,
+      "cpu_user_seconds": 2.328125,
+      "generated_tokens": 6,
+      "generation_eval_ms": 141.817,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 639.6276999730617,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621367296,
+      "private_bytes_min": 619536384,
+      "prompt_eval_ms": 485.561,
+      "prompt_tokens": 111,
+      "prompt_tokens_per_second": 228.60155572626306,
+      "queries_served": 89,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 88,
+      "system_available_ram_bytes_min": 3558776832,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 42.30804487473293,
+      "ttft_ms": 496.8551999772899,
+      "working_set_bytes_max": 993685504,
+      "working_set_bytes_min": 991858688,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_unknown::V0",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 88,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 0,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 0,
+    "other_or_chat_envelope": 6,
+    "percent": {
+      "evidence": 0.0,
+      "instructions": 81.08108108108108,
+      "other_or_chat_envelope": 5.405405405405405,
+      "question": 13.513513513513514
+    },
+    "question": 15,
+    "total": 111
+  },
+  "prompt_sha256": "a97025aacc6760c8529fa4826122f088f9749757f5b80121fc94917ce3a176da",
+  "query_spec": {
+    "category": "unknown",
+    "expected_record_ids": [],
+    "query": "Which reed strength does the Zephyr ZX-9 saxophone require?",
+    "query_id": "dev_unknown",
+    "required_fact_groups": [],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 0,
+    "active_pages": [],
+    "record_bytes": 0,
+    "records_retrieved": [],
+    "source_ids": []
+  },
+  "run_id": "run-20260822T102429Z-499ee96595",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:24:29Z",
+  "variant": "V0",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

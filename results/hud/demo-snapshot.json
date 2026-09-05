@@ -1,0 +1,525 @@
+{
+  "schema_version": 1,
+  "mode": "COMPLETE",
+  "data_source": "DEMO DATA · valores sintéticos",
+  "demo_data": true,
+  "run_id": "demo-sqlite-python",
+  "query_id": "demo-sqlite-python",
+  "query": "Como abrir um banco SQLite usando Python?",
+  "answer": "Use sqlite3.connect('arquivo.db') para abrir a conexão, crie um cursor e execute seus comandos SQL. [DEMO DATA]",
+  "current_event": "ANSWER_READY",
+  "current_component": "ANSWER",
+  "current_message": "A resposta está pronta.",
+  "pipeline": {
+    "INPUT": {
+      "status": "SUCCESS",
+      "duration_ms": null
+    },
+    "ROUTER": {
+      "status": "SUCCESS",
+      "duration_ms": 0.18
+    },
+    "GATE": {
+      "status": "SUCCESS",
+      "duration_ms": 0.14
+    },
+    "BRAIN": {
+      "status": "SUCCESS",
+      "duration_ms": 3.8
+    },
+    "CONTEXT": {
+      "status": "SUCCESS",
+      "duration_ms": 7.1
+    },
+    "CORE": {
+      "status": "SUCCESS",
+      "duration_ms": 1710
+    },
+    "ANSWER": {
+      "status": "SUCCESS",
+      "duration_ms": null
+    }
+  },
+  "brain": {
+    "total_bytes": 1073741824,
+    "total_pages": 1024,
+    "active_bytes": 3145728,
+    "active_pages": 3,
+    "active_rate": 0.0029296875,
+    "pages": [
+      {
+        "page_id": 3,
+        "domain": "PROGRAMMING",
+        "topic": "Python",
+        "state": "ACTIVE",
+        "reasons": [
+          "termo Python",
+          "CURRENT_QUERY"
+        ],
+        "provenance": [
+          "CURRENT_QUERY"
+        ],
+        "scores": {
+          "lexical": 0.93
+        },
+        "resident": null
+      },
+      {
+        "page_id": 5,
+        "domain": "PROGRAMMING",
+        "topic": "SQLite",
+        "state": "ACTIVE",
+        "reasons": [
+          "termo SQLite",
+          "SEMANTIC_RESCUE"
+        ],
+        "provenance": [
+          "SEMANTIC_RESCUE"
+        ],
+        "scores": {
+          "semantic": 0.88
+        },
+        "resident": null
+      },
+      {
+        "page_id": 8,
+        "domain": "SYSTEM",
+        "topic": "Database files",
+        "state": "ACTIVE",
+        "reasons": [
+          "Record relevante"
+        ],
+        "provenance": [
+          "CURRENT_QUERY"
+        ],
+        "scores": {
+          "lexical": 0.71
+        },
+        "resident": null
+      },
+      {
+        "page_id": 12,
+        "domain": "SCIENCE",
+        "topic": "Biology",
+        "state": "INHIBITED",
+        "reasons": [
+          "domínio incompatível"
+        ],
+        "provenance": [],
+        "scores": {},
+        "resident": null
+      }
+    ]
+  },
+  "knowledge": {
+    "records": [
+      {
+        "record_id": "demo-connect",
+        "source": "Python docs",
+        "section": "sqlite3.connect",
+        "excerpt": "Open a connection to an SQLite database file.",
+        "score": 0.94,
+        "reason": "CURRENT_QUERY"
+      },
+      {
+        "record_id": "demo-cursor",
+        "source": "Python docs",
+        "section": "Cursor",
+        "excerpt": "Create a cursor and execute SQL statements through the connection.",
+        "score": 0.82,
+        "reason": "SEMANTIC_RESCUE"
+      },
+      {
+        "record_id": "demo-transaction",
+        "source": "SQLite docs",
+        "section": "Transactions",
+        "excerpt": "Commit the transaction when changes should be persisted.",
+        "score": 0.78,
+        "reason": "PAGE_LOCALITY"
+      }
+    ],
+    "selected": 3,
+    "retrieved": 5,
+    "expected": 2
+  },
+  "context": {
+    "tokens": 1204,
+    "token_budget": 4096,
+    "bytes": 4816,
+    "records_used": 3,
+    "records_discarded": 2
+  },
+  "core": {
+    "model": "Qwen3-0.6B Q8_0",
+    "mode": "CPU ONLY",
+    "status": "IDLE",
+    "ttft_ms": 1020.0,
+    "tokens_per_second": 31.4,
+    "input_tokens": 1204,
+    "output_tokens": 58,
+    "total_latency_ms": 1710.0
+  },
+  "resources": {
+    "cpu_current_percent": null,
+    "cpu_average_percent": 73.0,
+    "cpu_peak_percent": 91.0,
+    "threads_used": 4,
+    "threads_total": 16,
+    "ram_bytes": 1262485504,
+    "pss_bytes": 1232076800,
+    "anonymous_bytes": 557842432,
+    "file_backed_bytes": 651165696,
+    "temperature_c": null,
+    "pressure": "LOW"
+  },
+  "storage": {
+    "logical_bytes": 3145728,
+    "physical_bytes": 1048576,
+    "resident_pages": 2,
+    "nonresident_pages": 1,
+    "kernel_bonus_pages": 1,
+    "cache_state": "WARM",
+    "major_faults": 1,
+    "minor_faults": 36
+  },
+  "quality": {
+    "required_fact_score": 1.0,
+    "source_correct": true,
+    "status": "DEMO"
+  },
+  "bottleneck": {
+    "component": "CORE",
+    "label": "Processamento do Core",
+    "share_percent": 99.34813678669781,
+    "duration_ms": 1710
+  },
+  "work_avoided": {
+    "sleeping_pages": 1021,
+    "sleeping_rate": 0.9970703125,
+    "inhibited_candidates": 1,
+    "semantic_rescue_skipped": false
+  },
+  "components": {
+    "worked": [
+      "REFLEX",
+      "ROUTER",
+      "GATE",
+      "BRAIN",
+      "STORAGE",
+      "CONTEXT",
+      "CORE",
+      "RESOURCES"
+    ],
+    "sleeping": [
+      "PREFETCH",
+      "HIPPOCAMPUS",
+      "SKILLS",
+      "CONNECTIVITY"
+    ]
+  },
+  "timeline": [
+    {
+      "sequence": 1,
+      "timestamp": 1787225553.899217,
+      "event_type": "QUERY_RECEIVED",
+      "component": "INPUT",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Recebi a pergunta e vou decidir quais partes do cérebro precisam trabalhar."
+    },
+    {
+      "sequence": 2,
+      "timestamp": 1787225553.909217,
+      "event_type": "REFLEX_SKIPPED",
+      "component": "REFLEX",
+      "status": "SKIPPED",
+      "duration_ms": null,
+      "message": "O caminho rápido não se aplica; vou consultar o cérebro maior."
+    },
+    {
+      "sequence": 3,
+      "timestamp": 1787225553.9192169,
+      "event_type": "ROUTER_STARTED",
+      "component": "ROUTER",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "Estou descobrindo quais áreas do conhecimento podem responder à pergunta."
+    },
+    {
+      "sequence": 4,
+      "timestamp": 1787225553.9592168,
+      "event_type": "ROUTER_CANDIDATES",
+      "component": "ROUTER",
+      "status": "INFO",
+      "duration_ms": null,
+      "message": "Encontrei áreas candidatas e estou avaliando sua relevância."
+    },
+    {
+      "sequence": 5,
+      "timestamp": 1787225553.994217,
+      "event_type": "ROUTER_COMPLETED",
+      "component": "ROUTER",
+      "status": "SUCCESS",
+      "duration_ms": 0.18,
+      "message": "As áreas mais promissoras foram identificadas."
+    },
+    {
+      "sequence": 6,
+      "timestamp": 1787225554.0092168,
+      "event_type": "GATE_STARTED",
+      "component": "GATE",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "Estou decidindo quais áreas realmente podem acordar."
+    },
+    {
+      "sequence": 7,
+      "timestamp": 1787225554.039217,
+      "event_type": "PAGE_ACTIVATED",
+      "component": "BRAIN",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta."
+    },
+    {
+      "sequence": 8,
+      "timestamp": 1787225554.069217,
+      "event_type": "PAGE_ACTIVATED",
+      "component": "BRAIN",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta."
+    },
+    {
+      "sequence": 9,
+      "timestamp": 1787225554.099217,
+      "event_type": "PAGE_ACTIVATED",
+      "component": "BRAIN",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Uma região de conhecimento foi ativada porque pode contribuir para a resposta."
+    },
+    {
+      "sequence": 10,
+      "timestamp": 1787225554.119217,
+      "event_type": "PAGE_INHIBITED",
+      "component": "BRAIN",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Uma região candidata foi bloqueada porque a evidência atual indica baixa utilidade."
+    },
+    {
+      "sequence": 11,
+      "timestamp": 1787225554.149217,
+      "event_type": "GATE_COMPLETED",
+      "component": "GATE",
+      "status": "SUCCESS",
+      "duration_ms": 0.14,
+      "message": "O conjunto de conhecimento ativo foi limitado ao necessário."
+    },
+    {
+      "sequence": 12,
+      "timestamp": 1787225554.1692169,
+      "event_type": "STORAGE_READ_STARTED",
+      "component": "STORAGE",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "Estou acessando as páginas de conhecimento selecionadas."
+    },
+    {
+      "sequence": 13,
+      "timestamp": 1787225554.289217,
+      "event_type": "STORAGE_READ_COMPLETED",
+      "component": "STORAGE",
+      "status": "SUCCESS",
+      "duration_ms": 3.8,
+      "message": "O acesso ao conhecimento terminou."
+    },
+    {
+      "sequence": 14,
+      "timestamp": 1787225554.309217,
+      "event_type": "KNOWLEDGE_RECORD_SELECTED",
+      "component": "CONTEXT",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Um trecho de conhecimento relevante foi selecionado."
+    },
+    {
+      "sequence": 15,
+      "timestamp": 1787225554.329217,
+      "event_type": "KNOWLEDGE_RECORD_SELECTED",
+      "component": "CONTEXT",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Um trecho de conhecimento relevante foi selecionado."
+    },
+    {
+      "sequence": 16,
+      "timestamp": 1787225554.349217,
+      "event_type": "KNOWLEDGE_RECORD_SELECTED",
+      "component": "CONTEXT",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "Um trecho de conhecimento relevante foi selecionado."
+    },
+    {
+      "sequence": 17,
+      "timestamp": 1787225554.369217,
+      "event_type": "CONTEXT_BUILD_STARTED",
+      "component": "CONTEXT",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "Estou organizando o conhecimento antes de entregá-lo ao Core."
+    },
+    {
+      "sequence": 18,
+      "timestamp": 1787225554.5192168,
+      "event_type": "CONTEXT_BUILD_COMPLETED",
+      "component": "CONTEXT",
+      "status": "SUCCESS",
+      "duration_ms": 7.1,
+      "message": "O contexto do Core está pronto."
+    },
+    {
+      "sequence": 19,
+      "timestamp": 1787225554.539217,
+      "event_type": "CORE_STARTED",
+      "component": "CORE",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "O Core foi iniciado em modo CPU-only."
+    },
+    {
+      "sequence": 20,
+      "timestamp": 1787225554.579217,
+      "event_type": "CORE_PROMPT_PROCESSING",
+      "component": "CORE",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "O modelo está lendo a pergunta e o conhecimento selecionado."
+    },
+    {
+      "sequence": 21,
+      "timestamp": 1787225555.559217,
+      "event_type": "CORE_GENERATING",
+      "component": "CORE",
+      "status": "RUNNING",
+      "duration_ms": null,
+      "message": "O modelo está gerando a resposta."
+    },
+    {
+      "sequence": 22,
+      "timestamp": 1787225556.2492168,
+      "event_type": "CORE_COMPLETED",
+      "component": "CORE",
+      "status": "SUCCESS",
+      "duration_ms": 1710,
+      "message": "O Core terminou o processamento."
+    },
+    {
+      "sequence": 23,
+      "timestamp": 1787225556.2692168,
+      "event_type": "PRESSURE_CHANGED",
+      "component": "RESOURCES",
+      "status": "INFO",
+      "duration_ms": null,
+      "message": "O estado de pressão de memória mudou."
+    },
+    {
+      "sequence": 24,
+      "timestamp": 1787225556.289217,
+      "event_type": "ANSWER_READY",
+      "component": "ANSWER",
+      "status": "SUCCESS",
+      "duration_ms": null,
+      "message": "A resposta está pronta."
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "phases": [
+    {
+      "phase": "1",
+      "name": "CPU Core",
+      "status": "COMPLETE",
+      "proof": "Core CPU-only executou dentro do envelope de memória.",
+      "source": "results/baseline_cold_5x.json"
+    },
+    {
+      "phase": "2",
+      "name": "Storage Brain",
+      "status": "COMPLETE",
+      "proof": "mmap manteve memória proporcional às páginas tocadas.",
+      "source": "results/phase2/analysis_v2.json"
+    },
+    {
+      "phase": "2.5",
+      "name": "Page Refinement",
+      "status": "COMPLETE",
+      "proof": "1 MiB logical / 4 MiB extent tornou-se o baseline equilibrado.",
+      "source": "results/phase2_5/analysis.json"
+    },
+    {
+      "phase": "3",
+      "name": "Router / Gating",
+      "status": "COMPLETE",
+      "proof": "Router e Gate ativaram uma pequena fração do cérebro.",
+      "source": "results/phase3/summary.json"
+    },
+    {
+      "phase": "3.5",
+      "name": "Recall Shield",
+      "status": "COMPLETE",
+      "proof": "Recuperação progressiva aumentou recall com custo adicional.",
+      "source": "results/phase3_5/summary.json"
+    },
+    {
+      "phase": "3.75",
+      "name": "Semantic Rescue",
+      "status": "COMPLETE",
+      "proof": "HYBRID + TF-IDF melhorou recall, precisão e esparsidade.",
+      "source": "results/phase3_75/summary.json"
+    },
+    {
+      "phase": "4A",
+      "name": "Cognitive Cache",
+      "status": "COMPLETE",
+      "proof": "Cache cognitivo venceu LRU logicamente em condições específicas.",
+      "source": "results/phase4a/summary.json"
+    },
+    {
+      "phase": "4B",
+      "name": "Physical Residency",
+      "status": "COMPLETE",
+      "proof": "KernelOnly venceu o controle físico agressivo.",
+      "source": "results/phase4b/summary.json"
+    },
+    {
+      "phase": "4C",
+      "name": "Memory Pressure",
+      "status": "COMPLETE",
+      "proof": "COLD pressure-aware ajudou apenas sob pressão específica.",
+      "source": "results/phase4c/summary.json"
+    },
+    {
+      "phase": "4D",
+      "name": "Real Knowledge",
+      "status": "COMPLETE",
+      "proof": "O primeiro pipeline real end-to-end passou.",
+      "source": "results/phase4d/end-to-end.json"
+    },
+    {
+      "phase": "4E",
+      "name": "Physical Validation",
+      "status": "NEXT",
+      "proof": "Validação física TARGET_8GB preparada; execução ainda não realizada.",
+      "source": "results/phase4e/STATUS.md"
+    }
+  ],
+  "updated_at": 1787225560.0050323,
+  "privacy": {
+    "query_hidden": false,
+    "records_hidden": false,
+    "answer_hidden": false
+  }
+}

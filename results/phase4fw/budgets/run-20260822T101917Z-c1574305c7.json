@@ -1,0 +1,427 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4013,
+    "distiller_cpu_ms": 62.5,
+    "distiller_wall_ms": 49.923,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1003,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 365,
+        "estimated_tokens": 104,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 0,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.5646422451833143,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "* **check_same_thread** (*bool*) -- If \"True\" (default), \"ProgrammingError\" will be raised if the database connection is used by a thread other than the one that created it. If \"False\", the connection may be accessed in multiple threads; write operations may need to be serialized by the user to avoid data corruption. See \"threadsafety\" for more information.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 422,
+        "estimated_tokens": 74,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 2,
+        "record_id": "1c0af7eacc3877bdb1335e96",
+        "score": 0.4514540018780939,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 181,
+        "text": "Changed in version 3.13: Positional use of the parameters *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements*, and *uri* is deprecated. They will become keyword-only parameters in Python 3.15.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1369,
+        "estimated_tokens": 69,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 5,
+        "record_id": "986a75c75cde83776823fb18",
+        "score": 0.38310492547852987,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 1151,
+        "text": "sqlite3.connect(database, timeout=5.0, detect_types=0, isolation_level='DEFERRED', check_same_thread=True, factory=sqlite3.Connection, cached_statements=128, uri=False, *, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)",
+        "title": "sqlite3"
+      },
+      {
+        "end": 682,
+        "estimated_tokens": 58,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 2,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.32979376033482954,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 506,
+        "text": "* **cached_statements** (*int*) -- The number of statements that \"sqlite3\" should internally cache for this connection, to avoid parsing overhead. By default, 128 statements.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 1338,
+        "estimated_tokens": 92,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 4,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.3264604270014962,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 1022,
+        "text": "* **autocommit** (*bool*) -- Control **PEP 249** transaction handling behaviour. See \"Connection.autocommit\" and Transaction control via the autocommit attribute for more information. *autocommit* currently defaults to \"LEGACY_TRANSACTION_CONTROL\". The default will change to \"False\" in a future Python release.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 714,
+        "estimated_tokens": 60,
+        "kind": "sentence",
+        "page_id": 0,
+        "position": 4,
+        "record_id": "4b64abfa66f5631bd8fb7e85",
+        "score": 0.31309663815276617,
+        "section": "threads",
+        "source_id": "python-3.14.7-docs",
+        "start": 530,
+        "text": "However, even on builds with the GIL disabled, it is still required to have an attached thread state, as the interpreter needs to keep track of which threads may access Python objects.",
+        "title": "threads"
+      },
+      {
+        "end": 210,
+        "estimated_tokens": 70,
+        "kind": "paragraph",
+        "page_id": 6,
+        "position": 0,
+        "record_id": "41d8d7a86ee2fba05c85ec2a",
+        "score": 0.2847368616478162,
+        "section": "executionmodel",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "A Python implementation may support using multiple interpreters at the same time in the same process. They are independent and isolated from one another. For example, each interpreter has its own \"sys.modules\".",
+        "title": "executionmodel"
+      },
+      {
+        "end": 1359,
+        "estimated_tokens": 101,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 6,
+        "record_id": "1c0af7eacc3877bdb1335e96",
+        "score": 0.28305573347982554,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 1005,
+        "text": "Enable or disable callback tracebacks. By default you will not get any tracebacks in user-defined functions, aggregates, converters, authorizer callbacks etc. If you want to debug them, you can call this function with *flag* set to \"True\". Afterwards, you will get tracebacks from callbacks on \"sys.stderr\". Use \"False\" to disable the feature again.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 504,
+        "estimated_tokens": 48,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 1,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.27941497245604163,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 367,
+        "text": "* **factory** (*Connection*) -- A custom subclass of \"Connection\" to create the connection with, if not the default \"Connection\" class.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 268,
+        "estimated_tokens": 81,
+        "kind": "paragraph",
+        "page_id": 0,
+        "position": 0,
+        "record_id": "4b64abfa66f5631bd8fb7e85",
+        "score": 0.2785511836073117,
+        "section": "threads",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "The Python interpreter keeps some thread-local information inside a data structure called \"PyThreadState\", known as a *thread state*. Each thread has a thread-local pointer to a \"PyThreadState\"; a thread state referenced by this pointer is considered to be *attached*.",
+        "title": "threads"
+      },
+      {
+        "end": 1020,
+        "estimated_tokens": 97,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 3,
+        "record_id": "d1218136e7c0557a257511f4",
+        "score": 0.2731649724560416,
+        "section": "sqlite3",
+        "source_id": "python-3.14.7-docs",
+        "start": 684,
+        "text": "* **uri** (*bool*) -- If set to \"True\", *database* is interpreted as a URI (Uniform Resource Identifier) with a file path and an optional query string. The scheme part *must* be \"\"file:\"\", and the path can be relative or absolute. The query string allows passing parameters to SQLite, enabling various How to work with SQLite URIs.",
+        "title": "sqlite3"
+      },
+      {
+        "end": 535,
+        "estimated_tokens": 98,
+        "kind": "paragraph",
+        "page_id": 6,
+        "position": 1,
+        "record_id": "41d8d7a86ee2fba05c85ec2a",
+        "score": 0.2722368616478162,
+        "section": "executionmodel",
+        "source_id": "python-3.14.7-docs",
+        "start": 212,
+        "text": "For thread-specific runtime state, each interpreter has a set of thread states, which it manages, in the same way the global runtime contains a set of interpreters. It can have thread states for as many host threads as it needs. It may even have multiple thread states for the same host thread, though that isn't as common.",
+        "title": "executionmodel"
+      },
+      {
+        "end": 936,
+        "estimated_tokens": 51,
+        "kind": "paragraph",
+        "page_id": 6,
+        "position": 3,
+        "record_id": "41d8d7a86ee2fba05c85ec2a",
+        "score": 0.26598686164781615,
+        "section": "executionmodel",
+        "source_id": "python-3.14.7-docs",
+        "start": 803,
+        "text": "The term \"Python thread\" can sometimes refer to a thread state, but normally it means a thread created using the \"threading\" module.",
+        "title": "executionmodel"
+      }
+    ],
+    "records_pruned": [
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "records_retained": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85",
+      "41d8d7a86ee2fba05c85ec2a"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 13,
+    "source_ids": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85",
+      "41d8d7a86ee2fba05c85ec2a"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **check_same_thread** (*bool*) -- If \"True\" (default), \"ProgrammingError\" will be raised if the database connection is used by a thread other than the one that created it. If \"False\", the connection may be accessed in multiple threads; write operations may need to be serialized by the user to avoid data corruption. See \"threadsafety\" for more information.\n\n[SOURCE: 1c0af7eacc3877bdb1335e96] sqlite3 — sqlite3\nChanged in version 3.13: Positional use of the parameters *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements*, and *uri* is deprecated. They will become keyword-only parameters in Python 3.15.\n\n[SOURCE: 986a75c75cde83776823fb18] sqlite3 — sqlite3\nsqlite3.connect(database, timeout=5.0, detect_types=0, isolation_level='DEFERRED', check_same_thread=True, factory=sqlite3.Connection, cached_statements=128, uri=False, *, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **cached_statements** (*int*) -- The number of statements that \"sqlite3\" should internally cache for this connection, to avoid parsing overhead. By default, 128 statements.\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **autocommit** (*bool*) -- Control **PEP 249** transaction handling behaviour. See \"Connection.autocommit\" and Transaction control via the autocommit attribute for more information. *autocommit* currently defaults to \"LEGACY_TRANSACTION_CONTROL\". The default will change to \"False\" in a future Python release.\n\n[SOURCE: 4b64abfa66f5631bd8fb7e85] threads — threads\nHowever, even on builds with the GIL disabled, it is still required to have an attached thread state, as the interpreter needs to keep track of which threads may access Python objects.\n\n[SOURCE: 41d8d7a86ee2fba05c85ec2a] executionmodel — executionmodel\nA Python implementation may support using multiple interpreters at the same time in the same process. They are independent and isolated from one another. For example, each interpreter has its own \"sys.modules\".\n\n[SOURCE: 1c0af7eacc3877bdb1335e96] sqlite3 — sqlite3\nEnable or disable callback tracebacks. By default you will not get any tracebacks in user-defined functions, aggregates, converters, authorizer callbacks etc. If you want to debug them, you can call this function with *flag* set to \"True\". Afterwards, you will get tracebacks from callbacks on \"sys.stderr\". Use \"False\" to disable the feature again.\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **factory** (*Connection*) -- A custom subclass of \"Connection\" to create the connection with, if not the default \"Connection\" class.\n\n[SOURCE: 4b64abfa66f5631bd8fb7e85] threads — threads\nThe Python interpreter keeps some thread-local information inside a data structure called \"PyThreadState\", known as a *thread state*. Each thread has a thread-local pointer to a \"PyThreadState\"; a thread state referenced by this pointer is considered to be *attached*.\n\n[SOURCE: d1218136e7c0557a257511f4] sqlite3 — sqlite3\n* **uri** (*bool*) -- If set to \"True\", *database* is interpreted as a URI (Uniform Resource Identifier) with a file path and an optional query string. The scheme part *must* be \"\"file:\"\", and the path can be relative or absolute. The query string allows passing parameters to SQLite, enabling various How to work with SQLite URIs.\n\n[SOURCE: 41d8d7a86ee2fba05c85ec2a] executionmodel — executionmodel\nFor thread-specific runtime state, each interpreter has a set of thread states, which it manages, in the same way the global runtime contains a set of interpreters. It can have thread states for as many host threads as it needs. It may even have multiple thread states for the same host thread, though that isn't as common.\n\n[SOURCE: 41d8d7a86ee2fba05c85ec2a] executionmodel — executionmodel\nThe term \"Python thread\" can sometimes refer to a thread state, but normally it means a thread created using the \"threading\" module."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2693,
+    "context_activation_rate": 0.3724470850352766,
+    "context_density": 0.05682951146560319,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 501.5,
+    "useful_oracle_tokens": 57
+  },
+  "context_sha256": "ead9b5152da7eefd0fcfb5144d928780f1abb052096626fc9e74bc837a104996",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1241,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "FALSE_NO_KNOWLEDGE",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 6552.769600006286,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 50.0,
+      "cpu_kernel_seconds": 0.609375,
+      "cpu_percent_total_average": 398.4479326111962,
+      "cpu_percent_total_peak": 511.63415125198,
+      "cpu_time_seconds": 26.109375,
+      "cpu_user_seconds": 25.5,
+      "generated_tokens": 6,
+      "generation_eval_ms": 253.631,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 6552.769600006286,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621178880,
+      "private_bytes_min": 619347968,
+      "prompt_eval_ms": 6284.792,
+      "prompt_tokens": 1241,
+      "prompt_tokens_per_second": 197.46079106516174,
+      "queries_served": 50,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 49,
+      "system_available_ram_bytes_min": 3078909952,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 23.65641423958428,
+      "ttft_ms": 6298.148599977139,
+      "working_set_bytes_max": 1208107008,
+      "working_set_bytes_min": 1206280192,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 780
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_thread_connection::EXTRACTIVE_B1024",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 49,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1004,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 178,
+    "other_or_chat_envelope": 119,
+    "percent": {
+      "evidence": 80.90249798549557,
+      "instructions": 7.2522159548751,
+      "other_or_chat_envelope": 9.58904109589041,
+      "question": 2.2562449637389204
+    },
+    "question": 28,
+    "total": 1241
+  },
+  "prompt_sha256": "fb96bee830470187e280be1f7642bc935387330c3712121321451c4086a2422e",
+  "query_spec": {
+    "category": "multi_record",
+    "expected_record_ids": [
+      "1c0af7eacc3877bdb1335e96"
+    ],
+    "query": "In Python sqlite3, what happens with check_same_thread by default and what must the user do if it is disabled?",
+    "query_id": "holdout_thread_connection",
+    "required_fact_groups": [
+      [
+        "programmingerror"
+      ],
+      [
+        "serialized",
+        "serialize"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      0,
+      4,
+      5,
+      6
+    ],
+    "record_bytes": 10757,
+    "records_retrieved": [
+      "d1218136e7c0557a257511f4",
+      "1c0af7eacc3877bdb1335e96",
+      "986a75c75cde83776823fb18",
+      "4b64abfa66f5631bd8fb7e85",
+      "41d8d7a86ee2fba05c85ec2a",
+      "849a3a2e63a5f9c97c9d0239",
+      "b670f20db7a5b7cdec8ffa75",
+      "eb7fb534e0d4dbe48d372841"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T101917Z-c1574305c7",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:19:17Z",
+  "variant": "EXTRACTIVE_B1024",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

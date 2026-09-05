@@ -1,0 +1,395 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "a80f2f9c7e7e5db0472d21930239403676467956cc7b432260bed1ba79be6520",
+  "configuration": {
+    "budgets": [
+      384,
+      768
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": true,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 3050,
+    "distiller_cpu_ms": 46.875,
+    "distiller_wall_ms": 37.8824,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 761,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 192,
+        "estimated_tokens": 60,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 0,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.6031261218696345,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.",
+        "title": "json"
+      },
+      {
+        "end": 318,
+        "estimated_tokens": 92,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 0,
+        "record_id": "18893306b3c2b47f6463001c",
+        "score": 0.37260043715457497,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by implementing specific object APIs);",
+        "title": "pickle"
+      },
+      {
+        "end": 820,
+        "estimated_tokens": 85,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 3,
+        "record_id": "18893306b3c2b47f6463001c",
+        "score": 0.3538504371545749,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 533,
+        "text": "The data format used by \"pickle\" is Python-specific. This has the advantage that there are no restrictions imposed by external standards such as JSON (which can't represent pointer sharing); however it means that non-Python programs may not be able to reconstruct pickled Python objects.",
+        "title": "pickle"
+      },
+      {
+        "end": 1301,
+        "estimated_tokens": 47,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 5,
+        "record_id": "859fda16a4d715b5f6c73141",
+        "score": 0.34376380775296245,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 1160,
+        "text": "Serialize *obj* as a JSON formatted stream to *fp* (a \".write()\"-supporting *file-like object*) using this Python-to-JSON conversion table.",
+        "title": "json"
+      },
+      {
+        "end": 1232,
+        "estimated_tokens": 40,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 6,
+        "record_id": "224d71d9f13fc0d43000d9c5",
+        "score": 0.34248191386276366,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 1126,
+        "text": "* JSON is interoperable and widely used outside of the Python ecosystem, while pickle is Python-specific;",
+        "title": "pickle"
+      },
+      {
+        "end": 480,
+        "estimated_tokens": 75,
+        "kind": "code_block",
+        "page_id": 3,
+        "position": 1,
+        "record_id": "b227a6f4bc64f5797a340f22",
+        "score": 0.3384318403825588,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 221,
+        "text": ">>> # Neither of these calls raises an exception, but the results are not valid JSON >>> json.dumps(float('-inf')) '-Infinity' >>> json.dumps(float('nan')) 'NaN' >>> # Same when deserializing >>> json.loads('-Infinity') -inf >>> json.loads('NaN') nan",
+        "title": "json"
+      },
+      {
+        "end": 398,
+        "estimated_tokens": 63,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 1,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.31789884914236183,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 194,
+        "text": "* **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"json\" module always produces \"str\" objects, not \"bytes\" objects, therefore \"fp.write()\" must support \"str\" input.",
+        "title": "json"
+      },
+      {
+        "end": 464,
+        "estimated_tokens": 65,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 1,
+        "record_id": "7409230c3d31263ba576b2d1",
+        "score": 0.3143741162656816,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 253,
+        "text": "The term \"object\" in the context of JSON processing in Python can be ambiguous. All values in Python are objects. In JSON, an object refers to any data wrapped in curly braces, similar to a Python dictionary.",
+        "title": "json"
+      },
+      {
+        "end": 253,
+        "estimated_tokens": 76,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 0,
+        "record_id": "224d71d9f13fc0d43000d9c5",
+        "score": 0.3093650307458806,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "* \"marshal\" cannot be used to serialize user-defined classes and their instances. \"pickle\" can save and restore class instances transparently, however the class definition must be importable and live in the same module as when the object was pickled.",
+        "title": "pickle"
+      },
+      {
+        "end": 1243,
+        "estimated_tokens": 124,
+        "kind": "code_block",
+        "page_id": 3,
+        "position": 4,
+        "record_id": "7409230c3d31263ba576b2d1",
+        "score": 0.3068741162656816,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 782,
+        "text": ">>> import json >>> json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}]) '[\"foo\", {\"bar\": [\"baz\", null, 1.0, 2]}]' >>> print(json.dumps(\"\\\"foo\\bar\")) \"\\\"foo\\bar\" >>> print(json.dumps('\\u1234')) \"\\u1234\" >>> print(json.dumps('\\\\')) \"\\\\\" >>> print(json.dumps({\"c\": 0, \"b\": 0, \"a\": 0}, sort_keys=True)) {\"a\": 0, \"b\": 0, \"c\": 0} >>> from io import StringIO >>> io = StringIO() >>> json.dump(['streaming API'], io) >>> io.getvalue() '[\"streaming API\"]'",
+        "title": "json"
+      },
+      {
+        "end": 81,
+        "estimated_tokens": 34,
+        "kind": "paragraph",
+        "page_id": 4,
+        "position": 0,
+        "record_id": "b83cccde7b72abcccc6e5c93",
+        "score": 0.29201058569605515,
+        "section": "pickle",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "\"pickle\" --- Python object serialization ****************************************",
+        "title": "pickle"
+      }
+    ],
+    "records_pruned": [
+      "dcc841948e6ec5fbcb6b8043"
+    ],
+    "records_retained": [
+      "2b0a025ac1549a6b04ae5a17",
+      "18893306b3c2b47f6463001c",
+      "859fda16a4d715b5f6c73141",
+      "224d71d9f13fc0d43000d9c5",
+      "b227a6f4bc64f5797a340f22",
+      "7409230c3d31263ba576b2d1",
+      "b83cccde7b72abcccc6e5c93"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 11,
+    "source_ids": [
+      "2b0a025ac1549a6b04ae5a17",
+      "18893306b3c2b47f6463001c",
+      "859fda16a4d715b5f6c73141",
+      "224d71d9f13fc0d43000d9c5",
+      "b227a6f4bc64f5797a340f22",
+      "7409230c3d31263ba576b2d1",
+      "b83cccde7b72abcccc6e5c93"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\nUnlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.\n\n[SOURCE: 18893306b3c2b47f6463001c] pickle — pickle\n* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by implementing specific object APIs);\n\n[SOURCE: 18893306b3c2b47f6463001c] pickle — pickle\nThe data format used by \"pickle\" is Python-specific. This has the advantage that there are no restrictions imposed by external standards such as JSON (which can't represent pointer sharing); however it means that non-Python programs may not be able to reconstruct pickled Python objects.\n\n[SOURCE: 859fda16a4d715b5f6c73141] json — json\nSerialize *obj* as a JSON formatted stream to *fp* (a \".write()\"-supporting *file-like object*) using this Python-to-JSON conversion table.\n\n[SOURCE: 224d71d9f13fc0d43000d9c5] pickle — pickle\n* JSON is interoperable and widely used outside of the Python ecosystem, while pickle is Python-specific;\n\n[SOURCE: b227a6f4bc64f5797a340f22] json — json\n>>> # Neither of these calls raises an exception, but the results are not valid JSON >>> json.dumps(float('-inf')) '-Infinity' >>> json.dumps(float('nan')) 'NaN' >>> # Same when deserializing >>> json.loads('-Infinity') -inf >>> json.loads('NaN') nan\n\n[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\n* **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"json\" module always produces \"str\" objects, not \"bytes\" objects, therefore \"fp.write()\" must support \"str\" input.\n\n[SOURCE: 7409230c3d31263ba576b2d1] json — json\nThe term \"object\" in the context of JSON processing in Python can be ambiguous. All values in Python are objects. In JSON, an object refers to any data wrapped in curly braces, similar to a Python dictionary.\n\n[SOURCE: 224d71d9f13fc0d43000d9c5] pickle — pickle\n* \"marshal\" cannot be used to serialize user-defined classes and their instances. \"pickle\" can save and restore class instances transparently, however the class definition must be importable and live in the same module as when the object was pickled.\n\n[SOURCE: 7409230c3d31263ba576b2d1] json — json\n>>> import json >>> json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}]) '[\"foo\", {\"bar\": [\"baz\", null, 1.0, 2]}]' >>> print(json.dumps(\"\\\"foo\\bar\")) \"\\\"foo\\bar\" >>> print(json.dumps('\\u1234')) \"\\u1234\" >>> print(json.dumps('\\\\')) \"\\\\\" >>> print(json.dumps({\"c\": 0, \"b\": 0, \"a\": 0}, sort_keys=True)) {\"a\": 0, \"b\": 0, \"c\": 0} >>> from io import StringIO >>> io = StringIO() >>> json.dump(['streaming API'], io) >>> io.getvalue() '[\"streaming API\"]'\n\n[SOURCE: b83cccde7b72abcccc6e5c93] pickle — pickle\n\"pickle\" --- Python object serialization ****************************************"
+  },
+  "context_metrics": {
+    "available_record_tokens": 2574,
+    "context_activation_rate": 0.29564879564879565,
+    "context_density": 0.07884362680683311,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 380.5,
+    "useful_oracle_tokens": 60
+  },
+  "context_sha256": "e077524be8d2cb3e15a3ab45c90aaee1d5566314a8736fda653ca740461c3d1d",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1036,
+    "answer_quality": {
+      "cited_source_ids": [
+        "2b0a025ac1549a6b04ae5a17"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.5,
+      "required_facts_found": 1,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CORE_UTILIZATION_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that repeated calls to `json.dump()` with the same file-like object `fp` will result in an invalid JSON file because of the JSON format's limitations.",
+    "metrics": {
+      "backend_total_ms": 10519.511500024237,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 16.0,
+      "cpu_kernel_seconds": 2.34375,
+      "cpu_percent_total_average": 389.3063380358075,
+      "cpu_percent_total_peak": 579.5103672652992,
+      "cpu_time_seconds": 40.953125,
+      "cpu_user_seconds": 38.609375,
+      "generated_tokens": 92,
+      "generation_eval_ms": 4640.234,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 10519.511500024237,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1295.1990000437945,
+      "persistent_reserved_memory": 1175490560,
+      "private_bytes_max": 620974080,
+      "private_bytes_min": 619147264,
+      "prompt_eval_ms": 5865.573,
+      "prompt_tokens": 1036,
+      "prompt_tokens_per_second": 176.6238353865854,
+      "queries_served": 16,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 15,
+      "system_available_ram_bytes_min": 3251277824,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 19.826586331637582,
+      "ttft_ms": 5878.349400009029,
+      "working_set_bytes_max": 1207939072,
+      "working_set_bytes_min": 1206112256,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 817
+    },
+    "output_sha256": "b19d95d470b67fbc4c3491042c5be19fb279f7c2a5b24ea031c3b387c36b12ea",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_json_frames::EXTRACTIVE_B768",
+  "matrix_id": "matrix-20260822T100617Z-ba998f9cc9",
+  "mode": "run",
+  "order": 15,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 763,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 126,
+    "other_or_chat_envelope": 159,
+    "percent": {
+      "evidence": 73.64864864864865,
+      "instructions": 8.687258687258687,
+      "other_or_chat_envelope": 15.347490347490348,
+      "question": 2.3166023166023164
+    },
+    "question": 24,
+    "total": 1036
+  },
+  "prompt_sha256": "492f82b1fb8cca546c118bd25f967d851aac53d1332c5caea8f89c55d6949904",
+  "query_spec": {
+    "category": "distractor",
+    "expected_record_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+    "query_id": "holdout_json_frames",
+    "required_fact_groups": [
+      [
+        "not a framed protocol"
+      ],
+      [
+        "invalid json"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": true,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      3,
+      4
+    ],
+    "record_bytes": 10286,
+    "records_retrieved": [
+      "2b0a025ac1549a6b04ae5a17",
+      "7409230c3d31263ba576b2d1",
+      "859fda16a4d715b5f6c73141",
+      "18893306b3c2b47f6463001c",
+      "224d71d9f13fc0d43000d9c5",
+      "b227a6f4bc64f5797a340f22",
+      "b83cccde7b72abcccc6e5c93",
+      "dcc841948e6ec5fbcb6b8043"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T100810Z-b8fde6073d",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:08:10Z",
+  "variant": "EXTRACTIVE_B768",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

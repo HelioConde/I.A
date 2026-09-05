@@ -1,0 +1,285 @@
+{
+  "chosen": {
+    "active_brain_mib_mean": 2.5454545454545454,
+    "false_early_stop_rate": 0,
+    "method": "tfidf",
+    "precision": 0.8181818181818181,
+    "recall": 1.0,
+    "required_recall": 1.0,
+    "route_ms_mean": 0.3150090909090909,
+    "semantic_margin": 0.05,
+    "semantic_threshold": 0.24,
+    "unknown_safe_rate": 1
+  },
+  "development_query_ids": [
+    "d_exact_json",
+    "d_multi",
+    "d_fuzzy",
+    "d_sem_async",
+    "d_sem_dns",
+    "d_partial1",
+    "d_partial2",
+    "d_switch",
+    "d_ood",
+    "d_nn_trap",
+    "d_server_trap"
+  ],
+  "pre_rescue_development_calibration": [
+    {
+      "count": 4,
+      "post_rescue_actual_recall": 1.0,
+      "pre_confidence_range": [
+        0,
+        0.5
+      ],
+      "pre_rescue_actual_recall": 1.0
+    },
+    {
+      "count": 3,
+      "post_rescue_actual_recall": 1.0,
+      "pre_confidence_range": [
+        0.5,
+        0.7
+      ],
+      "pre_rescue_actual_recall": 1.0
+    },
+    {
+      "count": 3,
+      "post_rescue_actual_recall": 1.0,
+      "pre_confidence_range": [
+        0.7,
+        0.85
+      ],
+      "pre_rescue_actual_recall": 0.5
+    },
+    {
+      "count": 1,
+      "post_rescue_actual_recall": 1.0,
+      "pre_confidence_range": [
+        0.85,
+        1.01
+      ],
+      "pre_rescue_actual_recall": 1.0
+    }
+  ],
+  "schema_version": 1,
+  "selection_policy": "deterministic lexicographic: OOD safety, required recall, false stop, precision, active MiB, TF-IDF tie preference, higher threshold, higher margin; latency is reported but never a tie-breaker",
+  "trials": [
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3171358181818182,
+      "semantic_margin": 0.0,
+      "semantic_threshold": 0.12,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3031316363636364,
+      "semantic_margin": 0.025,
+      "semantic_threshold": 0.12,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3152987272727273,
+      "semantic_margin": 0.05,
+      "semantic_threshold": 0.12,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3341301818181818,
+      "semantic_margin": 0.0,
+      "semantic_threshold": 0.18,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3284345454545455,
+      "semantic_margin": 0.025,
+      "semantic_threshold": 0.18,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.32656799999999997,
+      "semantic_margin": 0.05,
+      "semantic_threshold": 0.18,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.31648854545454547,
+      "semantic_margin": 0.0,
+      "semantic_threshold": 0.24,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3201002727272727,
+      "semantic_margin": 0.025,
+      "semantic_threshold": 0.24,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.5454545454545454,
+      "false_early_stop_rate": 0,
+      "method": "tfidf",
+      "precision": 0.8181818181818181,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3150090909090909,
+      "semantic_margin": 0.05,
+      "semantic_threshold": 0.24,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3442450909090909,
+      "semantic_margin": 0.0,
+      "semantic_threshold": 0.06,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.33563163636363635,
+      "semantic_margin": 0.015,
+      "semantic_threshold": 0.06,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.33940136363636364,
+      "semantic_margin": 0.03,
+      "semantic_threshold": 0.06,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.3312878181818182,
+      "semantic_margin": 0.0,
+      "semantic_threshold": 0.1,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.37384100000000003,
+      "semantic_margin": 0.015,
+      "semantic_threshold": 0.1,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.33605127272727275,
+      "semantic_margin": 0.03,
+      "semantic_threshold": 0.1,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.34121345454545454,
+      "semantic_margin": 0.0,
+      "semantic_threshold": 0.14,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.33480590909090907,
+      "semantic_margin": 0.015,
+      "semantic_threshold": 0.14,
+      "unknown_safe_rate": 1
+    },
+    {
+      "active_brain_mib_mean": 2.727272727272727,
+      "false_early_stop_rate": 0,
+      "method": "char_ngram",
+      "precision": 0.7727272727272727,
+      "recall": 1.0,
+      "required_recall": 1.0,
+      "route_ms_mean": 0.33321172727272724,
+      "semantic_margin": 0.03,
+      "semantic_threshold": 0.14,
+      "unknown_safe_rate": 1
+    }
+  ]
+}

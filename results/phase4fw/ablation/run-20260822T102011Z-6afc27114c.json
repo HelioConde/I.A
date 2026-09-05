@@ -1,0 +1,673 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4994,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 16.4344,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1246,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 330,
+        "estimated_tokens": 96,
+        "kind": "code_block",
+        "page_id": 12,
+        "position": 0,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.4899585360461514,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "A host parameter is a place-holder in an SQL statement that is filled in using one of the sqlite3_bind_XXXX() interfaces. Many SQL programmers are familiar with using a question mark (\"?\") as a host parameter. SQLite also supports named host parameters prefaced by \":\", \"$\", or \"@\" and numbered host parameters of the form \"?123\".",
+        "title": "limits"
+      },
+      {
+        "end": 615,
+        "estimated_tokens": 66,
+        "kind": "code_block",
+        "page_id": 12,
+        "position": 2,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.3943047925021965,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 411,
+        "text": "A \"variable\" or \"parameter\" token specifies a placeholder in the expression for a value that is filled in at runtime using the sqlite3_bind() family of C/C++ interfaces. Parameters can take several forms:",
+        "title": "lang expr"
+      },
+      {
+        "end": 586,
+        "estimated_tokens": 77,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 1,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.3774585360461514,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 332,
+        "text": "Each host parameter in an SQLite statement is assigned a number. The numbers normally begin with 1 and increase by one with each new parameter. However, when the \"?123\" form is used, the host parameter number is the number that follows the question mark.",
+        "title": "limits"
+      },
+      {
+        "end": 755,
+        "estimated_tokens": 50,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 3,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.3722214591688631,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 617,
+        "text": "?NNN A question mark followed by a number NNN holds a spot for the NNN-th parameter. NNN must be between 1 and SQLITE_MAX_VARIABLE_NUMBER.",
+        "title": "lang expr"
+      },
+      {
+        "end": 535,
+        "estimated_tokens": 72,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 2,
+        "record_id": "1dd8a418051e0eeceb4b9386",
+        "score": 0.33191524698096303,
+        "section": "walformat",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 306,
+        "text": "A consequence of this is that if the WAL file contains more than read-mark[N] frames (if mxFrame>read-mark[N] for any read-mark for which WAL_READ_LOCK(N) is held by another process), then the checkpoint cannot run to completion.",
+        "title": "walformat"
+      },
+      {
+        "end": 904,
+        "estimated_tokens": 52,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 5,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.3301381258355298,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 758,
+        "text": "A question mark that is not followed by a number creates a parameter with a number one greater than the largest parameter number already assigned.",
+        "title": "lang expr"
+      },
+      {
+        "end": 1093,
+        "estimated_tokens": 71,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 5,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.3291252027128181,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 863,
+        "text": "To prevent excessive memory allocations, the maximum value of a host parameter number is SQLITE_MAX_VARIABLE_NUMBER, which defaults to 999 for SQLite versions prior to 3.32.0 (2020-05-22) or 32766 for SQLite versions after 3.32.0.",
+        "title": "limits"
+      },
+      {
+        "end": 1230,
+        "estimated_tokens": 47,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 6,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.32852996461758,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1097,
+        "text": "The maximum host parameter number can be lowered at run-time using the sqlite3_limit(db,SQLITE_LIMIT_VARIABLE_NUMBER,size) interface.",
+        "title": "limits"
+      },
+      {
+        "end": 692,
+        "estimated_tokens": 40,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 2,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.29329186937948476,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 588,
+        "text": "SQLite allocates space to hold all host parameters between 1 and the largest host parameter number used.",
+        "title": "limits"
+      },
+      {
+        "end": 998,
+        "estimated_tokens": 39,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 6,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.2895428877402917,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 904,
+        "text": "If this means the parameter number is greater than SQLITE_MAX_VARIABLE_NUMBER, it is an error.",
+        "title": "lang expr"
+      },
+      {
+        "end": 1181,
+        "estimated_tokens": 41,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 8,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.2887492369466409,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1078,
+        "text": "But because it is easy to miscount the question marks, the use of this parameter format is discouraged.",
+        "title": "lang expr"
+      },
+      {
+        "end": 306,
+        "estimated_tokens": 51,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 1,
+        "record_id": "1dd8a418051e0eeceb4b9386",
+        "score": 0.25608191364762967,
+        "section": "walformat",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 164,
+        "text": "Were it to do so, it would overwrite content that the process holding the lock was expecting to be able to read out of the main database file.",
+        "title": "walformat"
+      },
+      {
+        "end": 799,
+        "estimated_tokens": 40,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 3,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.2512085360461514,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 692,
+        "text": "Hence, an SQL statement that contains a host parameter like ?1000000000 would require gigabytes of storage.",
+        "title": "limits"
+      },
+      {
+        "end": 805,
+        "estimated_tokens": 82,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 3,
+        "record_id": "1dd8a418051e0eeceb4b9386",
+        "score": 0.24983191364762966,
+        "section": "walformat",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 539,
+        "text": "When a writer wants to reset the WAL, it must ensure that there are no locks on WAL_READ_LOCK(N) for N>0 because such locks indicate that some other connection is still using the current WAL file and a WAL reset would delete content out from those other connections.",
+        "title": "walformat"
+      },
+      {
+        "end": 1078,
+        "estimated_tokens": 35,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 7,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.24909645916886314,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 998,
+        "text": "This parameter format is provided for compatibility with other database engines.",
+        "title": "lang expr"
+      },
+      {
+        "end": 1383,
+        "estimated_tokens": 51,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 7,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.2480835360461514,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1232,
+        "text": "SQLite limits the depth of recursion of triggers in order to prevent a statement involving recursive triggers from using an unbounded amount of memory.",
+        "title": "limits"
+      },
+      {
+        "end": 274,
+        "estimated_tokens": 84,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 0,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.23097145916886314,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "A string constant is formed by enclosing the string in single quotes ('). A single quote within the string can be encoded by putting two single quotes in a row - as in Pascal. C-style escapes using the backslash character are not supported because they are not standard SQL.",
+        "title": "lang expr"
+      },
+      {
+        "end": 164,
+        "estimated_tokens": 56,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "1dd8a418051e0eeceb4b9386",
+        "score": 0.22858191364762964,
+        "section": "walformat",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "When a checkpoint runs, if it sees a lock on WAL_READ_LOCK(N), then it must not move WAL content into the main database for more than the first read-mark[N] frames.",
+        "title": "walformat"
+      },
+      {
+        "end": 409,
+        "estimated_tokens": 48,
+        "kind": "paragraph",
+        "page_id": 12,
+        "position": 1,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.21847145916886315,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 276,
+        "text": "BLOB literals are string literals containing hexadecimal data and preceded by a single \"x\" or \"X\" character. Example: X'53514C697465'",
+        "title": "lang expr"
+      },
+      {
+        "end": 758,
+        "estimated_tokens": 15,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 4,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.21097145916886315,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 757,
+        "text": "?",
+        "title": "lang expr"
+      },
+      {
+        "end": 863,
+        "estimated_tokens": 29,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 4,
+        "record_id": "a4cfdfd3ccd30e1c9f741e15",
+        "score": 0.20995853604615142,
+        "section": "limits",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 801,
+        "text": "This could easily overwhelm the resources of the host machine.",
+        "title": "limits"
+      },
+      {
+        "end": 1282,
+        "estimated_tokens": 40,
+        "kind": "sentence",
+        "page_id": 12,
+        "position": 9,
+        "record_id": "bfdc468a8ef07d73294704ca",
+        "score": 0.20847145916886314,
+        "section": "lang expr",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 1181,
+        "text": "Programmers are encouraged to use one of the symbolic formats below or the ?NNN format above instead.",
+        "title": "lang expr"
+      },
+      {
+        "end": 1000,
+        "estimated_tokens": 64,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 4,
+        "record_id": "1dd8a418051e0eeceb4b9386",
+        "score": 0.16858191364762964,
+        "section": "walformat",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 805,
+        "text": "It is ok for a WAL reset to occur if other connections are holding WAL_READ_LOCK(0) because by holding WAL_READ_LOCK(0), those other connections are promising not to use any content from the WAL.",
+        "title": "walformat"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "a4cfdfd3ccd30e1c9f741e15",
+      "bfdc468a8ef07d73294704ca",
+      "1dd8a418051e0eeceb4b9386"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 23,
+    "source_ids": [
+      "a4cfdfd3ccd30e1c9f741e15",
+      "bfdc468a8ef07d73294704ca",
+      "1dd8a418051e0eeceb4b9386"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nA host parameter is a place-holder in an SQL statement that is filled in using one of the sqlite3_bind_XXXX() interfaces. Many SQL programmers are familiar with using a question mark (\"?\") as a host parameter. SQLite also supports named host parameters prefaced by \":\", \"$\", or \"@\" and numbered host parameters of the form \"?123\".\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nA \"variable\" or \"parameter\" token specifies a placeholder in the expression for a value that is filled in at runtime using the sqlite3_bind() family of C/C++ interfaces. Parameters can take several forms:\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nEach host parameter in an SQLite statement is assigned a number. The numbers normally begin with 1 and increase by one with each new parameter. However, when the \"?123\" form is used, the host parameter number is the number that follows the question mark.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\n?NNN A question mark followed by a number NNN holds a spot for the NNN-th parameter. NNN must be between 1 and SQLITE_MAX_VARIABLE_NUMBER.\n\n[SOURCE: 1dd8a418051e0eeceb4b9386] walformat — walformat\nA consequence of this is that if the WAL file contains more than read-mark[N] frames (if mxFrame>read-mark[N] for any read-mark for which WAL_READ_LOCK(N) is held by another process), then the checkpoint cannot run to completion.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nA question mark that is not followed by a number creates a parameter with a number one greater than the largest parameter number already assigned.\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nTo prevent excessive memory allocations, the maximum value of a host parameter number is SQLITE_MAX_VARIABLE_NUMBER, which defaults to 999 for SQLite versions prior to 3.32.0 (2020-05-22) or 32766 for SQLite versions after 3.32.0.\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nThe maximum host parameter number can be lowered at run-time using the sqlite3_limit(db,SQLITE_LIMIT_VARIABLE_NUMBER,size) interface.\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nSQLite allocates space to hold all host parameters between 1 and the largest host parameter number used.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nIf this means the parameter number is greater than SQLITE_MAX_VARIABLE_NUMBER, it is an error.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nBut because it is easy to miscount the question marks, the use of this parameter format is discouraged.\n\n[SOURCE: 1dd8a418051e0eeceb4b9386] walformat — walformat\nWere it to do so, it would overwrite content that the process holding the lock was expecting to be able to read out of the main database file.\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nHence, an SQL statement that contains a host parameter like ?1000000000 would require gigabytes of storage.\n\n[SOURCE: 1dd8a418051e0eeceb4b9386] walformat — walformat\nWhen a writer wants to reset the WAL, it must ensure that there are no locks on WAL_READ_LOCK(N) for N>0 because such locks indicate that some other connection is still using the current WAL file and a WAL reset would delete content out from those other connections.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nThis parameter format is provided for compatibility with other database engines.\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nSQLite limits the depth of recursion of triggers in order to prevent a statement involving recursive triggers from using an unbounded amount of memory.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nA string constant is formed by enclosing the string in single quotes ('). A single quote within the string can be encoded by putting two single quotes in a row - as in Pascal. C-style escapes using the backslash character are not supported because they are not standard SQL.\n\n[SOURCE: 1dd8a418051e0eeceb4b9386] walformat — walformat\nWhen a checkpoint runs, if it sees a lock on WAL_READ_LOCK(N), then it must not move WAL content into the main database for more than the first read-mark[N] frames.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nBLOB literals are string literals containing hexadecimal data and preceded by a single \"x\" or \"X\" character. Example: X'53514C697465'\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\n?\n\n[SOURCE: a4cfdfd3ccd30e1c9f741e15] limits — limits\nThis could easily overwhelm the resources of the host machine.\n\n[SOURCE: bfdc468a8ef07d73294704ca] lang expr — lang expr\nProgrammers are encouraged to use one of the symbolic formats below or the ?NNN format above instead.\n\n[SOURCE: 1dd8a418051e0eeceb4b9386] walformat — walformat\nIt is ok for a WAL reset to occur if other connections are holding WAL_READ_LOCK(0) because by holding WAL_READ_LOCK(0), those other connections are promising not to use any content from the WAL."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2520,
+    "context_activation_rate": 0.49444444444444446,
+    "context_density": 0.07062600321027288,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 623.0,
+    "useful_oracle_tokens": 88
+  },
+  "context_sha256": "32f82c4eaa1b98a1d7cee0af2d784c312013632fc68869c9c1aff4251a6a35ac",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1588,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 0.0,
+      "required_facts_found": 0,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": false,
+      "source_correct": false
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        true,
+        false
+      ],
+      "recall": 0.5,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "CONTEXT_DISTILLATION_MISS",
+    "false_no_knowledge": true,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 9044.527099991683,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 56.0,
+      "cpu_kernel_seconds": 1.375,
+      "cpu_percent_total_average": 399.4128117547817,
+      "cpu_percent_total_peak": 590.9606650834335,
+      "cpu_time_seconds": 36.125,
+      "cpu_user_seconds": 34.75,
+      "generated_tokens": 6,
+      "generation_eval_ms": 273.754,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 9044.527099991683,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621211648,
+      "private_bytes_min": 619380736,
+      "prompt_eval_ms": 8756.279,
+      "prompt_tokens": 1588,
+      "prompt_tokens_per_second": 181.35557352615191,
+      "queries_served": 56,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 55,
+      "system_available_ram_bytes_min": 3066068992,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 21.91748796364619,
+      "ttft_ms": 8769.679200020619,
+      "working_set_bytes_max": 1208156160,
+      "working_set_bytes_min": 1206329344,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 780
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_python_sqlite::COMBINED_B1536",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 55,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1249,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 306,
+    "other_or_chat_envelope": 210,
+    "percent": {
+      "evidence": 78.65239294710328,
+      "instructions": 5.667506297229219,
+      "other_or_chat_envelope": 13.224181360201511,
+      "question": 2.455919395465995
+    },
+    "question": 39,
+    "total": 1588
+  },
+  "prompt_sha256": "58ad597411d456f4b8fad2a0d711266d9e5a8b5408dea9a9ed7e79d522d6bb82",
+  "query_spec": {
+    "category": "multi_document",
+    "expected_record_ids": [
+      "0be5e11beaf36611325a42aa",
+      "f58b2c4d54169ef7d0eda88e"
+    ],
+    "query": "How do I bind a year value with a question-mark placeholder using Python sqlite3, and what does SQLite return by default if another process locks the file?",
+    "query_id": "holdout_python_sqlite",
+    "required_fact_groups": [
+      [
+        "placeholder",
+        "parameter substitution"
+      ],
+      [
+        "sqlite_busy"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 4194304,
+    "active_pages": [
+      2,
+      4,
+      12,
+      14
+    ],
+    "record_bytes": 10071,
+    "records_retrieved": [
+      "bfdc468a8ef07d73294704ca",
+      "a4cfdfd3ccd30e1c9f741e15",
+      "0be5e11beaf36611325a42aa",
+      "aa511378075f626734bde81d",
+      "1dd8a418051e0eeceb4b9386",
+      "57beca14df21b646a57ca164",
+      "a9597f0ce2d83c76fefc6f08",
+      "7bde415bf27ff68ca7f31828"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102011Z-6afc27114c",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:20:11Z",
+  "variant": "COMBINED_B1536",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "mark",
+            "parameter",
+            "question",
+            "sqlite",
+            "sqlite3",
+            "value"
+          ],
+          "record_id": "bfdc468a8ef07d73294704ca",
+          "score": 0.8582144132035965
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "mark",
+            "parameter",
+            "question",
+            "sqlite",
+            "sqlite3",
+            "value"
+          ],
+          "record_id": "a4cfdfd3ccd30e1c9f741e15",
+          "score": 0.8539939001922976
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "parameter",
+            "python",
+            "question",
+            "year"
+          ],
+          "record_id": "0be5e11beaf36611325a42aa",
+          "score": 0.8148361518741716
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "another",
+            "return",
+            "year"
+          ],
+          "record_id": "aa511378075f626734bde81d",
+          "score": 0.7075208640593292
+        },
+        {
+          "contains_unique_evidence": true,
+          "query_terms": [
+            "another",
+            "file",
+            "locks",
+            "mark",
+            "process"
+          ],
+          "record_id": "1dd8a418051e0eeceb4b9386",
+          "score": 0.6815913068651235
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "default",
+            "python",
+            "return",
+            "value",
+            "year"
+          ],
+          "record_id": "57beca14df21b646a57ca164",
+          "score": 0.674118192622827
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "default",
+            "python",
+            "return",
+            "value",
+            "year"
+          ],
+          "record_id": "a9597f0ce2d83c76fefc6f08",
+          "score": 0.6624699261216835
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "file",
+            "mark",
+            "parameter",
+            "sqlite",
+            "sqlite3",
+            "value"
+          ],
+          "record_id": "7bde415bf27ff68ca7f31828",
+          "score": 0.6214262266278112
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "0be5e11beaf36611325a42aa",
+        "aa511378075f626734bde81d",
+        "57beca14df21b646a57ca164",
+        "a9597f0ce2d83c76fefc6f08",
+        "7bde415bf27ff68ca7f31828"
+      ],
+      "retained_record_ids": [
+        "bfdc468a8ef07d73294704ca",
+        "a4cfdfd3ccd30e1c9f741e15",
+        "1dd8a418051e0eeceb4b9386"
+      ],
+      "wall_ms": 1.6855
+    }
+  }
+}

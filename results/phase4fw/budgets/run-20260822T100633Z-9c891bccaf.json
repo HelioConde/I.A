@@ -1,0 +1,187 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "a80f2f9c7e7e5db0472d21930239403676467956cc7b432260bed1ba79be6520",
+  "configuration": {
+    "budgets": [
+      384,
+      768
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": true,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 0,
+    "distiller_cpu_ms": 0.0,
+    "distiller_wall_ms": 0.0097,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 0,
+    "metadata_bytes": 0,
+    "provenance": [],
+    "records_pruned": [],
+    "records_retained": [],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 0,
+    "source_ids": [],
+    "startup_wall_ms": 0.0,
+    "text": ""
+  },
+  "context_metrics": {
+    "available_record_tokens": 0,
+    "context_activation_rate": 0.0,
+    "context_density": 1.0,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": null,
+    "useful_oracle_tokens": 0
+  },
+  "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 109,
+    "answer_quality": {
+      "cited_source_ids": [],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 0,
+      "required_facts_total": 0,
+      "retrieval_supports_expected": true,
+      "source_correct": true
+    },
+    "answer_status": "NO_KNOWLEDGE",
+    "context_fact_recall": {
+      "found": 0,
+      "matched": [],
+      "recall": 1.0,
+      "total": 0
+    },
+    "correctness": true,
+    "diagnostic": "SAFE_NO_KNOWLEDGE",
+    "false_no_knowledge": false,
+    "grounding": true,
+    "unknown_safe": true
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "NO_KNOWLEDGE.",
+    "metrics": {
+      "backend_total_ms": 765.6296999775805,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 2.0,
+      "cpu_kernel_seconds": 0.125,
+      "cpu_percent_total_average": 389.7935255238126,
+      "cpu_percent_total_peak": 582.1390422975121,
+      "cpu_time_seconds": 2.984375,
+      "cpu_user_seconds": 2.859375,
+      "generated_tokens": 6,
+      "generation_eval_ms": 169.261,
+      "handle_count_max": 162,
+      "handle_count_min": 161,
+      "latency_ms": 765.6296999775805,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1295.1990000437945,
+      "persistent_reserved_memory": 1175490560,
+      "private_bytes_max": 618348544,
+      "private_bytes_min": 616517632,
+      "prompt_eval_ms": 584.67,
+      "prompt_tokens": 109,
+      "prompt_tokens_per_second": 186.42995193870047,
+      "queries_served": 2,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 1,
+      "system_available_ram_bytes_min": 3155849216,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 35.44821311465725,
+      "ttft_ms": 595.6315000075847,
+      "working_set_bytes_max": 1189191680,
+      "working_set_bytes_min": 1179713536,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 759
+    },
+    "output_sha256": "05e14b1b80c7f576aa05a02c62e9d8185bfa009aef2b905ba32e16bc916723bb",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_unknown_near::EXTRACTIVE_B384",
+  "matrix_id": "matrix-20260822T100617Z-ba998f9cc9",
+  "mode": "run",
+  "order": 1,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 0,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 0,
+    "other_or_chat_envelope": 2,
+    "percent": {
+      "evidence": 0.0,
+      "instructions": 82.56880733944953,
+      "other_or_chat_envelope": 1.834862385321101,
+      "question": 15.596330275229358
+    },
+    "question": 17,
+    "total": 109
+  },
+  "prompt_sha256": "65be4be38eb10db1ab26ca926367820d2a440a1048bf434d1cd8472b9010cef9",
+  "query_spec": {
+    "category": "unknown_not_in_corpus",
+    "expected_record_ids": [],
+    "query": "What is the exact default cache size of the Python OrionDB driver?",
+    "query_id": "holdout_unknown_near",
+    "required_fact_groups": [],
+    "split": "holdout"
+  },
+  "quick": true,
+  "retrieval": {
+    "active_brain_bytes": 0,
+    "active_pages": [],
+    "record_bytes": 0,
+    "records_retrieved": [],
+    "source_ids": []
+  },
+  "run_id": "run-20260822T100633Z-9c891bccaf",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:06:33Z",
+  "variant": "EXTRACTIVE_B384",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

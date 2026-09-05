@@ -1,0 +1,576 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 4519,
+    "distiller_cpu_ms": 15.625,
+    "distiller_wall_ms": 11.3545,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 1127,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 787,
+        "estimated_tokens": 95,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 2,
+        "record_id": "35fdf925a73a3db9729f9e4e",
+        "score": 0.6857922532997924,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 452,
+        "text": "If *ensure_ascii* is true (the default), the output is guaranteed to have all incoming non-ASCII and non-printable characters escaped. If *ensure_ascii* is false, all characters will be output as-is, except for the characters that must be escaped: quotation mark, reverse solidus, and the control characters U+0000 through U+001F.",
+        "title": "json"
+      },
+      {
+        "end": 920,
+        "estimated_tokens": 96,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 3,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.6482105533975229,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 582,
+        "text": "* **ensure_ascii** (*bool*) -- If \"True\" (the default), the output is guaranteed to have all incoming non-ASCII and non- printable characters escaped. If \"False\", all characters will be outputted as-is, except for the characters that must be escaped: quotation mark, reverse solidus, and the control characters U+0000 through U+001F.",
+        "title": "json"
+      },
+      {
+        "end": 357,
+        "estimated_tokens": 102,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 0,
+        "record_id": "8117a1f94e896a38a7bb3cd1",
+        "score": 0.4006371212889504,
+        "section": "stdtypes",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "Return \"True\" if all bytes in the sequence are alphabetical ASCII characters or ASCII decimal digits and the sequence is not empty, \"False\" otherwise. Alphabetic ASCII characters are those byte values in the sequence \"b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'\". ASCII decimal digits are those byte values in the sequence \"b'0123456789'\".",
+        "title": "stdtypes"
+      },
+      {
+        "end": 611,
+        "estimated_tokens": 77,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 1,
+        "record_id": "8117a1f94e896a38a7bb3cd1",
+        "score": 0.3881371212889504,
+        "section": "stdtypes",
+        "source_id": "python-3.14.7-docs",
+        "start": 359,
+        "text": "Return \"True\" if all bytes in the sequence are alphabetic ASCII characters and the sequence is not empty, \"False\" otherwise. Alphabetic ASCII characters are those byte values in the sequence \"b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'\".",
+        "title": "stdtypes"
+      },
+      {
+        "end": 1082,
+        "estimated_tokens": 48,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 4,
+        "record_id": "8117a1f94e896a38a7bb3cd1",
+        "score": 0.3806371212889504,
+        "section": "stdtypes",
+        "source_id": "python-3.14.7-docs",
+        "start": 947,
+        "text": "Return \"True\" if there is at least one lowercase ASCII character in the sequence and no uppercase ASCII characters, \"False\" otherwise.",
+        "title": "stdtypes"
+      },
+      {
+        "end": 748,
+        "estimated_tokens": 48,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 2,
+        "record_id": "8117a1f94e896a38a7bb3cd1",
+        "score": 0.3173037879556171,
+        "section": "stdtypes",
+        "source_id": "python-3.14.7-docs",
+        "start": 613,
+        "text": "Return \"True\" if the sequence is empty or all bytes in the sequence are ASCII, \"False\" otherwise. ASCII bytes are in the range 0-0x7F.",
+        "title": "stdtypes"
+      },
+      {
+        "end": 945,
+        "estimated_tokens": 63,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 3,
+        "record_id": "8117a1f94e896a38a7bb3cd1",
+        "score": 0.3152204546222837,
+        "section": "stdtypes",
+        "source_id": "python-3.14.7-docs",
+        "start": 750,
+        "text": "Return \"True\" if all bytes in the sequence are ASCII decimal digits and the sequence is not empty, \"False\" otherwise. ASCII decimal digits are those byte values in the sequence \"b'0123456789'\".",
+        "title": "stdtypes"
+      },
+      {
+        "end": 1281,
+        "estimated_tokens": 63,
+        "kind": "paragraph",
+        "page_id": 5,
+        "position": 5,
+        "record_id": "8117a1f94e896a38a7bb3cd1",
+        "score": 0.3131371212889504,
+        "section": "stdtypes",
+        "source_id": "python-3.14.7-docs",
+        "start": 1084,
+        "text": "Lowercase ASCII characters are those byte values in the sequence \"b'abcdefghijklmnopqrstuvwxyz'\". Uppercase ASCII characters are those byte values in the sequence \"b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\".",
+        "title": "stdtypes"
+      },
+      {
+        "end": 450,
+        "estimated_tokens": 63,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 1,
+        "record_id": "35fdf925a73a3db9729f9e4e",
+        "score": 0.28995891996645906,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 246,
+        "text": "If *skipkeys* is false (the default), a \"TypeError\" will be raised when trying to encode keys that are not \"str\", \"int\", \"float\", \"bool\" or \"None\". If *skipkeys* is true, such items are simply skipped.",
+        "title": "json"
+      },
+      {
+        "end": 1047,
+        "estimated_tokens": 76,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 3,
+        "record_id": "35fdf925a73a3db9729f9e4e",
+        "score": 0.28370891996645903,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 789,
+        "text": "If *check_circular* is true (the default), then lists, dicts, and custom encoded objects will be checked for circular references during encoding to prevent an infinite recursion (which would cause a \"RecursionError\"). Otherwise, no such check takes place.",
+        "title": "json"
+      },
+      {
+        "end": 1334,
+        "estimated_tokens": 83,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 4,
+        "record_id": "35fdf925a73a3db9729f9e4e",
+        "score": 0.28245891996645905,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 1049,
+        "text": "If *allow_nan* is true (the default), then \"NaN\", \"Infinity\", and \"-Infinity\" will be encoded as such. This behavior is not JSON specification compliant, but is consistent with most JavaScript based encoders and decoders. Otherwise, it will be a \"ValueError\" to encode such floats.",
+        "title": "json"
+      },
+      {
+        "end": 580,
+        "estimated_tokens": 57,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 2,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.2502938867308563,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 400,
+        "text": "* **skipkeys** (*bool*) -- If \"True\", keys that are not of a basic type (\"str\", \"int\", \"float\", \"bool\", \"None\") will be skipped instead of raising a \"TypeError\". Default \"False\".",
+        "title": "json"
+      },
+      {
+        "end": 1116,
+        "estimated_tokens": 60,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 4,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.24696055339752293,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 922,
+        "text": "* **check_circular** (*bool*) -- If \"False\", the circular reference check for container types is skipped and a circular reference will result in a \"RecursionError\" (or worse). Default \"True\".",
+        "title": "json"
+      },
+      {
+        "end": 244,
+        "estimated_tokens": 73,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 0,
+        "record_id": "35fdf925a73a3db9729f9e4e",
+        "score": 0.2357922532997924,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "To extend this to recognize other objects, subclass and implement a \"default()\" method with another method that returns a serializable object for \"o\" if possible, otherwise it should call the superclass implementation (to raise \"TypeError\").",
+        "title": "json"
+      },
+      {
+        "end": 192,
+        "estimated_tokens": 60,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 0,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.20029388673085624,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 0,
+        "text": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.",
+        "title": "json"
+      },
+      {
+        "end": 398,
+        "estimated_tokens": 63,
+        "kind": "paragraph",
+        "page_id": 3,
+        "position": 1,
+        "record_id": "2b0a025ac1549a6b04ae5a17",
+        "score": 0.18779388673085626,
+        "section": "json",
+        "source_id": "python-3.14.7-docs",
+        "start": 194,
+        "text": "* **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"json\" module always produces \"str\" objects, not \"bytes\" objects, therefore \"fp.write()\" must support \"str\" input.",
+        "title": "json"
+      }
+    ],
+    "records_pruned": [],
+    "records_retained": [
+      "35fdf925a73a3db9729f9e4e",
+      "2b0a025ac1549a6b04ae5a17",
+      "8117a1f94e896a38a7bb3cd1"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 16,
+    "source_ids": [
+      "35fdf925a73a3db9729f9e4e",
+      "2b0a025ac1549a6b04ae5a17",
+      "8117a1f94e896a38a7bb3cd1"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 35fdf925a73a3db9729f9e4e] json — json\nIf *ensure_ascii* is true (the default), the output is guaranteed to have all incoming non-ASCII and non-printable characters escaped. If *ensure_ascii* is false, all characters will be output as-is, except for the characters that must be escaped: quotation mark, reverse solidus, and the control characters U+0000 through U+001F.\n\n[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\n* **ensure_ascii** (*bool*) -- If \"True\" (the default), the output is guaranteed to have all incoming non-ASCII and non- printable characters escaped. If \"False\", all characters will be outputted as-is, except for the characters that must be escaped: quotation mark, reverse solidus, and the control characters U+0000 through U+001F.\n\n[SOURCE: 8117a1f94e896a38a7bb3cd1] stdtypes — stdtypes\nReturn \"True\" if all bytes in the sequence are alphabetical ASCII characters or ASCII decimal digits and the sequence is not empty, \"False\" otherwise. Alphabetic ASCII characters are those byte values in the sequence \"b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'\". ASCII decimal digits are those byte values in the sequence \"b'0123456789'\".\n\n[SOURCE: 8117a1f94e896a38a7bb3cd1] stdtypes — stdtypes\nReturn \"True\" if all bytes in the sequence are alphabetic ASCII characters and the sequence is not empty, \"False\" otherwise. Alphabetic ASCII characters are those byte values in the sequence \"b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'\".\n\n[SOURCE: 8117a1f94e896a38a7bb3cd1] stdtypes — stdtypes\nReturn \"True\" if there is at least one lowercase ASCII character in the sequence and no uppercase ASCII characters, \"False\" otherwise.\n\n[SOURCE: 8117a1f94e896a38a7bb3cd1] stdtypes — stdtypes\nReturn \"True\" if the sequence is empty or all bytes in the sequence are ASCII, \"False\" otherwise. ASCII bytes are in the range 0-0x7F.\n\n[SOURCE: 8117a1f94e896a38a7bb3cd1] stdtypes — stdtypes\nReturn \"True\" if all bytes in the sequence are ASCII decimal digits and the sequence is not empty, \"False\" otherwise. ASCII decimal digits are those byte values in the sequence \"b'0123456789'\".\n\n[SOURCE: 8117a1f94e896a38a7bb3cd1] stdtypes — stdtypes\nLowercase ASCII characters are those byte values in the sequence \"b'abcdefghijklmnopqrstuvwxyz'\". Uppercase ASCII characters are those byte values in the sequence \"b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'\".\n\n[SOURCE: 35fdf925a73a3db9729f9e4e] json — json\nIf *skipkeys* is false (the default), a \"TypeError\" will be raised when trying to encode keys that are not \"str\", \"int\", \"float\", \"bool\" or \"None\". If *skipkeys* is true, such items are simply skipped.\n\n[SOURCE: 35fdf925a73a3db9729f9e4e] json — json\nIf *check_circular* is true (the default), then lists, dicts, and custom encoded objects will be checked for circular references during encoding to prevent an infinite recursion (which would cause a \"RecursionError\"). Otherwise, no such check takes place.\n\n[SOURCE: 35fdf925a73a3db9729f9e4e] json — json\nIf *allow_nan* is true (the default), then \"NaN\", \"Infinity\", and \"-Infinity\" will be encoded as such. This behavior is not JSON specification compliant, but is consistent with most JavaScript based encoders and decoders. Otherwise, it will be a \"ValueError\" to encode such floats.\n\n[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\n* **skipkeys** (*bool*) -- If \"True\", keys that are not of a basic type (\"str\", \"int\", \"float\", \"bool\", \"None\") will be skipped instead of raising a \"TypeError\". Default \"False\".\n\n[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\n* **check_circular** (*bool*) -- If \"False\", the circular reference check for container types is skipped and a circular reference will result in a \"RecursionError\" (or worse). Default \"True\".\n\n[SOURCE: 35fdf925a73a3db9729f9e4e] json — json\nTo extend this to recognize other objects, subclass and implement a \"default()\" method with another method that returns a serializable object for \"o\" if possible, otherwise it should call the superclass implementation (to raise \"TypeError\").\n\n[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\nUnlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file.\n\n[SOURCE: 2b0a025ac1549a6b04ae5a17] json — json\n* **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"json\" module always produces \"str\" objects, not \"bytes\" objects, therefore \"fp.write()\" must support \"str\" input."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2394,
+    "context_activation_rate": 0.47076023391812866,
+    "context_density": 0.08518189884649512,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 563.5,
+    "useful_oracle_tokens": 96
+  },
+  "context_sha256": "0ff9fc8bc5b8ccb0b21f5232a1e9cda31340012fc9bda6edb4daa477d9cb1ed8",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 1443,
+    "answer_quality": {
+      "cited_source_ids": [
+        "35fdf925a73a3db9729f9e4e"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 2,
+      "required_facts_total": 2,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 2,
+      "matched": [
+        true,
+        true
+      ],
+      "recall": 1.0,
+      "total": 2
+    },
+    "correctness": false,
+    "diagnostic": "GROUNDING_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "If *ensure_ascii* is true (the default), the output is guaranteed to have all incoming non-ASCII and non-printable characters escaped. [SOURCE: 35fdf925a73a3db9729f9e4e]",
+    "metrics": {
+      "backend_total_ms": 10507.314899994526,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 61.0,
+      "cpu_kernel_seconds": 1.5,
+      "cpu_percent_total_average": 398.08576594598674,
+      "cpu_percent_total_peak": 593.3318988514079,
+      "cpu_time_seconds": 41.828125,
+      "cpu_user_seconds": 40.328125,
+      "generated_tokens": 56,
+      "generation_eval_ms": 2908.419,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 10507.314899994526,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621289472,
+      "private_bytes_min": 619458560,
+      "prompt_eval_ms": 7584.091,
+      "prompt_tokens": 1443,
+      "prompt_tokens_per_second": 190.2667043420233,
+      "queries_served": 61,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 60,
+      "system_available_ram_bytes_min": 3185229824,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 19.254447175596088,
+      "ttft_ms": 7597.312800004147,
+      "working_set_bytes_max": 1208229888,
+      "working_set_bytes_min": 1206403072,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 780
+    },
+    "output_sha256": "44c4480861f8e72526b14dfb5daed79c151ab270af56ea2b12bd7329c445f927",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "dev_json_ascii::COMBINED_B1536",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 60,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 1130,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 188,
+    "other_or_chat_envelope": 202,
+    "percent": {
+      "evidence": 78.3090783090783,
+      "instructions": 6.237006237006237,
+      "other_or_chat_envelope": 13.998613998614,
+      "question": 1.4553014553014554
+    },
+    "question": 21,
+    "total": 1443
+  },
+  "prompt_sha256": "929de5a291cc37c35787bc41ea5df979ed9bdef59596d7f95f456c3b87139ca3",
+  "query_spec": {
+    "category": "direct_fact",
+    "expected_record_ids": [
+      "2b0a025ac1549a6b04ae5a17"
+    ],
+    "query": "What does Python json.dumps do with non-ASCII characters when ensure_ascii is true?",
+    "query_id": "dev_json_ascii",
+    "required_fact_groups": [
+      [
+        "escaped"
+      ],
+      [
+        "non-ascii"
+      ]
+    ],
+    "split": "development"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 3145728,
+    "active_pages": [
+      3,
+      5,
+      8
+    ],
+    "record_bytes": 9558,
+    "records_retrieved": [
+      "35fdf925a73a3db9729f9e4e",
+      "2b0a025ac1549a6b04ae5a17",
+      "80d355dfa010679d9bcf5003",
+      "8117a1f94e896a38a7bb3cd1",
+      "53a7154eabc3c72a8b34ba0b",
+      "632edc999ae3e5e9afacf4ed",
+      "c6ae94d95f7eeb7c61813b15",
+      "e7dadca6ac19517261d3450b"
+    ],
+    "source_ids": [
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs",
+      "python-3.14.7-docs"
+    ]
+  },
+  "run_id": "run-20260822T102105Z-254207f8b0",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:21:05Z",
+  "variant": "COMBINED_B1536",
+  "variant_metadata": {
+    "pruning": {
+      "contribution": [
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "ensure",
+            "ensure_ascii",
+            "non",
+            "non-ascii",
+            "true"
+          ],
+          "record_id": "35fdf925a73a3db9729f9e4e",
+          "score": 0.8783010554158017
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "ensure",
+            "ensure_ascii",
+            "non",
+            "non-ascii",
+            "true"
+          ],
+          "record_id": "2b0a025ac1549a6b04ae5a17",
+          "score": 0.7303911947119011
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "ensure",
+            "ensure_ascii",
+            "python",
+            "true"
+          ],
+          "record_id": "80d355dfa010679d9bcf5003",
+          "score": 0.692683009903867
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "true"
+          ],
+          "record_id": "8117a1f94e896a38a7bb3cd1",
+          "score": 0.73182133870396
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "ensure",
+            "ensure_ascii",
+            "json.dumps",
+            "true"
+          ],
+          "record_id": "53a7154eabc3c72a8b34ba0b",
+          "score": 0.6816305040186059
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "json.dumps",
+            "non",
+            "non-ascii",
+            "python"
+          ],
+          "record_id": "632edc999ae3e5e9afacf4ed",
+          "score": 0.602782114389751
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "true"
+          ],
+          "record_id": "c6ae94d95f7eeb7c61813b15",
+          "score": 0.6222034242237764
+        },
+        {
+          "contains_unique_evidence": false,
+          "query_terms": [
+            "ascii",
+            "characters",
+            "non",
+            "non-ascii",
+            "true"
+          ],
+          "record_id": "e7dadca6ac19517261d3450b",
+          "score": 0.5936702758013436
+        }
+      ],
+      "cpu_ms": 0.0,
+      "pruned_record_ids": [
+        "80d355dfa010679d9bcf5003",
+        "53a7154eabc3c72a8b34ba0b",
+        "632edc999ae3e5e9afacf4ed",
+        "c6ae94d95f7eeb7c61813b15",
+        "e7dadca6ac19517261d3450b"
+      ],
+      "retained_record_ids": [
+        "35fdf925a73a3db9729f9e4e",
+        "2b0a025ac1549a6b04ae5a17",
+        "8117a1f94e896a38a7bb3cd1"
+      ],
+      "wall_ms": 1.5509
+    }
+  }
+}

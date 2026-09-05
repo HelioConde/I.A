@@ -1,0 +1,280 @@
+{
+  "canonical": false,
+  "chain_of_thought_stored": false,
+  "config_hash": "d4d285415bdd2e17a3049ad566bb832a9ecc1691117af1acda2b42aa13e3f0b3",
+  "configuration": {
+    "budgets": [
+      256,
+      384,
+      512,
+      768,
+      1024,
+      1280,
+      1536
+    ],
+    "context_size": 4096,
+    "device": "none",
+    "distiller": "ContextDistiller/extractive-v1",
+    "max_tokens": 96,
+    "pruner_max_records": 3,
+    "quick": false,
+    "reasoning": "off",
+    "sampling": "greedy_when_temperature_zero",
+    "seed": null,
+    "stop_sequences": [],
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "context": {
+    "bytes": 1528,
+    "distiller_cpu_ms": 31.25,
+    "distiller_wall_ms": 19.8851,
+    "duplicate_tokens_removed": 0,
+    "estimated_tokens": 382,
+    "metadata_bytes": 0,
+    "provenance": [
+      {
+        "end": 1383,
+        "estimated_tokens": 257,
+        "kind": "code_block",
+        "page_id": 14,
+        "position": 3,
+        "record_id": "410994326670080c3fb5f32f",
+        "score": 0.8628480826492569,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 401,
+        "text": "By default, SQLite will automatically checkpoint whenever a COMMIT occurs that causes the WAL file to be 1000 pages or more in size, or when the last database connection on a database file closes. The default configuration is intended to work well for most applications. But programs that want more control can force a checkpoint using the wal_checkpoint pragma or by calling the sqlite3_wal_checkpoint() C interface. The automatic checkpoint threshold can be changed or automatic checkpointing can be completely disabled using the wal_autocheckpoint pragma or by calling the sqlite3_wal_autocheckpoint() C interface. A program can also use sqlite3_wal_hook() to register a callback to be invoked whenever any transaction commits to the WAL. This callback can then invoke sqlite3_wal_checkpoint() or sqlite3_wal_checkpoint_v2() based on whatever criteria it thinks is appropriate. (The automatic checkpoint mechanism is implemented as a simple wrapper around sqlite3_wal_hook().)",
+        "title": "wal"
+      },
+      {
+        "end": 303,
+        "estimated_tokens": 88,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 0,
+        "record_id": "c881b56dc9b63d07517c60ad",
+        "score": 0.8273976502717376,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 0,
+        "text": "By default, SQLite does a checkpoint automatically when the WAL file reaches a threshold size of 1000 pages. (The SQLITE_DEFAULT_WAL_AUTOCHECKPOINT compile-time option can be used to specify a different default.) Applications using WAL do not have to do anything in order for these checkpoints to occur.",
+        "title": "wal"
+      },
+      {
+        "end": 639,
+        "estimated_tokens": 37,
+        "kind": "sentence",
+        "page_id": 14,
+        "position": 3,
+        "record_id": "717669418865321c238768db",
+        "score": 0.5277624717070506,
+        "section": "wal",
+        "source_id": "sqlite-3.53.4-docs",
+        "start": 538,
+        "text": "The checkpoint does not normally truncate the WAL file (unless the journal_size_limit pragma is set).",
+        "title": "wal"
+      }
+    ],
+    "records_pruned": [
+      "8ac1d6d5f4b2febef24927d9",
+      "ec3d4f55b0862ac30c2cb167",
+      "1ccf3ab37263037dd48df2cd",
+      "73fe07518d90c4474c0060de",
+      "91d2cf537ad180a4671b4a42"
+    ],
+    "records_retained": [
+      "410994326670080c3fb5f32f",
+      "c881b56dc9b63d07517c60ad",
+      "717669418865321c238768db"
+    ],
+    "selection_policy": "lexical+frozen_record_score+heading+structural; deterministic; no evaluation labels",
+    "sentences_retained": 3,
+    "source_ids": [
+      "410994326670080c3fb5f32f",
+      "c881b56dc9b63d07517c60ad",
+      "717669418865321c238768db"
+    ],
+    "startup_wall_ms": 0.0,
+    "text": "[SOURCE: 410994326670080c3fb5f32f] wal — wal\nBy default, SQLite will automatically checkpoint whenever a COMMIT occurs that causes the WAL file to be 1000 pages or more in size, or when the last database connection on a database file closes. The default configuration is intended to work well for most applications. But programs that want more control can force a checkpoint using the wal_checkpoint pragma or by calling the sqlite3_wal_checkpoint() C interface. The automatic checkpoint threshold can be changed or automatic checkpointing can be completely disabled using the wal_autocheckpoint pragma or by calling the sqlite3_wal_autocheckpoint() C interface. A program can also use sqlite3_wal_hook() to register a callback to be invoked whenever any transaction commits to the WAL. This callback can then invoke sqlite3_wal_checkpoint() or sqlite3_wal_checkpoint_v2() based on whatever criteria it thinks is appropriate. (The automatic checkpoint mechanism is implemented as a simple wrapper around sqlite3_wal_hook().)\n\n[SOURCE: c881b56dc9b63d07517c60ad] wal — wal\nBy default, SQLite does a checkpoint automatically when the WAL file reaches a threshold size of 1000 pages. (The SQLITE_DEFAULT_WAL_AUTOCHECKPOINT compile-time option can be used to specify a different default.) Applications using WAL do not have to do anything in order for these checkpoints to occur.\n\n[SOURCE: 717669418865321c238768db] wal — wal\nThe checkpoint does not normally truncate the WAL file (unless the journal_size_limit pragma is set)."
+  },
+  "context_metrics": {
+    "available_record_tokens": 2581,
+    "context_activation_rate": 0.1480046493607129,
+    "context_density": 0.23036649214659685,
+    "context_density_evaluation_only": true,
+    "tokens_per_required_fact": 382.0,
+    "useful_oracle_tokens": 88
+  },
+  "context_sha256": "ca4e8cda7d1f7c3e77bb455706c159144bba33772702dd9e9731d366e301c324",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "evaluation": {
+    "actual_prompt_tokens": 463,
+    "answer_quality": {
+      "cited_source_ids": [
+        "410994326670080c3fb5f32f"
+      ],
+      "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+      "required_fact_score": 1.0,
+      "required_facts_found": 1,
+      "required_facts_total": 1,
+      "retrieval_supports_expected": true,
+      "source_correct": false
+    },
+    "answer_status": "ANSWER",
+    "context_fact_recall": {
+      "found": 1,
+      "matched": [
+        true
+      ],
+      "recall": 1.0,
+      "total": 1
+    },
+    "correctness": false,
+    "diagnostic": "GROUNDING_FAILURE",
+    "false_no_knowledge": false,
+    "grounding": false,
+    "unknown_safe": false
+  },
+  "experiment": "PHASE_4F_W",
+  "generation": {
+    "answer": "The default WAL size for automatic checkpointing is 1000 pages. \n\n[SOURCE: 410994326670080c3fb5f32f]",
+    "metrics": {
+      "backend_total_ms": 3565.1149999466725,
+      "core_mode": "PERSISTENT_CORE",
+      "core_reuse_ratio": 85.0,
+      "cpu_kernel_seconds": 0.515625,
+      "cpu_percent_total_average": 397.9535022071439,
+      "cpu_percent_total_peak": 741.7605228555169,
+      "cpu_time_seconds": 14.1875,
+      "cpu_user_seconds": 13.671875,
+      "generated_tokens": 46,
+      "generation_eval_ms": 1483.838,
+      "handle_count_max": 163,
+      "handle_count_min": 162,
+      "latency_ms": 3565.1149999466725,
+      "model_load_ms": 0.0,
+      "model_loads": 1,
+      "one_time_startup_cost_ms": 1275.8392000105232,
+      "persistent_reserved_memory": 1175322624,
+      "private_bytes_max": 621367296,
+      "private_bytes_min": 619536384,
+      "prompt_eval_ms": 2068.136,
+      "prompt_tokens": 463,
+      "prompt_tokens_per_second": 223.87309151815936,
+      "queries_served": 85,
+      "read_operations_delta": 0,
+      "read_transfer_bytes_delta": 0,
+      "reload_avoidance_rate": 1.0,
+      "reloads_avoided": 84,
+      "system_available_ram_bytes_min": 3583627264,
+      "thread_count_max": null,
+      "thread_count_min": null,
+      "tokens_per_second": 31.000688754432762,
+      "ttft_ms": 2080.086999980267,
+      "working_set_bytes_max": 993685504,
+      "working_set_bytes_min": 991858688,
+      "write_operations_delta": 21,
+      "write_transfer_bytes_delta": 829
+    },
+    "output_sha256": "cbdc8b64dd07231875fc57ee074e3b62a4a8f6ea58e0804ebd5494e77a99fdab",
+    "return_code": 0
+  },
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model": {
+      "bytes": 639446688,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031"
+    },
+    "persistent_core": {
+      "bytes": 18535936,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win-persistent\\bin\\llama-server.exe",
+      "sha256": "ecf6207498a81df80ac753c60243e9a2fbdf9f046c9e8195a61a83e507cc7dc0"
+    },
+    "qa": {
+      "bytes": 5451,
+      "path": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\benchmarks\\data\\phase4d_real_qa.json",
+      "sha256": "0e5b8ed4e97b2f5d95c617f1ee7ca540cadcbec1c7135756a3e5cd4bd2861c0d"
+    },
+    "seed": 20260822
+  },
+  "key": "holdout_wal_checkpoint::EXTRACTIVE_B384",
+  "matrix_id": "matrix-20260822T101155Z-c4de1dc8b4",
+  "mode": "run",
+  "order": 84,
+  "phase4e_valid": false,
+  "phase4f_canonical": false,
+  "phase4f_windows_experimental": true,
+  "phase4fw_windows_canonical": false,
+  "phase5_started": false,
+  "prefetch_enabled": false,
+  "prompt_composition": {
+    "evidence": 382,
+    "instructions": 90,
+    "measurement": "actual total from backend; components estimated with frozen bytes/4 estimator",
+    "metadata_within_evidence": 33,
+    "other_or_chat_envelope": 0,
+    "percent": {
+      "evidence": 82.50539956803456,
+      "instructions": 19.43844492440605,
+      "other_or_chat_envelope": 0.0,
+      "question": 3.67170626349892
+    },
+    "question": 17,
+    "total": 463
+  },
+  "prompt_sha256": "0080fe9d44de1a663f5b8e1d811fa2bde1724969edcaf7504653fb88dc97e2ca",
+  "query_spec": {
+    "category": "direct_fact",
+    "expected_record_ids": [
+      "c881b56dc9b63d07517c60ad"
+    ],
+    "query": "At what WAL size does SQLite automatically checkpoint by default?",
+    "query_id": "holdout_wal_checkpoint",
+    "required_fact_groups": [
+      [
+        "1000 pages"
+      ]
+    ],
+    "split": "holdout"
+  },
+  "quick": false,
+  "retrieval": {
+    "active_brain_bytes": 2097152,
+    "active_pages": [
+      9,
+      14
+    ],
+    "record_bytes": 10311,
+    "records_retrieved": [
+      "410994326670080c3fb5f32f",
+      "717669418865321c238768db",
+      "8ac1d6d5f4b2febef24927d9",
+      "ec3d4f55b0862ac30c2cb167",
+      "1ccf3ab37263037dd48df2cd",
+      "73fe07518d90c4474c0060de",
+      "c881b56dc9b63d07517c60ad",
+      "91d2cf537ad180a4671b4a42"
+    ],
+    "source_ids": [
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs",
+      "sqlite-3.53.4-docs"
+    ]
+  },
+  "run_id": "run-20260822T102414Z-25c1399f36",
+  "schema_version": 1,
+  "status": "PASS",
+  "timestamp_utc": "2026-08-22T10:24:14Z",
+  "variant": "EXTRACTIVE_B384",
+  "variant_metadata": {
+    "pruning": null
+  }
+}

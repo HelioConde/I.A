@@ -1,0 +1,1242 @@
+{
+  "canonical": false,
+  "config_hash": "ec62cc044a05c0ed1f77bd3fbf9523e27b09407d78d9268e0132508fb57b03eb",
+  "configuration": {
+    "context_size": 4096,
+    "device": "none",
+    "duration_minutes": null,
+    "index_reuse_within_session": false,
+    "max_tokens": 96,
+    "mode": "single_shot",
+    "model_reuse": false,
+    "quick": true,
+    "reasoning": "off",
+    "temperature": 0.0,
+    "threads": 4
+  },
+  "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+  "environment": "WINDOWS_NATIVE_FUNCTIONAL",
+  "environment_fingerprint": "05a828cd900d5a27b5c98ac962f447a7b70cf24b3e2102979425ff9331e3d5ac",
+  "identity": {
+    "git_commit": "8ed092476f0478fd8c21482d7812506ee4763366",
+    "llama_cpp_commit": "217df17ac30ba2a8c374088772f81926cc5beee3",
+    "model_bytes": 639446688,
+    "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "runtime_sha256": "b89490a2f25e3d573db8eff43080188d04996b958cdabfef3497a940337bf685"
+  },
+  "matrix_id": "matrix-20260820T132749Z-33a606824e",
+  "mode": "single_shot",
+  "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux native environment.",
+  "phase4e_valid": false,
+  "phase4ew_canonical": false,
+  "qwen_only_vs_brain_ssd": {
+    "brain_ssd": {
+      "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+      "metrics": {
+        "anonymous_bytes_max": null,
+        "backend_total_ms": 23109.22,
+        "cpu_kernel_seconds": 5.140625,
+        "cpu_percent_normalized_average": 31.23020253462938,
+        "cpu_percent_normalized_peak": 63.37482617348016,
+        "cpu_percent_total_average": 374.76243041555256,
+        "cpu_percent_total_peak": 760.4979140817619,
+        "cpu_user_seconds": 86.046875,
+        "generated_tokens": 95,
+        "generation_eval_ms": 8430.17,
+        "handle_count_max": 121,
+        "latency_ms": 24332.081499975175,
+        "model_load_ms": 14640.08,
+        "page_fault_count_delta": 328737,
+        "peak_working_set_bytes_max": 1202888704,
+        "physical_read_bytes": null,
+        "private_bytes_max": 914825216,
+        "prompt_eval_ms": 14633.68,
+        "prompt_tokens": 2086,
+        "prompt_tokens_per_second": 142.55,
+        "pss_bytes_max": null,
+        "read_operations_delta": 2906,
+        "read_transfer_bytes_delta": 11902976,
+        "rss_file_bytes_max": null,
+        "system_available_ram_bytes_min": 6178418688,
+        "system_total_ram_bytes": 16957431808,
+        "temperature_c": null,
+        "thread_count_max": 8,
+        "tokens_per_second": 11.27,
+        "ttft_ms": 15680.690200009849,
+        "working_set_bytes_max": 1202880512,
+        "write_operations_delta": 163,
+        "write_transfer_bytes_delta": 2775
+      },
+      "quality": {
+        "cited_source_ids": [
+          "2b0a025ac1549a6b04ae5a17"
+        ],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 1.0,
+        "required_facts_found": 2,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": true,
+        "source_correct": true
+      },
+      "query_id": "holdout_json_frames",
+      "retrieval_cost_ms": 43.6984
+    },
+    "objective": "Measure cost and required-fact/source support; not a superiority claim.",
+    "qwen_only": {
+      "answer": "NO_KNOWLEDGE.",
+      "answer_status": "NO_KNOWLEDGE",
+      "metrics": {
+        "anonymous_bytes_max": null,
+        "backend_total_ms": 773.21,
+        "cpu_kernel_seconds": 0.9375,
+        "cpu_percent_normalized_average": 18.39021561568711,
+        "cpu_percent_normalized_peak": 50.96432653948856,
+        "cpu_percent_total_average": 220.68258738824534,
+        "cpu_percent_total_peak": 611.5719184738628,
+        "cpu_user_seconds": 3.546875,
+        "generated_tokens": 9,
+        "generation_eval_ms": 339.39,
+        "handle_count_max": 121,
+        "latency_ms": 2032.0475000189617,
+        "model_load_ms": 429.8,
+        "page_fault_count_delta": 323314,
+        "peak_working_set_bytes_max": 1180008448,
+        "physical_read_bytes": null,
+        "private_bytes_max": 913080320,
+        "prompt_eval_ms": 429.26,
+        "prompt_tokens": 63,
+        "prompt_tokens_per_second": 146.76,
+        "pss_bytes_max": null,
+        "read_operations_delta": 2906,
+        "read_transfer_bytes_delta": 11902976,
+        "rss_file_bytes_max": null,
+        "system_available_ram_bytes_min": 6486675456,
+        "system_total_ram_bytes": 16957431808,
+        "temperature_c": null,
+        "thread_count_max": 8,
+        "tokens_per_second": 26.52,
+        "ttft_ms": 1477.5937999947928,
+        "working_set_bytes_max": 1180000256,
+        "write_operations_delta": 77,
+        "write_transfer_bytes_delta": 2542
+      },
+      "quality": {
+        "cited_source_ids": [],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 0.0,
+        "required_facts_found": 0,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": false,
+        "source_correct": false
+      },
+      "query_id": "holdout_json_frames",
+      "return_code": 0,
+      "runtime_report": {
+        "configured_threads": 4,
+        "cpu_backend": "llama.cpp CPU (--device none)",
+        "features": {
+          "avx": true,
+          "avx2": true,
+          "avx512": null,
+          "blas": null,
+          "f16c": true,
+          "fma": true,
+          "openmp": true
+        },
+        "system_info": "n_threads = 4 (n_threads_batch = 4) / 12 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 |"
+      },
+      "stderr_sha256": "e28cf896d319b553d777637f57f1e63ba3bbc71c17c27637aa3606f20c935b95"
+    }
+  },
+  "run_id": "single-20260820T132808Z-99f9bf720b",
+  "runs": [
+    {
+      "answer": "The answer is: [SOURCE: 2b0a025ac1549a6b04ae5a17] \n\nThe source: 2b0a025ac1549a6b04ae5a17 explains that JSON is not a framed protocol, and attempting to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON",
+      "answer_status": "ANSWER",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 24332.081499975175
+      },
+      "canonical_baseline": false,
+      "capability_status": {
+        "cgroups_v2": "UNSUPPORTED",
+        "hud": "SUPPORTED",
+        "madvise_cold": "UNSUPPORTED",
+        "madvise_pageout": "UNSUPPORTED",
+        "memory_mapped_brain": "SUPPORTED",
+        "mincore_residency": "UNSUPPORTED",
+        "physical_ssd_io": "DEGRADED",
+        "process_cpu": "SUPPORTED",
+        "process_io_transfer": "SUPPORTED",
+        "process_memory": "SUPPORTED",
+        "procfs_metrics": "UNSUPPORTED",
+        "psi_pressure": "UNSUPPORTED",
+        "temperature": "NOT_MEASURED",
+        "windows_working_set": "SUPPORTED"
+      },
+      "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+      "environment_type": "WINDOWS_NATIVE_FUNCTIONAL",
+      "error": null,
+      "generated_at": 1787232514.493383,
+      "generation": {
+        "backend": "llama.cpp-cpu-local",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+        "measurement_semantics": {
+          "physical_read_bytes": "NOT_MEASURED on Windows native functional runtime.",
+          "private_bytes_max": "Maximum sampled private commit for the llama.cpp child.",
+          "pss_bytes_max": "UNSUPPORTED on Windows; Linux /proc semantics were not emulated.",
+          "read_transfer_bytes_delta": "Process I/O transfer counter; not a physical SSD-read measurement.",
+          "working_set_bytes_max": "Maximum sampled resident working set for the llama.cpp child."
+        },
+        "metrics": {
+          "anonymous_bytes_max": null,
+          "backend_total_ms": 23109.22,
+          "cpu_kernel_seconds": 5.140625,
+          "cpu_percent_normalized_average": 31.23020253462938,
+          "cpu_percent_normalized_peak": 63.37482617348016,
+          "cpu_percent_total_average": 374.76243041555256,
+          "cpu_percent_total_peak": 760.4979140817619,
+          "cpu_user_seconds": 86.046875,
+          "generated_tokens": 95,
+          "generation_eval_ms": 8430.17,
+          "handle_count_max": 121,
+          "latency_ms": 24332.081499975175,
+          "model_load_ms": 14640.08,
+          "page_fault_count_delta": 328737,
+          "peak_working_set_bytes_max": 1202888704,
+          "physical_read_bytes": null,
+          "private_bytes_max": 914825216,
+          "prompt_eval_ms": 14633.68,
+          "prompt_tokens": 2086,
+          "prompt_tokens_per_second": 142.55,
+          "pss_bytes_max": null,
+          "read_operations_delta": 2906,
+          "read_transfer_bytes_delta": 11902976,
+          "rss_file_bytes_max": null,
+          "system_available_ram_bytes_min": 6178418688,
+          "system_total_ram_bytes": 16957431808,
+          "temperature_c": null,
+          "thread_count_max": 8,
+          "tokens_per_second": 11.27,
+          "ttft_ms": 15680.690200009849,
+          "working_set_bytes_max": 1202880512,
+          "write_operations_delta": 163,
+          "write_transfer_bytes_delta": 2775
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "cpu_backend": "llama.cpp CPU (--device none)",
+          "features": {
+            "avx": true,
+            "avx2": true,
+            "avx512": null,
+            "blas": null,
+            "f16c": true,
+            "fma": true,
+            "openmp": true
+          },
+          "system_info": "n_threads = 4 (n_threads_batch = 4) / 12 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 |"
+        },
+        "stderr_sha256": "319936ee1e5cb6624ad745413388669c0135b792d6743c6396707b7771d8b86d"
+      },
+      "outlier_candidate": false,
+      "outlier_rule": "1.5*IQR on startup-inclusive total latency; preserved",
+      "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux environment.",
+      "phase4e_valid": false,
+      "quality": {
+        "cited_source_ids": [
+          "2b0a025ac1549a6b04ae5a17"
+        ],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 1.0,
+        "required_facts_found": 2,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": true,
+        "source_correct": true
+      },
+      "query": "Ignoring pickle, why can repeated json.dump calls to the same Python file produce invalid JSON?",
+      "query_id": "31eb95d41458",
+      "query_spec": {
+        "category": "distractor",
+        "expected_record_ids": [
+          "2b0a025ac1549a6b04ae5a17"
+        ],
+        "query_id": "holdout_json_frames",
+        "split": "holdout"
+      },
+      "retrieval": {
+        "activated_pages": [
+          3,
+          4
+        ],
+        "active_brain_bytes": 2097152,
+        "candidates": [
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "calls",
+              "file",
+              "invalid",
+              "json",
+              "pickle",
+              "repeated",
+              "same"
+            ],
+            "query_coverage": 0.6363636363636364,
+            "record_id": "2b0a025ac1549a6b04ae5a17",
+            "score": 0.7800709623355986,
+            "tfidf_score": 0.4212393745673646
+          },
+          {
+            "lexical_score": 0.8407683407172079,
+            "matched_terms": [
+              "json",
+              "json.dump",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "7409230c3d31263ba576b2d1",
+            "score": 0.765384575349431,
+            "tfidf_score": 0.6423900108020059
+          },
+          {
+            "lexical_score": 0.6855563109400244,
+            "matched_terms": [
+              "json",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.2727272727272727,
+            "record_id": "18893306b3c2b47f6463001c",
+            "score": 0.7286381851137593,
+            "tfidf_score": 0.7989296640288003
+          },
+          {
+            "lexical_score": 0.7083154058720793,
+            "matched_terms": [
+              "file",
+              "json",
+              "json.dump",
+              "python"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "859fda16a4d715b5f6c73141",
+            "score": 0.6952911181625963,
+            "tfidf_score": 0.6740409645313347
+          },
+          {
+            "lexical_score": 0.713756599929492,
+            "matched_terms": [
+              "json",
+              "pickle",
+              "python",
+              "same"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "224d71d9f13fc0d43000d9c5",
+            "score": 0.6924300523502601,
+            "tfidf_score": 0.6576341062999344
+          },
+          {
+            "lexical_score": 0.6516765434242732,
+            "matched_terms": [
+              "calls",
+              "json",
+              "python",
+              "repeated",
+              "same"
+            ],
+            "query_coverage": 0.45454545454545453,
+            "record_id": "b227a6f4bc64f5797a340f22",
+            "score": 0.6383523652303589,
+            "tfidf_score": 0.6166129165981831
+          },
+          {
+            "lexical_score": 0.6646371805908327,
+            "matched_terms": [
+              "file",
+              "json",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.36363636363636365,
+            "record_id": "b83cccde7b72abcccc6e5c93",
+            "score": 0.620119864642654,
+            "tfidf_score": 0.547486349148257
+          },
+          {
+            "lexical_score": 0.5079362339494969,
+            "matched_terms": [
+              "file",
+              "pickle",
+              "python"
+            ],
+            "query_coverage": 0.2727272727272727,
+            "record_id": "dcc841948e6ec5fbcb6b8043",
+            "score": 0.5807228518773234,
+            "tfidf_score": 0.699479965338514
+          }
+        ],
+        "context": {
+          "bytes": 7874,
+          "estimated_tokens": 1971,
+          "source_ids": [
+            "2b0a025ac1549a6b04ae5a17",
+            "7409230c3d31263ba576b2d1",
+            "859fda16a4d715b5f6c73141",
+            "b227a6f4bc64f5797a340f22",
+            "18893306b3c2b47f6463001c",
+            "224d71d9f13fc0d43000d9c5"
+          ]
+        },
+        "record_ids": [
+          "18893306b3c2b47f6463001c",
+          "224d71d9f13fc0d43000d9c5",
+          "2b0a025ac1549a6b04ae5a17",
+          "7409230c3d31263ba576b2d1",
+          "859fda16a4d715b5f6c73141",
+          "b227a6f4bc64f5797a340f22",
+          "b83cccde7b72abcccc6e5c93",
+          "dcc841948e6ec5fbcb6b8043"
+        ],
+        "selected_record_bytes": 10286,
+        "sources": [
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": "Unlike \"pickle\" and \"marshal\", JSON is not a framed protocol, so trying to serialize multiple objects with repeated calls to \"dump()\" using the same *fp* will result in an invalid JSON file. * **fp** (*file-like object*) -- The file-like object *obj* will be serialized to. The \"j",
+            "page_id": 3,
+            "record_id": "2b0a025ac1549a6b04ae5a17",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": "JSON (JavaScript Object Notation), specified by **RFC 7159** (which obsoletes **RFC 4627**) and by ECMA-404, is a lightweight data interchange format inspired by JavaScript object literal syntax (although it is not a strict subset of JavaScript [1] ). The term \"object\" in the con",
+            "page_id": 3,
+            "record_id": "7409230c3d31263ba576b2d1",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": ">>> import json >>> class ComplexEncoder(json.JSONEncoder): ... def default(self, obj): ... if isinstance(obj, complex): ... return [obj.real, obj.imag] ... # Let the base class default method raise the TypeError ... return super().default(obj) ... >>> json.dumps(2 + 1j, cls=Comp",
+            "page_id": 3,
+            "record_id": "859fda16a4d715b5f6c73141",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/json.txt",
+            "excerpt": "The RFC does not permit the representation of infinite or NaN number values. Despite that, by default, this module accepts and outputs \"Infinity\", \"-Infinity\", and \"NaN\" as if they were valid JSON number literal values: >>> # Neither of these calls raises an exception, but the re",
+            "page_id": 3,
+            "record_id": "b227a6f4bc64f5797a340f22",
+            "section": "json",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/pickle.txt",
+            "excerpt": "* JSON, by default, can only represent a subset of the Python built-in types, and no custom classes; pickle can represent an extremely large number of Python types (many of them automatically, by clever usage of Python's introspection facilities; complex cases can be tackled by i",
+            "page_id": 4,
+            "record_id": "18893306b3c2b47f6463001c",
+            "section": "pickle",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/pickle.txt",
+            "excerpt": "* \"marshal\" cannot be used to serialize user-defined classes and their instances. \"pickle\" can save and restore class instances transparently, however the class definition must be importable and live in the same module as when the object was pickled. * The \"marshal\" serialization",
+            "page_id": 4,
+            "record_id": "224d71d9f13fc0d43000d9c5",
+            "section": "pickle",
+            "source_id": "python-3.14.7-docs"
+          }
+        ],
+        "status": "OK",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 2097152,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 751366505037806985
+        },
+        "timing_ms": {
+          "context_build": 0.637,
+          "gate_separate": null,
+          "retrieval_total": 43.6984,
+          "routing_and_gate": 28.6429,
+          "storage": 2.2983
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "run_id": "win-a2b6f09af73a",
+      "schema_version": 1,
+      "startup_ms": 1225.6858,
+      "timing_ms": {
+        "context_build": 0.637,
+        "qwen_core": 24332.081499975175,
+        "routing_and_gate": 28.6429,
+        "storage": 2.2983,
+        "total": 24383.2996
+      },
+      "total_with_startup_ms": 25608.985399999998
+    },
+    {
+      "answer": "To safely bind variables in Python to SQLite3 execute statements, use placeholders instead of string formatting. For example:  \n```python\ncur.execute(\"INSERT INTO movie VALUES(?, ?, ?)\", data)\n```  \nThis approach avoids SQL injection and ensures secure data binding.  \n\n[SOURCE: 801c3ac239e928d776230cf8]",
+      "answer_status": "ANSWER",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 23295.36879999796
+      },
+      "canonical_baseline": false,
+      "capability_status": {
+        "cgroups_v2": "UNSUPPORTED",
+        "hud": "SUPPORTED",
+        "madvise_cold": "UNSUPPORTED",
+        "madvise_pageout": "UNSUPPORTED",
+        "memory_mapped_brain": "SUPPORTED",
+        "mincore_residency": "UNSUPPORTED",
+        "physical_ssd_io": "DEGRADED",
+        "process_cpu": "SUPPORTED",
+        "process_io_transfer": "SUPPORTED",
+        "process_memory": "SUPPORTED",
+        "procfs_metrics": "UNSUPPORTED",
+        "psi_pressure": "UNSUPPORTED",
+        "temperature": "NOT_MEASURED",
+        "windows_working_set": "SUPPORTED"
+      },
+      "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+      "environment_type": "WINDOWS_NATIVE_FUNCTIONAL",
+      "error": null,
+      "generated_at": 1787232539.0252843,
+      "generation": {
+        "backend": "llama.cpp-cpu-local",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+        "measurement_semantics": {
+          "physical_read_bytes": "NOT_MEASURED on Windows native functional runtime.",
+          "private_bytes_max": "Maximum sampled private commit for the llama.cpp child.",
+          "pss_bytes_max": "UNSUPPORTED on Windows; Linux /proc semantics were not emulated.",
+          "read_transfer_bytes_delta": "Process I/O transfer counter; not a physical SSD-read measurement.",
+          "working_set_bytes_max": "Maximum sampled resident working set for the llama.cpp child."
+        },
+        "metrics": {
+          "anonymous_bytes_max": null,
+          "backend_total_ms": 22052.97,
+          "cpu_kernel_seconds": 5.078125,
+          "cpu_percent_normalized_average": 30.926434971632492,
+          "cpu_percent_normalized_peak": 61.88245683358562,
+          "cpu_percent_total_average": 371.1172196595899,
+          "cpu_percent_total_peak": 742.5894820030275,
+          "cpu_user_seconds": 81.375,
+          "generated_tokens": 85,
+          "generation_eval_ms": 7465.19,
+          "handle_count_max": 121,
+          "latency_ms": 23295.36879999796,
+          "model_load_ms": 14554.46,
+          "page_fault_count_delta": 328767,
+          "peak_working_set_bytes_max": 1202487296,
+          "physical_read_bytes": null,
+          "private_bytes_max": 914374656,
+          "prompt_eval_ms": 14548.69,
+          "prompt_tokens": 2083,
+          "prompt_tokens_per_second": 143.17,
+          "pss_bytes_max": null,
+          "read_operations_delta": 2906,
+          "read_transfer_bytes_delta": 11902976,
+          "rss_file_bytes_max": null,
+          "system_available_ram_bytes_min": 6190743552,
+          "system_total_ram_bytes": 16957431808,
+          "temperature_c": null,
+          "thread_count_max": 8,
+          "tokens_per_second": 11.39,
+          "ttft_ms": 15582.378399965819,
+          "working_set_bytes_max": 1202479104,
+          "write_operations_delta": 153,
+          "write_transfer_bytes_delta": 2838
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "cpu_backend": "llama.cpp CPU (--device none)",
+          "features": {
+            "avx": true,
+            "avx2": true,
+            "avx512": null,
+            "blas": null,
+            "f16c": true,
+            "fma": true,
+            "openmp": true
+          },
+          "system_info": "n_threads = 4 (n_threads_batch = 4) / 12 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 |"
+        },
+        "stderr_sha256": "483bbc44b613fd85f9cb61a97f0fa161fc7effd24f95077ca59b40273a62fd3b"
+      },
+      "outlier_candidate": false,
+      "outlier_rule": "1.5*IQR on startup-inclusive total latency; preserved",
+      "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux environment.",
+      "phase4e_valid": false,
+      "quality": {
+        "cited_source_ids": [
+          "801c3ac239e928d776230cf8"
+        ],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 0.5,
+        "required_facts_found": 1,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": true,
+        "source_correct": false
+      },
+      "query": "How should variables be bound safely in Python sqlite3 execute instead of formatting SQL strings?",
+      "query_id": "84c36f5882a3",
+      "query_spec": {
+        "category": "procedure",
+        "expected_record_ids": [
+          "0be5e11beaf36611325a42aa"
+        ],
+        "query_id": "dev_sql_params",
+        "split": "development"
+      },
+      "retrieval": {
+        "activated_pages": [
+          4,
+          7,
+          11,
+          13
+        ],
+        "active_brain_bytes": 4194304,
+        "candidates": [
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "execute",
+              "instead",
+              "parameter",
+              "python",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.6,
+            "record_id": "801c3ac239e928d776230cf8",
+            "score": 0.9242550661100926,
+            "tfidf_score": 0.8006712266055069
+          },
+          {
+            "lexical_score": 0.9651248814248867,
+            "matched_terms": [
+              "formatting",
+              "instead",
+              "parameter",
+              "python",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.6,
+            "record_id": "367d8201386fc06e850afecb",
+            "score": 0.7501190549248316,
+            "tfidf_score": 0.3993200748457941
+          },
+          {
+            "lexical_score": 0.9854160361458261,
+            "matched_terms": [
+              "execute",
+              "instead",
+              "parameter",
+              "python",
+              "sql",
+              "variables"
+            ],
+            "query_coverage": 0.6,
+            "record_id": "0fc79bc49ca725b41bb16b29",
+            "score": 0.733187321610577,
+            "tfidf_score": 0.3216562610530655
+          },
+          {
+            "lexical_score": 0.8440740605216913,
+            "matched_terms": [
+              "execute",
+              "sql",
+              "sqlite3",
+              "variables"
+            ],
+            "query_coverage": 0.4,
+            "record_id": "d7b9a4e28a517bf936a40571",
+            "score": 0.7235817555140044,
+            "tfidf_score": 0.5269890473435678
+          },
+          {
+            "lexical_score": 0.5971303969903098,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "79991b001c7de5c74daed0b6",
+            "score": 0.7228163295672478,
+            "tfidf_score": 0.9278828511401466
+          },
+          {
+            "lexical_score": 0.5308909759023535,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "14a1d46c897c0a65a56945a1",
+            "score": 0.7091524050594591,
+            "tfidf_score": 1.0
+          },
+          {
+            "lexical_score": 0.5958168900028349,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "220a4b4b6ab78b746663e2e5",
+            "score": 0.6943294122041561,
+            "tfidf_score": 0.8550603694799961
+          },
+          {
+            "lexical_score": 0.5293781136553545,
+            "matched_terms": [
+              "parameter",
+              "sql",
+              "sqlite3"
+            ],
+            "query_coverage": 0.3,
+            "record_id": "e38b6d377e1ff99d283f55f8",
+            "score": 0.6931381122241402,
+            "tfidf_score": 0.9603254783100538
+          }
+        ],
+        "context": {
+          "bytes": 7605,
+          "estimated_tokens": 1903,
+          "source_ids": [
+            "801c3ac239e928d776230cf8",
+            "367d8201386fc06e850afecb",
+            "0be5e11beaf36611325a42aa",
+            "812bf462a398609855d5300a",
+            "0fc79bc49ca725b41bb16b29",
+            "eee646b530126e63f5437e2a"
+          ]
+        },
+        "record_ids": [
+          "0be5e11beaf36611325a42aa",
+          "0fc79bc49ca725b41bb16b29",
+          "367d8201386fc06e850afecb",
+          "79991b001c7de5c74daed0b6",
+          "801c3ac239e928d776230cf8",
+          "812bf462a398609855d5300a",
+          "d7b9a4e28a517bf936a40571",
+          "eee646b530126e63f5437e2a"
+        ],
+        "selected_record_bytes": 10191,
+        "sources": [
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": "* **parameters** (\"dict\" | *sequence*) -- Python values to bind to placeholders in *sql*. A \"dict\" if named placeholders are used. A *sequence* if unnamed placeholders are used. See How to use placeholders to bind values in SQL queries. Raises: **ProgrammingError** -- When *sql* ",
+            "page_id": 4,
+            "record_id": "801c3ac239e928d776230cf8",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": "We can verify that the data was inserted correctly by executing a \"SELECT\" query. Use the now-familiar \"cur.execute(...)\" to assign the result to \"res\", and call \"res.fetchall()\" to return all resulting rows: >>> res = cur.execute(\"SELECT score FROM movie\") >>> res.fetchall() [(8",
+            "page_id": 4,
+            "record_id": "367d8201386fc06e850afecb",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": ">>> # Never do this -- insecure! >>> symbol = input() ' OR TRUE; -- >>> sql = \"SELECT * FROM stocks WHERE symbol = '%s'\" % symbol >>> print(sql) SELECT * FROM stocks WHERE symbol = '' OR TRUE; --' >>> cur.execute(sql) Instead, use the DB-API's parameter substitution. To insert a ",
+            "page_id": 4,
+            "record_id": "0be5e11beaf36611325a42aa",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": "The initial \"row_factory\" for \"Cursor\" objects created from this connection. Assigning to this attribute does not affect the \"row_factory\" of existing cursors belonging to this connection, only new ones. Is \"None\" by default, meaning each row is returned as a \"tuple\". Changed in ",
+            "page_id": 4,
+            "record_id": "812bf462a398609855d5300a",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/whatsnew/2.5.txt",
+            "excerpt": "Usually your SQL operations will need to use values from Python variables. You shouldn't assemble your query using Python's string operations because doing so is insecure; it makes your program vulnerable to an SQL injection attack. Instead, use the DB-API's parameter substitutio",
+            "page_id": 7,
+            "record_id": "0fc79bc49ca725b41bb16b29",
+            "section": "2.5",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/whatsnew/2.0.txt",
+            "excerpt": "Taking the \"repr()\" of a float now uses a different formatting precision than \"str()\". \"repr()\" uses \"%.17g\" format string for C's \"sprintf()\", while \"str()\" uses \"%.12g\" as before. The effect is that \"repr()\" may occasionally show more decimal places than \"str()\", for certain nu",
+            "page_id": 7,
+            "record_id": "eee646b530126e63f5437e2a",
+            "section": "2.0",
+            "source_id": "python-3.14.7-docs"
+          }
+        ],
+        "status": "OK",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 4194304,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 105663580654018306
+        },
+        "timing_ms": {
+          "context_build": 0.4731,
+          "gate_separate": null,
+          "retrieval_total": 48.4539,
+          "routing_and_gate": 29.9916,
+          "storage": 4.0364
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "run_id": "win-8a3f288dff0f",
+      "schema_version": 1,
+      "startup_ms": 1034.543,
+      "timing_ms": {
+        "context_build": 0.4731,
+        "qwen_core": 23295.36879999796,
+        "routing_and_gate": 29.9916,
+        "storage": 4.0364,
+        "total": 23350.0339
+      },
+      "total_with_startup_ms": 24384.5769
+    },
+    {
+      "answer": "NO_KNOWLEDGE.",
+      "answer_status": "NO_KNOWLEDGE",
+      "bottleneck": {
+        "component": "qwen_core",
+        "duration_ms": 17066.234199970495
+      },
+      "canonical_baseline": false,
+      "capability_status": {
+        "cgroups_v2": "UNSUPPORTED",
+        "hud": "SUPPORTED",
+        "madvise_cold": "UNSUPPORTED",
+        "madvise_pageout": "UNSUPPORTED",
+        "memory_mapped_brain": "SUPPORTED",
+        "mincore_residency": "UNSUPPORTED",
+        "physical_ssd_io": "DEGRADED",
+        "process_cpu": "SUPPORTED",
+        "process_io_transfer": "SUPPORTED",
+        "process_memory": "SUPPORTED",
+        "procfs_metrics": "UNSUPPORTED",
+        "psi_pressure": "UNSUPPORTED",
+        "temperature": "NOT_MEASURED",
+        "windows_working_set": "SUPPORTED"
+      },
+      "development_status": "EXPERIMENTAL_FUNCTIONAL_RUNTIME",
+      "environment_type": "WINDOWS_NATIVE_FUNCTIONAL",
+      "error": null,
+      "generated_at": 1787232557.5370805,
+      "generation": {
+        "backend": "llama.cpp-cpu-local",
+        "executable": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\third_party\\llama.cpp\\build-win\\bin\\llama-completion.exe",
+        "measurement_semantics": {
+          "physical_read_bytes": "NOT_MEASURED on Windows native functional runtime.",
+          "private_bytes_max": "Maximum sampled private commit for the llama.cpp child.",
+          "pss_bytes_max": "UNSUPPORTED on Windows; Linux /proc semantics were not emulated.",
+          "read_transfer_bytes_delta": "Process I/O transfer counter; not a physical SSD-read measurement.",
+          "working_set_bytes_max": "Maximum sampled resident working set for the llama.cpp child."
+        },
+        "metrics": {
+          "anonymous_bytes_max": null,
+          "backend_total_ms": 15631.94,
+          "cpu_kernel_seconds": 3.640625,
+          "cpu_percent_normalized_average": 30.510721867446318,
+          "cpu_percent_normalized_peak": 52.961972417421634,
+          "cpu_percent_total_average": 366.1286624093558,
+          "cpu_percent_total_peak": 635.5436690090596,
+          "cpu_user_seconds": 58.84375,
+          "generated_tokens": 9,
+          "generation_eval_ms": 793.42,
+          "handle_count_max": 121,
+          "latency_ms": 17066.234199970495,
+          "model_load_ms": 14833.64,
+          "page_fault_count_delta": 328747,
+          "peak_working_set_bytes_max": 1202597888,
+          "physical_read_bytes": null,
+          "private_bytes_max": 914440192,
+          "prompt_eval_ms": 14828.78,
+          "prompt_tokens": 2119,
+          "prompt_tokens_per_second": 142.9,
+          "pss_bytes_max": null,
+          "read_operations_delta": 2906,
+          "read_transfer_bytes_delta": 11902976,
+          "rss_file_bytes_max": null,
+          "system_available_ram_bytes_min": 6169128960,
+          "system_total_ram_bytes": 16957431808,
+          "temperature_c": null,
+          "thread_count_max": 8,
+          "tokens_per_second": 11.34,
+          "ttft_ms": 16081.755399995018,
+          "working_set_bytes_max": 1202589696,
+          "write_operations_delta": 77,
+          "write_transfer_bytes_delta": 2542
+        },
+        "model": "C:\\Users\\CONDE\\Documents\\IA\\Pal-Server\\Brain-SSD\\models\\Qwen3-0.6B-Q8_0.gguf",
+        "return_code": 0,
+        "runtime_report": {
+          "configured_threads": 4,
+          "cpu_backend": "llama.cpp CPU (--device none)",
+          "features": {
+            "avx": true,
+            "avx2": true,
+            "avx512": null,
+            "blas": null,
+            "f16c": true,
+            "fma": true,
+            "openmp": true
+          },
+          "system_info": "n_threads = 4 (n_threads_batch = 4) / 12 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 |"
+        },
+        "stderr_sha256": "03a53c6d820abaca7c2a8e5390b41bcdcd12cf4b31cf471e121a3586641633cd"
+      },
+      "outlier_candidate": false,
+      "outlier_rule": "1.5*IQR on startup-inclusive total latency; preserved",
+      "phase4e_invalid_reason": "Phase 4E canonical physical baseline requires Debian/Linux environment.",
+      "phase4e_valid": false,
+      "quality": {
+        "cited_source_ids": [],
+        "groundedness_scope": "required-fact and expected-source support only; not a general hallucination detector",
+        "required_fact_score": 0.0,
+        "required_facts_found": 0,
+        "required_facts_total": 2,
+        "retrieval_supports_expected": true,
+        "source_correct": false
+      },
+      "query": "How do I bind a year value with a question-mark placeholder using Python sqlite3, and what does SQLite return by default if another process locks the file?",
+      "query_id": "16137978ca32",
+      "query_spec": {
+        "category": "multi_document",
+        "expected_record_ids": [
+          "0be5e11beaf36611325a42aa",
+          "f58b2c4d54169ef7d0eda88e"
+        ],
+        "query_id": "holdout_python_sqlite",
+        "split": "holdout"
+      },
+      "retrieval": {
+        "activated_pages": [
+          2,
+          4,
+          12,
+          14
+        ],
+        "active_brain_bytes": 4194304,
+        "candidates": [
+          {
+            "lexical_score": 0.9915319250348367,
+            "matched_terms": [
+              "mark",
+              "parameter",
+              "question",
+              "sqlite",
+              "sqlite3",
+              "value"
+            ],
+            "query_coverage": 0.4,
+            "record_id": "bfdc468a8ef07d73294704ca",
+            "score": 0.8582144132035965,
+            "tfidf_score": 0.6406963675842047
+          },
+          {
+            "lexical_score": 1.0,
+            "matched_terms": [
+              "mark",
+              "parameter",
+              "question",
+              "sqlite",
+              "sqlite3",
+              "value"
+            ],
+            "query_coverage": 0.4,
+            "record_id": "a4cfdfd3ccd30e1c9f741e15",
+            "score": 0.8539939001922976,
+            "tfidf_score": 0.615773421558678
+          },
+          {
+            "lexical_score": 0.9352278537164149,
+            "matched_terms": [
+              "parameter",
+              "python",
+              "question",
+              "sqlite3",
+              "year"
+            ],
+            "query_coverage": 0.3333333333333333,
+            "record_id": "0be5e11beaf36611325a42aa",
+            "score": 0.8148361518741716,
+            "tfidf_score": 0.6184075857105114
+          },
+          {
+            "lexical_score": 0.5881466676854246,
+            "matched_terms": [
+              "another",
+              "return",
+              "year"
+            ],
+            "query_coverage": 0.2,
+            "record_id": "aa511378075f626734bde81d",
+            "score": 0.7075208640593292,
+            "tfidf_score": 0.9022892897220158
+          },
+          {
+            "lexical_score": 0.6431065137415652,
+            "matched_terms": [
+              "default",
+              "parameter",
+              "sqlite",
+              "sqlite3",
+              "value"
+            ],
+            "query_coverage": 0.3333333333333333,
+            "record_id": "e681fadff3db3d763d89fbd3",
+            "score": 0.6885429657188245,
+            "tfidf_score": 0.762676124208037
+          },
+          {
+            "lexical_score": 0.8289848415022997,
+            "matched_terms": [
+              "another",
+              "file",
+              "locks",
+              "mark",
+              "process"
+            ],
+            "query_coverage": 0.3333333333333333,
+            "record_id": "1dd8a418051e0eeceb4b9386",
+            "score": 0.6815913068651235,
+            "tfidf_score": 0.44110711877288855
+          },
+          {
+            "lexical_score": 0.6053259421903238,
+            "matched_terms": [
+              "default",
+              "python",
+              "return",
+              "value",
+              "year"
+            ],
+            "query_coverage": 0.3333333333333333,
+            "record_id": "57beca14df21b646a57ca164",
+            "score": 0.674118192622827,
+            "tfidf_score": 0.7863581801705953
+          },
+          {
+            "lexical_score": 0.6249215137298265,
+            "matched_terms": [
+              "file",
+              "parameter",
+              "sqlite",
+              "sqlite3",
+              "value"
+            ],
+            "query_coverage": 0.3333333333333333,
+            "record_id": "79991b001c7de5c74daed0b6",
+            "score": 0.6731132849319423,
+            "tfidf_score": 0.7517419642617105
+          }
+        ],
+        "context": {
+          "bytes": 7847,
+          "estimated_tokens": 1963,
+          "source_ids": [
+            "aa511378075f626734bde81d",
+            "57beca14df21b646a57ca164",
+            "a9597f0ce2d83c76fefc6f08",
+            "0be5e11beaf36611325a42aa",
+            "bfdc468a8ef07d73294704ca",
+            "a4cfdfd3ccd30e1c9f741e15"
+          ]
+        },
+        "record_ids": [
+          "0be5e11beaf36611325a42aa",
+          "1dd8a418051e0eeceb4b9386",
+          "57beca14df21b646a57ca164",
+          "7bde415bf27ff68ca7f31828",
+          "a4cfdfd3ccd30e1c9f741e15",
+          "a9597f0ce2d83c76fefc6f08",
+          "aa511378075f626734bde81d",
+          "bfdc468a8ef07d73294704ca"
+        ],
+        "selected_record_bytes": 10071,
+        "sources": [
+          {
+            "document": "python-3.14-docs-text/library/datetime.txt",
+            "excerpt": ">>> # Components of another_year add up to exactly 365 days >>> import datetime as dt >>> year = dt.timedelta(days=365) >>> another_year = dt.timedelta(weeks=40, days=84, hours=23, ... minutes=50, seconds=600) >>> year == another_year True >>> year.total_seconds() 31536000.0 >>> ",
+            "page_id": 2,
+            "record_id": "aa511378075f626734bde81d",
+            "section": "datetime",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/datetime.txt",
+            "excerpt": "Return a \"datetime\" corresponding to the ISO calendar date specified by *year*, *week* and *day*. The non-date components of the datetime are populated with their normal default values. This is the inverse of the function \"datetime.isocalendar()\". Return a \"datetime\" correspondin",
+            "page_id": 2,
+            "record_id": "57beca14df21b646a57ca164",
+            "section": "datetime",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/datetime.txt",
+            "excerpt": "Return a \"date\" corresponding to the ISO calendar date specified by *year*, *week* and *day*. This is the inverse of the function \"date.isocalendar()\". Return a \"date\" corresponding to *date_string*, parsed according to *format*. This is equivalent to: \"ValueError\" is raised if t",
+            "page_id": 2,
+            "record_id": "a9597f0ce2d83c76fefc6f08",
+            "section": "datetime",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "python-3.14-docs-text/library/sqlite3.txt",
+            "excerpt": ">>> # Never do this -- insecure! >>> symbol = input() ' OR TRUE; -- >>> sql = \"SELECT * FROM stocks WHERE symbol = '%s'\" % symbol >>> print(sql) SELECT * FROM stocks WHERE symbol = '' OR TRUE; --' >>> cur.execute(sql) Instead, use the DB-API's parameter substitution. To insert a ",
+            "page_id": 4,
+            "record_id": "0be5e11beaf36611325a42aa",
+            "section": "sqlite3",
+            "source_id": "python-3.14.7-docs"
+          },
+          {
+            "document": "sqlite-doc-3530400/lang_expr.html",
+            "excerpt": "A string constant is formed by enclosing the string in single quotes ('). A single quote within the string can be encoded by putting two single quotes in a row - as in Pascal. C-style escapes using the backslash character are not supported because they are not standard SQL. BLOB ",
+            "page_id": 12,
+            "record_id": "bfdc468a8ef07d73294704ca",
+            "section": "lang expr",
+            "source_id": "sqlite-3.53.4-docs"
+          },
+          {
+            "document": "sqlite-doc-3530400/limits.html",
+            "excerpt": "A host parameter is a place-holder in an SQL statement that is filled in using one of the sqlite3_bind_XXXX() interfaces. Many SQL programmers are familiar with using a question mark (\"?\") as a host parameter. SQLite also supports named host parameters prefaced by \":\", \"$\", or \"@",
+            "page_id": 12,
+            "record_id": "a4cfdfd3ccd30e1c9f741e15",
+            "section": "limits",
+            "source_id": "sqlite-3.53.4-docs"
+          }
+        ],
+        "status": "OK",
+        "storage": {
+          "checksum_errors": 0,
+          "logical_page_bytes": 4194304,
+          "physical_read_bytes": null,
+          "physical_read_semantics": "NOT_MEASURED on Windows; process transfer counters are not physical SSD reads.",
+          "process_read_transfer_bytes": 0,
+          "sink": 133850185299764823
+        },
+        "timing_ms": {
+          "context_build": 0.4771,
+          "gate_separate": null,
+          "retrieval_total": 91.3424,
+          "routing_and_gate": 73.4049,
+          "storage": 4.1757
+        },
+        "timing_semantics": {
+          "gate_separate": "NOT_MEASURED: frozen retrieve() returns routing and gate selection together."
+        }
+      },
+      "run_id": "win-b10486e5feda",
+      "schema_version": 1,
+      "startup_ms": 1203.9216,
+      "timing_ms": {
+        "context_build": 0.4771,
+        "qwen_core": 17066.234199970495,
+        "routing_and_gate": 73.4049,
+        "storage": 4.1757,
+        "total": 17164.7116
+      },
+      "total_with_startup_ms": 18368.6332
+    }
+  ],
+  "schema_version": 1,
+  "standard_rag": {
+    "reason": "No separate Windows wrapper was added to the initial 4E-W matrix; frozen Phase 4D results remain available.",
+    "status": "NOT_RUN"
+  },
+  "status": "PASS",
+  "summary": {
+    "active_brain_bytes": {
+      "coefficient_of_variation": 0.282842712474619,
+      "count": 3,
+      "max": 4194304.0,
+      "mean": 3495253.3333333335,
+      "median": 4194304.0,
+      "min": 2097152.0,
+      "p95": 4194304.0
+    },
+    "active_pages": {
+      "coefficient_of_variation": 0.282842712474619,
+      "count": 3,
+      "max": 4.0,
+      "mean": 3.3333333333333335,
+      "median": 4.0,
+      "min": 2.0,
+      "p95": 4.0
+    },
+    "context_tokens": {
+      "coefficient_of_variation": 0.015596788318301923,
+      "count": 3,
+      "max": 1971.0,
+      "mean": 1945.6666666666667,
+      "median": 1963.0,
+      "min": 1903.0,
+      "p95": 1971.0
+    },
+    "core_ms": {
+      "coefficient_of_variation": 0.14880117312436136,
+      "count": 3,
+      "max": 24332.081499975175,
+      "mean": 21564.56149998121,
+      "median": 23295.36879999796,
+      "min": 17066.234199970495,
+      "p95": 24332.081499975175
+    },
+    "retrieval_total_ms": {
+      "coefficient_of_variation": 0.35031283604917096,
+      "count": 3,
+      "max": 91.3424,
+      "mean": 61.164899999999996,
+      "median": 48.4539,
+      "min": 43.6984,
+      "p95": 91.3424
+    },
+    "startup_ms": {
+      "coefficient_of_variation": 0.0739912777030573,
+      "count": 3,
+      "max": 1225.6858,
+      "mean": 1154.7168,
+      "median": 1203.9216,
+      "min": 1034.543,
+      "p95": 1225.6858
+    },
+    "total_with_startup_ms": {
+      "coefficient_of_variation": 0.13886052983639752,
+      "count": 3,
+      "max": 25608.985399999998,
+      "mean": 22787.3985,
+      "median": 24384.5769,
+      "min": 18368.6332,
+      "p95": 25608.985399999998
+    }
+  },
+  "target_8gb": "NOT_TESTED",
+  "timestamp_utc": "2026-08-20T13:28:08Z",
+  "validation_track": "PHASE_4E_W"
+}
