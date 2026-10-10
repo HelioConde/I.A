@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 
 from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
+from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
@@ -118,7 +119,7 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None) -> None:
         self._runtime_factory = runtime_factory
         if memory_aliases and episodic_store is None:
             raise ValueError("A recuperação por sinônimos exige memória episódica explícita.")
@@ -128,6 +129,8 @@ class ChatEngine:
         self.diagnostics = diagnostics
         self._runtime: Any | None = None
         self._error: str | None = None
+        self._startup_error_code: str | None = None
+        self._startup_reporter = startup_reporter
         self._state = "starting"
         self._inference_verified = False
         self._lock = threading.Lock()
@@ -146,12 +149,20 @@ class ChatEngine:
             try:
                 runtime = self._runtime_factory()
             except Exception as exc:
-                # Do not expose native model paths, file names or traceback text
-                # through the unauthenticated loopback health/status endpoint.
-                self._error = "Não foi possível iniciar o modelo local. Consulte o terminal e o diagnóstico."
+                # Only fixed, allowlisted guidance is sent to HTTP and terminal.
+                # Native stack traces, personal directories, and raw exception
+                # messages must not escape through /api/status or JSONL.
+                diagnosis = classify_startup_error(exc)
+                self._startup_error_code = diagnosis.code
+                self._error = diagnosis.guidance
                 self._state = "error"
                 if self.diagnostics:
                     self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
+                if self._startup_reporter:
+                    try:
+                        self._startup_reporter(f"[{diagnosis.code}] {diagnosis.guidance}")
+                    except Exception:
+                        pass
             else:
                 self._runtime = runtime
                 self._state = "ready"
@@ -188,6 +199,7 @@ class ChatEngine:
             "execution": "CPU-only",
             "local": True,
             "error": self._error if self._state == "error" else None,
+            "startup_error_code": self._startup_error_code if self._state == "error" else None,
             "experimental": True,
             "episodic_memory_enabled": self.episodic_store is not None,
             "episodic_aliases_enabled": self.memory_aliases,

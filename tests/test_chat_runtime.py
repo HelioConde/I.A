@@ -14,6 +14,9 @@ from brain_ssd.local_runtime.pipeline import MODEL_RELATIVE
 
 class TestOptionalSSD(unittest.TestCase):
     def setUp(self):
+        minimum=patch("brain_ssd.chat.runtime.MIN_PLAUSIBLE_GGUF_BYTES", 32)
+        minimum.start()
+        self.addCleanup(minimum.stop)
         self.directory = tempfile.TemporaryDirectory()
         self.root = Path(self.directory.name)
         model = self.root / MODEL_RELATIVE
@@ -55,8 +58,32 @@ class TestOptionalSSD(unittest.TestCase):
 
     def test_missing_model(self):
         (self.root / MODEL_RELATIVE).unlink()
-        with self.assertRaisesRegex(FileNotFoundError, "GGUF"):
+        with self.assertRaisesRegex(RuntimeError, "Modelo GGUF ausente"):
             LocalChatRuntime(self.root)
+
+    def test_short_gguf_fails_preflight_before_native_model_load(self):
+        with patch("brain_ssd.chat.runtime.MIN_PLAUSIBLE_GGUF_BYTES", 64):
+            with self.assertRaisesRegex(RuntimeError, "GGUF"):
+                LocalChatRuntime(self.root)
+
+    def test_missing_binary_is_classified_without_local_path_in_status(self):
+        (self.root / "third_party/llama.cpp/build-win/bin/llama-completion.exe").unlink()
+        # Linux resolver also checks without .exe.
+        bare = self.root / "third_party/llama.cpp/build-win/bin/llama-completion"
+        if bare.is_file():
+            bare.unlink()
+        from brain_ssd.chat.server import ChatEngine
+        messages=[]
+        engine=ChatEngine(lambda: LocalChatRuntime(self.root,profile="economia"),
+                          startup_reporter=messages.append)
+        engine.start()
+        try:
+            info=engine.status()
+            self.assertEqual(info["startup_error_code"], "CORE_MISSING")
+            self.assertEqual(len(messages),1)
+            self.assertNotIn(str(self.root), str(info))
+        finally:
+            engine.close()
 
     def test_economy_releases_knowledge_brain_after_each_query(self):
         runtime = LocalChatRuntime(self.root, profile="economia")
@@ -87,7 +114,7 @@ class TestOptionalSSD(unittest.TestCase):
 
     def test_bad_gguf(self):
         (self.root / MODEL_RELATIVE).write_bytes(b"invalid")
-        with self.assertRaisesRegex(ValueError, "GGUF"):
+        with self.assertRaisesRegex(RuntimeError, "GGUF"):
             LocalChatRuntime(self.root)
 
 

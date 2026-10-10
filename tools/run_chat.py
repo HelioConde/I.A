@@ -41,7 +41,8 @@ def main() -> int:
             cpu_threads=PROFILES[args.profile]["threads"],
             episodic_enabled=args.episodic_memory, shadow_enabled=args.cognitive_shadow)
     episodic_store = EpisodicMemory(args.episodic_db or default_episodic_path()) if args.episodic_memory else None
-    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases)
+    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases,
+        startup_reporter=lambda message: print("\n[Brain-SSD] " + message + "\n[Brain-SSD] Execute DIAGNOSTICAR-CHAT-WINDOWS.bat para verificar os requisitos.\n", file=sys.stderr, flush=True))
     history_store = ChatHistory(args.history_db or default_history_path())
     try:
         server = create_chat_server(engine, ROOT / "chat", port=args.port, history_store=history_store, episodic_store=episodic_store)

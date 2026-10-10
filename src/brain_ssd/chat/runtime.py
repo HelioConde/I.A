@@ -5,12 +5,15 @@ from pathlib import Path
 from typing import Any
 
 from brain_ssd.local_runtime.backend import resolve_llama_executable
+from brain_ssd.chat.startup_diagnostics import ChatStartupError
 from brain_ssd.local_runtime.core_backend import (
     PersistentCoreBackend, SubprocessPerQueryCore, resolve_server_executable,
 )
 from brain_ssd.local_runtime.pipeline import (
     INDEX_RELATIVE, MANIFEST_RELATIVE, MODEL_RELATIVE, LocalBrainSSD,
 )
+
+MIN_PLAUSIBLE_GGUF_BYTES = 64 * 1024 * 1024
 
 PROFILES = {
     "economia": {"threads": 2, "context_size": 2048, "mode": "subprocess", "knowledge_budget": 1200, "prompt_budget_bytes": 3600},
@@ -35,13 +38,16 @@ class LocalChatRuntime:
         self.prompt_budget_bytes = int(settings["prompt_budget_bytes"])
         self.model_path = self.root / MODEL_RELATIVE
         if not self.model_path.is_file():
-            raise FileNotFoundError(
-                f"Modelo GGUF ausente: {self.model_path}. "
-                "Coloque Qwen3-0.6B-Q8_0.gguf na pasta models/ e reinicie."
-            )
-        with self.model_path.open("rb") as stream:
-            if stream.read(4) != b"GGUF":
-                raise ValueError(f"Modelo inválido (assinatura GGUF ausente): {self.model_path}")
+            raise ChatStartupError("MODEL_MISSING")
+        try:
+            # Avoid invoking a native process on a truncated download.
+            if self.model_path.stat().st_size < MIN_PLAUSIBLE_GGUF_BYTES:
+                raise ChatStartupError("MODEL_INVALID")
+            with self.model_path.open("rb") as stream:
+                if stream.read(4) != b"GGUF":
+                    raise ChatStartupError("MODEL_INVALID")
+        except OSError as exc:
+            raise ChatStartupError("MODEL_UNREADABLE") from exc
         self._completion_path: Path | None = None
         self._brain: LocalBrainSSD | None = None
         self._closed = False
@@ -51,7 +57,10 @@ class LocalChatRuntime:
             and (self.root / MANIFEST_RELATIVE).with_name("brain.dat").is_file()
         )
         if self.core_mode == "persistent":
-            executable = resolve_server_executable(self.root)
+            try:
+                executable = resolve_server_executable(self.root)
+            except FileNotFoundError as exc:
+                raise ChatStartupError("SERVER_MISSING") from exc
             self.core_backend = PersistentCoreBackend(
                 executable, self.model_path,
                 threads=int(settings["threads"]), context_size=int(settings["context_size"]),
@@ -61,7 +70,10 @@ class LocalChatRuntime:
             except FileNotFoundError:
                 pass  # Optional SSD retrieval is unavailable without the frozen CLI.
         else:
-            self._completion_path = resolve_llama_executable(self.root)
+            try:
+                self._completion_path = resolve_llama_executable(self.root)
+            except FileNotFoundError as exc:
+                raise ChatStartupError("CORE_MISSING") from exc
             self.core_backend = SubprocessPerQueryCore(
                 self._completion_path, self.model_path,
                 threads=int(settings["threads"]), context_size=int(settings["context_size"]),
