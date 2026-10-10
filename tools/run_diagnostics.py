@@ -33,6 +33,7 @@ CHAT_SUITES = [
     ("cognitive_lab", "test_cognitive_lab.py"),
     ("consolidation", "test_consolidation.py"),
     ("diagnostics", "test_diagnostics.py"),
+    ("compare_diagnostics", "test_compare_diagnostics.py"),
 ]
 CORE_SUITES = [
     ("core", "test_core.py"),

@@ -113,3 +113,17 @@ A chave legada `latency` representa **apenas chamadas de chat concluídas**;
 não mistura inferência e duração total como se fossem amostras independentes.
 Essas contagens ainda não representam RAM física total nem bytes reais lidos
 do SSD. Valores ausentes significam medição indisponível, não zero.
+
+## Comparação A/B de pacotes antigos e novos
+
+Depois de rodar os testes em versões diferentes, você pode comparar os
+arquivos sanitizados sem enviar conteúdo pessoal:
+
+    python tools/compare_diagnostics.py caminho/antes.zip caminho/depois.zip
+
+O programa calcula diferenças observadas em latência, tempo até o primeiro
+token e picos de memória **apenas quando os dois lados possuem amostras**.
+Se faltar uma medição, o campo será NOT_COMPARABLE em vez de zero.
+Testes do GitHub Actions usam modelos simulados: uma melhoria nessas
+métricas não demonstra ganho com Qwen no Windows real.
+Resultados de CPU/RAM precisam de hardware, versão, carga e prompts iguais.

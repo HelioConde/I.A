@@ -25,6 +25,8 @@ on:
       - "tools/run_diagnostics.py"
       - "tools/export_diagnostics.py"
       - "tests/test_diagnostics.py"
+      - "tests/test_compare_diagnostics.py"
+      - "tools/compare_diagnostics.py"
       - "GERAR-LOGS-WINDOWS.bat"
       - "tests/test_chat_runtime.py"
       - "tests/test_chat_history.py"
@@ -40,7 +42,7 @@ jobs:
           python-version: "3.11"
       - name: Verify syntax
         shell: pwsh
-        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/doctor_chat.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_chat_episodic_http.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py
+        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/doctor_chat.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_chat_episodic_http.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tools/compare_diagnostics.py
       - name: Test the Windows UI and independent chat adapter (mock Core)
         shell: pwsh
         run: |
@@ -54,6 +56,7 @@ jobs:
           python -m unittest discover -s tests -p "test_cognitive_lab.py" -v
           python -m unittest discover -s tests -p "test_consolidation.py" -v
           python -m unittest discover -s tests -p "test_diagnostics.py" -v
+          python -m unittest discover -s tests -p "test_compare_diagnostics.py" -v
       - name: Synthetic episodic negative controls
         shell: pwsh
         run: |
