@@ -15,3 +15,10 @@ brain_data/**/*.tmp
 *.sqlite3-shm
 *.sqlite3-wal
 data/chat-history*
+
+# Local diagnostic telemetry and exported packages; never commit personal test logs
+results/diagnostics/
+results/chat_validation/
+diagnostics/
+*.diagnostics.jsonl
+brain-ssd-diagnostics-*.zip
