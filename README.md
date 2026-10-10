@@ -150,6 +150,15 @@ Verifique o estado das automações: [Chat Linux](https://github.com/HelioConde/
 - Os módulos experimentais de ação operam apenas em ambiente simulado, sem permissão para controlar o computador.
 - Respostas de modelos e memórias recuperadas podem conter erros ou informações desatualizadas.
 
+## Logs e análise dos testes
+
+O Brain-SSD registra **eventos estruturados locais**, sem salvar o texto das perguntas,
+respostas ou lembranças. No Windows, execute `GERAR-LOGS-WINDOWS.bat` para rodar testes
+e gerar um ZIP sanitizado que pode ser anexado à conversa para análise. O GitHub Actions
+também publica pacotes de diagnóstico das suítes simuladas.
+
+[Guia de coleta, privacidade e exportação](docs/LOGS_DIAGNOSTICOS.md).
+
 ## Próximos objetivos
 
 1. **P0 — Inferência ponta a ponta no Windows:** confirmar “Olá!”, sessões com vários turnos, encerramento de processos e comportamento offline com GGUF real.

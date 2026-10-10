@@ -47,7 +47,7 @@ ENUMS = {
               "chat_doctor", "chat_episodic", "chat_episodic_http",
               "cognitive_lab", "consolidation", "core", "storage",
               "router_gating", "cache_policy", "hybrid", "progressive",
-              "bench_episodic_memory", "run_cognitive_lab",
+              "bench_episodic_memory", "run_cognitive_lab", "diagnostics",
               "real_windows_inference"},
     "error_type": {"ValueError", "RuntimeError", "FileNotFoundError",
                    "PermissionError", "OSError", "TimeoutError",
