@@ -6,11 +6,12 @@ Each operation opens its own connection to support ThreadingHTTPServer safely.
 from __future__ import annotations
 
 import os
+from contextlib import contextmanager
 import sqlite3
 import time
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 
 def default_history_path() -> Path:
@@ -45,12 +46,24 @@ class ChatHistory:
                   ON conversations(updated_at DESC);
             """)
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
+        # sqlite3's native context manager commits but DOES NOT close the
+        # connection. Windows locks the database file until close(), so use
+        # an explicit finally block (also required by TemporaryDirectory tests).
         db = sqlite3.connect(self.path, timeout=10.0)
-        db.row_factory = sqlite3.Row
-        db.execute("PRAGMA foreign_keys = ON")
-        db.execute("PRAGMA busy_timeout = 10000")
-        return db
+        try:
+            db.row_factory = sqlite3.Row
+            db.execute("PRAGMA foreign_keys = ON")
+            db.execute("PRAGMA busy_timeout = 10000")
+            try:
+                yield db
+                db.commit()
+            except BaseException:
+                db.rollback()
+                raise
+        finally:
+            db.close()
 
     @staticmethod
     def _valid_id(conversation_id: Any) -> str:
