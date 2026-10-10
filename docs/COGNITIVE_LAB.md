@@ -202,3 +202,14 @@ Avaliações antigas sem informação de versão (geradas por releases anteriore
 continuam no histórico local, porém **não contribuem para o viés de ranking**;
 esse comportamento conservador evita reutilizar sinais de texto desconhecido.
 O Qwen não recebe esses feedbacks automaticamente.
+
+## Integridade de consolidações após edição ou exclusão
+
+A fila de revisão guarda apenas IDs e versões das notas de origem como
+proveniência, sem copiar texto para esses metadados. Quando uma lembrança
+confirmada é corrigida ou excluída, o resumo aprovado permanece no histórico
+de auditoria, mas recebe o `effective_state`
+`SOURCE_CHANGED_OR_UNVERIFIED` ou `SOURCE_DELETED`. Rascunhos
+desatualizados não podem ser aprovados: devem ser criados novamente.
+Entradas legadas sem versões são consideradas não verificadas.
+A fila não altera automaticamente prompts nem pesos do Qwen.

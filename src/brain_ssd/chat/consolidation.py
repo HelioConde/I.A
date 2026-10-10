@@ -31,11 +31,15 @@ class ConsolidationQueue:
                     summary TEXT,
                     state TEXT NOT NULL CHECK(state IN ('DRAFT','REVIEWED','REVOKED','REJECTED')),
                     created_at INTEGER NOT NULL,
-                    reviewed_at INTEGER
+                    reviewed_at INTEGER,
+                    source_versions TEXT
                 );
                 CREATE INDEX IF NOT EXISTS review_state
                   ON review_candidates(state, created_at DESC);
             """)
+            cols={row[1] for row in conn.execute("PRAGMA table_info(review_candidates)")}
+            if "source_versions" not in cols:
+                conn.execute("ALTER TABLE review_candidates ADD COLUMN source_versions TEXT")
 
     @contextmanager
     def _db(self) -> Iterator[sqlite3.Connection]:
@@ -81,6 +85,19 @@ class ConsolidationQueue:
             raise ValueError("Uma fonte deixou de ser uma memória confirmada.")
         return [mapping[x] for x in ids]
 
+    def _source_versions(self, ids: list[str]) -> dict[str,str]:
+        """Read revision IDs only, not content; missing sources fail closed."""
+        self._source_notes(ids)
+        versions={}
+        with self.episodes._connect() as db:
+            for identity in ids:
+                row=db.execute(
+                    "SELECT id FROM episode_revisions WHERE episode_id=? "
+                    "ORDER BY rowid DESC LIMIT 1", (identity,)
+                ).fetchone()
+                versions[identity]=row["id"] if row is not None else "ORIGINAL"
+        return versions
+
     def create_draft(self, source_ids: list[str]) -> dict[str,Any]:
         if not isinstance(source_ids,list):
             raise ValueError("Escolha uma lista de memórias.")
@@ -90,14 +107,18 @@ class ConsolidationQueue:
             shared.intersection_update(words(row["content"]))
         if len(shared)<2:
             raise ValueError("Não há pistas em comum suficientes para propor consolidação.")
+        snapshot=self._source_versions(source_ids)
         item={"id":str(uuid.uuid4()),"source_ids":list(source_ids),
-              "shared_cues":sorted(shared)[:20],"state":"DRAFT",
+              "shared_cues":sorted(shared)[:20],"source_versions":snapshot,"state":"DRAFT",
               "summary":None,"created_at":int(time.time())}
         with self._db() as db:
             db.execute(
-                "INSERT INTO review_candidates VALUES (?,?,?,?,?,?,?)",
+                "INSERT INTO review_candidates "
+                "(id,source_ids,shared_cues,summary,state,created_at,reviewed_at,source_versions) "
+                "VALUES (?,?,?,?,?,?,?,?)",
                 (item["id"],json.dumps(item["source_ids"]),
-                 json.dumps(item["shared_cues"]),None,"DRAFT",item["created_at"],None),
+                 json.dumps(item["shared_cues"]),None,"DRAFT",item["created_at"],None,
+                 json.dumps(snapshot)),
             )
         return item
 
@@ -110,6 +131,19 @@ class ConsolidationQueue:
         data=dict(row)
         data["source_ids"]=json.loads(data["source_ids"])
         data["shared_cues"]=json.loads(data["shared_cues"])
+        data["source_versions"]=(json.loads(data["source_versions"])
+                                 if data.get("source_versions") else None)
+        # Preserve reviewed history; mark snapshots stale if their sources
+        # have changed. This is not a decision about factual correctness.
+        try:
+            current=self._source_versions(data["source_ids"])
+        except ValueError:
+            data["effective_state"]="SOURCE_DELETED"
+        else:
+            if not data["source_versions"] or current != data["source_versions"]:
+                data["effective_state"]="SOURCE_CHANGED_OR_UNVERIFIED"
+            else:
+                data["effective_state"]=data["state"]
         return data
 
     def review(self, draft_id: str, decision: str, summary: str | None = None) -> dict[str,Any]:
@@ -121,6 +155,8 @@ class ConsolidationQueue:
         if decision=="approve":
             if not isinstance(summary,str) or not 1 <= len(summary.strip()) <= 500:
                 raise ValueError("A revisão precisa de resumo explícito de 1 a 500 caracteres.")
+            if draft["effective_state"] != "DRAFT":
+                raise ValueError("Uma memória de origem mudou ou desapareceu. Crie novo rascunho.")
             self._source_notes(draft["source_ids"])
             state="REVIEWED"
             saved=summary.strip()

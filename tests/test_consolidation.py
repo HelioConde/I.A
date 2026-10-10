@@ -50,6 +50,31 @@ class TestOfflineConsolidation(unittest.TestCase):
             self.queue.review(draft["id"],"approve","Ambas as reuniões")
         self.assertEqual(self.queue.list()[0]["state"],"DRAFT")
 
+    def test_edited_source_invalidates_draft_and_approved_review(self):
+        first=self.queue.create_draft([self.a["id"],self.b["id"]])
+        initial=self.queue.review(first["id"],"approve","Duas reuniões sobre rover")
+        self.assertEqual(initial["effective_state"],"REVIEWED")
+        draft=self.queue.create_draft([self.a["id"],self.b["id"]])
+        changed=self.episodes.replace(
+            self.a["id"],"Reunião do projeto rover sexta na biblioteca",
+            expected_content=self.a["content"])
+        self.assertTrue(changed["changed"])
+        self.assertEqual(self.queue._row(first["id"])["effective_state"],
+                         "SOURCE_CHANGED_OR_UNVERIFIED")
+        with self.assertRaises(ValueError):
+            self.queue.review(draft["id"],"approve","Resumir nota corrigida")
+        current=self.queue.create_draft([self.a["id"],self.b["id"]])
+        fresh=self.queue.review(current["id"],"approve","Reuniões com nota corrigida")
+        self.assertEqual(fresh["effective_state"],"REVIEWED")
+
+    def test_missing_source_invalidates_approved_review(self):
+        draft=self.queue.create_draft([self.a["id"],self.b["id"]])
+        self.queue.review(draft["id"],"approve","Resumo revisado")
+        self.episodes.delete(self.a["id"])
+        stale=self.queue._row(draft["id"])
+        self.assertEqual(stale["effective_state"],"SOURCE_DELETED")
+        self.assertTrue(self.queue.revoke(draft["id"]))
+
     def test_rejection_and_reopen_are_persistent(self):
         draft=self.queue.create_draft([self.a["id"],self.b["id"]])
         rejected=self.queue.review(draft["id"],"reject")
