@@ -91,6 +91,7 @@ class TestOfflineConsolidation(unittest.TestCase):
             db.execute("INSERT INTO review_candidates VALUES (?,?,?,?,?,?,?)",
                        (candidate,json.dumps([self.a["id"],self.b["id"]]),
                         json.dumps(["projeto","reuniao"]),None,"DRAFT",1,None))
+            db.commit()
         migrated=ConsolidationQueue(legacy,self.episodes)
         old=migrated._row(candidate)
         self.assertEqual(old["effective_state"],"SOURCE_CHANGED_OR_UNVERIFIED")

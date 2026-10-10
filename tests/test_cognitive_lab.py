@@ -181,6 +181,7 @@ class TestReversiblePlasticity(unittest.TestCase):
                        "signal INTEGER NOT NULL, created_at INTEGER NOT NULL, revoked_at INTEGER)")
             db.execute("INSERT INTO feedback VALUES (?,?,?,?,NULL)",
                        (str(uuid.uuid4()),self.a["id"],1,int(time.time())))
+            db.commit()
         migrated=PlasticityLedger(legacy,self.episodes)
         assert migrated.shadow_bias(self.a["id"])["active_support"] == 0
         for _ in range(3):
