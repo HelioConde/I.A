@@ -123,6 +123,29 @@ class TestChatEngine(unittest.TestCase):
         self.assertEqual(history_count, 0)
         self.assertGreaterEqual(evidence_bytes, 0)
 
+    def test_qwen_prompt_not_double_wrapped_with_manual_assistant_prefix(self):
+        prompt = build_chat_prompt("Explique como o SSD é usado.", [
+            {"role": "user", "content": "Olá"},
+            {"role": "assistant", "content": "Bom dia"},
+        ], "")
+        self.assertIn("Pergunta atual do usuário:", prompt)
+        self.assertIn("/no_think", prompt)
+        self.assertNotIn("\n\nAssistente:\n\n/no_think", prompt)
+        self.assertTrue(prompt.endswith("/no_think"))
+        self.assertIn("Assistente: Bom dia", prompt)
+
+    def test_repetitive_failed_legacy_answers_are_not_reinjected(self):
+        old = [
+            {"role": "user", "content": "Explique algo"},
+            {"role": "assistant", "content": "Não soube."},
+            {"role": "user", "content": "Como está hoje?"},
+            {"role": "assistant", "content": "Não sou um assistente, estou apenas criando um modelo de IA experimental. Como uma IA..."},
+            {"role": "user", "content": "O que você consegue fazer?"},
+        ]
+        cleaned = normalize_history(old)
+        self.assertEqual(len(cleaned), 3)
+        self.assertTrue(all(row["role"] == "user" for row in cleaned))
+
     def test_large_question_fails_instead_of_being_silently_cut(self):
         with self.assertRaisesRegex(ValueError, "Mensagem longa"):
             bounded_chat_prompt("x" * 2200, [], "", 1000)
