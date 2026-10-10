@@ -15,7 +15,7 @@ from brain_ssd.local_runtime.pipeline import (
 PROFILES = {
     "economia": {"threads": 2, "context_size": 2048, "mode": "subprocess", "knowledge_budget": 1200, "prompt_budget_bytes": 3600},
     "equilibrado": {"threads": 4, "context_size": 4096, "mode": "subprocess", "knowledge_budget": 3500, "prompt_budget_bytes": 7600},
-    "rapido": {"threads": 4, "context_size": 4096, "mode": "persistent", "knowledge_budget": 3500},
+    "rapido": {"threads": 4, "context_size": 4096, "mode": "persistent", "knowledge_budget": 3500, "prompt_budget_bytes": 7600},
 }
 
 

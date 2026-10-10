@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from brain_ssd.chat.runtime import LocalChatRuntime
+from brain_ssd.chat.runtime import LocalChatRuntime, PROFILES
 from brain_ssd.local_runtime.pipeline import MODEL_RELATIVE
 
 
@@ -25,6 +25,15 @@ class TestOptionalSSD(unittest.TestCase):
 
     def tearDown(self):
         self.directory.cleanup()
+
+    def test_all_profiles_have_complete_budgets(self):
+        for name, values in PROFILES.items():
+            with self.subTest(profile=name):
+                self.assertIn("threads", values)
+                self.assertIn("context_size", values)
+                self.assertIn("knowledge_budget", values)
+                self.assertIn("prompt_budget_bytes", values)
+                self.assertGreater(values["prompt_budget_bytes"], 1000)
 
     def test_chat_without_corpus(self):
         runtime = LocalChatRuntime(self.root, profile="economia")
