@@ -70,6 +70,75 @@ class EpisodicTests(unittest.TestCase):
             self.mem.delete("../../secret")
         self.assertEqual(words("MemÓria de Pesquisa"),frozenset({"memoria","pesquisa"}))
 
+    def test_explicit_correction_rebuilds_index_and_can_be_restored(self):
+        first = self.mem.add("Visita ao museu marcada para terça")
+        self.assertEqual(self.mem.recall("visita museu terça")[0]["id"],first["id"])
+        revised = self.mem.replace(
+            first["id"],"Visita ao museu remarcada para quinta",
+            expected_content=first["content"]
+        )
+        self.assertTrue(revised["changed"])
+        self.assertEqual(self.mem.recall("visita museu terça"),[])
+        self.assertEqual(self.mem.recall("visita museu quinta")[0]["id"],first["id"])
+        history = self.mem.revisions(first["id"])
+        self.assertEqual(history[0]["old_content"],first["content"])
+        self.assertEqual(history[0]["operation"],"EDIT")
+        reopened = EpisodicMemory(self.file)
+        self.assertEqual(len(reopened.revisions(first["id"])),1)
+        restored = reopened.restore(first["id"],history[0]["id"],
+                                    expected_content=revised["content"])
+        self.assertTrue(restored["changed"])
+        self.assertEqual(reopened.recall("visita museu terça")[0]["id"],first["id"])
+        self.assertEqual(reopened.recall("visita museu quinta"),[])
+        self.assertEqual(reopened.revisions(first["id"])[0]["operation"],"RESTORE")
+        self.assertEqual(len(reopened.revisions(first["id"])),2)
+
+    def test_stale_editor_is_rejected_and_both_versions_remain_intact(self):
+        original=self.mem.add("Projeto rover azul guardado na garagem")
+        self.mem.replace(original["id"],"Projeto rover verde guardado na garagem",
+                         expected_content=original["content"])
+        with self.assertRaisesRegex(ValueError,"outra janela"):
+            self.mem.replace(original["id"],"Projeto rover vermelho guardado na garagem",
+                             expected_content=original["content"])
+        self.assertEqual(self.mem.list()[0]["content"],"Projeto rover verde guardado na garagem")
+        self.assertEqual(len(self.mem.revisions(original["id"])),1)
+        with self.assertRaises(ValueError):
+            self.mem.restore(original["id"],"00000000-0000-0000-0000-000000000000",
+                             expected_content=self.mem.list()[0]["content"])
+
+    def test_delete_purges_local_index_and_revision_history(self):
+        note=self.mem.add("Meu computador está com defeito")
+        self.mem.replace(note["id"],"Meu notebook foi consertado",
+                         expected_content=note["content"])
+        self.assertEqual(len(self.mem.revisions(note["id"])),1)
+        self.assertTrue(self.mem.delete(note["id"]))
+        self.assertEqual(self.mem.revisions(note["id"]),[])
+        self.assertEqual(self.mem.recall("notebook consertado"),[])
+        with self.assertRaises(ValueError):
+            self.mem.replace(note["id"],"Texto novo",expected_content="Outro")
+
+    def test_revisions_bounded_to_twenty_and_last_is_deterministic(self):
+        note=self.mem.add("Revisão projeto rover versão inicial")
+        prev=note["content"]
+        for i in range(26):
+            nxt=f"Revisão projeto rover versão atualizada {i}"
+            self.mem.replace(note["id"],nxt,expected_content=prev)
+            prev=nxt
+        history=self.mem.revisions(note["id"],limit=100)
+        self.assertEqual(len(history),20)
+        self.assertEqual(history[0]["new_content"],prev)
+        self.assertEqual(history[-1]["new_content"],"Revisão projeto rover versão atualizada 6")
+        restored=self.mem.restore(note["id"],history[-1]["id"],expected_content=prev)
+        self.assertEqual(restored["content"],"Revisão projeto rover versão atualizada 5")
+        self.assertEqual(len(self.mem.revisions(note["id"])),20)
+
+    def test_noop_correction_keeps_version_history_empty(self):
+        note=self.mem.add("Minha pasta favorita é estudos")
+        same=self.mem.replace(note["id"],"  Minha pasta favorita é estudos ",
+                              expected_content=note["content"])
+        self.assertFalse(same["changed"])
+        self.assertEqual(self.mem.revisions(note["id"]),[])
+
     def test_offline_replay_only_returns_candidates(self):
         note=self.mem.add("Planejamento de tarefas para o Brain-SSD")
         self.assertEqual(self.mem.replay_candidates()[0]["id"],note["id"])

@@ -172,7 +172,7 @@ class EpisodicMemory:
         db.execute(
             "DELETE FROM episode_revisions WHERE episode_id=? "
             "AND id NOT IN (SELECT id FROM episode_revisions "
-            "WHERE episode_id=? ORDER BY created_at DESC,id DESC LIMIT 20)",
+            "WHERE episode_id=? ORDER BY rowid DESC LIMIT 20)",
             (identity, identity)
         )
         return {"id":identity, "content":normalized,
@@ -195,7 +195,7 @@ class EpisodicMemory:
             rows = db.execute(
                 "SELECT id,episode_id,old_content,new_content,created_at,operation "
                 "FROM episode_revisions WHERE episode_id=? "
-                "ORDER BY created_at DESC,id DESC LIMIT ?",
+                "ORDER BY rowid DESC LIMIT ?",
                 (identity,max(1,min(int(limit),20)))
             ).fetchall()
         return [dict(row) for row in rows]
