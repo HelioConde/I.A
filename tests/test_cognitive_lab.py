@@ -15,7 +15,7 @@ from brain_ssd.chat.cognitive_lab import (
     replay_preview, prediction_error, GridWorld,
 )
 from brain_ssd.chat.episodic import EpisodicMemory
-from brain_ssd.chat.plasticity import PlasticityLedger
+from brain_ssd.chat.plasticity import PlasticityLedger, PredictionJournal
 
 
 class TestAttentionAndWorkingMemory(unittest.TestCase):
@@ -139,3 +139,33 @@ class TestReversiblePlasticity(unittest.TestCase):
 
 if __name__=="__main__":
     unittest.main()
+
+
+class TestPredictionJournal(unittest.TestCase):
+    def test_feedback_changes_only_task_probability_and_is_reversible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/"predictions.sqlite3"
+            journal=PredictionJournal(path)
+            first=journal.predict("grid_reach_goal")
+            self.assertEqual(first["probability"],0.5)
+            observed=journal.observe("grid_reach_goal",True)
+            self.assertEqual(observed["prediction_error"],0.5)
+            self.assertEqual(observed["brier"],0.25)
+            self.assertAlmostEqual(journal.predict("grid_reach_goal")["probability"],0.666667)
+            journal.observe("grid_reach_goal",True)
+            self.assertEqual(journal.predict("grid_reach_goal")["probability"],0.75)
+            self.assertEqual(journal.predict("other_task")["probability"],0.5)
+            self.assertTrue(journal.revoke(observed["id"]))
+            self.assertEqual(journal.predict("grid_reach_goal")["probability"],0.666667)
+            self.assertFalse(journal.revoke(observed["id"]))
+            reopened=PredictionJournal(path)
+            self.assertEqual(reopened.predict("grid_reach_goal")["observations"],1)
+
+    def test_ground_truth_and_keys_must_be_verified(self):
+        with tempfile.TemporaryDirectory() as directory:
+            journal=PredictionJournal(Path(directory)/"predictions.sqlite3")
+            with self.assertRaises(ValueError):
+                journal.observe("grid_reach_goal","yes")
+            with self.assertRaises(ValueError):
+                journal.observe("my password is 123", True)
+            self.assertEqual(journal.predict("grid_reach_goal")["observations"],0)

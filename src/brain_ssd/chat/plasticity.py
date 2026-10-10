@@ -129,3 +129,94 @@ class PlasticityLedger:
                               "FROM feedback ORDER BY created_at DESC,id DESC LIMIT ?",
                               (max(1,min(int(limit),100)),)).fetchall()
         return [dict(x) for x in rows]
+
+
+class PredictionJournal:
+    """Versioned, reversible Beta-Bernoulli predictions for verified outcomes.
+
+    Learns a scalar probability for a limited task ID, NOT Qwen facts/weights.
+    Unverified guesses have no effect; rollback restores the previous estimate.
+    """
+
+    def __init__(self, path: Path) -> None:
+        import re
+        self.path = Path(path).expanduser().resolve()
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with self._connect() as db:
+            db.executescript("""
+                CREATE TABLE IF NOT EXISTS prediction_feedback (
+                    id TEXT PRIMARY KEY,
+                    task_key TEXT NOT NULL,
+                    predicted REAL NOT NULL,
+                    observed INTEGER NOT NULL CHECK(observed IN (0,1)),
+                    timestamp INTEGER NOT NULL,
+                    revoked_at INTEGER
+                );
+                CREATE INDEX IF NOT EXISTS prediction_task_idx
+                    ON prediction_feedback(task_key, revoked_at);
+            """)
+
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
+        conn = sqlite3.connect(self.path, timeout=10)
+        try:
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA busy_timeout=10000")
+            try:
+                yield conn
+                conn.commit()
+            except BaseException:
+                conn.rollback()
+                raise
+        finally:
+            conn.close()
+
+    @staticmethod
+    def _task_key(key: str) -> str:
+        import re
+        if not isinstance(key, str) or re.fullmatch(r"[a-z][a-z0-9_.-]{0,63}", key) is None:
+            raise ValueError("Use um identificador de tarefa sem dados pessoais.")
+        return key
+
+    def predict(self, task_key: str) -> dict[str, Any]:
+        key = self._task_key(task_key)
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT SUM(observed) AS successes, COUNT(*) AS n FROM prediction_feedback "
+                "WHERE task_key=? AND revoked_at IS NULL",
+                (key,),
+            ).fetchone()
+        count = int(row["n"])
+        success = int(row["successes"] or 0)
+        # Beta(1,1) conjugate mean; smoothed and bounded away from certainty.
+        p = (success + 1) / (count + 2)
+        return {"task": key, "probability": round(p, 6), "observations": count,
+                "status": "SYNTHETIC_METADATA_ONLY", "model_weights_changed": False}
+
+    def observe(self, task_key: str, verified_outcome: bool) -> dict[str, Any]:
+        key = self._task_key(task_key)
+        if type(verified_outcome) is not bool:
+            raise ValueError("O resultado precisa ser um booleano verificado.")
+        before = self.predict(key)
+        with self._connect() as db:
+            total = int(db.execute("SELECT COUNT(*) FROM prediction_feedback").fetchone()[0])
+            if total >= MAX_EVENTS:
+                raise ValueError("Limite de observações atingido.")
+            identifier = str(uuid.uuid4())
+            db.execute(
+                "INSERT INTO prediction_feedback VALUES (?,?,?,?,?,NULL)",
+                (identifier,key,before["probability"],int(verified_outcome),int(time.time())),
+            )
+        error = float(verified_outcome) - before["probability"]
+        return {"id": identifier, "task": key, "predicted": before["probability"],
+                "observed": verified_outcome, "prediction_error": round(error,6),
+                "brier": round(error*error,6), "updated": self.predict(key)}
+
+    def revoke(self, observation_id: str) -> bool:
+        event = PlasticityLedger._check_uuid(observation_id)
+        with self._connect() as db:
+            cursor=db.execute(
+                "UPDATE prediction_feedback SET revoked_at=? WHERE id=? AND revoked_at IS NULL",
+                (int(time.time()),event),
+            )
+            return cursor.rowcount == 1
