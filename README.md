@@ -159,6 +159,22 @@ também publica pacotes de diagnóstico das suítes simuladas.
 
 [Guia de coleta, privacidade e exportação](docs/LOGS_DIAGNOSTICOS.md).
 
+## Qualidade e segurança de memória (experimento)
+
+O chat com memória episódica agora sinaliza **possíveis datas divergentes**
+entre notas confirmadas relacionadas ao mesmo assunto, sem escolher uma
+como verdade automaticamente. O aviso é uma hipótese conservadora:
+podem ser eventos diferentes, não lembranças incorretas.
+
+Correções adicionais preservam pistas relevantes no final de perguntas longas,
+normalizam o campo de confirmação vindo do SQLite para uso por associação
+e replay, e impedem que feedback de uma memória excluída continue
+influenciando o ranking experimental.
+
+Execute `python tools/bench_memory_quality.py`: o conjunto sintético
+e lexical contém **24 recuperações positivas, 20 negativas, 5 verificações
+de ambiguidade e 1 de exclusão**. Os resultados não medem qualidade do Qwen,
+generalização semântica nem memória humana. Veja [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
 ## Próximos objetivos
 
 1. **P0 — Inferência ponta a ponta no Windows:** confirmar “Olá!”, sessões com vários turnos, encerramento de processos e comportamento offline com GGUF real.
