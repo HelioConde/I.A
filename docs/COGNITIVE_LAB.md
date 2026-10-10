@@ -151,3 +151,13 @@ silenciosamente uma delas: se não couberem as duas fontes **e o aviso**
 de incerteza, retira as notas disputadas do prompt e informa no retorno
 `episodic_ambiguities_withheld=true`. Esse mecanismo sacrifica cobertura
 para não apresentar evidência parcial como verdade única.
+
+### Exibição da proteção na interface
+
+Quando o aviso de divergência e ambas as notas não cabem no orçamento de
+prompt, a resposta HTTP inclui `episodic_ambiguities_withheld: true`.
+A interface informa explicitamente que **nenhuma das fontes conflitantes
+foi escolhida apenas para caber** e recomenda esclarecer o evento ou
+aumentar o contexto. Isso não garante que o Qwen interprete corretamente
+um conflito quando todas as notas couberem — essa qualidade precisa de
+avaliação com o modelo verdadeiro.
