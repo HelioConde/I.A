@@ -138,16 +138,31 @@ class EpisodicMemory:
             result = db.execute("DELETE FROM episodes WHERE id=?", (identifier,))
             return result.rowcount == 1
 
-    def recall(self, cue: str, limit: int = 3) -> list[dict[str, Any]]:
-        """Rare-term overlap with a minimum of 2 cues for multiword queries.
+    def recall(self, cue: str, limit: int = 3, *,
+               experimental_aliases: bool = False) -> list[dict[str, Any]]:
+        """Return selective episodic notes, never model-generated facts.
 
-        Does not infer new facts or perform neural pattern completion; unrelated
-        cues abstain. Always bounded to avoid reading a whole corpus into RAM.
+        Default behavior remains pure lexical retrieval. The separately gated
+        synonym bridge uses a handful of exact PT-BR aliases; it is NOT
+        embedding-based semantic retrieval. Every alias hit needs >=2 distinct
+        query concepts, protecting against single-word semantic collisions.
+        No full corpus scan is needed, and the number of candidate rows is
+        strictly bounded.
         """
-        terms = list(cue_tokens(cue)[-24:])
-        if not terms:
+        raw_terms = list(cue_tokens(cue)[-24:])
+        if not raw_terms:
             return []
-        threshold = 2 if len(terms) > 1 else 1
+        if experimental_aliases:
+            # Deferred import leaves the default path and dependencies intact.
+            from brain_ssd.chat.semantic_bridge import (
+                concepts, expand_query
+            )
+            query_concepts = concepts(raw_terms)
+            terms = list(expand_query(raw_terms))
+        else:
+            query_concepts = frozenset(raw_terms)
+            terms = raw_terms
+        threshold = 2 if len(query_concepts) > 1 else 1
         placeholders = ",".join("?" for _ in terms)
         with self._connect() as db:
             total = db.execute("SELECT COUNT(*) FROM episodes").fetchone()[0]
@@ -156,7 +171,7 @@ class EpisodicMemory:
                 "FROM episode_terms t JOIN episodes e ON t.episode_id=e.id "
                 f"WHERE t.term IN ({placeholders}) AND e.confirmed=1 "
                 "GROUP BY e.id HAVING COUNT(*)>=? "
-                "ORDER BY matches DESC,e.created_at DESC,e.id DESC LIMIT 30",
+                "ORDER BY matches DESC,e.created_at DESC,e.id DESC LIMIT 120",
                 (*terms,threshold),
             ).fetchall()
             if not rows:
@@ -166,20 +181,40 @@ class EpisodicMemory:
                 terms,
             ).fetchall()
         df = {row["term"]: row["n"] for row in counts}
-        scored = []
-        query = set(terms)
+        scored: list[dict[str, Any]] = []
+        query = set(raw_terms)
         for row in rows:
-            episode_terms = query & words(row["content"])
-            if len(episode_terms) < threshold:
+            memory_terms = words(row["content"])
+            exact = query & memory_terms
+            matching = concepts(memory_terms) & query_concepts if experimental_aliases else exact
+            if len(matching) < threshold:
                 continue
-            idf = sum(math.log1p((total + 1) / (df.get(t, 0) + 1)) for t in episode_terms)
-            score = round(idf + len(episode_terms) / len(query), 5)
-            scored.append({
-                "id": row["id"], "content": row["content"], "created_at": row["created_at"],
-                "source": "explicit_user", "confirmed": True, "matched_terms": sorted(episode_terms),
+            # Semantic-only one-word bridges are too permissive; allow a
+            # single cue only when its literal token is also present.
+            if experimental_aliases and not exact and len(matching) < 2:
+                continue
+            idf = sum(math.log1p((total + 1) / (df.get(t, 0) + 1)) for t in exact)
+            # Exact-only score remains compatible with the previous strategy.
+            score = round(idf + len(matching) / len(query_concepts), 5)
+            hit = {
+                "id": row["id"], "content": row["content"],
+                "created_at": row["created_at"],
+                "source": "explicit_user", "confirmed": True,
+                "matched_terms": sorted(exact),
                 "score": score,
-            })
-        scored.sort(key=lambda x: (-x["score"], -x["created_at"], x["id"]))
+            }
+            if experimental_aliases:
+                hit["matched_concepts"] = sorted(matching)
+                hit["match_mode"] = "LEXICAL" if len(exact) >= threshold else "SEMANTIC_ALIAS"
+            scored.append(hit)
+        if experimental_aliases:
+            scored.sort(key=lambda x: (
+                -len(x["matched_concepts"]),
+                -len(x["matched_terms"]),
+                -x["score"], -x["created_at"], x["id"]
+            ))
+        else:
+            scored.sort(key=lambda x: (-x["score"], -x["created_at"], x["id"]))
         return scored[:max(1,min(int(limit),3))]
 
     def replay_candidates(self, limit: int = 10) -> list[dict[str, Any]]:
