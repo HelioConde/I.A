@@ -127,3 +127,23 @@ python tools/doctor_chat.py --profile economia --json e --probe.
 Se os arquivos necessários estiverem presentes, execute o teste de resposta
 real: python tools/validate_chat_windows.py --profile economia.
 O teste de instalação não substitui uma inferência verdadeira.
+
+
+## Streaming de tokens e Parar (10/10/2026)
+
+O chat usa POST /api/chat/stream com Server-Sent Events (SSE). A interface
+mostra os pedaços da resposta à medida que o Core os envia e oferece **Parar**.
+O perfil Economia e Equilibrado usam stdout incremental do llama-completion,
+sem manter o modelo carregado entre consultas. O perfil Rápido encaminha
+os eventos do llama-server persistente. Nos dois casos a resposta é produzida
+pelo modelo local, não por animação de texto fictícia.
+
+Parar solicita cancelamento ao backend: o subprocesso é encerrado; no perfil
+persistente, interromper mata o processo llama-server para evitar inferência
+em segundo plano (o próximo prompt o reinicia). Uma resposta interrompida não
+é salva no SQLite. Se a CLI acumular stdout antes de escrever, os tokens podem
+chegar em blocos maiores; essa granularidade depende do binário.
+
+O streaming não afirma maior velocidade nem menos RAM. Os testes automatizados
+usam um Core simulado apenas para verificar transporte, cancelamento e
+persistência; a validação real ainda exige Windows + Qwen GGUF + llama.cpp.
