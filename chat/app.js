@@ -235,6 +235,9 @@ function updateMetrics(data) {
   $("detailPages").textContent = Number.isFinite(data.active_pages) ? String(data.active_pages) : "—";
   $("detailSources").textContent = Number.isFinite(data.sources_from_ssd) ? String(data.sources_from_ssd) : "—";
   $("detailEpisodes").textContent = Number.isFinite(data.episodic_memories_used) ? String(data.episodic_memories_used) : "—";
+  const shadow = data.cognitive_shadow;
+  $("detailAttention").textContent = shadow ? shadow.attention_selected_candidates + " candidatos / " + shadow.attention_candidate_bytes + " B" : "desativado";
+  $("detailWorking").textContent = shadow ? shadow.working_memory_bytes + " B · " + shadow.working_topics.length + " tópicos" : "desativado";
 }
 async function send() {
   const question = composer.value.trim();

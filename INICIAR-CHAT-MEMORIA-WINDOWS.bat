@@ -8,13 +8,13 @@ echo As notas so serao salvas se voce usar "Guardar uma lembranca".
 echo Arquivo privado: %%LOCALAPPDATA%%\BrainSSD\episodic-notes.sqlite3
 echo.
 if exist ".venv\Scripts\python.exe" (
-  ".venv\Scripts\python.exe" "tools\run_chat.py" --profile economia --episodic-memory
+  ".venv\Scripts\python.exe" "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow
 ) else (
   where py >nul 2>nul
   if not errorlevel 1 (
-    py -3 "tools\run_chat.py" --profile economia --episodic-memory
+    py -3 "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow
   ) else (
-    python "tools\run_chat.py" --profile economia --episodic-memory
+    python "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow
   )
 )
 if errorlevel 1 (

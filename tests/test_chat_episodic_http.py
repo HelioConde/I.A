@@ -56,6 +56,28 @@ class TestEngine(unittest.TestCase):
             finally:
                 engine.close()
 
+    def test_shadow_reports_state_but_does_not_change_core_prompt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            memory=EpisodicMemory(Path(temp)/"notes.sqlite3")
+            memory.add("Meu projeto favorito é o rover azul")
+            one=FakeRuntime()
+            two=FakeRuntime()
+            baseline=ChatEngine(lambda:one,episodic_store=memory)
+            shadow=ChatEngine(lambda:two,episodic_store=memory,cognitive_shadow=True)
+            baseline.start()
+            shadow.start()
+            try:
+                b=baseline.ask("Qual meu projeto favorito?",[])
+                s=shadow.ask("Qual meu projeto favorito?",[])
+                self.assertEqual(one.core_backend.prompts[-1],two.core_backend.prompts[-1])
+                self.assertIsNone(b["cognitive_shadow"])
+                self.assertEqual(s["cognitive_shadow"]["mode"],"READ_ONLY_SHADOW")
+                self.assertFalse(s["cognitive_shadow"]["changed_model_prompt"])
+                self.assertEqual(shadow.status()["cognitive_shadow_enabled"],True)
+            finally:
+                baseline.close()
+                shadow.close()
+
     def test_disabled_by_default(self):
         engine=ChatEngine(FakeRuntime)
         engine.start()

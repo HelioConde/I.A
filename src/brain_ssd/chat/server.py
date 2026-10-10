@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 
 from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.episodic import EpisodicMemory
+from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
 from brain_ssd.chat.http_stream import serve_stream
 from brain_ssd.backend import GenerationRequest
@@ -114,9 +115,10 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False) -> None:
         self._runtime_factory = runtime_factory
         self.episodic_store = episodic_store
+        self.cognitive_shadow = bool(cognitive_shadow)
         self._runtime: Any | None = None
         self._error: str | None = None
         self._state = "starting"
@@ -157,6 +159,7 @@ class ChatEngine:
             "error": self._error if self._state == "error" else None,
             "experimental": True,
             "episodic_memory_enabled": self.episodic_store is not None,
+            "cognitive_shadow_enabled": self.cognitive_shadow,
         }
 
     def begin_stream(self, request_id: str) -> threading.Event:
@@ -208,6 +211,25 @@ class ChatEngine:
                     context = retrieval.get("context", {})
                     knowledge = str(context.get("text", ""))[:getattr(self._runtime, "knowledge_budget", 5_000)]
             episodes = self.episodic_store.recall(question) if (self.episodic_store and not _GREETING.fullmatch(question)) else []
+            # Shadow-only: no modifications to Qwen prompt or retrieval.
+            shadow = None
+            if self.cognitive_shadow:
+                sketch = working_state([*history, {"role": "user", "content": question}])
+                plan = select_attention(
+                    question,
+                    [{"id": episode["id"], "text": episode["content"]} for episode in episodes],
+                    max_records=3, max_bytes=900,
+                )
+                shadow = {
+                    "mode": "READ_ONLY_SHADOW",
+                    "working_topics": list(sketch.topics),
+                    "working_memory_bytes": sketch.approx_bytes,
+                    "attention_selected_candidates": len(plan.selected_ids),
+                    "attention_inhibited_candidates": len(plan.inhibited_ids),
+                    "attention_candidate_bytes": plan.activation_bytes,
+                    "changed_model_prompt": False,
+                    "changed_core_weights": False,
+                }
             episode_text = "\n".join(
                 "[episodio=" + item["id"] + "] " + json.dumps(item["content"], ensure_ascii=False)
                 for item in episodes
@@ -237,6 +259,7 @@ class ChatEngine:
                 "answer": answer,
                 "model": MODEL_NAME,
                 "mode": "experimental_chat",
+                "cognitive_shadow": shadow,
                 "profile": getattr(self._runtime, "profile", "equilibrado"),
                 "core_mode": getattr(self._runtime, "core_mode", "subprocess"),
                 "sources_from_ssd": len(retrieval.get("sources", [])) if (retrieval and evidence_bytes) else 0,

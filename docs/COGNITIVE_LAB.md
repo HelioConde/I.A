@@ -44,3 +44,15 @@ de que a IA funciona como um cérebro.
 **Cuidado:** o comando de demonstração não é um chatbot cognitivo novo. É um
 conjunto limitado de hipóteses testáveis. O funcionamento com Qwen exige
 outra matriz de qualidade, no Windows real.
+
+## Integração opcional no chat
+
+Para obter diagnósticos somente shadow, execute:
+
+    python tools/run_chat.py --profile economia --episodic-memory --cognitive-shadow
+
+A janela Diagnóstico local mostra bytes do estado compacto e número de
+candidatos de atenção. Isso não altera o prompt, não descarta fontes do Core
+nem atualiza os pesos do modelo. Sem a flag, não há processamento extra.
+O BAT INICIAR-CHAT-MEMORIA-WINDOWS.bat ativa explicitamente os experimentos;
+o BAT comum continua usando o chat básico.
