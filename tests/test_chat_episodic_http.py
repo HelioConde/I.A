@@ -237,6 +237,34 @@ class TestHttp(unittest.TestCase):
         self.assertTrue(self.call("DELETE","/api/memories/"+item["id"])["deleted"])
         self.assertEqual(self.call("GET","/api/memories")["memories"],[])
 
+    def test_explicit_edit_restore_and_origin_protection(self):
+        old=self.call("POST","/api/memories",{"content":"Projeto rover terça biblioteca"})["memory"]
+        endpoint="/api/memories/"+old["id"]
+        update={"content":"Projeto rover quinta biblioteca",
+                "expected_content":old["content"]}
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.call("POST",endpoint+"/edit",update,origin="https://attacker.invalid")
+        self.assertEqual(ctx.exception.code,403)
+        newer=self.call("POST",endpoint+"/edit",update)["memory"]
+        self.assertTrue(newer["changed"])
+        self.assertEqual(newer["id"],old["id"])
+        self.assertEqual(len(self.memory.recall("projeto rover terça")),0)
+        self.assertEqual(self.memory.recall("projeto rover quinta")[0]["id"],old["id"])
+        revisions=self.call("GET",endpoint+"/revisions")["revisions"]
+        self.assertEqual(len(revisions),1)
+        self.assertEqual(revisions[0]["old_content"],old["content"])
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.call("POST",endpoint+"/edit",update)
+        self.assertEqual(ctx.exception.code,400)
+        restored=self.call("POST",endpoint+"/restore",{
+            "revision_id":revisions[0]["id"],
+            "expected_content":newer["content"]
+        })["memory"]
+        self.assertEqual(restored["content"],old["content"])
+        self.assertEqual(self.memory.recall("projeto rover terça")[0]["id"],old["id"])
+        self.assertTrue(self.call("DELETE",endpoint)["deleted"])
+        self.assertEqual(self.call("GET",endpoint+"/revisions")["revisions"],[])
+
     def test_reject_oversized_or_cross_origin_memory(self):
         with self.assertRaises(urllib.error.HTTPError) as ctx:
             self.call("POST","/api/memories",{"content":"x"*501})

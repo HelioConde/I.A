@@ -480,6 +480,19 @@ class ChatHandler(BaseHTTPRequestHandler):
             store = self.server.episodic_store
             self._json({"enabled": store is not None, "memories": store.list() if store else []})
             return
+        if path.startswith("/api/memories/") and path.endswith("/revisions"):
+            store = self.server.episodic_store
+            if store is None:
+                self._json({"error": "Memória episódica desabilitada."}, HTTPStatus.NOT_FOUND)
+                return
+            identity = path.removeprefix("/api/memories/").removesuffix("/revisions").rstrip("/")
+            try:
+                history = store.revisions(identity)
+            except ValueError as exc:
+                self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+                return
+            self._json({"revisions": history})
+            return
         if path == "/api/conversations" and self.server.history_store is not None:
             self._json({"conversations": self.server.history_store.list()})
             return
@@ -517,10 +530,12 @@ class ChatHandler(BaseHTTPRequestHandler):
             self._json({"error": "Origem não permitida."}, HTTPStatus.FORBIDDEN)
             return
         path = urlsplit(self.path).path
-        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel", "/api/memories"):
+        memory_mutation = (path.startswith("/api/memories/") and
+                           (path.endswith("/edit") or path.endswith("/restore")))
+        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel", "/api/memories") and not memory_mutation:
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
             return
-        if path == "/api/memories" and self.server.episodic_store is None:
+        if (path == "/api/memories" or memory_mutation) and self.server.episodic_store is None:
             self._json({"error": "Memória episódica desabilitada; use --episodic-memory."}, HTTPStatus.NOT_FOUND)
             return
         if path == "/api/conversations" and self.server.history_store is None:
@@ -542,6 +557,17 @@ class ChatHandler(BaseHTTPRequestHandler):
                 raise ValueError("JSON inválido.")
             if path == "/api/memories":
                 result = {"memory": self.server.episodic_store.add(data.get("content"))}
+            elif memory_mutation:
+                endpoint = "edit" if path.endswith("/edit") else "restore"
+                identity = path.removeprefix("/api/memories/").removesuffix("/" + endpoint)
+                store = self.server.episodic_store
+                if endpoint == "edit":
+                    item = store.replace(identity, data.get("content"),
+                                         expected_content=data.get("expected_content"))
+                else:
+                    item = store.restore(identity, data.get("revision_id"),
+                                         expected_content=data.get("expected_content"))
+                result = {"memory": item}
             elif path == "/api/conversations":
                 result = {"conversation": self.server.history_store.create()}
             elif path == "/api/chat/cancel":
