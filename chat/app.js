@@ -1,6 +1,6 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false };
+const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false, assistantName:"Brain-SSD" };
 const composer = $("messageInput");
 const log = $("messages");
 
@@ -17,7 +17,7 @@ async function refreshEpisodicMemory() {
     const payload = await requestJson("/api/memories", {cache:"no-store"});
     $("saveMemory").disabled = !payload.enabled;
     status.textContent = payload.enabled
-      ? "Notas locais. Corrija, restaure uma versão anterior ou apague uma lembrança; nenhuma mudança é automática."
+      ? "Notas locais. Use 'salve na memória que ...' no chat ou o botão abaixo; nada é salvo sem seu pedido."
       : "Desativadas. Reinicie com --episodic-memory para permitir notas explícitas.";
     list.replaceChildren();
     if (!payload.enabled) return;
@@ -213,6 +213,10 @@ async function refreshStatus() {
     setConnection(data.status, data.error, Boolean(data.inference_verified));
     $("modeInfo").textContent = data.profile ? ("Perfil: " + data.profile) : "Perfil: —";
     $("knowledgeInfo").textContent = data.knowledge_note || "Conhecimento SSD: verificando";
+    app.assistantName = data.assistant_name || "Brain-SSD";
+    document.querySelectorAll(".message-label").forEach(label => {
+      if (label.textContent !== "Problema na execução") label.textContent = app.assistantName;
+    });
   } catch (_) {
     setConnection("error", "Servidor local desconectado. Abra o iniciador do Brain-SSD.");
   }
@@ -242,7 +246,7 @@ function addMessage(role, content, extraClass = "") {
   if (role !== "user") {
     const label = document.createElement("p");
     label.className = "message-label";
-    label.textContent = extraClass === "error" ? "Problema na execução" : "Brain-SSD";
+    label.textContent = extraClass === "error" ? "Problema na execução" : app.assistantName;
     body.appendChild(label);
   }
   const text = document.createElement("div");
@@ -362,7 +366,10 @@ async function send() {
           actionNote.className = "local-action-note";
           actionNote.textContent = "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
           pending.querySelector(".message-body").appendChild(actionNote);
-          if (payload.local_action === "memory_save") void refreshEpisodicMemory();
+          if (payload.local_action === "memory_save") {
+            void refreshEpisodicMemory();
+            void refreshStatus();
+          }
         }
         updateMetrics(payload);
         completed = true;
