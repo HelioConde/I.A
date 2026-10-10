@@ -275,7 +275,13 @@ class EpisodicMemory:
         df = {row["term"]: row["n"] for row in counts}
         scored: list[dict[str, Any]] = []
         query = set(raw_terms)
+        from brain_ssd.chat.memory_safety import disagrees_with_explicit_cue
         for row in rows:
+            # "terça" must not recover an episode explicitly corrected to
+            # "quinta" solely due to generic topic overlap. Multi-valued
+            # or unspecified dates/times remain eligible and are not judged.
+            if disagrees_with_explicit_cue(cue, row["content"]):
+                continue
             memory_terms = words(row["content"])
             exact = query & memory_terms
             matching = concepts(memory_terms) & query_concepts if experimental_aliases else exact

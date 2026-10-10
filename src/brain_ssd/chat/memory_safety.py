@@ -135,6 +135,22 @@ def check_memory_ambiguities(episodes: list[dict[str, Any]], *,
     return warnings
 
 
+
+
+def disagrees_with_explicit_cue(query: str, note: str) -> bool:
+    """Abstain on an explicit single-value mismatch, never choose a winner.
+
+    If either side contains zero or multiple values of a category, do not
+    assert a disagreement. Generic topical cues stay eligible for recall.
+    This is conservative *retrieval filtering*, not semantic verification.
+    """
+    for _, extractor in _FIELDS:
+        expected = extractor(query)
+        observed = extractor(note)
+        if len(expected) == 1 and len(observed) == 1 and expected != observed:
+            return True
+    return False
+
 AMBIGUITY_PROMPT = (
     "[ATENÇÃO: estas notas podem descrever eventos, datas, horários ou preços "
     "diferentes. Não escolha uma delas como verdade apenas pela ordem; "

@@ -106,6 +106,30 @@ class TestMemorySafety(unittest.TestCase):
                          {"POSSIBLE_DIFFERENT_WEEKDAY","POSSIBLE_DIFFERENT_PRICE"})
         self.assertEqual(len(notes),2)
 
+    def test_explicit_query_mismatch_abstains_on_four_structured_fields(self):
+        from brain_ssd.chat.memory_safety import disagrees_with_explicit_cue
+        self.assertTrue(disagrees_with_explicit_cue(
+            "Visita ao museu terça", "Visita ao museu quinta"
+        ))
+        self.assertTrue(disagrees_with_explicit_cue(
+            "Consulta veterinária 05/11/2026", "Consulta veterinária 04/11/2026"
+        ))
+        self.assertTrue(disagrees_with_explicit_cue(
+            "Reunião projeto rover às 14:00", "Reunião projeto rover às 15h"
+        ))
+        self.assertTrue(disagrees_with_explicit_cue(
+            "Preço arroz integral R$ 12,50", "Preço arroz integral R$ 13,90"
+        ))
+        self.assertFalse(disagrees_with_explicit_cue(
+            "Qual dia da visita ao museu?", "Visita ao museu quinta"
+        ))
+        self.assertFalse(disagrees_with_explicit_cue(
+            "Mudou de terça para quinta?", "Visita ao museu quinta"
+        ))
+        self.assertFalse(disagrees_with_explicit_cue(
+            "Visita terça", "Visita terça"
+        ))
+
     def test_deleted_notes_no_longer_participate(self):
         with tempfile.TemporaryDirectory() as tmp:
             db=EpisodicMemory(Path(tmp)/"episodes.sqlite3")
