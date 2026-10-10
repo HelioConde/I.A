@@ -68,3 +68,11 @@
 /* User-controlled episodic revisions. */
 .episodic-item button {flex:0 0 28px; cursor:pointer}
 .episodic-item button[title="Corrigir esta lembrança"],.episodic-item button[title="Restaurar versão anterior"]{font-size:17px}
+
+/* Clearly distinguish confirmed local SQLite actions from Qwen text. */
+.local-action-note {
+  color: #a9c5b8;
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 6px 0 0;
+}
