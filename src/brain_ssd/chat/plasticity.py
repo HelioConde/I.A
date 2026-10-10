@@ -33,11 +33,17 @@ class PlasticityLedger:
                     episode_id TEXT NOT NULL,
                     signal INTEGER NOT NULL CHECK(signal IN (-1, 1)),
                     created_at INTEGER NOT NULL,
-                    revoked_at INTEGER
+                    revoked_at INTEGER,
+                    source_version TEXT
                 );
                 CREATE INDEX IF NOT EXISTS feedback_episode
                     ON feedback(episode_id, revoked_at);
             """)
+            # Migrate existing private ledgers. Old unversioned feedback is not
+            # promoted: no proof of which edited note it evaluated.
+            cols = {row[1] for row in db.execute("PRAGMA table_info(feedback)")}
+            if "source_version" not in cols:
+                db.execute("ALTER TABLE feedback ADD COLUMN source_version TEXT")
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
@@ -69,20 +75,27 @@ class PlasticityLedger:
         ident = self._check_uuid(episode_id)
         if type(signal) is not int or signal not in (-1, 1):
             raise ValueError("O feedback precisa ser +1 ou -1, explicitamente.")
-        # No feedback for unapproved/generated text or notes no longer present.
-        if not any(note["id"] == ident for note in self.episodes.list(limit=100)):
-            # More than 100 episodes: membership check without loading notes.
-            with self.episodes._connect() as db:
-                row = db.execute("SELECT id FROM episodes WHERE id=? AND confirmed=1", (ident,)).fetchone()
-            if row is None:
+        # Bind feedback to a unique revision, not merely the stable note ID.
+        # Each explicit edit/restore produces a fresh revision UUID.
+        with self.episodes._connect() as db:
+            confirmed = db.execute(
+                "SELECT id FROM episodes WHERE id=? AND confirmed=1", (ident,)
+            ).fetchone()
+            if confirmed is None:
                 raise ValueError("Memória confirmada não encontrada.")
+            row = db.execute(
+                "SELECT id FROM episode_revisions WHERE episode_id=? "
+                "ORDER BY rowid DESC LIMIT 1", (ident,)
+            ).fetchone()
+            version = row["id"] if row is not None else "ORIGINAL"
         event_id = str(uuid.uuid4())
         with self._connect() as db:
             count = db.execute("SELECT COUNT(*) FROM feedback").fetchone()[0]
             if count >= MAX_EVENTS:
                 raise ValueError("Limite de feedback atingido.")
-            db.execute("INSERT INTO feedback VALUES (?,?,?,?,NULL)",
-                       (event_id, ident, signal, int(time.time())))
+            db.execute("INSERT INTO feedback(id,episode_id,signal,created_at,revoked_at,source_version) "
+                "VALUES (?,?,?,?,NULL,?)",
+                (event_id, ident, signal, int(time.time()), version)
         return event_id
 
     def revoke(self, event_id: str) -> bool:
@@ -110,6 +123,11 @@ class PlasticityLedger:
             source_exists = source_db.execute(
                 "SELECT 1 FROM episodes WHERE id=? AND confirmed=1", (ident,)
             ).fetchone() is not None
+            current_row = source_db.execute(
+                "SELECT id FROM episode_revisions WHERE episode_id=? "
+                "ORDER BY rowid DESC LIMIT 1", (ident,)
+            ).fetchone() if source_exists else None
+            current_version = current_row["id"] if current_row else "ORIGINAL"
         if not source_exists:
             return {"episode_id": ident, "active_support": 0,
                     "bias": 0.0, "status": "SOURCE_DELETED",
@@ -118,8 +136,9 @@ class PlasticityLedger:
         with self._connect() as db:
             rows = db.execute(
                 "SELECT signal,created_at FROM feedback "
-                "WHERE episode_id=? AND revoked_at IS NULL ORDER BY created_at DESC LIMIT 100",
-                (ident,),
+                "WHERE episode_id=? AND revoked_at IS NULL AND source_version=? "
+                "ORDER BY created_at DESC LIMIT 100",
+                (ident,current_version),
             ).fetchall()
         n = len(rows)
         weight = [math.exp(-math.log(2) * max(0, now-row["created_at"]) /

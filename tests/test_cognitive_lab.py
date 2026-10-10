@@ -141,6 +141,36 @@ class TestReversiblePlasticity(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.ledger.add_feedback(self.a["id"],1)
 
+    def test_feedback_follows_exact_revision_and_restore_does_not_reactivate(self):
+        for _ in range(3):
+            self.ledger.add_feedback(self.a["id"],1)
+        self.assertGreater(self.ledger.shadow_bias(self.a["id"])["bias"],0)
+        corrected=self.episodes.replace(
+            self.a["id"], "Meu projeto Python usa PostgreSQL",
+            expected_content=self.a["content"])
+        self.assertEqual(corrected["id"],self.a["id"])
+        self.assertEqual(self.ledger.shadow_bias(self.a["id"])["active_support"],0)
+        self.assertEqual(self.ledger.shadow_bias(self.a["id"])["bias"],0)
+        for _ in range(3):
+            self.ledger.add_feedback(self.a["id"],-1)
+        self.assertLess(self.ledger.shadow_bias(self.a["id"])["bias"],0)
+        # Returning to exactly the old text is a NEW revision. Old evidence
+        # must remain inactive until the user explicitly evaluates it again.
+        item=self.episodes.restore(
+            self.a["id"], self.episodes.revisions(self.a["id"])[0]["id"],
+            expected_content=corrected["content"])
+        self.assertEqual(item["content"],self.a["content"])
+        self.assertEqual(self.ledger.shadow_bias(self.a["id"])["bias"],0)
+
+    def test_migrated_unversioned_ledger_is_conservatively_ignored(self):
+        import sqlite3
+        # Old feedback rows created by earlier releases contain no
+        # revision identifier; never attach them to an edited note.
+        with self.ledger._connect() as db:
+            db.execute("INSERT INTO feedback (id,episode_id,signal,created_at,revoked_at) VALUES (?,?,?,?,NULL)",
+                       ("11111111-1111-4111-8111-111111111111", self.a["id"],1,int(time.time())))
+        self.assertEqual(self.ledger.shadow_bias(self.a["id"])["active_support"],0)
+
     def test_bad_feedback_and_unknown_memory(self):
         with self.assertRaises(ValueError):
             self.ledger.add_feedback(self.a["id"],True)

@@ -62,7 +62,8 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
             cancelled.set()
         else:
             try:
-                event("error", {"error": str(exc)})
+                # Never stream arbitrary backend exception messages to the UI.
+                event("error", {"error": "Falha interna da geração local. Consulte o diagnóstico."})
             except OSError:
                 cancelled.set()
     finally:

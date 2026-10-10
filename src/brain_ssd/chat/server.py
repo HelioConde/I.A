@@ -146,7 +146,9 @@ class ChatEngine:
             try:
                 runtime = self._runtime_factory()
             except Exception as exc:
-                self._error = f"{type(exc).__name__}: {exc}"
+                # Do not expose native model paths, file names or traceback text
+            # through the unauthenticated loopback health/status endpoint.
+            self._error = "Não foi possível iniciar o modelo local. Consulte o terminal e o diagnóstico."
                 self._state = "error"
                 if self.diagnostics:
                     self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
@@ -587,8 +589,9 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result = self.server.engine.ask(data.get("message"), data.get("history", []))
         except (ValueError, json.JSONDecodeError) as exc:
             self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
-        except Exception as exc:
-            self._json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
+        except Exception:
+            # Native errors may contain paths, prompt fragments, or secrets.
+            self._json({"error": "Falha interna do motor local. Consulte o diagnóstico."}, HTTPStatus.SERVICE_UNAVAILABLE)
         else:
             self._json(result)
 
