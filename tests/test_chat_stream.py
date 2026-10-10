@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
-from brain_ssd.local_runtime.core_backend import SubprocessPerQueryCore
+from brain_ssd.local_runtime.core_backend import SubprocessPerQueryCore, PersistentCoreBackend
 
 
 class DummyCore:
@@ -97,6 +97,52 @@ class TestPipeCancellation(unittest.TestCase):
     def _request():
         from brain_ssd.backend import GenerationRequest
         return GenerationRequest("olá")
+
+
+class TestPersistentModelLoadCancellation(unittest.TestCase):
+    def test_stop_during_model_loading_exits_before_timeout(self):
+        class Child:
+            def __init__(self):
+                self.stopped = threading.Event()
+            def poll(self):
+                return 1 if self.stopped.is_set() else None
+            def terminate(self):
+                self.stopped.set()
+            def wait(self, timeout=None):
+                return 1
+            def kill(self):
+                self.stopped.set()
+
+        child = Child()
+        core = object.__new__(PersistentCoreBackend)
+        core.process = child
+        core.host = "127.0.0.1"
+        core.port = 9000
+        started = threading.Event()
+        closed = threading.Event()
+
+        def slow_start():
+            started.set()
+            if not child.stopped.wait(timeout=4):
+                raise RuntimeError("A model stayed loading without cancellation")
+            raise RuntimeError("persistent Core exited during loading")
+        core.start = slow_start
+        core.close = closed.set
+        signal = threading.Event()
+        from brain_ssd.backend import GenerationRequest
+
+        def interrupt():
+            self.assertTrue(started.wait(timeout=2))
+            signal.set()
+        stopper = threading.Thread(target=interrupt)
+        stopper.start()
+        before = time.monotonic()
+        with self.assertRaises(GenerationCancelled):
+            generate_streamed(core, GenerationRequest("Olá"), lambda _: None, signal)
+        stopper.join(timeout=3)
+        self.assertLess(time.monotonic() - before, 3)
+        self.assertTrue(child.stopped.is_set())
+        self.assertTrue(closed.is_set())
 
 
 class TestHttpStreaming(unittest.TestCase):

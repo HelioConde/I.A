@@ -127,34 +127,50 @@ class ChatEngine:
         self._state = "starting"
         self._inference_verified = False
         self._lock = threading.Lock()
+        self._lifecycle_lock = threading.Lock()
+        self._closed = False
         self._stream_lock = threading.Lock()
         self._active_id: str | None = None
         self._active_cancel: threading.Event | None = None
 
     def start(self) -> None:
-        try:
-            runtime = self._runtime_factory()
-        except Exception as exc:
-            self._error = f"{type(exc).__name__}: {exc}"
-            self._state = "error"
-            if self.diagnostics:
-                self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
-        else:
-            self._runtime = runtime
-            self._state = "ready"
-            if self.diagnostics:
-                status = runtime.status() if hasattr(runtime, "status") else {}
-                self.diagnostics.emit("runtime.ready", profile=status.get("profile", "not_applicable"),
-                    core_mode=status.get("core_mode", "not_applicable"), cpu_threads=status.get("threads"))
+        # Startup may run in the background. Do not resurrect an engine after
+        # shutdown or allocate a second native runtime on repeated start().
+        with self._lifecycle_lock:
+            if self._closed or self._state != "starting":
+                return
+            try:
+                runtime = self._runtime_factory()
+            except Exception as exc:
+                self._error = f"{type(exc).__name__}: {exc}"
+                self._state = "error"
+                if self.diagnostics:
+                    self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
+            else:
+                self._runtime = runtime
+                self._state = "ready"
+                if self.diagnostics:
+                    status = runtime.status() if hasattr(runtime, "status") else {}
+                    self.diagnostics.emit("runtime.ready", profile=status.get("profile", "not_applicable"),
+                        core_mode=status.get("core_mode", "not_applicable"), cpu_threads=status.get("threads"))
 
     def close(self) -> None:
         with self._stream_lock:
             if self._active_cancel is not None:
                 self._active_cancel.set()
         with self._lock:
-            if self._runtime is not None:
-                self._runtime.close()
-                self._runtime = None
+            # Wait for in-flight initialization before closing the runtime.
+            # Lock order matches start() and excludes late initialization.
+            with self._lifecycle_lock:
+                if self._closed:
+                    return
+                self._closed = True
+                self._state = "stopped"
+                if self._runtime is not None:
+                    try:
+                        self._runtime.close()
+                    finally:
+                        self._runtime = None
 
     def status(self) -> dict[str, Any]:
         details = self._runtime.status() if self._runtime is not None and hasattr(self._runtime, "status") else {}

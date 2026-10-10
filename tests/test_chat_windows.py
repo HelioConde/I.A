@@ -105,6 +105,54 @@ class TestChatEngine(unittest.TestCase):
             bad.ask("Olá", [])
 
 
+class TestLifecycle(unittest.TestCase):
+    def test_close_during_async_start_never_leaves_runtime_alive(self):
+        opened = threading.Event()
+        continue_start = threading.Event()
+        sessions = []
+
+        class SlowRuntime(FakeRuntime):
+            pass
+
+        def factory():
+            opened.set()
+            self.assertTrue(continue_start.wait(timeout=3))
+            obj = SlowRuntime()
+            sessions.append(obj)
+            return obj
+
+        engine = ChatEngine(factory)
+        initializer = threading.Thread(target=engine.start)
+        initializer.start()
+        self.assertTrue(opened.wait(timeout=2))
+        closer = threading.Thread(target=engine.close)
+        closer.start()
+        continue_start.set()
+        initializer.join(timeout=3)
+        closer.join(timeout=3)
+        self.assertFalse(initializer.is_alive())
+        self.assertFalse(closer.is_alive())
+        self.assertEqual(len(sessions), 1)
+        self.assertTrue(sessions[0].closed)
+        self.assertEqual(engine.status()["status"], "stopped")
+        engine.start()  # Must not reopen after close.
+        self.assertEqual(len(sessions), 1)
+
+    def test_duplicate_start_is_idempotent(self):
+        calls = []
+        def factory():
+            runtime = FakeRuntime()
+            calls.append(runtime)
+            return runtime
+        engine = ChatEngine(factory)
+        engine.start()
+        engine.start()
+        self.assertEqual(len(calls), 1)
+        engine.close()
+        engine.close()
+        self.assertTrue(calls[0].closed)
+
+
 class TestHttpUI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

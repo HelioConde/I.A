@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import codecs
+from collections import deque
 import json
 import os
 import subprocess
@@ -43,8 +44,9 @@ def _subprocess_stream(core: SubprocessPerQueryCore, request: GenerationRequest,
         bufsize=0, creationflags=flags,
         env={**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
     done = threading.Event()
-    samples: list[Any] = []
-    stderr: list[bytes] = []
+    # Bounded tails: native stderr may be verbose during long model load.
+    samples: deque[Any] = deque(maxlen=4096)
+    stderr: deque[bytes] = deque(maxlen=64)
     output: list[str] = []
     first_at: float | None = None
 
@@ -119,13 +121,22 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
     done = threading.Event()
     first_at: float | None = None
     output: list[str] = []
-    samples: list[Any] = []
+    samples: deque[Any] = deque(maxlen=4096)
     timings: dict = {}
 
     def watch() -> None:
         while not done.wait(0.05):
             if cancel.is_set():
-                core.close()  # Kill persistent inference, not just the HTTP stream.
+                # PersistentCoreBackend.start() holds its own RLock while
+                # waiting for the model. Calling close() alone can block up
+                # to ready_timeout_s. Terminate the child *before* close().
+                active = core.process
+                if active is not None:
+                    try:
+                        _stop(active)
+                    except OSError:
+                        pass
+                core.close()
                 return
             if os.name == "nt" and core.process is not None and core.process.poll() is None:
                 samples.append(windows_process_snapshot(core.process.pid))
@@ -176,7 +187,9 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
             "private_bytes_max": _max_ram(samples, "private_bytes"),
             "physical_read_bytes": None,
         }}
-    except (OSError, TimeoutError):
+    except Exception:
+        # A child killed during model loading may raise RuntimeError ("exited")
+        # rather than OSError. It is still a user cancellation.
         if cancel.is_set():
             raise GenerationCancelled() from None
         raise
