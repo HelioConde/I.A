@@ -175,6 +175,16 @@ Execute `python tools/bench_memory_quality.py`: o conjunto sintético
 e lexical contém **24 recuperações positivas, 20 negativas, 5 verificações
 de ambiguidade e 1 de exclusão**. Os resultados não medem qualidade do Qwen,
 generalização semântica nem memória humana. Veja [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
+### Experimento de sinônimos (desativado por padrão)
+
+A busca episódica pode testar uma **ponte restrita de sinônimos PT-BR**, sem
+bibliotecas de embeddings nem conexão externa. É ativada exclusivamente
+por `python tools/run_chat.py --episodic-memory --memory-aliases`.
+O teste A/B `python tools/bench_semantic_bridge.py` mede recuperação e
+falsas associações sobre dados inventados. Sinônimos não representam
+compreensão semântica geral, e resultados sintéticos não comprovam melhoria
+no Qwen. Consulte [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
+
 ## Próximos objetivos
 
 1. **P0 — Inferência ponta a ponta no Windows:** confirmar “Olá!”, sessões com vários turnos, encerramento de processos e comportamento offline com GGUF real.

@@ -12,6 +12,8 @@ on:
       - "tests/test_chat_episodic.py"
       - "tests/test_memory_safety.py"
       - "tools/bench_memory_quality.py"
+      - "tools/bench_semantic_bridge.py"
+      - "tests/test_semantic_bridge.py"
       - "tests/test_chat_episodic_http.py"
       - "tools/doctor_chat.py"
       - "tools/bench_episodic_memory.py"
@@ -44,7 +46,7 @@ jobs:
       - name: Verify JavaScript syntax
         run: node --check chat/app.js
       - name: Verify syntax
-        run: python -m compileall -q tools/run_chat.py tools/doctor_chat.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_memory_safety.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py
+        run: python -m compileall -q tools/run_chat.py tools/doctor_chat.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_memory_safety.py tests/test_semantic_bridge.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tools/bench_semantic_bridge.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py
       - name: Test HTTP and chat adapter with mock CPU Core
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
@@ -53,6 +55,7 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_stream.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic.py" -v
           python -m unittest discover -s tests -p "test_memory_safety.py" -v
+          python -m unittest discover -s tests -p "test_semantic_bridge.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic_http.py" -v
           python -m unittest discover -s tests -p "test_cognitive_lab.py" -v
           python -m unittest discover -s tests -p "test_consolidation.py" -v
@@ -63,6 +66,7 @@ jobs:
         run: |
           python tools/bench_episodic_memory.py
           python tools/bench_memory_quality.py
+          python tools/bench_semantic_bridge.py
           python tools/run_cognitive_lab.py
 
       - name: Build sanitized diagnostic artifact (mock tests)

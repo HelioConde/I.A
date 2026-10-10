@@ -52,7 +52,7 @@ ENUMS = {
               "cognitive_lab", "consolidation", "core", "storage",
               "router_gating", "cache_policy", "hybrid", "progressive",
               "bench_episodic_memory", "run_cognitive_lab", "diagnostics",
-              "real_windows_inference", "chat_static_ui", "memory_safety", "memory_quality"},
+              "real_windows_inference", "chat_static_ui", "memory_safety", "memory_quality", "semantic_bridge", "bench_semantic_bridge"},
     "error_type": {"ValueError", "RuntimeError", "FileNotFoundError",
                    "PermissionError", "OSError", "TimeoutError",
                    "ConnectionError", "BrokenPipeError",
