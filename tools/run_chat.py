@@ -12,16 +12,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from brain_ssd.chat.server import ChatEngine, create_chat_server
-from brain_ssd.local_runtime.pipeline import LocalBrainSSD
+from brain_ssd.chat.runtime import LocalChatRuntime, PROFILES
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Brain-SSD local Windows visual chat")
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--no-open-browser", action="store_true")
-    parser.add_argument("--core-mode", choices=("subprocess", "persistent"), default="subprocess")
+    parser.add_argument("--profile", choices=tuple(PROFILES), default="equilibrado")
+    parser.add_argument("--core-mode", choices=("subprocess", "persistent"), default=None, help="Substitui o modo do perfil")
     args = parser.parse_args()
-    engine = ChatEngine(lambda: LocalBrainSSD(ROOT, core_mode=args.core_mode))
+    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode))
     try:
         server = create_chat_server(engine, ROOT / "chat", port=args.port)
     except OSError as exc:
@@ -30,7 +31,7 @@ def main() -> int:
     threading.Thread(target=engine.start, name="brain-chat-initialize", daemon=True).start()
     url = f"http://127.0.0.1:{server.server_address[1]}/"
     print(f"Brain-SSD Chat local: {url}")
-    print("CPU-only. Nenhuma chave de API ou conexão com serviço externo é necessária.")
+    print(f"Perfil: {args.profile} | CPU-only | SSD opcional para conversar | sem API externa.")
     print("A primeira resposta pode levar mais tempo devido ao carregamento do modelo.")
     print("Mantenha o terminal aberto; pressione Ctrl+C para encerrar.")
     if not args.no_open_browser:

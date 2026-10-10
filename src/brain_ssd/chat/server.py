@@ -60,6 +60,7 @@ class ChatEngine:
         self._runtime: Any | None = None
         self._error: str | None = None
         self._state = "starting"
+        self._inference_verified = False
         self._lock = threading.Lock()
 
     def start(self) -> None:
@@ -79,7 +80,10 @@ class ChatEngine:
                 self._runtime = None
 
     def status(self) -> dict[str, Any]:
+        details = self._runtime.status() if self._runtime is not None and hasattr(self._runtime, "status") else {}
         return {
+            **details,
+            "inference_verified": self._inference_verified,
             "status": self._state,
             "model": MODEL_NAME,
             "execution": "CPU-only",
@@ -106,7 +110,7 @@ class ChatEngine:
                 retrieval = self._runtime.retrieve(question)
                 if retrieval.get("status") == "OK":
                     context = retrieval.get("context", {})
-                    knowledge = str(context.get("text", ""))[:5_000]
+                    knowledge = str(context.get("text", ""))[:getattr(self._runtime, "knowledge_budget", 5_000)]
             prompt = build_chat_prompt(question, history, knowledge)
             measured = self._runtime.core_backend.generate(
                 GenerationRequest(prompt=prompt, max_tokens=180, temperature=0.35)
@@ -116,11 +120,14 @@ class ChatEngine:
             answer = clean_answer(str(measured.get("stdout", "")))
             if not answer:
                 raise RuntimeError("O modelo não retornou uma resposta. Tente novamente.")
+            self._inference_verified = True
             metrics = measured.get("metrics") or {}
             return {
                 "answer": answer,
                 "model": MODEL_NAME,
                 "mode": "experimental_chat",
+                "profile": getattr(self._runtime, "profile", "equilibrado"),
+                "core_mode": getattr(self._runtime, "core_mode", "subprocess"),
                 "sources_from_ssd": len(retrieval.get("sources", [])) if retrieval else 0,
                 "active_pages": len(retrieval.get("activated_pages", [])) if retrieval else 0,
                 "metrics": {
