@@ -30,7 +30,7 @@ Conectividade não implica causalidade; coativação não implica necessidade; f
 | Organoides: auto-organização e dinâmica coletiva temporal | Metadata funcional pode evoluir; módulos podem executar por fases | Coativação aprendida e phased execution reduzem trabalho | Coactivation learning; CognitiveCycleScheduler | Menos trabalho repetido e menor duty cycle | Instabilidade, custo de coordenação e alegações indevidas | Static vs learned metadata; always-on vs scheduled | Não implementado |
 | Neurociência humana: memória de trabalho pode persistir sem atividade contínua de todo circuito | Estado compacto preserva contexto relevante | Activity-silent state reduz execução contínua | Cognitive State compacto | Menos CPU e módulos always-on | Estado desatualizado ou insuficiente | Estado compacto vs reexecução do módulo | Precursor implementado; compute saving não medido |
 | Neurociência humana: processamento hierárquico e especialização | Decisão coarse-to-fine e cascade condicional | Representações pequenas evitam carregar detalhe | Router → tópico → página → Record | Menos I/O, contexto e CPU | Early stop incorreto | Custo e qualidade por nível da cascade | Parcialmente implementado |
-| Hipocampo: separação e conclusão de padrões | Episódios semelhantes permanecem distintos; pistas parciais recuperam memória | Memória episódica separada reduz colisões | Futuro Hippocampus | Melhor memória contextual | Mistura de episódico e semântico | Collision/false retrieval/partial-cue recall | Não implementado; partial cue é precursor |
+| Hipocampo: separação e conclusão de padrões | Episódios semelhantes permanecem distintos; pistas parciais recuperam memória | Memória episódica separada reduz colisões | Futuro Hippocampus | Melhor memória contextual | Mistura de episódico e semântico | Collision/false retrieval/partial-cue recall | Memória episódica mínima opt-in no chat (notas explicitamente confirmadas); avaliação biológica e A/B ainda pendentes |
 | Cerebelo: automatização de padrões praticados | Raciocínio repetido pode virar Skill validada | Skill reduz Core calls e CPU | Futuro Cerebellum/Skills | Menor TTFT e tokens | Automatizar erro ou executar código inseguro | Core vs Skill, sandbox e rollback | Não implementado |
 | Glia/homeostase: suporte e resposta ao estado de recursos | Monitor de recursos informa política sem raciocínio linguístico | Adaptação sob pressão evita trabalho/risco | ResourcePressureMonitor/Glia | Menos reclaim, faults e throttling | Redução de qualidade ou controle excessivo | Perfis de recurso com piso de qualidade | Monitor implementado; adaptação ampla não |
 | Paleoneurologia: representação observável é proxy incompleto da estrutura interna | Nenhuma métrica isolada autoriza decisão irreversível | Multi-evidence é mais robusta que proxy único | Cascade e decisões explicáveis | Menos overfit a metadata | Mais custo e complexidade | Ablation por evidência e custo marginal | Princípio documental; parcialmente refletido no HYBRID |
@@ -69,7 +69,7 @@ Semantic packing coloca conteúdo relacionado próximo e melhorou ativação de 
 - CognitiveCycleScheduler;
 - Module/Compute Duty Cycle operacional;
 - ReflexCore;
-- memória episódica hipocampal;
+- memória episódica hipocampal avançada, além de notas manuais do chat;
 - compilação de raciocínio em Skills;
 - Context Delta no Core;
 - consolidação e repacking físico offline;

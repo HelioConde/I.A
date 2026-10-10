@@ -11,6 +11,7 @@ on:
       - "tools/validate_chat_windows.py"
       - "tools/doctor_chat.py"
       - "DIAGNOSTICAR-CHAT-WINDOWS.bat"
+      - "INICIAR-CHAT-MEMORIA-WINDOWS.bat"
       - "tests/test_chat_history.py"
       - "tests/test_chat_doctor.py"
       - "tests/test_chat_stream.py"

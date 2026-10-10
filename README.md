@@ -1,5 +1,7 @@
 # Brain-SSD
 
+[Pesquisa Brain-SSD × Neurociência (10/10/2026)](docs/NEUROCIENCIA_AUDITORIA_2026-10-10.md) — comparativo científico, lacunas e módulo de memória episódica experimental.
+
 **Auditoria e próximas prioridades:** [Reavaliação geral (10/10/2026)](docs/AUDITORIA_GERAL_2026-10-10.md)
 
 ## Objetivo 1: Chat visual no Windows

@@ -185,3 +185,25 @@ padrão. O perfil Rápido continua opt-in. O diagnóstico rejeita arquivos
 GGUF com cabeçalho válido e menos de 64 MiB (limiar conservador para
 detectar arquivos truncados, não validação do modelo inteiro).
 Os resultados canônicos anteriores do Core permanecem inalterados.
+
+## Memória episódica experimental (opt-in)
+
+O chat possui um **módulo separado de notas episódicas** inspirado funcionalmente
+na distinção hipocampo/neocórtex. Não é modelo neuronal nem treinamento do Qwen.
+Para ativar, execute `python tools/run_chat.py --episodic-memory --profile economia`
+ou abra `INICIAR-CHAT-MEMORIA-WINDOWS.bat` (opt-in explícito).
+Por padrão a função continua desativada: o Brain-SSD NÃO grava fatos em memória
+de longo prazo automaticamente. A pessoa precisa escolher Guardar uma lembrança
+no painel lateral e digitar a nota; limite de 500 caracteres por nota.
+
+As notas são salvas separadamente em
+`%LOCALAPPDATA%\BrainSSD\episodic-notes.sqlite3` no Windows.
+São usadas como **dados não confiáveis** no prompt, nunca como comandos.
+A busca usa pistas lexicais, até 3 memórias retornadas por pergunta e abstém
+quando não há evidências suficientes. Não tenta adivinhar lembranças ausentes.
+Apagar pelo botão X remove logicamente uma nota do SQLite; backup, snapshots
+ou blocos físicos podem continuar existindo no SSD.
+
+Há apenas um plano de replay offline de leitura, não 'sono', consolidação real
+ou atualização automática de redes neurais.
+Veja `docs/NEUROCIENCIA_AUDITORIA_2026-10-10.md`.
