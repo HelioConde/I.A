@@ -192,3 +192,13 @@ Não imprime textos, IDs, nomes de arquivo, caminhos ou segredos, não
 faz reparos automáticos nem lê o conteúdo de conversas separadas.
 Se nenhum banco existir, retorna `MISSING` sem criá-lo.
 Para um banco específico: `python tools/audit_episodic_db.py --db CAMINHO.sqlite3`.
+
+## Feedback e versões das memórias
+
+As avaliações explícitas armazenadas no SQLite de plasticidade agora ficam
+vinculadas ao **identificador da revisão da nota**. Corrigir ou restaurar
+uma memória cria uma nova revisão e deixa feedback anterior inativo.
+Avaliações antigas sem informação de versão (geradas por releases anteriores)
+continuam no histórico local, porém **não contribuem para o viés de ranking**;
+esse comportamento conservador evita reutilizar sinais de texto desconhecido.
+O Qwen não recebe esses feedbacks automaticamente.

@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import sys
 import threading
+import uuid
 import unittest
 import urllib.error
 import urllib.request
@@ -200,6 +201,60 @@ class TestHttpUI(unittest.TestCase):
         with self.assertRaises(urllib.error.HTTPError) as context:
             urllib.request.urlopen(req, timeout=3)
         self.assertEqual(context.exception.code, 403)
+
+    def test_private_backend_error_is_redacted_in_http_and_sse(self):
+        private = "SK_PROJECT_NEVER_LOG_THIS_INTERNAL_SECRET"
+        class UnsafeCore(FakeCore):
+            def generate(self, request):
+                raise RuntimeError("internal failure at C:\\Users\\secret\\" + private)
+        class UnsafeRuntime(FakeRuntime):
+            def __init__(self):
+                super().__init__()
+                self.core_backend = UnsafeCore()
+        engine = ChatEngine(UnsafeRuntime)
+        engine.start()
+        server = create_chat_server(engine, ROOT / "chat", port=0)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        origin = f"http://127.0.0.1:{server.server_address[1]}"
+        try:
+            request = urllib.request.Request(
+                origin + "/api/chat", method="POST",
+                data=json.dumps({"message": "Olá", "history": []}).encode(),
+                headers={"Origin": origin, "Content-Type": "application/json"},
+            )
+            with self.assertRaises(urllib.error.HTTPError) as ctx:
+                urllib.request.urlopen(request, timeout=5)
+            self.assertEqual(ctx.exception.code, 503)
+            error_data = ctx.exception.read().decode()
+            self.assertNotIn(private, error_data)
+            self.assertNotIn("C:\\Users", error_data)
+
+            sse = urllib.request.Request(
+                origin + "/api/chat/stream", method="POST",
+                data=json.dumps({"message": "Olá", "history": [],
+                                 "request_id": str(uuid.uuid4())}).encode(),
+                headers={"Origin": origin, "Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(sse, timeout=5) as reply:
+                events = reply.read().decode()
+            self.assertIn("event: error", events)
+            self.assertNotIn(private, events)
+            self.assertNotIn("C:\\Users", events)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=3)
+            engine.close()
+
+    def test_startup_failure_does_not_expose_local_paths(self):
+        engine = ChatEngine(lambda: (_ for _ in ()).throw(
+            FileNotFoundError("C:\\Users\\Sensitive\\models\\private-model.gguf")))
+        engine.start()
+        error = engine.status()["error"]
+        self.assertNotIn("C:\\Users", error)
+        self.assertNotIn("private-model", error)
+        engine.close()
 
     def test_unknown_file_is_not_exposed(self):
         with self.assertRaises(urllib.error.HTTPError) as context:

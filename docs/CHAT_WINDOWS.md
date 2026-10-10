@@ -215,3 +215,10 @@ e executa `test_chat_static_ui.py` para detectar IDs duplicados, referências
 JavaScript a elementos HTML inexistentes, âncoras e arquivos estáticos.
 Isso não substitui captura de tela, acessibilidade em navegador real ou teste
 de usabilidade no Windows, mas bloqueia erros simples antes da publicação.
+
+## Redação de erros internos
+
+A API do chat e os eventos de streaming não incluem mensagens brutas de
+exceções do `llama.cpp` ou caminhos locais. Erros inesperados retornam
+mensagens genéricas; o log diagnóstico registra **apenas o tipo da falha**.
+Erros de validação de notas permanecem legíveis para permitir correção do usuário.

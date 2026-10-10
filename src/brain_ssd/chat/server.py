@@ -588,7 +588,12 @@ class ChatHandler(BaseHTTPRequestHandler):
                     # Legacy isolated HTTP tests may still pass bounded history.
                     result = self.server.engine.ask(data.get("message"), data.get("history", []))
         except (ValueError, json.JSONDecodeError) as exc:
-            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            if path in ("/api/chat", "/api/chat/stream"):
+                # Even a backend ValueError may embed prompts or local paths.
+                self._json({"error": "Solicitação de chat inválida ou contexto indisponível."},
+                           HTTPStatus.BAD_REQUEST)
+            else:
+                self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
         except Exception:
             # Native errors may contain paths, prompt fragments, or secrets.
             self._json({"error": "Falha interna do motor local. Consulte o diagnóstico."}, HTTPStatus.SERVICE_UNAVAILABLE)
