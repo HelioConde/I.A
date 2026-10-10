@@ -300,3 +300,31 @@ em `tools/doctor_chat.py`. Python 3.14.7 passou no requisito de versão.
 
 Os testes de preparação simulam downloads sem rede no CI e verificam
 hashes, ZIPs maliciosos, ausência de sobrescrita e preservação de dados.
+
+## Diagnóstico de respostas genéricas e repetidas (Qwen3 GGUF)
+
+O chat CPU de produção aplica o template de conversa embutido no GGUF com
+`--jinja --conversation --single-turn`. O prompt contém **somente um turno de
+usuário** (instruções, contexto, pergunta atual e `/no_think`); o llama.cpp
+adiciona os delimitadores corretos do Qwen3. O chat não acrescenta mais um
+`Assistente:` falso na ponta do prompt. As configurações de amostragem do
+chat usam temperatura 0,7, top-p 0,8, top-k 20 e min-p 0, mantendo o Core
+congelado de benchmark separado. Respostas passadas exatamente iguais a
+`Não soube.` e uma resposta genérica identificada no bug de 10/10/2026 são
+excluídas **somente do contexto** de novos turnos: não se apagam do histórico.
+
+Para conferir a qualidade em uma sessão independente, sem usar histórico ou
+notas episódicas pessoais, execute no Windows, a partir da raiz do projeto:
+
+```powershell
+py -3 .\tools\validate_chat_quality_windows.py --profile economia
+```
+
+O teste efetua **três inferências reais**: capacidades, SSD/RAM e aritmética
+básica. O relatório `results/chat_validation/latest-quality-windows.json`
+registra somente tamanho de respostas, classificações simples e presença de
+fontes SSD; nenhuma pergunta ou resposta é salva por padrão. Adicione
+`--include-answers` somente se quiser guardar os textos localmente. O teste
+usa critérios heurísticos e **não garante precisão, qualidade geral nem
+vantagem do Brain-SSD**. A integração com o hardware real ainda deve ser
+validada antes de considerar o bug encerrado.
