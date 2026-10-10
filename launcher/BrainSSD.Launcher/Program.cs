@@ -18,22 +18,24 @@ while (true)
 {
     TryClear();
     Header(projectRoot);
-    Console.WriteLine("  [1] Executar Brain-SSD local com HUD real");
-    Console.WriteLine("  [2] Executar Brain-SSD local no terminal");
-    Console.WriteLine("  [3] Testar o HUD com DEMO DATA");
-    Console.WriteLine("  [4] Reproduzir resultado real da Fase 4D");
-    Console.WriteLine("  [5] Abrir HUD live (aguardando eventos)");
-    Console.WriteLine("  [6] Abrir a pasta do projeto para editar");
+    Console.WriteLine("  [1] Conversar com IA no CHAT VISUAL (Windows)");
+    Console.WriteLine("  [2] Executar Brain-SSD local com HUD real");
+    Console.WriteLine("  [3] Executar Brain-SSD local no terminal");
+    Console.WriteLine("  [4] Testar o HUD com DEMO DATA");
+    Console.WriteLine("  [5] Reproduzir resultado real da Fase 4D");
+    Console.WriteLine("  [6] Abrir HUD live (aguardando eventos)");
+    Console.WriteLine("  [7] Abrir a pasta do projeto para editar");
     Console.WriteLine("  [0] Sair");
     Console.Write("\nEscolha: ");
     switch (Console.ReadLine()?.Trim())
     {
-        case "1": return RunMode("brain", projectRoot);
-        case "2": return RunMode("brain-terminal", projectRoot);
-        case "3": return RunMode("demo", projectRoot);
-        case "4": return RunMode("replay", projectRoot);
-        case "5": return RunMode("live", projectRoot);
-        case "6":
+        case "1": return RunMode("chat", projectRoot);
+        case "2": return RunMode("brain", projectRoot);
+        case "3": return RunMode("brain-terminal", projectRoot);
+        case "4": return RunMode("demo", projectRoot);
+        case "5": return RunMode("replay", projectRoot);
+        case "6": return RunMode("live", projectRoot);
+        case "7":
             Process.Start(new ProcessStartInfo("explorer.exe", projectRoot) { UseShellExecute = true });
             Console.WriteLine("Pasta aberta. Pressione qualquer tecla para voltar.");
             Console.ReadKey(true);
@@ -55,26 +57,27 @@ static int RunMode(string mode, string root)
         return 3;
     }
     var functional = mode is "brain" or "brain-terminal";
-    var scriptName = functional ? "run_local_brain_ssd.py" : mode == "replay" ? "replay_hud.py" : "run_hud.py";
+    var chat = mode is "chat" or "conversa";
+    var scriptName = chat ? "run_chat.py" : functional ? "run_local_brain_ssd.py" : mode == "replay" ? "replay_hud.py" : "run_hud.py";
     var start = new ProcessStartInfo(python.Value.Command) { WorkingDirectory = root, UseShellExecute = false };
     foreach (var prefix in python.Value.PrefixArgs) start.ArgumentList.Add(prefix);
     start.ArgumentList.Add(Path.Combine(root, "tools", scriptName));
     if (mode == "brain") start.ArgumentList.Add("--hud");
     if (mode == "demo") start.ArgumentList.Add("--demo");
-    if (!functional)
+    if (!functional && !chat)
     {
         start.ArgumentList.Add("--host"); start.ArgumentList.Add("127.0.0.1");
         start.ArgumentList.Add("--port"); start.ArgumentList.Add("8765");
     }
     TryClear(); Header(root);
     Console.WriteLine($"Modo: {mode.ToUpperInvariant()}");
-    Console.WriteLine(mode == "brain" ? "O HUD abrirá em http://127.0.0.1:8765" : functional ? "Use /help para ver os comandos." : "O navegador abrirá em http://127.0.0.1:8765");
+    Console.WriteLine(chat ? "O chat abrirá em http://127.0.0.1:8766" : mode == "brain" ? "O HUD abrirá em http://127.0.0.1:8765" : functional ? "Use /help para ver os comandos." : "O navegador abrirá em http://127.0.0.1:8765");
     Console.WriteLine("Feche esta janela ou pressione Ctrl+C para encerrar.\n");
     try
     {
         using var child = Process.Start(start);
         if (child is null) throw new InvalidOperationException("O processo Python não iniciou.");
-        if (!functional) _ = OpenBrowserWhenReady();
+        if (!functional && !chat) _ = OpenBrowserWhenReady();
         child.WaitForExit();
         return child.ExitCode;
     }

@@ -1,5 +1,14 @@
-<<<<<<< HEAD
 # Brain-SSD
+
+## Objetivo 1: Chat visual no Windows
+
+Para conversar com a IA local, abra **INICIAR-CHAT-WINDOWS.bat** e digite
+**Olá** no chat em http://127.0.0.1:8766. A resposta vem do Qwen local,
+rodando via CPU. Consulte [o guia de instalação e limitações](docs/CHAT_WINDOWS.md).
+
+O launcher .NET também tem opção de Chat no código-fonte, mas o executável
+versionado precisa ser recompilado para recebê-la.
+
 
 ## Execução local no Windows
 
@@ -24,6 +33,3 @@ PYTHONPATH=src python3 benchmarks/baseline.py --help
 O benchmark aceita qualquer executável compatível por meio de um backend de processo. A configuração de referência usa `llama-completion`, CPU-only, uma thread e um modelo GGUF fornecido explicitamente. Modelos, builds de terceiros e resultados não são versionados.
 
 Veja [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/BENCHMARKS.md](docs/BENCHMARKS.md) e [docs/REQUIREMENTS_TRACEABILITY.md](docs/REQUIREMENTS_TRACEABILITY.md).
-=======
-# I.A
->>>>>>> 31200d0a2d89172f1bd3e0184017ff735e4da92a

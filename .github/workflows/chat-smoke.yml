@@ -1,0 +1,27 @@
+name: Brain-SSD Chat Smoke
+on:
+  push:
+    paths:
+      - "chat/**"
+      - "src/brain_ssd/chat/**"
+      - "tools/run_chat.py"
+      - "tests/test_chat_windows.py"
+      - ".github/workflows/chat-smoke.yml"
+  pull_request:
+    paths:
+      - "chat/**"
+      - "src/brain_ssd/chat/**"
+      - "tools/run_chat.py"
+      - "tests/test_chat_windows.py"
+jobs:
+  chat-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify syntax
+        run: python -m compileall -q tools/run_chat.py src/brain_ssd/chat tests/test_chat_windows.py
+      - name: Test HTTP and chat adapter with mock CPU Core
+        run: python -m unittest discover -s tests -p "test_chat_windows.py" -v

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Brain-SSD: converse com uma IA local no Windows usando CPU e recuperação seletiva do SSD.">
+  <title>Brain-SSD — Chat local</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#chat">Ir para a conversa</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação">
+      <div class="side-brand">
+        <span class="brand-icon" aria-hidden="true">✺</span>
+        <div><strong>Brain-SSD</strong><small>INTELIGÊNCIA LOCAL</small></div>
+        <button class="mobile-close icon-btn" id="closeMenu" type="button" aria-label="Fechar menu">×</button>
+      </div>
+      <button class="new-chat" id="newChat" type="button">
+        <span aria-hidden="true">＋</span> Nova conversa <span class="shortcut">Ctrl K</span>
+      </button>
+      <div class="side-section">SESSÃO</div>
+      <div class="current-chat"><span aria-hidden="true">☰</span> Conversa atual</div>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-panel">
+        <span class="micro-title">EXECUÇÃO LOCAL</span>
+        <div class="sidebar-row"><span class="status-dot" id="sidebarDot"></span><strong id="sidebarStatus">Iniciando...</strong></div>
+        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p>
+      </div>
+      <div class="side-footer">Brain-SSD V0 · Interface experimental</div>
+    </aside>
+
+    <main class="workspace" id="chat">
+      <header class="topbar">
+        <div class="top-left">
+          <button class="icon-btn menu-btn" id="openMenu" type="button" aria-label="Abrir menu">☰</button>
+          <div>
+            <div class="top-heading">Brain-SSD <span class="chevron">⌄</span></div>
+            <div class="top-subtitle">Qwen3-0.6B <span class="separator">·</span> CPU somente</div>
+          </div>
+        </div>
+        <div class="top-right">
+          <span class="privacy-pill"><span class="tiny-lock">◆</span> Local e privado</span>
+          <button class="icon-btn info-btn" id="showDetails" type="button" aria-label="Mostrar detalhes técnicos" aria-expanded="false">ⓘ</button>
+        </div>
+      </header>
+
+      <div class="connection-banner" id="connectionBanner" role="status" aria-live="polite">
+        <span class="spinner"></span><span id="connectionText">Preparando o modelo local...</span>
+      </div>
+
+      <section class="conversation" aria-label="Conversa">
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions text">
+          <div class="welcome" id="welcome">
+            <div class="hero-symbol" aria-hidden="true">✺</div>
+            <h1>Como posso ajudar?</h1>
+            <p>Sou o Brain-SSD. Funcionando localmente no seu computador, sem exigir uma placa de vídeo dedicada.</p>
+            <div class="suggestions" aria-label="Sugestões para começar">
+              <button type="button" class="suggestion" data-prompt="Olá!">👋 <span>Diga olá</span></button>
+              <button type="button" class="suggestion" data-prompt="O que você consegue fazer?">✦ <span>Suas capacidades</span></button>
+              <button type="button" class="suggestion" data-prompt="Explique como você usa o SSD e a RAM.">▤ <span>Como funciona</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="composer-section">
+        <form class="composer" id="chatForm">
+          <label class="sr-only" for="messageInput">Mensagem para o Brain-SSD</label>
+          <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Pergunte alguma coisa..." aria-label="Mensagem para o Brain-SSD"></textarea>
+          <div class="composer-bottom">
+            <div class="composer-hints"><span class="cpu-badge">CPU</span> Sem API externa</div>
+            <button class="send-button" id="sendButton" aria-label="Enviar mensagem" type="submit" disabled>↑</button>
+          </div>
+        </form>
+        <p class="disclaimer">Projeto experimental. Respostas podem conter erros. RAM e latência dependem do computador.</p>
+      </div>
+    </main>
+  </div>
+
+  <div class="backdrop" id="backdrop" hidden></div>
+  <aside class="details-panel" id="detailsPanel" aria-label="Métricas técnicas" hidden>
+    <div class="details-head"><h2>Diagnóstico local</h2><button class="icon-btn" id="closeDetails" type="button" aria-label="Fechar detalhes">×</button></div>
+    <p>Dados da última resposta (quando disponíveis). Estes valores não representam validação física do SSD.</p>
+    <dl>
+      <div><dt>Modelo</dt><dd>Qwen3-0.6B Q8_0</dd></div>
+      <div><dt>Execução</dt><dd>CPU-only</dd></div>
+      <div><dt>Latência</dt><dd id="detailLatency">—</dd></div>
+      <div><dt>Velocidade</dt><dd id="detailSpeed">—</dd></div>
+      <div><dt>Pico de RAM do Core</dt><dd id="detailRam">—</dd></div>
+      <div><dt>Páginas SSD ativadas</dt><dd id="detailPages">—</dd></div>
+      <div><dt>Fontes SSD usadas</dt><dd id="detailSources">—</dd></div>
+    </dl>
+    <small>As métricas são experimentais; leitura física do SSD não foi medida neste modo.</small>
+  </aside>
+</body>
+</html>
