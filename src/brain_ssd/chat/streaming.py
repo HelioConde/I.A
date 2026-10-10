@@ -60,8 +60,14 @@ def _subprocess_stream(core: SubprocessPerQueryCore, request: GenerationRequest,
             if cancel.is_set():
                 _stop(p)
                 return
-            if os.name == "nt" and p.poll() is None:
-                samples.append(windows_process_snapshot(p.pid))
+            if os.name == "nt":
+                # Telemetry is best-effort: sampling must never disable
+                # cancellation, even if a child exits during Win32 polling.
+                try:
+                    if p.poll() is None:
+                        samples.append(windows_process_snapshot(p.pid))
+                except (OSError, AttributeError, ValueError):
+                    pass
 
     thread_err = threading.Thread(target=read_stderr, daemon=True)
     thread_stop = threading.Thread(target=watch, daemon=True)
@@ -138,8 +144,16 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
                         pass
                 core.close()
                 return
-            if os.name == "nt" and core.process is not None and core.process.poll() is None:
-                samples.append(windows_process_snapshot(core.process.pid))
+            if os.name == "nt":
+                # core.close() can invalidate core.process at any time.
+                # Capture a local reference; a vanished PID is non-fatal.
+                try:
+                    active = core.process
+                    pid = getattr(active, "pid", None)
+                    if active is not None and isinstance(pid, int) and pid > 0 and active.poll() is None:
+                        samples.append(windows_process_snapshot(pid))
+                except (OSError, AttributeError, ValueError):
+                    pass
 
     watcher = threading.Thread(target=watch, daemon=True)
     watcher.start()
