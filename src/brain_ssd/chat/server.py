@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import re
 import threading
+import uuid
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -11,6 +12,8 @@ from typing import Any, Callable
 from urllib.parse import urlsplit
 
 from brain_ssd.chat.history import ChatHistory
+from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
+from brain_ssd.chat.http_stream import serve_stream
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
 
@@ -63,6 +66,9 @@ class ChatEngine:
         self._state = "starting"
         self._inference_verified = False
         self._lock = threading.Lock()
+        self._stream_lock = threading.Lock()
+        self._active_id: str | None = None
+        self._active_cancel: threading.Event | None = None
 
     def start(self) -> None:
         try:
@@ -75,6 +81,9 @@ class ChatEngine:
             self._state = "ready"
 
     def close(self) -> None:
+        with self._stream_lock:
+            if self._active_cancel is not None:
+                self._active_cancel.set()
         with self._lock:
             if self._runtime is not None:
                 self._runtime.close()
@@ -93,7 +102,36 @@ class ChatEngine:
             "experimental": True,
         }
 
-    def ask(self, question: str, raw_history: Any) -> dict[str, Any]:
+    def begin_stream(self, request_id: str) -> threading.Event:
+        try:
+            if str(uuid.UUID(request_id)) != request_id:
+                raise ValueError()
+        except (ValueError, AttributeError, TypeError):
+            raise ValueError("ID de geração inválido.") from None
+        with self._stream_lock:
+            if self._active_id is not None:
+                raise RuntimeError("Aguarde ou interrompa a resposta atual.")
+            event = threading.Event()
+            self._active_id = request_id
+            self._active_cancel = event
+            return event
+
+    def cancel_stream(self, request_id: Any) -> bool:
+        with self._stream_lock:
+            if self._active_id != request_id or self._active_cancel is None:
+                return False
+            self._active_cancel.set()
+            return True
+
+    def finish_stream(self, request_id: str) -> None:
+        with self._stream_lock:
+            if self._active_id == request_id:
+                self._active_id = None
+                self._active_cancel = None
+
+    def ask(self, question: str, raw_history: Any, *,
+            on_chunk: Callable[[str], None] | None = None,
+            cancel_event: threading.Event | None = None) -> dict[str, Any]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Digite uma mensagem.")
         question = question.strip()
@@ -113,11 +151,17 @@ class ChatEngine:
                     context = retrieval.get("context", {})
                     knowledge = str(context.get("text", ""))[:getattr(self._runtime, "knowledge_budget", 5_000)]
             prompt = build_chat_prompt(question, history, knowledge)
-            measured = self._runtime.core_backend.generate(
-                GenerationRequest(prompt=prompt, max_tokens=180, temperature=0.35)
-            )
+            generation = GenerationRequest(prompt=prompt, max_tokens=180, temperature=0.35)
+            if on_chunk is None:
+                measured = self._runtime.core_backend.generate(generation)
+            else:
+                if cancel_event is None:
+                    raise ValueError("Evento de cancelamento obrigatório para streaming.")
+                measured = generate_streamed(self._runtime.core_backend, generation, on_chunk, cancel_event)
             if measured.get("return_code") != 0:
                 raise RuntimeError("O mecanismo local falhou ao gerar a resposta. Consulte o terminal.")
+            if cancel_event is not None and cancel_event.is_set():
+                raise GenerationCancelled()
             answer = clean_answer(str(measured.get("stdout", "")))
             if not answer:
                 raise RuntimeError("O modelo não retornou uma resposta. Tente novamente.")
@@ -230,7 +274,7 @@ class ChatHandler(BaseHTTPRequestHandler):
             self._json({"error": "Origem não permitida."}, HTTPStatus.FORBIDDEN)
             return
         path = urlsplit(self.path).path
-        if path not in ("/api/chat", "/api/conversations"):
+        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel"):
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
             return
         if path == "/api/conversations" and self.server.history_store is None:
@@ -252,6 +296,11 @@ class ChatHandler(BaseHTTPRequestHandler):
                 raise ValueError("JSON inválido.")
             if path == "/api/conversations":
                 result = {"conversation": self.server.history_store.create()}
+            elif path == "/api/chat/cancel":
+                result = {"cancelled": self.server.engine.cancel_stream(data.get("request_id"))}
+            elif path == "/api/chat/stream":
+                serve_stream(self, data)
+                return
             else:
                 identifier = data.get("conversation_id")
                 if identifier is not None and self.server.history_store is not None:
