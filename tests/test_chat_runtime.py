@@ -55,9 +55,40 @@ class TestOptionalSSD(unittest.TestCase):
         self.assertEqual(resolve_chat_completion(self.root),community)
         runtime=LocalChatRuntime(self.root,profile="economia")
         try:
-            self.assertIsNone(runtime._completion_path)
-            self.assertFalse(runtime.status()["knowledge_available"])
+            self.assertEqual(runtime._completion_path,community.resolve())
+            self.assertFalse(runtime.status()["knowledge_available"])  # No corpus in this fixture
+            self.assertEqual(runtime.status()["retrieval_runtime"], "official_cpu_distribution")
             self.assertEqual(runtime.core_backend.runtime_path,community)
+        finally:
+            runtime.close()
+
+    def test_official_cpu_runtime_enables_optional_ssd_retrieval(self):
+        frozen = self.root / "third_party/llama.cpp/build-win/bin/llama-completion.exe"
+        frozen.unlink()
+        community = self.root / "third_party/llama.cpp/runtime-win-cpu-x64/bin/llama-completion.exe"
+        community.parent.mkdir(parents=True)
+        community.write_bytes(b"MZ community binary")
+        # Only path presence is tested here; no real corpus or model is loaded.
+        for relative in (
+            "brain_data/real_knowledge/semantic/manifest.json",
+            "brain_data/real_knowledge/semantic/brain.dat",
+            "brain_data/real_knowledge/index/record-index.json.gz",
+        ):
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"fixture")
+
+        runtime = LocalChatRuntime(self.root, profile="economia")
+        try:
+            self.assertTrue(runtime.status()["knowledge_available"])
+            self.assertEqual(runtime.status()["retrieval_runtime"], "official_cpu_distribution")
+            with patch("brain_ssd.chat.runtime.LocalBrainSSD") as factory:
+                instance = factory.return_value.__enter__.return_value
+                instance.retrieve.return_value = {"status": "OK", "activated_pages": [0]}
+                result = runtime.retrieve("O que e SQLite?")
+                self.assertEqual(result["status"], "OK")
+                self.assertEqual(factory.call_args.args[0], self.root)
+                self.assertEqual(factory.call_args.kwargs["executable"], community.resolve())
         finally:
             runtime.close()
 
