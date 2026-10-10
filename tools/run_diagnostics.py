@@ -25,6 +25,7 @@ from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir
 
 CHAT_SUITES = [
     ("chat_windows", "test_chat_windows.py"),
+    ("chat_local_actions", "test_chat_local_actions.py"),
     ("chat_history", "test_chat_history.py"),
     ("chat_stream", "test_chat_stream.py"),
     ("chat_doctor", "test_chat_doctor.py"),
