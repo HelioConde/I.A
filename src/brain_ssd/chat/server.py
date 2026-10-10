@@ -17,6 +17,7 @@ from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
+from brain_ssd.chat.local_actions import local_command
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -342,6 +343,18 @@ class ChatEngine:
             raise RuntimeError(self._error or "O modelo local ainda não está pronto.")
         history = normalize_history(raw_history)
         with self._lock:
+            if cancel_event is not None and cancel_event.is_set():
+                raise GenerationCancelled()
+            local_result = local_command(question, self.episodic_store)
+            if local_result is not None:
+                # Explicit app commands are performed by Python/SQLite, not Qwen.
+                # Do not claim an inference occurred or mark it validated.
+                if self.diagnostics:
+                    self.diagnostics.emit("chat.local_action", request_id=request_id,
+                        action=local_result["local_action"], status="PASS")
+                if on_chunk is not None:
+                    on_chunk(local_result["answer"])
+                return local_result
             # Keep the frozen benchmark paths unchanged. This is an experimental
             # conversational adapter on top of the existing runtime and SSD retrieval.
             retrieval: dict[str, Any] | None = None
