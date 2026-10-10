@@ -54,7 +54,7 @@ async function refreshEpisodicMemory() {
 async function saveEpisodicMemory() {
   if (app.sending) return;
   const note = window.prompt(
-    "Guardar uma lembrança local (máximo 500 caracteres)? Só salve informações que você quer que a IA recupere em outras conversas."
+    "Guardar uma lembrança local (máximo 500 caracteres)? Só salve informações que você quer que a IA recupere em outras conversas. Não inclua senhas nem dados confidenciais."
   );
   if (note === null || !note.trim()) return;
   try {

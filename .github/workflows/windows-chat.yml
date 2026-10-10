@@ -17,6 +17,7 @@ on:
       - "tests/test_chat_stream.py"
       - "tests/test_chat_episodic.py"
       - "tests/test_chat_episodic_http.py"
+      - "tools/bench_episodic_memory.py"
       - "tests/test_chat_runtime.py"
       - "tests/test_chat_history.py"
       - "launcher/**"
@@ -42,6 +43,9 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_stream.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic_http.py" -v
+      - name: Synthetic episodic negative controls
+        shell: pwsh
+        run: python tools/bench_episodic_memory.py
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"

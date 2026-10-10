@@ -12,6 +12,7 @@ on:
       - "tests/test_chat_episodic.py"
       - "tests/test_chat_episodic_http.py"
       - "tools/doctor_chat.py"
+      - "tools/bench_episodic_memory.py"
       - ".github/workflows/chat-smoke.yml"
   pull_request:
     paths:
@@ -37,3 +38,5 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_stream.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic_http.py" -v
+      - name: Synthetic episodic negative controls (not a human memory benchmark)
+        run: python tools/bench_episodic_memory.py

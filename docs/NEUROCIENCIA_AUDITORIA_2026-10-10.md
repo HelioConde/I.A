@@ -87,3 +87,12 @@ Foi criado o módulo `src/brain_ssd/chat/episodic.py`, usando biblioteca-padrão
 15. Memory neuroprosthesis (2024): https://pmc.ncbi.nlm.nih.gov/articles/PMC10881797/
 
 **Síntese:** a tese principal do Brain-SSD (grande capacidade no SSD, pequena ativação por tarefa) é uma abstração válida para experimentar, mas o gargalo fundamental é demonstrar aprendizado, recuperação confiável, qualidade e custo, não replicar a anatomia cerebral por aparência.
+
+### Microbench de sanidade (sem Qwen)
+
+Foi adicionado `tools/bench_episodic_memory.py`, com 8 notas fictícias,
+8 perguntas positivas, 8 controles negativos e um caso de duas experiências
+similares. Ele mede recuperação top-1, falsos reconhecimentos e separação de
+notas distintas em um conjunto propositalmente pequeno. **Não mede** memória
+humana, generalização semântica, qualidade do Qwen ou comportamento de usuários.
+Rode `python tools/bench_episodic_memory.py` e compare com conjuntos holdout maiores.
