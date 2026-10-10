@@ -18,7 +18,9 @@ class TestOptionalSSD(unittest.TestCase):
         minimum.start()
         self.addCleanup(minimum.stop)
         self.directory = tempfile.TemporaryDirectory()
-        self.root = Path(self.directory.name)
+        # On Windows the Temp environment variable can use 8.3 path aliases.
+        # Normalize once so path comparisons agree with runtime.resolve().
+        self.root = Path(self.directory.name).resolve()
         model = self.root / MODEL_RELATIVE
         model.parent.mkdir(parents=True)
         model.write_bytes(b"GGUF" + b"\0" * 32)
