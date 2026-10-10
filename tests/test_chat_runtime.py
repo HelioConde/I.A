@@ -92,6 +92,28 @@ class TestOptionalSSD(unittest.TestCase):
         finally:
             runtime.close()
 
+    def test_chat_subprocess_uses_qwen_gguf_template_without_touching_frozen_core(self):
+        from brain_ssd.backend import GenerationRequest
+        from brain_ssd.local_runtime.backend import LocalLlamaCppBackend
+        runtime = LocalChatRuntime(self.root, profile="economia")
+        try:
+            request = GenerationRequest("Pergunta atual: olá /no_think", max_tokens=256, temperature=0.7)
+            command = runtime.core_backend.backend.command(request)
+            self.assertIn("--jinja", command)
+            self.assertIn("--conversation", command)
+            self.assertIn("--single-turn", command)
+            self.assertEqual(command[command.index("--top-p") + 1], "0.8")
+            self.assertEqual(command[command.index("--top-k") + 1], "20")
+            self.assertEqual(command[command.index("--min-p") + 1], "0")
+            # Frozen runtime flags are not changed by the chat-only adapter.
+            frozen = LocalLlamaCppBackend(
+                runtime.core_backend.runtime_path, runtime.model_path,
+                threads=2, context_size=2048
+            )
+            self.assertNotIn("--jinja", frozen.command(request))
+        finally:
+            runtime.close()
+
     def test_all_profiles_have_complete_budgets(self):
         for name, values in PROFILES.items():
             with self.subTest(profile=name):
