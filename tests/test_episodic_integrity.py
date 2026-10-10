@@ -1,6 +1,7 @@
 """Read-only memory database audit, including corruption and privacy."""
 from __future__ import annotations
 import json
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import sys
@@ -49,10 +50,11 @@ class TestIntegrity(unittest.TestCase):
     def test_missing_and_stale_index_terms_detected_without_repair(self):
         db=EpisodicMemory(self.db)
         item=db.add("Projeto rover sensor lidar")
-        with sqlite3.connect(self.db) as conn:
+        with closing(sqlite3.connect(self.db)) as conn:
             conn.execute("DELETE FROM episode_terms WHERE episode_id=? AND term=?",
                          (item["id"],"lidar"))
             conn.execute("INSERT INTO episode_terms VALUES (?,?)",(item["id"],"inventado"))
+            conn.commit()
         report=audit_episodic_database(self.db)
         self.assertEqual(report["status"],"ISSUES_FOUND")
         self.assertEqual(report["missing_index_terms"],1)
@@ -69,6 +71,7 @@ class TestIntegrity(unittest.TestCase):
                          ("00000000-0000-0000-0000-000000000001",
                           "00000000-0000-0000-0000-000000000002",
                           "antigo","novo",0,"EDIT"))
+            conn.commit()
         report=audit_episodic_database(self.db)
         self.assertEqual(report["status"],"ISSUES_FOUND")
         self.assertEqual(report["orphan_revisions"],1)
