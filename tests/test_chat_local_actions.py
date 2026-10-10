@@ -66,9 +66,8 @@ class TestExplicitLocalCommands(unittest.TestCase):
             engine2.start()
             try:
                 name = engine2.ask("Oi, qual é seu nome?", [])
-                # Free-form introductions remain Qwen conversation; the exact
-                # supported local question and /nome are deterministic.
-                self.assertIn(name["answer"], ("Resposta do modelo.",))
+                self.assertEqual(name["local_action"], "assistant_name")
+                self.assertIn("Luna", name["answer"])
                 direct = engine2.ask("qual é seu nome?", [])
                 self.assertEqual(direct["local_action"], "assistant_name")
                 self.assertIn("Luna", direct["answer"])
