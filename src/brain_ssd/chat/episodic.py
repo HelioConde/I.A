@@ -32,13 +32,25 @@ def default_episodic_path() -> Path:
     return (Path(base) if base else Path.home() / ".local" / "share") / "BrainSSD" / "episodic-notes.sqlite3"
 
 
-def words(value: str) -> frozenset[str]:
+def cue_tokens(value: str) -> tuple[str, ...]:
+    """Normalized unique cues, preserved in sentence order.
+
+    Prefer recent specific terms over alphabetical prefixes when queries
+    exceed the limited 24-token retrieval budget.
+    """
     plain = unicodedata.normalize("NFKD", value.casefold())
     plain = "".join(c for c in plain if not unicodedata.combining(c))
-    return frozenset(
-        token for token in re.findall(r"[a-z0-9]{3,}", plain)
-        if token not in STOPWORDS
-    )
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for token in re.findall(r"[a-z0-9]{3,}", plain):
+        if token not in STOPWORDS and token not in seen:
+            ordered.append(token)
+            seen.add(token)
+    return tuple(ordered)
+
+
+def words(value: str) -> frozenset[str]:
+    return frozenset(cue_tokens(value))
 
 
 class EpisodicMemory:
@@ -132,7 +144,7 @@ class EpisodicMemory:
         Does not infer new facts or perform neural pattern completion; unrelated
         cues abstain. Always bounded to avoid reading a whole corpus into RAM.
         """
-        terms = sorted(words(cue))[:24]
+        terms = list(cue_tokens(cue)[-24:])
         if not terms:
             return []
         threshold = 2 if len(terms) > 1 else 1

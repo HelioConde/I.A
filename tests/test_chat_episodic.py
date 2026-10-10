@@ -55,6 +55,13 @@ class EpisodicTests(unittest.TestCase):
         self.assertEqual(len(preview.candidate_ids),2)
         self.assertEqual(len(propose_associations(listed)),1)
 
+    def test_long_question_prioritizes_recent_unique_cues(self):
+        note=self.mem.add("Projeto rover biblioteca norte")
+        filler=" ".join("termo"+str(i).zfill(3) for i in range(45))
+        found=self.mem.recall(filler+" projeto rover biblioteca")
+        self.assertEqual(len(found),1)
+        self.assertEqual(found[0]["id"],note["id"])
+
     def test_invalid_and_long_note_rejected(self):
         for note in ("  ","A"*501, {"text":"x"}):
             with self.assertRaises(ValueError):
