@@ -161,10 +161,12 @@ também publica pacotes de diagnóstico das suítes simuladas.
 
 ## Qualidade e segurança de memória (experimento)
 
-O chat com memória episódica agora sinaliza **possíveis datas divergentes**
-entre notas confirmadas relacionadas ao mesmo assunto, sem escolher uma
-como verdade automaticamente. O aviso é uma hipótese conservadora:
-podem ser eventos diferentes, não lembranças incorretas.
+O chat episódico sinaliza **possíveis diferenças de dia da semana, data,
+horário e preço em reais** entre notas confirmadas relacionadas ao mesmo
+assunto, sem escolher uma como verdade automaticamente. O aviso é conservador:
+podem ser eventos ou produtos diferentes, não necessariamente lembranças
+incorretas. Quando o orçamento de contexto não permite apresentar todas as
+fontes divergentes e o aviso, o chat omite as notas em disputa e avisa na tela.
 
 Correções adicionais preservam pistas relevantes no final de perguntas longas,
 normalizam o campo de confirmação vindo do SQLite para uso por associação
@@ -175,13 +177,15 @@ Execute `python tools/bench_memory_quality.py`: o conjunto sintético
 e lexical contém **24 recuperações positivas, 20 negativas, 5 verificações
 de ambiguidade e 1 de exclusão**. Os resultados não medem qualidade do Qwen,
 generalização semântica nem memória humana. Veja [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
+
 ### Experimento de sinônimos (desativado por padrão)
 
 A busca episódica pode testar uma **ponte restrita de sinônimos PT-BR**, sem
 bibliotecas de embeddings nem conexão externa. É ativada exclusivamente
 por `python tools/run_chat.py --episodic-memory --memory-aliases`.
-O teste A/B `python tools/bench_semantic_bridge.py` mede recuperação e
-falsas associações sobre dados inventados. Sinônimos não representam
+O teste A/B `python tools/bench_semantic_bridge.py` mediu **6/12 acertos**
+no baseline lexical e **12/12** com a ponte nos casos sintéticos escolhidos,
+sem falsos reconhecimentos nas 12 perguntas negativas de controle. Sinônimos não representam
 compreensão semântica geral, e resultados sintéticos não comprovam melhoria
 no Qwen. Consulte [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
 
