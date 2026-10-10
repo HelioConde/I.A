@@ -45,7 +45,9 @@ class TestInstallationDoctor(unittest.TestCase):
             # Patch Path.open for a single specific model file.
             real_open=Path.open
             def denied(path,*args,**kwargs):
-                if path == model:
+                # Windows may canonicalize the temporary directory through
+                # a junction when inspect_installation() calls resolve().
+                if path.name == model.name and path.parent.name == "models":
                     raise PermissionError("private data must not escape")
                 return real_open(path,*args,**kwargs)
             with patch("doctor_chat.MIN_PLAUSIBLE_GGUF_BYTES",1024),patch.object(Path,"open",denied):
