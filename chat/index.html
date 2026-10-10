@@ -21,15 +21,14 @@
       <button class="new-chat" id="newChat" type="button">
         <span aria-hidden="true">＋</span> Nova conversa <span class="shortcut">Ctrl K</span>
       </button>
-      <div class="side-section">SESSÃO</div>
-      <div class="current-chat"><span aria-hidden="true">☰</span> Conversa atual</div>
-      <div class="sidebar-spacer"></div>
+      <div class="side-section">CONVERSAS LOCAIS</div>
+      <div class="conversation-list" id="conversationList" aria-label="Histórico de conversas"><p class="history-empty">Carregando histórico...</p></div>
       <div class="sidebar-panel">
         <span class="micro-title">EXECUÇÃO LOCAL</span>
         <div class="sidebar-row"><span class="status-dot" id="sidebarDot"></span><strong id="sidebarStatus">Iniciando...</strong></div>
         <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p>
       </div>
-      <div class="side-footer">Brain-SSD V0 · Interface experimental</div>
+      <div class="side-footer">Histórico privado neste computador · Brain-SSD V0</div>
     </aside>
 
     <main class="workspace" id="chat">

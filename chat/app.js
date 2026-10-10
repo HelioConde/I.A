@@ -1,8 +1,89 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const app = { ready:false, sending:false, messages:[] };
+const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[] };
 const composer = $("messageInput");
 const log = $("messages");
+
+async function requestJson(path, options = {}) {
+  const response = await fetch(path, options);
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || "Falha ao acessar o histórico local.");
+  return payload;
+}
+function renderConversations() {
+  const container = $("conversationList");
+  container.replaceChildren();
+  if (!app.conversations.length) {
+    const empty = document.createElement("p");
+    empty.className = "history-empty";
+    empty.textContent = "As suas conversas aparecerão aqui.";
+    container.appendChild(empty);
+    return;
+  }
+  for (const conversation of app.conversations) {
+    const row = document.createElement("div");
+    row.className = "conversation-row" + (conversation.id === app.conversationId ? " active" : "");
+    const open = document.createElement("button");
+    open.className = "conversation-open";
+    open.type = "button";
+    open.textContent = conversation.title || "Nova conversa";
+    open.title = conversation.title || "Nova conversa";
+    open.addEventListener("click", () => openConversation(conversation.id));
+    const remove = document.createElement("button");
+    remove.className = "conversation-delete";
+    remove.type = "button";
+    remove.textContent = "×";
+    remove.title = "Excluir esta conversa";
+    remove.setAttribute("aria-label", "Excluir conversa: " + (conversation.title || "Nova conversa"));
+    remove.addEventListener("click", () => deleteConversation(conversation.id));
+    row.append(open, remove);
+    container.appendChild(row);
+  }
+}
+async function refreshConversations() {
+  try {
+    const result = await requestJson("/api/conversations", {cache:"no-store"});
+    app.conversations = Array.isArray(result.conversations) ? result.conversations : [];
+    renderConversations();
+  } catch (_) {
+    $("conversationList").textContent = "Não foi possível ler o histórico local.";
+  }
+}
+async function openConversation(identifier) {
+  if (app.sending) return;
+  try {
+    const result = await requestJson("/api/conversations/" + encodeURIComponent(identifier), {cache:"no-store"});
+    app.conversationId = identifier;
+    app.messages = result.messages || [];
+    log.replaceChildren();
+    if (!app.messages.length) showWelcome();
+    for (const message of app.messages) addMessage(message.role, message.content);
+    renderConversations();
+    closeMenu();
+    composer.focus();
+  } catch (error) {
+    window.alert("Não foi possível abrir a conversa: " + error.message);
+  }
+}
+async function deleteConversation(identifier) {
+  if (app.sending) return;
+  if (!window.confirm("Excluir esta conversa do histórico local?")) return;
+  try {
+    await requestJson("/api/conversations/" + encodeURIComponent(identifier),
+      {method:"DELETE", headers:{"Origin":window.location.origin}});
+    if (app.conversationId === identifier) resetChat();
+    await refreshConversations();
+  } catch (error) {
+    window.alert("Não foi possível excluir a conversa: " + error.message);
+  }
+}
+function showWelcome() {
+  const welcome = document.createElement("div");
+  welcome.className = "welcome";
+  welcome.id = "welcome";
+  welcome.innerHTML = '<div class="hero-symbol" aria-hidden="true">✺</div><h1>Nova conversa</h1><p>Envie uma pergunta para conversar com a IA local.</p>';
+  log.appendChild(welcome);
+}
 
 function setConnection(state, detail = "", verified = false) {
   app.ready = state === "ready";
@@ -105,16 +186,24 @@ async function send() {
   const pending = addThinking();
   updateSend();
   try {
+    if (!app.conversationId) {
+      const created = await requestJson("/api/conversations", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body:"{}"
+      });
+      app.conversationId = created.conversation.id;
+    }
     const response = await fetch("/api/chat", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:question, history})
+      body:JSON.stringify({message:question, conversation_id:app.conversationId})
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Não foi possível gerar a resposta.");
     pending.querySelector(".message-content").textContent = payload.answer;
     app.messages.push({role:"assistant", content:payload.answer});
     updateMetrics(payload);
+    await refreshConversations();
   } catch (error) {
     pending.remove();
     addMessage("assistant", "Não consegui responder: " + error.message, "error");
@@ -128,12 +217,10 @@ async function send() {
 function resetChat() {
   if (app.sending) return;
   app.messages = [];
+  app.conversationId = null;
   log.replaceChildren();
-  const welcome = document.createElement("div");
-  welcome.className = "welcome";
-  welcome.id = "welcome";
-  welcome.innerHTML = '<div class="hero-symbol" aria-hidden="true">✺</div><h1>Nova conversa</h1><p>Envie uma pergunta para conversar com a IA local.</p>';
-  log.appendChild(welcome);
+  showWelcome();
+  renderConversations();
   composer.value = "";
   fitComposer();
   closeMenu();
@@ -176,4 +263,5 @@ $("closeDetails").addEventListener("click", () => {
 });
 fitComposer();
 refreshStatus();
+refreshConversations();
 setInterval(refreshStatus, 3000);

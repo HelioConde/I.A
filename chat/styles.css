@@ -18,3 +18,15 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 
 .copy-message{display:inline-flex;align-items:center;margin-top:8px;background:transparent;border:1px solid #384352;border-radius:8px;color:#aebfd1;padding:5px 9px;font-size:11px}.copy-message:hover{background:#253448;color:#fff}.copy-message:focus-visible{outline:2px solid #8bcaff;outline-offset:2px}
+
+/* Local conversation list */
+.sidebar{gap:17px}
+.conversation-list{flex:1;min-height:50px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-color:#454953 transparent}
+.history-empty{color:#858d9f;font-size:12px;line-height:1.5;padding:6px 12px;margin:0}
+.conversation-row{display:flex;align-items:center;gap:2px;border-radius:10px;min-height:41px}
+.conversation-row.active{background:#232b37}
+.conversation-row:hover{background:#1b222c}
+.conversation-open{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:transparent;color:#c7d1df;border:0;text-align:left;padding:11px 9px 11px 13px;font-size:12px}
+.conversation-delete{border:0;background:transparent;color:#98a3b5;border-radius:8px;min-width:30px;min-height:30px;font-size:19px}
+.conversation-delete:hover{color:#fff;background:#6c3039}
+.conversation-open:focus-visible,.conversation-delete:focus-visible{outline:2px solid #8bcaff;outline-offset:1px}

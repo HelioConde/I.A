@@ -98,3 +98,20 @@ a confirmação de inferência aparece depois da primeira resposta verdadeira.
 A Action de Windows executa testes simulados e compila o launcher .NET,
 mas não contém Qwen/llama.cpp; ela não substitui o teste real.
 O instalador autônomo e o streaming de tokens continuam pendentes.
+
+
+## Histórico persistente e conversas locais
+
+As mensagens completas são armazenadas exclusivamente neste computador usando
+SQLite (biblioteca padrão do Python). No Windows, o banco padrão é
+%LOCALAPPDATA%\BrainSSD\chat-history.sqlite3.
+O histórico permanece após fechar a janela, é exibido na barra lateral,
+pode ser reaberto ou excluído pelo usuário e nunca é enviado à nuvem.
+O backend monta o contexto a partir das mensagens salvas, e não de texto
+arbitrário enviado pelo navegador. Apenas as 8 mensagens recentes são usadas
+para montar o prompt; isso evita crescimento descontrolado de contexto.
+Se desejar outro local, inicie com --history-db "C:\meus-dados\brain.sqlite3".
+A exclusão remove a conversa do banco, mas não garante eliminação forense
+dos blocos físicos no SSD. Não sincronize nem versiona este arquivo por engano.
+
+A interface continua sem streaming real de tokens e sem instalador independente.
