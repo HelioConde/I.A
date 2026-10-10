@@ -20,7 +20,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Brain-SSD local Windows visual chat")
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--no-open-browser", action="store_true")
-    parser.add_argument("--profile", choices=tuple(PROFILES), default="equilibrado")
+    parser.add_argument("--profile", choices=tuple(PROFILES), default="economia")
     parser.add_argument("--history-db", type=Path, default=None, help="Banco SQLite das conversas (local)")
     parser.add_argument("--core-mode", choices=("subprocess", "persistent"), default=None, help="Substitui o modo do perfil")
     args = parser.parse_args()

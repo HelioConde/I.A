@@ -18,6 +18,6 @@ dotnet publish $launcherProject `
 
 $executable = Join-Path $outputDirectory "BrainSSD.exe"
 if (-not (Test-Path -LiteralPath $executable)) {
-    throw "Launcher build finished without BrainSSD-HUD.exe"
+    throw "Launcher build finished without BrainSSD.exe"
 }
 Write-Host "Launcher criado: $executable"

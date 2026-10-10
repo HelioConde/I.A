@@ -177,3 +177,11 @@ do Core congelado e o experimento 4F-W não foram alterados.
 
 O diagnóstico recebe agora também o tempo até o primeiro token (TTFT),
 quando medido. Não confundir TTFT com latência total.
+
+## Auditoria de inicialização (10/10/2026)
+
+O launcher .NET, o BAT e run_chat.py iniciam no perfil Economia por
+padrão. O perfil Rápido continua opt-in. O diagnóstico rejeita arquivos
+GGUF com cabeçalho válido e menos de 64 MiB (limiar conservador para
+detectar arquivos truncados, não validação do modelo inteiro).
+Os resultados canônicos anteriores do Core permanecem inalterados.

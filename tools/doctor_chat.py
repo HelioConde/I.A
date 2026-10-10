@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+MIN_PLAUSIBLE_GGUF_BYTES = 64 * 1024 * 1024
 sys.path.insert(0, str(ROOT / "src"))
 
 from brain_ssd.chat.runtime import PROFILES
@@ -50,6 +51,7 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
     required = {
         "python_3_11_or_newer": sys.version_info >= (3, 11),
         "model_gguf_valid_header": model_exists and model_magic,
+        "model_plausible_size": model_size >= MIN_PLAUSIBLE_GGUF_BYTES,
         "cpu_runtime_found": runtime_present,
     }
     recommendations: list[str] = []
@@ -63,8 +65,8 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
         recommendations.append("Configure/compile o llama.cpp CPU-only (" + ("llama-server.exe" if mode == "persistent" else "llama-completion.exe") + ").")
     if not (manifest and index and data_file):
         recommendations.append("O corpus SSD está incompleto. O chat simples ainda poderá funcionar; a recuperação de conhecimento ficará desativada.")
-    if model_exists and 0 < model_size < 1024 * 1024:
-        recommendations.append("O arquivo GGUF parece pequeno demais; confirme que não é apenas um ponteiro ou arquivo de teste.")
+    if model_exists and model_size < MIN_PLAUSIBLE_GGUF_BYTES:
+        recommendations.append("O arquivo GGUF está pequeno demais para o Qwen3-0.6B Q8_0; confirme download completo.")
     if runtime_probe and (runtime_probe.get("error") or runtime_probe.get("cpu_only_build") is False):
         recommendations.append("Verifique se o binário executa corretamente e está compilado em modo CPU-only.")
     return {

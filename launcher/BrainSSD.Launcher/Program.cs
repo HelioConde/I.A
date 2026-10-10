@@ -66,6 +66,7 @@ static int RunMode(string mode, string root)
     foreach (var prefix in python.Value.PrefixArgs) start.ArgumentList.Add(prefix);
     start.ArgumentList.Add(Path.Combine(root, "tools", scriptName));
     if (mode == "brain") start.ArgumentList.Add("--hud");
+    if (chat || doctor) { start.ArgumentList.Add("--profile"); start.ArgumentList.Add("economia"); }
     if (mode == "demo") start.ArgumentList.Add("--demo");
     if (!functional && !chat && !doctor)
     {

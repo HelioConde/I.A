@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -26,7 +27,11 @@ class TestInstallationDoctor(unittest.TestCase):
             exe.write_bytes(b"MZ")
             # The resolver uses a suffix only on native Windows.
             exe.with_suffix("").write_bytes(b"ELF")
-            second = inspect_installation(root)
+            too_small = inspect_installation(root)
+            self.assertFalse(too_small["ready_for_test"])
+            self.assertFalse(too_small["required"]["model_plausible_size"])
+            with patch("doctor_chat.MIN_PLAUSIBLE_GGUF_BYTES", 1024):
+                second = inspect_installation(root)
             self.assertTrue(second["ready_for_test"])
             self.assertFalse(second["optional_ssd"]["available"])
             self.assertEqual(second["status"], "READY_FOR_REAL_INFERENCE_TEST")
