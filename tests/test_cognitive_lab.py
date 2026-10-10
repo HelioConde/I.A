@@ -171,6 +171,23 @@ class TestReversiblePlasticity(unittest.TestCase):
                        ("11111111-1111-4111-8111-111111111111", self.a["id"],1,int(time.time())))
         self.assertEqual(self.ledger.shadow_bias(self.a["id"])["active_support"],0)
 
+    def test_preexisting_feedback_database_migrates_without_reusing_old_signals(self):
+        import sqlite3
+        import uuid
+        legacy=Path(self.tmp.name)/"legacy-feedback.sqlite3"
+        with sqlite3.connect(legacy) as db:
+            db.execute("CREATE TABLE feedback (id TEXT PRIMARY KEY, episode_id TEXT NOT NULL, "
+                       "signal INTEGER NOT NULL, created_at INTEGER NOT NULL, revoked_at INTEGER)")
+            db.execute("INSERT INTO feedback VALUES (?,?,?,?,NULL)",
+                       (str(uuid.uuid4()),self.a["id"],1,int(time.time())))
+        migrated=PlasticityLedger(legacy,self.episodes)
+        assert migrated.shadow_bias(self.a["id"])["active_support"] == 0
+        for _ in range(3):
+            migrated.add_feedback(self.a["id"],-1)
+        self.assertLess(migrated.shadow_bias(self.a["id"])["bias"],0)
+        with sqlite3.connect(legacy) as db:
+            self.assertIn("source_version",{row[1] for row in db.execute("PRAGMA table_info(feedback)")})
+
     def test_bad_feedback_and_unknown_memory(self):
         with self.assertRaises(ValueError):
             self.ledger.add_feedback(self.a["id"],True)

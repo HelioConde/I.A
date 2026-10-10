@@ -75,6 +75,32 @@ class TestOfflineConsolidation(unittest.TestCase):
         self.assertEqual(stale["effective_state"],"SOURCE_DELETED")
         self.assertTrue(self.queue.revoke(draft["id"]))
 
+    def test_legacy_review_database_migrates_but_cannot_approve_unversioned_sources(self):
+        import json
+        import sqlite3
+        import uuid
+        root=Path(self.temp.name)
+        legacy=root/"legacy-review.sqlite3"
+        candidate=str(uuid.uuid4())
+        with sqlite3.connect(legacy) as db:
+            db.execute("CREATE TABLE review_candidates (id TEXT PRIMARY KEY, "
+                       "source_ids TEXT NOT NULL, shared_cues TEXT NOT NULL, "
+                       "summary TEXT, state TEXT NOT NULL, created_at INTEGER NOT NULL, "
+                       "reviewed_at INTEGER)")
+            db.execute("INSERT INTO review_candidates VALUES (?,?,?,?,?,?,?)",
+                       (candidate,json.dumps([self.a["id"],self.b["id"]]),
+                        json.dumps(["projeto","reuniao"]),None,"DRAFT",1,None))
+        migrated=ConsolidationQueue(legacy,self.episodes)
+        old=migrated._row(candidate)
+        self.assertEqual(old["effective_state"],"SOURCE_CHANGED_OR_UNVERIFIED")
+        with self.assertRaises(ValueError):
+            migrated.review(candidate,"approve","Resumo antigo")
+        created=migrated.create_draft([self.a["id"],self.b["id"]])
+        reviewed=migrated.review(created["id"],"approve","Resumo novo e conferido")
+        self.assertEqual(reviewed["effective_state"],"REVIEWED")
+        with sqlite3.connect(legacy) as db:
+            self.assertIn("source_versions",{row[1] for row in db.execute("PRAGMA table_info(review_candidates)")})
+
     def test_rejection_and_reopen_are_persistent(self):
         draft=self.queue.create_draft([self.a["id"],self.b["id"]])
         rejected=self.queue.review(draft["id"],"reject")
