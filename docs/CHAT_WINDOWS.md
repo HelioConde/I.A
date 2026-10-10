@@ -147,3 +147,12 @@ chegar em blocos maiores; essa granularidade depende do binário.
 O streaming não afirma maior velocidade nem menos RAM. Os testes automatizados
 usam um Core simulado apenas para verificar transporte, cancelamento e
 persistência; a validação real ainda exige Windows + Qwen GGUF + llama.cpp.
+
+
+### Validação de cancelamento de processos
+
+A suíte test_chat_stream.py agora inicia um processo Python local como
+substituto de um binário de inferência. Ela comprova que a leitura da saída
+do sistema operacional funciona progressivamente e que um processo que
+ficaria em execução é interrompido ao cancelar. Esse teste de I/O não
+substitui uma medição Windows de Qwen, latência ou economia de RAM.

@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import sys
 import tempfile
+from types import SimpleNamespace
 import threading
 import time
 import unittest
@@ -18,6 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
+from brain_ssd.local_runtime.core_backend import SubprocessPerQueryCore
 
 
 class DummyCore:
@@ -53,6 +55,48 @@ class TestNativeStreaming(unittest.TestCase):
         event.set()
         with self.assertRaises(GenerationCancelled):
             generate_streamed(DummyCore(), self._request("Olá"), lambda _: None, event)
+
+
+class TestPipeCancellation(unittest.TestCase):
+    """Uses an actual Python child to verify process I/O and cancellation.
+
+    This is NOT a Qwen quality test. It covers real OS process termination.
+    """
+    def core_with_child(self, script):
+        core = SubprocessPerQueryCore(Path(sys.executable), Path(sys.executable))
+        core.backend = SimpleNamespace(command=lambda _: [sys.executable, "-u", "-c", script])
+        return core
+
+    def test_real_pipe_delivers_chunks(self):
+        core = self.core_with_child("import sys,time;print('Primeiro',flush=True);time.sleep(.15);print('Segundo',flush=True)")
+        chunks = []
+        measured = generate_streamed(core, self._request(), chunks.append, threading.Event())
+        self.assertEqual(measured["return_code"], 0)
+        self.assertIn("Primeiro", "".join(chunks))
+        self.assertIn("Segundo", "".join(chunks))
+        self.assertEqual(core.query_count, 1)
+
+    def test_cancel_kills_real_child(self):
+        # Child never exits on its own within the test. Cancellation MUST end it.
+        core = self.core_with_child("import sys,time;print('Começou',flush=True);time.sleep(25)")
+        cancelled = threading.Event()
+        chunks = []
+
+        def receive(part):
+            chunks.append(part)
+            cancelled.set()
+
+        start = time.monotonic()
+        with self.assertRaises(GenerationCancelled):
+            generate_streamed(core, self._request(), receive, cancelled)
+        self.assertLess(time.monotonic() - start, 5)
+        self.assertIn("Começou", "".join(chunks))
+        self.assertEqual(core.query_count, 0)
+
+    @staticmethod
+    def _request():
+        from brain_ssd.backend import GenerationRequest
+        return GenerationRequest("olá")
 
 
 class TestHttpStreaming(unittest.TestCase):

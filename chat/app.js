@@ -171,6 +171,7 @@ function humanMemory(value) { return Number.isFinite(value) ? (value / (1024 * 1
 function updateMetrics(data) {
   const m = data.metrics || {};
   $("detailLatency").textContent = humanTime(m.latency_ms);
+  $("detailFirstToken").textContent = humanTime(m.ttft_ms);
   $("detailSpeed").textContent = Number.isFinite(m.tokens_per_second) ? m.tokens_per_second.toFixed(1) + " tokens/s" : "—";
   $("detailRam").textContent = humanMemory(m.working_set_bytes_max);
   $("detailPages").textContent = Number.isFinite(data.active_pages) ? String(data.active_pages) : "—";
