@@ -7,6 +7,8 @@ on:
       - "tools/run_chat.py"
       - "tests/test_chat_windows.py"
       - "tests/test_chat_history.py"
+      - "tests/test_chat_doctor.py"
+      - "tools/doctor_chat.py"
       - ".github/workflows/chat-smoke.yml"
   pull_request:
     paths:
@@ -23,8 +25,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Verify syntax
-        run: python -m compileall -q tools/run_chat.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py
+        run: python -m compileall -q tools/run_chat.py tools/doctor_chat.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py tests/test_chat_doctor.py
       - name: Test HTTP and chat adapter with mock CPU Core
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
+          python -m unittest discover -s tests -p "test_chat_doctor.py" -v

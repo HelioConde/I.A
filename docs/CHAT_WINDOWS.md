@@ -45,7 +45,7 @@ em Program.cs. Até recompilar, use o arquivo .bat.
 - Frontend e API: apenas 127.0.0.1:8766; POST exige Origin local. Não
   exponha a porta por túnel ou encaminhamento.
 - Histórico temporário só na aba; a UI envia até 8 mensagens recentes para
-  o processo local. Não há armazenamento de conversas em nuvem.
+  o prompt local. Não há armazenamento de conversas em nuvem.
 - O Core executa CPU-only com --device none. RAM e velocidade reais
   dependem da máquina e da pergunta. GPU dedicada não é necessária.
 - O modo subprocesso recarrega o modelo por pergunta (mais lento).
@@ -53,7 +53,7 @@ em Program.cs. Até recompilar, use o arquivo .bat.
 - Medidas de working set não comprovam leitura física do SSD.
 - Se o runtime estiver ausente, a tela informa a falha; não simula respostas.
 - O MVP ainda não tem streaming de tokens, cancelamento no meio da geração,
-  persistência de conversas nem instalador autônomo.
+  nem instalador autônomo.
 
 ## Arquivos e teste
 
@@ -115,3 +115,15 @@ A exclusão remove a conversa do banco, mas não garante eliminação forense
 dos blocos físicos no SSD. Não sincronize nem versiona este arquivo por engano.
 
 A interface continua sem streaming real de tokens e sem instalador independente.
+
+
+## Diagnóstico de instalação em um clique
+
+Abra DIAGNOSTICAR-CHAT-WINDOWS.bat na raiz do projeto para verificar Python,
+arquivo GGUF, runtime de inferência e corpus SSD opcional. A verificação é
+rápida e não carrega o modelo inteiro. O código Python também aceita
+python tools/doctor_chat.py --profile economia --json e --probe.
+
+Se os arquivos necessários estiverem presentes, execute o teste de resposta
+real: python tools/validate_chat_windows.py --profile economia.
+O teste de instalação não substitui uma inferência verdadeira.

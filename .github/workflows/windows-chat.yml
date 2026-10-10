@@ -9,6 +9,10 @@ on:
       - "src/brain_ssd/chat/**"
       - "tools/run_chat.py"
       - "tools/validate_chat_windows.py"
+      - "tools/doctor_chat.py"
+      - "DIAGNOSTICAR-CHAT-WINDOWS.bat"
+      - "tests/test_chat_history.py"
+      - "tests/test_chat_doctor.py"
       - "tests/test_chat_runtime.py"
       - "tests/test_chat_history.py"
       - "launcher/**"
@@ -23,13 +27,14 @@ jobs:
           python-version: "3.11"
       - name: Verify syntax
         shell: pwsh
-        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py
+        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/doctor_chat.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py
       - name: Test the Windows UI and independent chat adapter (mock Core)
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
           python -m unittest discover -s tests -p "test_chat_runtime.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
+          python -m unittest discover -s tests -p "test_chat_doctor.py" -v
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"

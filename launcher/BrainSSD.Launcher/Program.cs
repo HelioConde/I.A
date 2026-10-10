@@ -25,6 +25,7 @@ while (true)
     Console.WriteLine("  [5] Reproduzir resultado real da Fase 4D");
     Console.WriteLine("  [6] Abrir HUD live (aguardando eventos)");
     Console.WriteLine("  [7] Abrir a pasta do projeto para editar");
+    Console.WriteLine("  [8] Diagnosticar instalacao do chat (CPU / GGUF / SSD)");
     Console.WriteLine("  [0] Sair");
     Console.Write("\nEscolha: ");
     switch (Console.ReadLine()?.Trim())
@@ -35,6 +36,7 @@ while (true)
         case "4": return RunMode("demo", projectRoot);
         case "5": return RunMode("replay", projectRoot);
         case "6": return RunMode("live", projectRoot);
+        case "8": return RunMode("doctor", projectRoot);
         case "7":
             Process.Start(new ProcessStartInfo("explorer.exe", projectRoot) { UseShellExecute = true });
             Console.WriteLine("Pasta aberta. Pressione qualquer tecla para voltar.");
@@ -58,26 +60,27 @@ static int RunMode(string mode, string root)
     }
     var functional = mode is "brain" or "brain-terminal";
     var chat = mode is "chat" or "conversa";
-    var scriptName = chat ? "run_chat.py" : functional ? "run_local_brain_ssd.py" : mode == "replay" ? "replay_hud.py" : "run_hud.py";
+    var doctor = mode is "doctor";
+    var scriptName = doctor ? "doctor_chat.py" : chat ? "run_chat.py" : functional ? "run_local_brain_ssd.py" : mode == "replay" ? "replay_hud.py" : "run_hud.py";
     var start = new ProcessStartInfo(python.Value.Command) { WorkingDirectory = root, UseShellExecute = false };
     foreach (var prefix in python.Value.PrefixArgs) start.ArgumentList.Add(prefix);
     start.ArgumentList.Add(Path.Combine(root, "tools", scriptName));
     if (mode == "brain") start.ArgumentList.Add("--hud");
     if (mode == "demo") start.ArgumentList.Add("--demo");
-    if (!functional && !chat)
+    if (!functional && !chat && !doctor)
     {
         start.ArgumentList.Add("--host"); start.ArgumentList.Add("127.0.0.1");
         start.ArgumentList.Add("--port"); start.ArgumentList.Add("8765");
     }
     TryClear(); Header(root);
     Console.WriteLine($"Modo: {mode.ToUpperInvariant()}");
-    Console.WriteLine(chat ? "O chat abrirá em http://127.0.0.1:8766" : mode == "brain" ? "O HUD abrirá em http://127.0.0.1:8765" : functional ? "Use /help para ver os comandos." : "O navegador abrirá em http://127.0.0.1:8765");
+    Console.WriteLine(doctor ? "Verificando requisitos. Nenhum modelo sera executado." : chat ? "O chat abrirá em http://127.0.0.1:8766" : mode == "brain" ? "O HUD abrirá em http://127.0.0.1:8765" : functional ? "Use /help para ver os comandos." : "O navegador abrirá em http://127.0.0.1:8765");
     Console.WriteLine("Feche esta janela ou pressione Ctrl+C para encerrar.\n");
     try
     {
         using var child = Process.Start(start);
         if (child is null) throw new InvalidOperationException("O processo Python não iniciou.");
-        if (!functional && !chat) _ = OpenBrowserWhenReady();
+        if (!functional && !chat && !doctor) _ = OpenBrowserWhenReady();
         child.WaitForExit();
         return child.ExitCode;
     }
