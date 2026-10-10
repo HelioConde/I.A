@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 from brain_ssd.chat.history import ChatHistory, default_history_path
+from brain_ssd.chat.episodic import EpisodicMemory, default_episodic_path
 from brain_ssd.chat.runtime import LocalChatRuntime, PROFILES
 
 
@@ -21,13 +22,16 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--no-open-browser", action="store_true")
     parser.add_argument("--profile", choices=tuple(PROFILES), default="economia")
+    parser.add_argument("--episodic-memory", action="store_true", help="Ativa memórias confirmadas pelo usuário; desativadas por padrão")
+    parser.add_argument("--episodic-db", type=Path, default=None)
     parser.add_argument("--history-db", type=Path, default=None, help="Banco SQLite das conversas (local)")
     parser.add_argument("--core-mode", choices=("subprocess", "persistent"), default=None, help="Substitui o modo do perfil")
     args = parser.parse_args()
-    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode))
+    episodic_store = EpisodicMemory(args.episodic_db or default_episodic_path()) if args.episodic_memory else None
+    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode), episodic_store=episodic_store)
     history_store = ChatHistory(args.history_db or default_history_path())
     try:
-        server = create_chat_server(engine, ROOT / "chat", port=args.port, history_store=history_store)
+        server = create_chat_server(engine, ROOT / "chat", port=args.port, history_store=history_store, episodic_store=episodic_store)
     except OSError as exc:
         print(f"Não foi possível abrir a porta {args.port}: {exc}", file=sys.stderr)
         return 1
@@ -36,6 +40,7 @@ def main() -> int:
     print(f"Brain-SSD Chat local: {url}")
     print(f"Perfil: {args.profile} | CPU-only | SSD opcional para conversar | sem API externa.")
     print(f"Histórico local privado: {history_store.path}")
+    print(f"Memórias episódicas: {episodic_store.path if episodic_store else 'desativadas (opt-in --episodic-memory)'}")
     print("A primeira resposta pode levar mais tempo devido ao carregamento do modelo.")
     print("Mantenha o terminal aberto; pressione Ctrl+C para encerrar.")
     if not args.no_open_browser:
