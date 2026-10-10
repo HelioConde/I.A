@@ -315,6 +315,60 @@ class EpisodicMemory:
             scored.sort(key=lambda x: (-x["score"], -x["created_at"], x["id"]))
         return scored[:max(1,min(int(limit),3))]
 
+    def get_assistant_name(self) -> str | None:
+        """Return only the most recently *explicitly* saved assistant nickname."""
+        prefix = "Nome escolhido para o Brain-SSD: "
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT content FROM episodes WHERE confirmed=1 "
+                "AND substr(content, 1, ?) = ? ORDER BY rowid DESC LIMIT 1",
+                (len(prefix), prefix),
+            ).fetchone()
+        return row["content"][len(prefix):] if row is not None else None
+
+    def remember_assistant_name(self, name: str) -> dict[str, Any]:
+        """Persist an explicit chat command, never auto-infer a nickname.
+
+        Updates an existing nickname in place with revision history rather than
+        accumulating contradictory identity memories.
+        """
+        if not isinstance(name, str):
+            raise ValueError("Nome inválido.")
+        name = " ".join(name.strip().split())
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39}", name):
+            raise ValueError("Use um nome de 1 a 40 caracteres, apenas letras, espaços e hífen.")
+        name = name[0].upper() + name[1:]
+        prefix = "Nome escolhido para o Brain-SSD: "
+        content, terms = self._validated_note(prefix + name)
+        with self._connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            previous = db.execute(
+                "SELECT id, content, created_at FROM episodes WHERE confirmed=1 "
+                "AND substr(content, 1, ?) = ? ORDER BY rowid DESC LIMIT 1",
+                (len(prefix), prefix),
+            ).fetchone()
+            if previous is not None:
+                return self._replace_locked(
+                    db, previous["id"], content, previous["content"], "EDIT"
+                )
+            count = db.execute("SELECT COUNT(*) FROM episodes").fetchone()[0]
+            if count >= MAX_EPISODES:
+                raise ValueError("Limite de memórias atingido; exclua uma nota antes.")
+            item = {
+                "id": str(uuid.uuid4()), "content": content,
+                "created_at": int(time.time()), "source": "explicit_user",
+                "confirmed": True,
+            }
+            db.execute(
+                "INSERT INTO episodes VALUES(?,?,?,?,1)",
+                (item["id"], content, item["created_at"], item["source"]),
+            )
+            db.executemany(
+                "INSERT INTO episode_terms VALUES(?,?)",
+                ((item["id"], term) for term in terms),
+            )
+            return item
+
     def replay_candidates(self, limit: int = 10) -> list[dict[str, Any]]:
         """Read-only offline replay *plan*, NOT biological sleep/consolidation."""
         return self.list(limit=min(limit,10))
