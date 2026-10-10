@@ -179,6 +179,14 @@ e lexical contém **24 recuperações positivas, 20 negativas, 5 verificações
 de ambiguidade e 1 de exclusão**. Os resultados não medem qualidade do Qwen,
 generalização semântica nem memória humana. Veja [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
 
+### Auditoria das lembranças no SSD
+
+Para examinar **somente a integridade** do SQLite episódico, sem mostrar textos,
+UUIDs, caminhos ou senhas, execute `python tools/audit_episodic_db.py`.
+O relatório informa, de modo agregado, se existem termos desatualizados,
+revisões órfãs ou corrupção de estrutura. **A auditoria é somente leitura**;
+não modifica dados nem os envia à internet. Consulte [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md).
+
 ### Experimento de sinônimos (desativado por padrão)
 
 A busca episódica pode testar uma **ponte restrita de sinônimos PT-BR**, sem

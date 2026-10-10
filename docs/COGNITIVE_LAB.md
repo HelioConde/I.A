@@ -179,3 +179,16 @@ autocorreção de fatos pelo modelo.
 - Logs sanitizados não armazenam os textos das revisões.
 
 Este mecanismo não atualiza pesos do Qwen nem significa aprendizagem factual automática.
+
+## Auditoria local de integridade (somente leitura)
+
+Execute `python tools/audit_episodic_db.py` após criar notas locais no chat
+com `--episodic-memory`. A ferramenta abre o banco SQLite em modo
+**read-only** e relata apenas contadores agregados:
+integridade estrutural, número de episódios e revisões, termos faltantes
+ou antigos no índice, revisões órfãs e violações dos limites.
+
+Não imprime textos, IDs, nomes de arquivo, caminhos ou segredos, não
+faz reparos automáticos nem lê o conteúdo de conversas separadas.
+Se nenhum banco existir, retorna `MISSING` sem criá-lo.
+Para um banco específico: `python tools/audit_episodic_db.py --db CAMINHO.sqlite3`.
