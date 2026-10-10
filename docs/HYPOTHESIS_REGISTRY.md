@@ -122,3 +122,18 @@ Resultado:
 ## Regra de autorização
 
 Registro não é autorização. Nenhuma hipótese V2 pode ser implementada apenas por aparecer nesta tabela. Cada fase precisa de aprovação explícita depois da Fase 4E.
+
+
+## Neuro-lab shadow — 2026-10-10
+| ID | Hipótese testável | Status | Condição de promoção |
+| --- | --- | --- | --- |
+| NEURO-ATTN-01 | Atenção lexical com orçamento minimiza bytes sem perder fatos | SHADOW/UNTESTED | Comparar recall, false-negative, CPU/TTFT com V0 |
+| NEURO-WM-01 | Tópicos recentes compactos preservam coerência com menos tokens | SHADOW/UNTESTED | A/B multi-turn com avaliação de qualidade |
+| NEURO-LINK-01 | Associações explícitas podem melhorar recuperação por pista | SHADOW/UNTESTED | Holdout parcial, colisões e falsos positivos |
+| NEURO-REPLAY-01 | Revisão offline pode selecionar candidatos sem corromper conhecimento | READ-ONLY/UNTESTED | Confirmação do usuário e verificação independente antes de consolidação |
+| NEURO-PLASTIC-01 | Feedback explícito com suporte e rollback melhora ranking | SHADOW/UNTESTED | A/B e comparação do viés contra base sem feedback |
+| NEURO-ERROR-01 | Erro de previsão calibrado ajuda correção futura | METRIC_ONLY/UNTESTED | Ground truth verificável e melhoria de Brier em holdout |
+| NEURO-SENSOR-01 | Ciclo percepção→ação→feedback melhora política em simulação | SANDBOX/UNTESTED | Tarefas multiestágio com métricas e sem ações reais |
+| NEURO-UPLOAD-01 | Transferir memória/consciência humana para PC | NÃO DEMONSTRADO | Não promover alegações sem evidência científica independente |
+
+Isto NÃO modifica o roadmap da validação física canônica.

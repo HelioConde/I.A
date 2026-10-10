@@ -54,3 +54,11 @@ O backend encerra a geração e não salva respostas interrompidas. O histórico
 permanece somente no SQLite local. Consulte [CHAT_WINDOWS.md](docs/CHAT_WINDOWS.md).
 O CI valida o protocolo com backends de teste e encerramento real de processos,
 mas não possui o modelo Qwen; ainda falta um teste completo no Windows do usuário.
+
+### Laboratório cognitivo experimental
+
+Atenção e memória de trabalho compacta, associação episódica, replay somente leitura,
+plasticidade de metadados reversível, erro de previsão e percepção–ação simulada:
+consulte [COGNITIVE_LAB.md](docs/COGNITIVE_LAB.md) e execute
+`python tools/run_cognitive_lab.py`. Esses módulos não reescrevem o Qwen e
+não equivalem a neurônios ou transferência de consciência.
