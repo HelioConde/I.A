@@ -1,0 +1,79 @@
+"""Cheap zero-dependency HTML/JS wiring checks before deploying the UI.
+
+Node validates JavaScript syntax in CI; this checks DOM contracts and
+same-origin-only static assets without requiring a headless browser.
+"""
+from __future__ import annotations
+
+from html.parser import HTMLParser
+from pathlib import Path
+import re
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+HTML = ROOT / "chat" / "index.html"
+JS = ROOT / "chat" / "app.js"
+CSS = ROOT / "chat" / "styles.css"
+
+
+class HtmlInventory(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.ids = []
+        self.references = []
+        self.scripts = []
+        self.styles = []
+        self.inline_handlers = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if "id" in attributes:
+            self.ids.append(attributes["id"])
+        if "aria-controls" in attributes:
+            self.references.extend(attributes["aria-controls"].split())
+        if "href" in attributes and (attributes["href"] or "").startswith("#"):
+            self.references.append(attributes["href"][1:])
+        for key in attributes:
+            if key.startswith("on"):
+                self.inline_handlers.append((tag,key))
+        if tag == "script":
+            self.scripts.append(attributes.get("src"))
+        if tag == "link" and attributes.get("rel") == "stylesheet":
+            self.styles.append(attributes.get("href"))
+
+
+class TestStaticUI(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.html = HTML.read_text(encoding="utf-8")
+        cls.js = JS.read_text(encoding="utf-8")
+        cls.inventory = HtmlInventory()
+        cls.inventory.feed(cls.html)
+
+    def test_no_duplicate_dom_ids(self):
+        ids = self.inventory.ids
+        self.assertEqual(len(ids),len(set(ids)),"HTML contains duplicated IDs")
+
+    def test_all_static_js_id_references_exist(self):
+        references = set(re.findall(r'\$\("([a-zA-Z][a-zA-Z0-9_-]*)"\)',self.js))
+        self.assertTrue(references)
+        self.assertFalse(references - set(self.inventory.ids),
+                         f"JS references absent HTML IDs: {references - set(self.inventory.ids)}")
+
+    def test_accessibility_references_exist(self):
+        missing = set(self.inventory.references) - set(self.inventory.ids)
+        self.assertFalse(missing, f"Broken anchor/aria-controls targets: {missing}")
+        self.assertIn('lang="pt-BR"',self.html)
+        self.assertIn('id="messageInput"',self.html)
+        self.assertIn('aria-label="Mensagem para o Brain-SSD"',self.html)
+
+    def test_static_assets_are_local_and_no_inline_handlers(self):
+        self.assertEqual(self.inventory.scripts,["/app.js"])
+        self.assertEqual(self.inventory.styles,["/styles.css"])
+        self.assertFalse(self.inventory.inline_handlers)
+        self.assertFalse(re.search(r'<script[^>]+src="https?://',self.html))
+        self.assertTrue(CSS.is_file())
+
+
+if __name__=="__main__":
+    unittest.main()

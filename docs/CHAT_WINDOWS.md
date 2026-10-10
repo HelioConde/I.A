@@ -207,3 +207,11 @@ ou blocos físicos podem continuar existindo no SSD.
 Há apenas um plano de replay offline de leitura, não 'sono', consolidação real
 ou atualização automática de redes neurais.
 Veja `docs/NEUROCIENCIA_AUDITORIA_2026-10-10.md`.
+
+## Validação estática da interface
+
+Além das suítes do chat, o CI verifica a sintaxe de `chat/app.js` com Node
+e executa `test_chat_static_ui.py` para detectar IDs duplicados, referências
+JavaScript a elementos HTML inexistentes, âncoras e arquivos estáticos.
+Isso não substitui captura de tela, acessibilidade em navegador real ou teste
+de usabilidade no Windows, mas bloqueia erros simples antes da publicação.

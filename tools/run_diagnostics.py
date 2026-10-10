@@ -34,6 +34,7 @@ CHAT_SUITES = [
     ("consolidation", "test_consolidation.py"),
     ("diagnostics", "test_diagnostics.py"),
     ("compare_diagnostics", "test_compare_diagnostics.py"),
+    ("chat_static_ui", "test_chat_static_ui.py"),
 ]
 CORE_SUITES = [
     ("core", "test_core.py"),
