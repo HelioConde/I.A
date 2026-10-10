@@ -24,6 +24,8 @@ class TestInstallationDoctor(unittest.TestCase):
             exe = root / "third_party/llama.cpp/build-win/bin/llama-completion.exe"
             exe.parent.mkdir(parents=True)
             exe.write_bytes(b"MZ")
+            # The resolver uses a suffix only on native Windows.
+            exe.with_suffix("").write_bytes(b"ELF")
             second = inspect_installation(root)
             self.assertTrue(second["ready_for_test"])
             self.assertFalse(second["optional_ssd"]["available"])
