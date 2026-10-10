@@ -86,7 +86,9 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
             if name else "Meu nome padrão é Brain-SSD. Nenhum apelido foi salvo na memória local."
         )
     elif simple in (
-        "quais comandos voce tem", "quais comandos tem", "que comandos voce tem",
+        "quais comandos voce tem", "qual comandos voce tem", "qual comandos tem",
+        "quais comandos tem", "que comandos voce tem",
+        "quais informacoes voce sabe sobre voce", "quais informacoes voce sabe sobre si",
         "quais sao seus comandos", "o que voce consegue fazer", "o que voce pode fazer",
         "/ajuda", "/help", "ajuda comandos",
     ):
