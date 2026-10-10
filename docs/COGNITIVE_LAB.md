@@ -161,3 +161,21 @@ foi escolhida apenas para caber** e recomenda esclarecer o evento ou
 aumentar o contexto. Isso não garante que o Qwen interprete corretamente
 um conflito quando todas as notas couberem — essa qualidade precisa de
 avaliação com o modelo verdadeiro.
+
+## Correção e histórico reversível das notas
+
+A memória episódica explícita aceita correção **iniciada pelo usuário**,
+mantendo o mesmo UUID e atualizando atomicamente o índice lexical. A interface
+oferece **✎ Corrigir** e **↶ Restaurar versão anterior**. Não existe
+autocorreção de fatos pelo modelo.
+
+- O servidor exige o texto original (`expected_content`) para impedir
+  edições silenciosamente sobrescritas entre duas abas.
+- Até 20 revisões por nota são preservadas no SQLite local.
+- Restaurar cria nova revisão, preservando proveniência de alterações.
+- Apagar uma nota remove seus termos indexados e revisões associadas
+  logicamente, mas não apaga necessariamente backups nem blocos físicos.
+- Endpoints de escrita exigem a origem local permitida.
+- Logs sanitizados não armazenam os textos das revisões.
+
+Este mecanismo não atualiza pesos do Qwen nem significa aprendizagem factual automática.

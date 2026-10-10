@@ -17,7 +17,7 @@ async function refreshEpisodicMemory() {
     const payload = await requestJson("/api/memories", {cache:"no-store"});
     $("saveMemory").disabled = !payload.enabled;
     status.textContent = payload.enabled
-      ? "Notas salvas só neste computador. A IA recupera pistas relacionadas; você pode apagar a qualquer momento."
+      ? "Notas locais. Corrija, restaure uma versão anterior ou apague uma lembrança; nenhuma mudança é automática."
       : "Desativadas. Reinicie com --episodic-memory para permitir notas explícitas.";
     list.replaceChildren();
     if (!payload.enabled) return;
@@ -43,7 +43,58 @@ async function refreshEpisodicMemory() {
           window.alert("Erro ao apagar memória: " + error.message);
         }
       });
-      row.append(caption,del);
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.textContent = "✎";
+      edit.title = "Corrigir esta lembrança";
+      edit.setAttribute("aria-label", "Corrigir lembrança: " + memory.content.slice(0,60));
+      edit.addEventListener("click", async () => {
+        if (app.sending) return;
+        const updated = window.prompt(
+          "Corrija esta lembrança (até 500 caracteres). A versão anterior poderá ser restaurada.",
+          memory.content
+        );
+        if (updated === null || updated.trim() === memory.content) return;
+        try {
+          await requestJson("/api/memories/" + encodeURIComponent(memory.id) + "/edit", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({content:updated.trim(), expected_content:memory.content})
+          });
+          await refreshEpisodicMemory();
+        } catch (error) {
+          window.alert("Não foi possível corrigir a lembrança: " + error.message);
+          await refreshEpisodicMemory();
+        }
+      });
+      const undo = document.createElement("button");
+      undo.type = "button";
+      undo.textContent = "↶";
+      undo.title = "Restaurar versão anterior";
+      undo.setAttribute("aria-label", "Restaurar versão anterior de: " + memory.content.slice(0,60));
+      undo.addEventListener("click", async () => {
+        if (app.sending) return;
+        try {
+          const versions = await requestJson(
+            "/api/memories/" + encodeURIComponent(memory.id) + "/revisions",
+            {cache:"no-store"}
+          );
+          const previous = (versions.revisions || [])[0];
+          if (!previous) {
+            window.alert("Esta lembrança ainda não possui revisões.");
+            return;
+          }
+          if (!window.confirm("Restaurar a versão anterior desta lembrança?\n\n" + previous.old_content)) return;
+          await requestJson("/api/memories/" + encodeURIComponent(memory.id) + "/restore", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({revision_id:previous.id, expected_content:memory.content})
+          });
+          await refreshEpisodicMemory();
+        } catch (error) {
+          window.alert("Não foi possível restaurar a lembrança: " + error.message);
+          await refreshEpisodicMemory();
+        }
+      });
+      row.append(caption, edit, undo, del);
       list.appendChild(row);
     }
   } catch (_) {

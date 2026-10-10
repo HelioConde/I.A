@@ -169,6 +169,7 @@ incorretas. Quando o orçamento de contexto não permite apresentar todas as
 fontes divergentes e o aviso, o chat omite as notas em disputa e avisa na tela.
 
 Correções adicionais preservam pistas relevantes no final de perguntas longas,
+permitem corrigir notas com até 20 revisões e restauração explícita,
 normalizam o campo de confirmação vindo do SQLite para uso por associação
 e replay, e impedem que feedback de uma memória excluída continue
 influenciando o ranking experimental.

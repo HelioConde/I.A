@@ -64,3 +64,7 @@
   color: #e5d4b2;
   background: rgba(165, 133, 73, 0.11);
 }
+
+/* User-controlled episodic revisions. */
+.episodic-item button {flex:0 0 28px; cursor:pointer}
+.episodic-item button[title="Corrigir esta lembrança"],.episodic-item button[title="Restaurar versão anterior"]{font-size:17px}
