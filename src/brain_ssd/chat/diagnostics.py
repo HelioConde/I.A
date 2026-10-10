@@ -235,19 +235,36 @@ def inspect_events(files: Iterable[Path], *, max_events: int = MAX_EXPORT_EVENTS
     by_suite = Counter(r.get("suite", "") for r in events if r["event"] == "test.result")
     platforms = Counter(r["platform"] for r in events if r["event"] == "session.start" and "platform" in r)
     revisions = sorted({r["git_sha"] for r in events if "git_sha" in r})
-    durations = [r["duration_ms"] for r in events
-                 if r["event"] in ("inference.done", "chat.complete")
-                 and type(r.get("duration_ms")) in (int, float)]
+    def summarize(name: str, key: str) -> dict[str, Any]:
+        # Chat and inference durations are different measurements. Combining
+        # them double-counts each request and produces misleading medians.
+        values = [item[key] for item in events
+                  if item["event"] == name and type(item.get(key)) in (int, float)
+                  and item[key] >= 0]
+        if not values:
+            return {}
+        return {
+            "sample_count": len(values),
+            "mean": round(statistics.mean(values), 2),
+            "p50": round(statistics.median(values), 2),
+            "maximum": round(max(values), 2),
+        }
+
+    chat_latency = summarize("chat.complete", "duration_ms")
+    inference_latency = summarize("inference.done", "duration_ms")
+    first_token_latency = summarize("inference.done", "ttft_ms")
+    native_ram = summarize("inference.done", "working_set_bytes_max")
+    python_ram = summarize("chat.complete", "process_working_set_bytes")
+    # Keep legacy latency keys for existing consumers, but only the total
+    # completed chat timings contribute (not each submeasurement).
+    metrics: dict[str, Any] = ({
+        "sample_count": chat_latency["sample_count"],
+        "latency_mean_ms": chat_latency["mean"],
+        "latency_p50_ms": chat_latency["p50"],
+        "latency_max_ms": chat_latency["maximum"],
+    } if chat_latency else {})
     fails = Counter(r.get("error_type", "Other") for r in events
                     if r["event"] in ("runtime.error", "inference.error", "chat.error", "test.error"))
-    metrics: dict[str, Any] = {}
-    if durations:
-        metrics = {
-            "sample_count": len(durations),
-            "latency_mean_ms": round(statistics.mean(durations), 2),
-            "latency_p50_ms": round(statistics.median(durations), 2),
-            "latency_max_ms": round(max(durations), 2),
-        }
     report = {
         "schema_version": SCHEMA_VERSION,
         "category": "SANITIZED_DIAGNOSTIC_ONLY",
@@ -258,6 +275,16 @@ def inspect_events(files: Iterable[Path], *, max_events: int = MAX_EXPORT_EVENTS
         "test_suites_with_results": dict(sorted(by_suite.items())),
         "error_types": dict(sorted(fails.items())),
         "latency": metrics,
+        "chat_latency_ms": chat_latency,
+        "inference_latency_ms": inference_latency,
+        "time_to_first_token_ms": first_token_latency,
+        "native_peak_working_set_bytes": native_ram,
+        "python_working_set_bytes": python_ram,
+        "measurement_notes": [
+            "Chat latency and native inference duration are separate, not additive or independent samples.",
+            "Process working set is NOT the whole machine RAM or physically read SSD bytes.",
+            "Missing measurements mean unavailable rather than zero.",
+        ],
         "disclaimer": "No prompts or model answers. CI mock tests do not prove real Qwen inference.",
     }
     return events, report

@@ -103,3 +103,13 @@ sob inferência, latência mediana, TTFT, retorno de erros, cancelamento,
 recall episódico e efeito no contexto. Ainda falta comparar esses registros
 com **Qwen puro**, sob as mesmas perguntas e hardware, sem atribuir ganhos
 de RAM ao Brain-SSD antecipadamente.
+
+## Métricas separadas (evita resultados enganosos)
+
+O relatório `summary.json` separa `chat_latency_ms` (tempo de ponta a ponta),
+`inference_latency_ms` (geração no Core), `time_to_first_token_ms`,
+`native_peak_working_set_bytes` e `python_working_set_bytes`.
+A chave legada `latency` representa **apenas chamadas de chat concluídas**;
+não mistura inferência e duração total como se fossem amostras independentes.
+Essas contagens ainda não representam RAM física total nem bytes reais lidos
+do SSD. Valores ausentes significam medição indisponível, não zero.

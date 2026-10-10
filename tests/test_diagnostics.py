@@ -119,6 +119,20 @@ class TestDiagnosticLogger(unittest.TestCase):
         self.assertNotIn("Pergunta muito privada",text)
         self.assertGreater(summary["latency"]["sample_count"],0)
 
+    def test_chat_latency_and_inference_are_not_double_counted(self):
+        request_id = str(uuid.uuid4())
+        self.log.emit("inference.done", request_id=request_id,
+                      duration_ms=120, ttft_ms=40, working_set_bytes_max=102400)
+        self.log.emit("chat.complete", request_id=request_id,
+                      duration_ms=160, process_working_set_bytes=204800)
+        events, report = inspect_events(self.log.files())
+        self.assertEqual(report["latency"]["sample_count"], 1)
+        self.assertEqual(report["latency"]["latency_p50_ms"], 160)
+        self.assertEqual(report["inference_latency_ms"]["p50"], 120)
+        self.assertEqual(report["time_to_first_token_ms"]["p50"], 40)
+        self.assertEqual(report["native_peak_working_set_bytes"]["maximum"], 102400)
+        self.assertEqual(report["python_working_set_bytes"]["maximum"], 204800)
+
     def test_errors_are_types_not_raw_messages(self):
         class BrokenRuntime:
             def __init__(self):
