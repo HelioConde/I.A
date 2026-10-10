@@ -267,3 +267,36 @@ nativas do llama.cpp. Se o preflight passar e a inferência falhar, envie
 somente o ZIP gerado por `python tools/export_diagnostics.py`
 para analisar as categorias de erro. Não compartilhe senhas ou caminhos
 privados em capturas de terminal. O teste com o Qwen real continua necessário.
+
+## Primeira execução: GGUF e llama.cpp ausentes
+
+Se o chat iniciar em `127.0.0.1:8766` mas apresentar erro ao carregar o
+modelo, rode `DIAGNOSTICAR-CHAT-WINDOWS.bat`. Faltando requisitos,
+execute `PREPARAR-CHAT-WINDOWS.bat`. O download é opcional e exige
+confirmação. Não remove arquivos pessoais.
+
+Origem do modelo: Qwen/Qwen3-0.6B-GGUF, arquivo
+`Qwen3-0.6B-Q8_0.gguf`, tamanho 639.446.688 bytes, SHA-256:
+`9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031`.
+
+Runtime interativo: distribuição CPU x64 oficial
+`ggml-org/llama.cpp` versão `b11552`, arquivo
+`llama-b11552-bin-win-cpu-x64.zip`, SHA-256:
+`c00741179811ff903b515eae28bdeef1f47af6e81c49920c4e68b62954e056d6`.
+Fica em `third_party/llama.cpp/runtime-win-cpu-x64/bin`, separado do
+binário congelado da pesquisa (`build-win`). Não houve validação
+física da geração com esse pacote no computador do usuário.
+
+```bat
+cd /d "%USERPROFILE%\Documents\I.A"
+PREPARAR-CHAT-WINDOWS.bat
+DIAGNOSTICAR-CHAT-WINDOWS.bat
+INICIAR-CHAT-MEMORIA-WINDOWS.bat
+```
+
+O atalho já usa a pasta do projeto. Para chamar Python diretamente é
+obrigatório entrar nela primeiro; caso contrário ocorre FileNotFoundError
+em `tools/doctor_chat.py`. Python 3.14.7 passou no requisito de versão.
+
+Os testes de preparação simulam downloads sem rede no CI e verificam
+hashes, ZIPs maliciosos, ausência de sobrescrita e preservação de dados.

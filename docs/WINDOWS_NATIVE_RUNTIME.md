@@ -4,6 +4,13 @@ Este modo executa localmente o pipeline real congelado da Fase 4D: consulta, ret
 
 > **Classificação obrigatória:** `WINDOWS_NATIVE_FUNCTIONAL` / `EXPERIMENTAL_FUNCTIONAL_RUNTIME`. Todo resultado contém `phase4e_valid=false` e `Phase 4E canonical physical baseline requires Debian/Linux environment.` Este modo não substitui nem valida a Fase 4E física canônica.
 
+## Ambiente histórico de pesquisa, não instalação atual
+
+Os caminhos e capacidades descritos abaixo refletem um registro de
+um ambiente anterior. Um checkout novo no GitHub **não inclui** GGUF,
+executáveis nem corpus SSD. Para preparar o chat com o pacote oficial,
+veja `PREPARAR-CHAT-WINDOWS.bat`, separado do Core congelado desta seção.
+
 ## O que já está configurado nesta máquina
 
 - Windows 11 x64, Intel Core i5-12400, 6 cores/12 threads e aproximadamente 16 GiB de RAM.

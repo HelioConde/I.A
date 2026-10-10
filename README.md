@@ -54,6 +54,33 @@ As setas pontilhadas representam **experimentos de diagnóstico**, que **não al
 | **Percepção e ação** | `GridWorld` isolado com Q-learning e recompensa | Apenas simulação; sem câmera, robótica ou controle do computador |
 | **Emulação neural / consciência** | **Não implementadas** | Não há tecnologia comprovada de transferência integral da mente |
 
+## Preparar o chat no Windows quando faltarem modelo ou runtime
+
+O GitHub **não inclui** o GGUF nem binários nativos. Caso o diagnóstico
+mostre `FALTA model_gguf_valid_header` ou `FALTA cpu_runtime_found`,
+abra `PREPARAR-CHAT-WINDOWS.bat` na raiz do projeto.
+
+O programa **pede confirmação antes de baixar** o GGUF Qwen3-0.6B Q8_0
+oficial de [Qwen](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF)
+e um pacote CPU x64 oficial de
+[llama.cpp](https://github.com/ggml-org/llama.cpp/releases).
+Ambos os downloads são validados por SHA-256, não sobrescrevem arquivos
+existentes e não alteram histórico ou memória episódica. A distribuição
+oficial é instalada separadamente do Core congelado de pesquisa.
+
+Para o terminal CMD, entre primeiro na pasta correta:
+
+```bat
+cd /d "%USERPROFILE%\Documents\I.A"
+py -3 tools\install_windows_chat.py --all
+py -3 tools\doctor_chat.py --profile economia --probe
+```
+
+Não execute `tools/doctor_chat.py` a partir da pasta `Documents`: o caminho
+relativo só é válido depois de entrar em `I.A`.
+
+**Instalação concluída não comprova inferência.** O diagnóstico e uma resposta
+real com Qwen continuam necessários. Veja [CHAT_WINDOWS.md](docs/CHAT_WINDOWS.md).
 ## Começar no Windows
 
 Requisitos para **conversar realmente com o modelo**: Windows 10/11 x64, Python 3.11+, `llama.cpp` compatível e o arquivo `Qwen3-0.6B-Q8_0.gguf` local.

@@ -28,6 +28,7 @@ CHAT_SUITES = [
     ("chat_history", "test_chat_history.py"),
     ("chat_stream", "test_chat_stream.py"),
     ("chat_doctor", "test_chat_doctor.py"),
+    ("install_windows_chat", "test_install_windows_chat.py"),
     ("startup_diagnostics", "test_startup_diagnostics.py"),
     ("chat_episodic", "test_chat_episodic.py"),
     ("episodic_integrity", "test_episodic_integrity.py"),
