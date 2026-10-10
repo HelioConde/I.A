@@ -1,0 +1,42 @@
+name: Brain-SSD Windows Real Qwen Smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/real-windows-inference.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  real-qwen-windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned official Qwen and CPU runtime with verified SHA256
+        shell: pwsh
+        run: python tools/install_windows_chat.py --all
+      - name: Check exact model and runtime startup (no inference yet)
+        shell: pwsh
+        run: python tools/doctor_chat.py --profile economia --probe
+      - name: Test native Qwen inference (one short local question)
+        shell: pwsh
+        run: python tools/validate_chat_windows.py --profile economia
+      - name: Export sanitized diagnostics
+        if: always()
+        shell: pwsh
+        run: python tools/export_diagnostics.py --output results/diagnostics/real-qwen-diagnostics.zip
+      - name: Upload safe validation and metrics (no user prompts or answers)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BrainSSD-Windows-real-Qwen-smoke
+          path: |
+            results/chat_validation/latest-local-windows.json
+            results/diagnostics/real-qwen-diagnostics.zip
+          if-no-files-found: warn
+          retention-days: 7
