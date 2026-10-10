@@ -119,6 +119,18 @@ class TestReversiblePlasticity(unittest.TestCase):
         self.assertTrue(self.ledger.revoke(event2))
         self.assertTrue(self.ledger.revoke(event3))
 
+    def test_deleted_source_can_never_bias_ranking(self):
+        for _ in range(3):
+            self.ledger.add_feedback(self.a["id"],1)
+        self.assertGreater(self.ledger.shadow_bias(self.a["id"])["bias"],0)
+        self.assertTrue(self.episodes.delete(self.a["id"]))
+        result=self.ledger.shadow_bias(self.a["id"])
+        self.assertEqual(result["bias"],0.0)
+        self.assertEqual(result["active_support"],0)
+        self.assertEqual(result["status"],"SOURCE_DELETED")
+        with self.assertRaises(ValueError):
+            self.ledger.add_feedback(self.a["id"],1)
+
     def test_bad_feedback_and_unknown_memory(self):
         with self.assertRaises(ValueError):
             self.ledger.add_feedback(self.a["id"],True)

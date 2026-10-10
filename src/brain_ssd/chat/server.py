@@ -16,6 +16,7 @@ from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
+from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
 from brain_ssd.chat.http_stream import serve_stream
 from brain_ssd.backend import GenerationRequest
@@ -301,10 +302,14 @@ class ChatEngine:
                     "changed_model_prompt": False,
                     "changed_core_weights": False,
                 }
+            ambiguities = check_memory_ambiguities(episodes)
             episode_text = "\n".join(
                 "[episodio=" + item["id"] + "] " + json.dumps(item["content"], ensure_ascii=False)
                 for item in episodes
             )
+            if ambiguities:
+                # Explicit uncertainty, no automatic truth selection or edits.
+                episode_text = AMBIGUITY_PROMPT + "\n" + episode_text
             prompt, history_used, evidence_bytes = bounded_chat_prompt(
                 question, history, knowledge,
                 getattr(self._runtime, "prompt_budget_bytes", 8000),
@@ -365,6 +370,7 @@ class ChatEngine:
                 "core_mode": getattr(self._runtime, "core_mode", "subprocess"),
                 "sources_from_ssd": len(retrieval.get("sources", [])) if (retrieval and evidence_bytes) else 0,
                 "episodic_memories_used": sum(1 for episode in episodes if episode["id"] in prompt),
+                "episodic_ambiguities_detected": len(ambiguities),
                 "context_budget": {"prompt_utf8_bytes": len(prompt.encode("utf-8")), "history_messages": history_used, "evidence_utf8_bytes": evidence_bytes},
                 "active_pages": len(retrieval.get("activated_pages", [])) if retrieval else 0,
                 "metrics": {

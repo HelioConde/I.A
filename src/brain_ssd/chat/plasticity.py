@@ -104,6 +104,16 @@ class PlasticityLedger:
         ident = self._check_uuid(episode_id)
         if not 1 <= half_life_days <= 365:
             raise ValueError("Invalid half life")
+        # Forgotten episodic sources must not keep influencing any ranking,
+        # even if their old feedback events remain in this separate sidecar.
+        with self.episodes._connect() as source_db:
+            source_exists = source_db.execute(
+                "SELECT 1 FROM episodes WHERE id=? AND confirmed=1", (ident,)
+            ).fetchone() is not None
+        if not source_exists:
+            return {"episode_id": ident, "active_support": 0,
+                    "bias": 0.0, "status": "SOURCE_DELETED",
+                    "reversible": True, "half_life_days": half_life_days}
         now = int(time.time()) if now is None else int(now)
         with self._connect() as db:
             rows = db.execute(

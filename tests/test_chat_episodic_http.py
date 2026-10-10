@@ -78,6 +78,30 @@ class TestEngine(unittest.TestCase):
                 baseline.close()
                 shadow.close()
 
+    def test_possible_weekday_disagreement_warns_without_silently_replacing(self):
+        with tempfile.TemporaryDirectory() as temp:
+            mem=EpisodicMemory(Path(temp)/"notes.sqlite3")
+            old=mem.add("Reunião projeto rover terça biblioteca norte")
+            newer=mem.add("Reunião projeto rover quinta biblioteca norte")
+            runtime=FakeRuntime()
+            engine=ChatEngine(lambda:runtime,episodic_store=mem)
+            engine.start()
+            try:
+                result=engine.ask("Qual dia da reunião projeto rover biblioteca?",[])
+                prompt=runtime.core_backend.prompts[-1]
+                self.assertEqual(result["episodic_memories_used"],2)
+                self.assertEqual(result["episodic_ambiguities_detected"],1)
+                self.assertIn("Não escolha uma delas como verdade",prompt)
+                self.assertIn(old["id"],prompt)
+                self.assertIn(newer["id"],prompt)
+                mem.delete(old["id"])
+                second=engine.ask("Qual dia da reunião projeto rover biblioteca?",[])
+                self.assertEqual(second["episodic_ambiguities_detected"],0)
+                self.assertEqual(second["episodic_memories_used"],1)
+                self.assertNotIn(old["id"],runtime.core_backend.prompts[-1])
+            finally:
+                engine.close()
+
     def test_disabled_by_default(self):
         engine=ChatEngine(FakeRuntime)
         engine.start()
