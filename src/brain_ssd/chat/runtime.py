@@ -110,7 +110,7 @@ class LocalChatRuntime:
             "profile": self.profile,
             "core_mode": self.core_mode,
             "interactive_runtime": ("official_cpu_distribution"
-                if COMMUNITY_RUNTIME in self.core_backend.runtime_path.parents
+                if self.core_backend.runtime_path.parent == (self.root / COMMUNITY_RUNTIME).resolve()
                 else "frozen_checkout"),
             "threads": PROFILES[self.profile]["threads"],
             "prompt_budget_bytes": self.prompt_budget_bytes,
