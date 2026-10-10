@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import statistics
+import platform
 import sys
 import threading
 import time
@@ -36,9 +37,12 @@ NUMERIC = frozenset({
     "episodes", "history_messages", "prompt_utf8_bytes", "evidence_utf8_bytes",
     "answer_chars", "question_chars", "return_code", "cpu_threads", "count",
     "exit_code", "context_size", "activated_bytes",
+    "process_working_set_bytes", "process_private_bytes", "cpu_time_ms",
+    "python_major", "python_minor",
 })
 BOOLEAN = frozenset({"inference_verified", "episodic_enabled", "shadow_enabled"})
 ENUMS = {
+    "platform": {"Windows", "Linux", "macOS", "Other"},
     "profile": {"economia", "equilibrado", "rapido", "not_applicable"},
     "core_mode": {"subprocess", "persistent", "not_applicable"},
     "status": {"OK", "UNAVAILABLE", "FAIL", "PASS", "ERROR", "CANCELLED",
@@ -55,6 +59,35 @@ ENUMS = {
                    "GenerationCancelled", "Other"},
 }
 UUID_PATTERN = re.compile(r"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$")
+
+
+def machine_metadata() -> dict[str, Any]:
+    """Non-identifying environment facts; no hostnames, usernames or paths."""
+    current = platform.system()
+    system = current if current in ("Windows", "Linux") else (
+        "macOS" if current == "Darwin" else "Other")
+    return {"platform": system, "python_major": sys.version_info.major,
+            "python_minor": sys.version_info.minor}
+
+
+def process_snapshot() -> dict[str, int]:
+    """Best-effort Python process RSS/private bytes, separate from native Core.
+
+    Linux uses /proc/self/statm (current RSS); Windows uses the project's
+    existing Win32 process counters. These are NOT total system RAM.
+    """
+    try:
+        if os.name == "nt":
+            from brain_ssd.local_runtime.windows_metrics import windows_process_snapshot
+            snap = windows_process_snapshot(os.getpid())
+            return {"process_working_set_bytes": snap.working_set_bytes,
+                    "process_private_bytes": snap.private_bytes}
+        if sys.platform.startswith("linux"):
+            pages = int(Path("/proc/self/statm").read_text(encoding="ascii").split()[1])
+            return {"process_working_set_bytes": pages * os.sysconf("SC_PAGE_SIZE")}
+    except (OSError, ValueError, AttributeError, IndexError, ImportError):
+        pass
+    return {}
 
 
 def default_diagnostics_dir() -> Path:
@@ -75,6 +108,8 @@ def _safe_fields(raw: dict[str, Any]) -> dict[str, Any]:
         elif key in BOOLEAN and type(value) is bool:
             clean[key] = value
         elif key in ENUMS and isinstance(value, str) and value in ENUMS[key]:
+            clean[key] = value
+        elif key == "git_sha" and isinstance(value, str) and re.fullmatch(r"[a-f0-9]{40}", value):
             clean[key] = value
         elif key == "request_id" and isinstance(value, str) and UUID_PATTERN.fullmatch(value):
             clean[key] = value
@@ -198,6 +233,8 @@ def inspect_events(files: Iterable[Path], *, max_events: int = MAX_EXPORT_EVENTS
     events = list(records)
     counts = Counter(r["event"] for r in events)
     by_suite = Counter(r.get("suite", "") for r in events if r["event"] == "test.result")
+    platforms = Counter(r["platform"] for r in events if r["event"] == "session.start" and "platform" in r)
+    revisions = sorted({r["git_sha"] for r in events if "git_sha" in r})
     durations = [r["duration_ms"] for r in events
                  if r["event"] in ("inference.done", "chat.complete")
                  and type(r.get("duration_ms")) in (int, float)]
@@ -216,6 +253,7 @@ def inspect_events(files: Iterable[Path], *, max_events: int = MAX_EXPORT_EVENTS
         "category": "SANITIZED_DIAGNOSTIC_ONLY",
         "events_retained": len(events), "malformed_or_discarded_lines": malformed,
         "sessions": len(set(e["session_id"] for e in events)),
+        "platforms": dict(sorted(platforms.items())), "revisions": revisions,
         "event_counts": dict(sorted(counts.items())),
         "test_suites_with_results": dict(sorted(by_suite.items())),
         "error_types": dict(sorted(fails.items())),

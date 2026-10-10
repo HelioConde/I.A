@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 from brain_ssd.chat.history import ChatHistory, default_history_path
 from brain_ssd.chat.episodic import EpisodicMemory, default_episodic_path
-from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir
+from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir, machine_metadata
 from brain_ssd.chat.runtime import LocalChatRuntime, PROFILES
 
 
@@ -33,7 +33,7 @@ def main() -> int:
     args = parser.parse_args()
     diagnostics = None if args.no_diagnostics else DiagnosticLogger(args.diagnostics_dir or default_diagnostics_dir())
     if diagnostics:
-        diagnostics.emit("session.start", profile=args.profile,
+        diagnostics.emit("session.start", **machine_metadata(), profile=args.profile,
             core_mode=args.core_mode or PROFILES[args.profile]["mode"],
             cpu_threads=PROFILES[args.profile]["threads"],
             episodic_enabled=args.episodic_memory, shadow_enabled=args.cognitive_shadow)

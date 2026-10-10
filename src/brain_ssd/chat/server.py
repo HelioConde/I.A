@@ -13,7 +13,7 @@ from typing import Any, Callable
 from urllib.parse import urlsplit
 
 from brain_ssd.chat.history import ChatHistory
-from brain_ssd.chat.diagnostics import DiagnosticLogger
+from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -203,6 +203,7 @@ class ChatEngine:
             cancel_event: threading.Event | None = None,
             request_id: str | None = None) -> dict[str, Any]:
         started = time.monotonic()
+        started_cpu = time.process_time()
         trace_id = request_id or str(uuid.uuid4())
         if self.diagnostics:
             self.diagnostics.emit("chat.start", request_id=trace_id,
@@ -225,7 +226,9 @@ class ChatEngine:
         if self.diagnostics:
             self.diagnostics.emit("chat.complete", request_id=trace_id,
                 duration_ms=(time.monotonic() - started) * 1000, status="PASS",
-                answer_chars=len(result["answer"]), inference_verified=self._inference_verified)
+                answer_chars=len(result["answer"]), inference_verified=self._inference_verified,
+                cpu_time_ms=(time.process_time() - started_cpu) * 1000,
+                **process_snapshot())
         return result
 
     def _ask_inner(self, question: str, raw_history: Any, *,

@@ -57,14 +57,14 @@ eventos: `python tools/run_chat.py --no-diagnostics`.
 
 ### Quais informações ficam nos logs
 
-- **Sessão:** timestamp UTC, UUID aleatório e início/fim.
+- **Sessão:** timestamp UTC, UUID aleatório, Windows/Linux, versão Python, revisão GitHub quando presente e início/fim.
 - **Inicialização:** perfil Economia/Equilibrado/Rápido, tipo de backend,
   contagem de threads e categoria do erro (caso falhe).
 - **Consulta:** UUID, tamanho da mensagem (caracteres), número de turnos,
   tamanho do prompt (bytes UTF-8), tempo de recuperação SSD, fontes e páginas.
 - **Memória:** tempo de recall e quantidade de episódios (sem texto).
 - **Inferência:** duração, TTFT, tokens/s, working set e private bytes se o
-  backend conseguir medi-los; código de saída.
+  backend conseguir medi-los; código de saída. O chat também registra RSS do processo Python e tempo de CPU do processo, separados da RAM do modelo.
 - **Testes:** nome fixo da suíte, PASS/FAIL, duração e código de saída.
 
 Campos dinâmicos inesperados são descartados **antes da escrita e durante

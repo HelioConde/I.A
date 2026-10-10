@@ -21,7 +21,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir, export_diagnostics
+from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir, export_diagnostics, machine_metadata
 
 CHAT_SUITES = [
     ("chat_windows", "test_chat_windows.py"),
@@ -97,7 +97,9 @@ def main() -> int:
     directory = args.logs_dir or (ROOT / "results" / "diagnostics" / "ci" if args.ci
                                    else default_diagnostics_dir())
     logger=DiagnosticLogger(directory)
-    logger.emit("session.start", profile="not_applicable", core_mode="not_applicable")
+    logger.emit("session.start", **machine_metadata(),
+                git_sha=os.environ.get("GITHUB_SHA", ""),
+                profile="not_applicable", core_mode="not_applicable")
     suites=CHAT_SUITES + ([("chat_runtime", "test_chat_runtime.py")] if os.name=="nt" else [])
     if args.core:
         suites += CORE_SUITES
