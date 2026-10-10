@@ -357,6 +357,13 @@ async function send() {
           pending.querySelector(".message-body").appendChild(notice);
         }
         app.messages.push({role:"assistant", content:payload.answer});
+        if (payload.local_action) {
+          const actionNote = document.createElement("p");
+          actionNote.className = "local-action-note";
+          actionNote.textContent = "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
+          pending.querySelector(".message-body").appendChild(actionNote);
+          if (payload.local_action === "memory_save") void refreshEpisodicMemory();
+        }
         updateMetrics(payload);
         completed = true;
       } else if (event === "cancelled") {
