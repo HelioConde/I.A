@@ -10,6 +10,64 @@ async function requestJson(path, options = {}) {
   if (!response.ok) throw new Error(payload.error || "Falha ao acessar o histórico local.");
   return payload;
 }
+async function refreshEpisodicMemory() {
+  const status = $("episodicStatus");
+  const list = $("episodicList");
+  try {
+    const payload = await requestJson("/api/memories", {cache:"no-store"});
+    $("saveMemory").disabled = !payload.enabled;
+    status.textContent = payload.enabled
+      ? "Notas salvas só neste computador. A IA recupera pistas relacionadas; você pode apagar a qualquer momento."
+      : "Desativadas. Reinicie com --episodic-memory para permitir notas explícitas.";
+    list.replaceChildren();
+    if (!payload.enabled) return;
+    for (const memory of payload.memories || []) {
+      const row = document.createElement("div");
+      row.className = "episodic-item";
+      const caption = document.createElement("span");
+      caption.textContent = memory.content;
+      caption.title = memory.content;
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "×";
+      del.title = "Apagar esta lembrança";
+      del.setAttribute("aria-label", "Apagar lembrança: " + memory.content.slice(0,60));
+      del.addEventListener("click", async () => {
+        if (!window.confirm("Apagar esta nota da memória episódica local?")) return;
+        try {
+          await requestJson("/api/memories/" + encodeURIComponent(memory.id), {
+            method:"DELETE", headers:{"Origin":window.location.origin}
+          });
+          await refreshEpisodicMemory();
+        } catch (error) {
+          window.alert("Erro ao apagar memória: " + error.message);
+        }
+      });
+      row.append(caption,del);
+      list.appendChild(row);
+    }
+  } catch (_) {
+    status.textContent = "Memória episódica indisponível.";
+    $("saveMemory").disabled = true;
+  }
+}
+async function saveEpisodicMemory() {
+  if (app.sending) return;
+  const note = window.prompt(
+    "Guardar uma lembrança local (máximo 500 caracteres)? Só salve informações que você quer que a IA recupere em outras conversas."
+  );
+  if (note === null || !note.trim()) return;
+  try {
+    await requestJson("/api/memories", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({content:note.trim()})
+    });
+    await refreshEpisodicMemory();
+  } catch (error) {
+    window.alert("Não foi possível guardar a lembrança: " + error.message);
+  }
+}
+
 function renderConversations() {
   const container = $("conversationList");
   container.replaceChildren();
@@ -176,6 +234,7 @@ function updateMetrics(data) {
   $("detailRam").textContent = humanMemory(m.working_set_bytes_max);
   $("detailPages").textContent = Number.isFinite(data.active_pages) ? String(data.active_pages) : "—";
   $("detailSources").textContent = Number.isFinite(data.sources_from_ssd) ? String(data.sources_from_ssd) : "—";
+  $("detailEpisodes").textContent = Number.isFinite(data.episodic_memories_used) ? String(data.episodic_memories_used) : "—";
 }
 async function send() {
   const question = composer.value.trim();
@@ -350,7 +409,9 @@ $("closeDetails").addEventListener("click", () => {
   $("showDetails").setAttribute("aria-expanded","false");
 });
 $("stopButton").addEventListener("click", stopGeneration);
+$("saveMemory").addEventListener("click", saveEpisodicMemory);
 fitComposer();
 refreshStatus();
 refreshConversations();
+refreshEpisodicMemory();
 setInterval(refreshStatus, 3000);

@@ -23,6 +23,12 @@
       </button>
       <div class="side-section">CONVERSAS LOCAIS</div>
       <div class="conversation-list" id="conversationList" aria-label="Histórico de conversas"><p class="history-empty">Carregando histórico...</p></div>
+      <section class="episodic-panel" aria-labelledby="episodicHeading">
+        <div class="episodic-heading"><strong id="episodicHeading">Memórias episódicas</strong><span class="experiment-tag">EXPERIMENTAL</span></div>
+        <p id="episodicStatus">Desativadas por padrão para proteger sua privacidade.</p>
+        <button id="saveMemory" class="save-memory" type="button" disabled>＋ Guardar uma lembrança</button>
+        <div id="episodicList" class="episodic-list" aria-live="polite"></div>
+      </section>
       <div class="sidebar-panel">
         <span class="micro-title">EXECUÇÃO LOCAL</span>
         <div class="sidebar-row"><span class="status-dot" id="sidebarDot"></span><strong id="sidebarStatus">Iniciando...</strong></div>
@@ -92,6 +98,7 @@
       <div><dt>Pico de RAM do Core</dt><dd id="detailRam">—</dd></div>
       <div><dt>Páginas SSD ativadas</dt><dd id="detailPages">—</dd></div>
       <div><dt>Fontes SSD usadas</dt><dd id="detailSources">—</dd></div>
+      <div><dt>Memórias episódicas usadas</dt><dd id="detailEpisodes">—</dd></div>
     </dl>
     <small>As métricas são experimentais; leitura física do SSD não foi medida neste modo.</small>
   </aside>
