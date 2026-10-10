@@ -56,6 +56,50 @@ def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: s
     return "\n\n".join(parts)
 
 
+def bounded_chat_prompt(
+    question: str,
+    history: list[dict[str, str]],
+    knowledge: str,
+    max_prompt_bytes: int,
+) -> tuple[str, int, int]:
+    """Bound UTF-8 prompt size without cutting the latest user question.
+
+    This is a conservative byte budget, NOT a tokenizer-precise context
+    guarantee. Whole recent turns and evidence paragraphs are retained where
+    possible. Avoid truncating a code block or knowledge record mid-sentence.
+    """
+    if max_prompt_bytes < 512:
+        raise ValueError("Orçamento de prompt insuficiente.")
+    bare = build_chat_prompt(question, [], "")
+    if len(bare.encode("utf-8")) > max_prompt_bytes:
+        raise ValueError("Mensagem longa demais para o contexto deste perfil. Reduza a pergunta ou use Equilibrado.")
+
+    selected_history: list[dict[str, str]] = []
+    # Reserve space for evidence and generation; prioritize newest complete turns.
+    history_ceiling = min(max_prompt_bytes, max(700, int(max_prompt_bytes * 0.65)))
+    for item in reversed(history):
+        candidate = [item] + selected_history
+        prompt = build_chat_prompt(question, candidate, "")
+        if len(prompt.encode("utf-8")) <= history_ceiling:
+            selected_history = candidate
+        else:
+            break
+
+    selected_knowledge: list[str] = []
+    for paragraph in re.split(r"\n\s*\n", knowledge.strip()):
+        if not paragraph.strip():
+            continue
+        candidate = "\n\n".join([*selected_knowledge, paragraph])
+        if len(build_chat_prompt(question, selected_history, candidate).encode("utf-8")) <= max_prompt_bytes:
+            selected_knowledge.append(paragraph)
+        else:
+            # Never slice sources or code blocks in the middle.
+            continue
+    retained = "\n\n".join(selected_knowledge)
+    prompt = build_chat_prompt(question, selected_history, retained)
+    return prompt, len(selected_history), len(retained.encode("utf-8"))
+
+
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
@@ -150,7 +194,10 @@ class ChatEngine:
                 if retrieval.get("status") == "OK":
                     context = retrieval.get("context", {})
                     knowledge = str(context.get("text", ""))[:getattr(self._runtime, "knowledge_budget", 5_000)]
-            prompt = build_chat_prompt(question, history, knowledge)
+            prompt, history_used, evidence_bytes = bounded_chat_prompt(
+                question, history, knowledge,
+                getattr(self._runtime, "prompt_budget_bytes", 8000),
+            )
             generation = GenerationRequest(prompt=prompt, max_tokens=180, temperature=0.35)
             if on_chunk is None:
                 measured = self._runtime.core_backend.generate(generation)
@@ -173,10 +220,12 @@ class ChatEngine:
                 "mode": "experimental_chat",
                 "profile": getattr(self._runtime, "profile", "equilibrado"),
                 "core_mode": getattr(self._runtime, "core_mode", "subprocess"),
-                "sources_from_ssd": len(retrieval.get("sources", [])) if retrieval else 0,
+                "sources_from_ssd": len(retrieval.get("sources", [])) if (retrieval and evidence_bytes) else 0,
+                "context_budget": {"prompt_utf8_bytes": len(prompt.encode("utf-8")), "history_messages": history_used, "evidence_utf8_bytes": evidence_bytes},
                 "active_pages": len(retrieval.get("activated_pages", [])) if retrieval else 0,
                 "metrics": {
                     "latency_ms": metrics.get("latency_ms"),
+                    "ttft_ms": metrics.get("ttft_ms"),
                     "tokens_per_second": metrics.get("tokens_per_second"),
                     "working_set_bytes_max": metrics.get("working_set_bytes_max"),
                     "private_bytes_max": metrics.get("private_bytes_max"),

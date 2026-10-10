@@ -13,8 +13,8 @@ from brain_ssd.local_runtime.pipeline import (
 )
 
 PROFILES = {
-    "economia": {"threads": 2, "context_size": 2048, "mode": "subprocess", "knowledge_budget": 1200},
-    "equilibrado": {"threads": 4, "context_size": 4096, "mode": "subprocess", "knowledge_budget": 3500},
+    "economia": {"threads": 2, "context_size": 2048, "mode": "subprocess", "knowledge_budget": 1200, "prompt_budget_bytes": 3600},
+    "equilibrado": {"threads": 4, "context_size": 4096, "mode": "subprocess", "knowledge_budget": 3500, "prompt_budget_bytes": 7600},
     "rapido": {"threads": 4, "context_size": 4096, "mode": "persistent", "knowledge_budget": 3500},
 }
 
@@ -32,6 +32,7 @@ class LocalChatRuntime:
         if self.core_mode not in ("subprocess", "persistent"):
             raise ValueError(f"Modo desconhecido: {self.core_mode}")
         self.knowledge_budget = int(settings["knowledge_budget"])
+        self.prompt_budget_bytes = int(settings["prompt_budget_bytes"])
         self.model_path = self.root / MODEL_RELATIVE
         if not self.model_path.is_file():
             raise FileNotFoundError(
@@ -72,6 +73,8 @@ class LocalChatRuntime:
             "profile": self.profile,
             "core_mode": self.core_mode,
             "threads": PROFILES[self.profile]["threads"],
+            "prompt_budget_bytes": self.prompt_budget_bytes,
+            "knowledge_cache": "per_query" if self.profile == "economia" else "session",
             "knowledge_available": available,
             "knowledge_note": (
                 "Conhecimento SSD disponível"
@@ -82,6 +85,11 @@ class LocalChatRuntime:
     def retrieve(self, query: str) -> dict[str, Any]:
         if not self.has_knowledge_files or self._completion_path is None:
             return {"status": "UNAVAILABLE", "sources": [], "activated_pages": [], "context": {"text": ""}}
+        if self.profile == "economia":
+            # Don't retain a large manifest/index across idle chat turns.
+            # Trade SSD reload + CPU for reduced idle memory; opt-in by profile.
+            with LocalBrainSSD(self.root, executable=self._completion_path) as short_lived:
+                return short_lived.retrieve(query)
         if self._brain is None:
             self._brain = LocalBrainSSD(self.root, executable=self._completion_path)
         return self._brain.retrieve(query)

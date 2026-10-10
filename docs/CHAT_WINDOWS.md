@@ -157,3 +157,23 @@ substituto de um binário de inferência. Ela comprova que a leitura da saída
 do sistema operacional funciona progressivamente e que um processo que
 ficaria em execução é interrompido ao cancelar. Esse teste de I/O não
 substitui uma medição Windows de Qwen, latência ou economia de RAM.
+
+
+## Revisão de memória e contexto — 10/10/2026
+
+O perfil Economia passa a abrir o índice SSD somente durante a recuperação de
+conhecimento de cada pergunta e a fechá-lo em seguida; Equilibrado e Rápido
+retêm a estrutura de retrieval durante a sessão. Isso prioriza RAM em repouso
+em troca de mais trabalho de leitura/CPU por pergunta. O tamanho do ganho
+deve ser medido em máquinas físicas.
+
+Há um limite conservador no tamanho UTF-8 do prompt completo:
+Economia = 3.600 bytes; Equilibrado/Rápido = 7.600 bytes. O chat prioriza a
+pergunta atual, depois turnos recentes inteiros e evidências completas.
+O limite é apenas uma aproximação segura de orçamento: **bytes não são tokens**
+e cada runtime GGUF precisa de validação real para context overflow/qualidade.
+O limite de saída atual permanece 180 tokens por resposta. Os resultados
+do Core congelado e o experimento 4F-W não foram alterados.
+
+O diagnóstico recebe agora também o tempo até o primeiro token (TTFT),
+quando medido. Não confundir TTFT com latência total.

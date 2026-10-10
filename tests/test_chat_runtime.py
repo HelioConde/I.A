@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -47,6 +48,33 @@ class TestOptionalSSD(unittest.TestCase):
         (self.root / MODEL_RELATIVE).unlink()
         with self.assertRaisesRegex(FileNotFoundError, "GGUF"):
             LocalChatRuntime(self.root)
+
+    def test_economy_releases_knowledge_brain_after_each_query(self):
+        runtime = LocalChatRuntime(self.root, profile="economia")
+        runtime.has_knowledge_files = True  # mock only the heavy native index
+        try:
+            with patch("brain_ssd.chat.runtime.LocalBrainSSD") as factory:
+                factory.return_value.__enter__.return_value.retrieve.return_value = {"status": "OK"}
+                self.assertEqual(runtime.retrieve("Python")["status"], "OK")
+                self.assertEqual(runtime.retrieve("SQLite")["status"], "OK")
+                self.assertEqual(factory.call_count, 2)
+                self.assertIsNone(runtime._brain)
+                self.assertEqual(runtime.status()["knowledge_cache"], "per_query")
+        finally:
+            runtime.close()
+
+    def test_balanced_retains_index_for_session(self):
+        runtime = LocalChatRuntime(self.root, profile="equilibrado")
+        runtime.has_knowledge_files = True
+        try:
+            with patch("brain_ssd.chat.runtime.LocalBrainSSD") as factory:
+                factory.return_value.retrieve.return_value = {"status": "OK"}
+                runtime.retrieve("Python")
+                runtime.retrieve("SQLite")
+                self.assertEqual(factory.call_count, 1)
+                self.assertEqual(runtime.status()["knowledge_cache"], "session")
+        finally:
+            runtime.close()
 
     def test_bad_gguf(self):
         (self.root / MODEL_RELATIVE).write_bytes(b"invalid")

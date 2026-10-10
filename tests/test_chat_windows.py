@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from brain_ssd.chat.server import ChatEngine, build_chat_prompt, create_chat_server, normalize_history
+from brain_ssd.chat.server import ChatEngine, build_chat_prompt, bounded_chat_prompt, create_chat_server, normalize_history
 
 
 class FakeCore:
@@ -24,7 +24,7 @@ class FakeCore:
         return {
             "return_code": 0,
             "stdout": "Olá! Sou o Brain-SSD, rodando localmente.\n",
-            "metrics": {"latency_ms": 1250, "working_set_bytes_max": 128 * 1024 ** 2},
+            "metrics": {"latency_ms": 1250, "ttft_ms": 220, "working_set_bytes_max": 128 * 1024 ** 2},
         }
 
 
@@ -79,6 +79,24 @@ class TestChatEngine(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.engine.ask("x" * 2001, [])
 
+    def test_bounded_context_keeps_latest_question_and_recent_history(self):
+        history = [
+            {"role": "user", "content": "anterior" * 150},
+            {"role": "assistant", "content": "resposta" * 150},
+            {"role": "user", "content": "sou o usuário"},
+        ]
+        prompt, used, evidence = bounded_chat_prompt(
+            "Quanto é 2+2?", history, "um trecho muito grande " * 300, 1750
+        )
+        self.assertIn("Quanto é 2+2?", prompt)
+        self.assertLessEqual(len(prompt.encode("utf-8")), 1750)
+        self.assertLessEqual(used, len(history))
+        self.assertGreaterEqual(evidence, 0)
+
+    def test_large_question_fails_instead_of_being_silently_cut(self):
+        with self.assertRaisesRegex(ValueError, "Mensagem longa"):
+            bounded_chat_prompt("x" * 2200, [], "", 1000)
+
     def test_runtime_failure_does_not_pretend_ai_is_ready(self):
         bad = ChatEngine(lambda: (_ for _ in ()).throw(FileNotFoundError("modelo ausente")))
         bad.start()
@@ -124,6 +142,7 @@ class TestHttpUI(unittest.TestCase):
             result = json.loads(response.read())
         self.assertIn("Brain-SSD", result["answer"])
         self.assertEqual(result["metrics"]["working_set_bytes_max"], 128 * 1024 ** 2)
+        self.assertEqual(result["metrics"]["ttft_ms"], 220)
 
     def test_rejects_cross_origin_requests(self):
         req = urllib.request.Request(
