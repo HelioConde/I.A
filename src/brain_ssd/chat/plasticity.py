@@ -95,7 +95,7 @@ class PlasticityLedger:
                 raise ValueError("Limite de feedback atingido.")
             db.execute("INSERT INTO feedback(id,episode_id,signal,created_at,revoked_at,source_version) "
                 "VALUES (?,?,?,?,NULL,?)",
-                (event_id, ident, signal, int(time.time()), version)
+                (event_id, ident, signal, int(time.time()), version))
         return event_id
 
     def revoke(self, event_id: str) -> bool:

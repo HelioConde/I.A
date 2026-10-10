@@ -147,8 +147,8 @@ class ChatEngine:
                 runtime = self._runtime_factory()
             except Exception as exc:
                 # Do not expose native model paths, file names or traceback text
-            # through the unauthenticated loopback health/status endpoint.
-            self._error = "Não foi possível iniciar o modelo local. Consulte o terminal e o diagnóstico."
+                # through the unauthenticated loopback health/status endpoint.
+                self._error = "Não foi possível iniciar o modelo local. Consulte o terminal e o diagnóstico."
                 self._state = "error"
                 if self.diagnostics:
                     self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
