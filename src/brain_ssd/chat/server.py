@@ -157,7 +157,8 @@ class ChatEngine:
                 self._error = diagnosis.guidance
                 self._state = "error"
                 if self.diagnostics:
-                    self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
+                    self.diagnostics.emit("runtime.error", error_type=type(exc).__name__,
+                        startup_code=diagnosis.code)
                 if self._startup_reporter:
                     try:
                         self._startup_reporter(f"[{diagnosis.code}] {diagnosis.guidance}")

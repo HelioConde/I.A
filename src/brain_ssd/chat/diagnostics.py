@@ -42,6 +42,8 @@ NUMERIC = frozenset({
 })
 BOOLEAN = frozenset({"inference_verified", "episodic_enabled", "shadow_enabled"})
 ENUMS = {
+    "startup_code": {"MODEL_MISSING", "MODEL_INVALID", "CORE_MISSING", "SERVER_MISSING",
+                     "MODEL_UNREADABLE", "RUNTIME_UNREADABLE", "STARTUP_UNEXPECTED"},
     "platform": {"Windows", "Linux", "macOS", "Other"},
     "profile": {"economia", "equilibrado", "rapido", "not_applicable"},
     "core_mode": {"subprocess", "persistent", "not_applicable"},
@@ -263,6 +265,7 @@ def inspect_events(files: Iterable[Path], *, max_events: int = MAX_EXPORT_EVENTS
         "latency_p50_ms": chat_latency["p50"],
         "latency_max_ms": chat_latency["maximum"],
     } if chat_latency else {})
+    startup_failures = Counter(r["startup_code"] for r in events if r["event"]=="runtime.error" and "startup_code" in r)
     fails = Counter(r.get("error_type", "Other") for r in events
                     if r["event"] in ("runtime.error", "inference.error", "chat.error", "test.error"))
     report = {
@@ -274,6 +277,7 @@ def inspect_events(files: Iterable[Path], *, max_events: int = MAX_EXPORT_EVENTS
         "event_counts": dict(sorted(counts.items())),
         "test_suites_with_results": dict(sorted(by_suite.items())),
         "error_types": dict(sorted(fails.items())),
+        "startup_failure_codes": dict(sorted(startup_failures.items())),
         "latency": metrics,
         "chat_latency_ms": chat_latency,
         "inference_latency_ms": inference_latency,

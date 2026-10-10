@@ -127,3 +127,12 @@ Se faltar uma medição, o campo será NOT_COMPARABLE em vez de zero.
 Testes do GitHub Actions usam modelos simulados: uma melhoria nessas
 métricas não demonstra ganho com Qwen no Windows real.
 Resultados de CPU/RAM precisam de hardware, versão, carga e prompts iguais.
+
+## Falhas de inicialização (diagnóstico seguro)
+
+O relatório exportado agora inclui `startup_failure_codes` com categorias
+permitidas: `MODEL_MISSING`, `MODEL_INVALID`, `CORE_MISSING`, `SERVER_MISSING`,
+`MODEL_UNREADABLE`, `RUNTIME_UNREADABLE` ou `STARTUP_UNEXPECTED`.
+Nenhum caminho do usuário, texto de erro nativo ou traceback é incluído.
+Use `DIAGNOSTICAR-CHAT-WINDOWS.bat` para confirmar qual arquivo falta;
+o chat mostra orientação específica também no terminal local.

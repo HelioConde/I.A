@@ -177,6 +177,27 @@ class TestDiagnosticLogger(unittest.TestCase):
         self.assertIn("inference.error",[row["event"] for row in records])
         self.assertNotIn("inference.done",[row["event"] for row in records])
 
+    def test_startup_codes_are_exportable_but_never_include_user_path(self):
+        private = "C:\\Users\\private\\MY_SECRET_KEY"
+        class MissingRuntime:
+            def __init__(self):
+                raise FileNotFoundError("llama-completion missing: " + private)
+        engine=ChatEngine(MissingRuntime, diagnostics=self.log)
+        engine.start()
+        self.assertEqual(engine.status()["startup_error_code"],"CORE_MISSING")
+        engine.close()
+        records, summary=inspect_events(self.log.files())
+        failures=[row for row in records if row["event"]=="runtime.error"]
+        self.assertEqual(failures[0]["startup_code"],"CORE_MISSING")
+        self.assertEqual(summary["startup_failure_codes"],{"CORE_MISSING":1})
+        self.assertNotIn(private,self.log.file.read_text(encoding="utf-8"))
+        out=Path(self.temp.name)/"safe.zip"
+        export_diagnostics(self.folder,out)
+        with zipfile.ZipFile(out) as archive:
+            body=archive.read("summary.json").decode("utf-8")
+            self.assertIn("CORE_MISSING",body)
+            self.assertNotIn(private,body)
+
     def test_errors_are_types_not_raw_messages(self):
         class BrokenRuntime:
             def __init__(self):
