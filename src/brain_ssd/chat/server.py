@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import urlsplit
 
+from brain_ssd.chat.history import ChatHistory
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
 
@@ -144,12 +145,13 @@ class ChatHttpServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, address: tuple[str, int], engine: ChatEngine, static_dir: Path):
+    def __init__(self, address: tuple[str, int], engine: ChatEngine, static_dir: Path, history_store: ChatHistory | None = None):
         if address[0] != "127.0.0.1":
             raise ValueError("O chat deve usar apenas 127.0.0.1.")
         super().__init__(address, ChatHandler)
         self.engine = engine
         self.static_dir = static_dir
+        self.history_store = history_store
 
     def handle_error(self, request: Any, client_address: tuple[str, int]) -> None:
         # A browser can close a connection during a request.
@@ -191,6 +193,20 @@ class ChatHandler(BaseHTTPRequestHandler):
         if path in ("/api/health", "/api/status"):
             self._json(self.server.engine.status())
             return
+        if path == "/api/conversations" and self.server.history_store is not None:
+            self._json({"conversations": self.server.history_store.list()})
+            return
+        if path.startswith("/api/conversations/") and self.server.history_store is not None:
+            try:
+                identifier = path.removeprefix("/api/conversations/")
+                entry = self.server.history_store.get(identifier)
+                if entry is None:
+                    self._json({"error": "Conversa não encontrada."}, HTTPStatus.NOT_FOUND)
+                else:
+                    self._json({"conversation": entry, "messages": self.server.history_store.messages(identifier)})
+            except ValueError as exc:
+                self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            return
         assets = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "application/javascript"), "/styles.css": ("styles.css", "text/css")}
         if path not in assets:
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
@@ -213,8 +229,12 @@ class ChatHandler(BaseHTTPRequestHandler):
         if self.headers.get("Origin") not in accepted_origins:
             self._json({"error": "Origem não permitida."}, HTTPStatus.FORBIDDEN)
             return
-        if urlsplit(self.path).path != "/api/chat":
+        path = urlsplit(self.path).path
+        if path not in ("/api/chat", "/api/conversations"):
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
+            return
+        if path == "/api/conversations" and self.server.history_store is None:
+            self._json({"error": "Histórico desabilitado."}, HTTPStatus.NOT_FOUND)
             return
         if self.headers.get("Content-Type", "").split(";")[0].strip().lower() != "application/json":
             self._json({"error": "Envie JSON."}, HTTPStatus.UNSUPPORTED_MEDIA_TYPE)
@@ -230,7 +250,18 @@ class ChatHandler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(size))
             if not isinstance(data, dict):
                 raise ValueError("JSON inválido.")
-            result = self.server.engine.ask(data.get("message"), data.get("history", []))
+            if path == "/api/conversations":
+                result = {"conversation": self.server.history_store.create()}
+            else:
+                identifier = data.get("conversation_id")
+                if identifier is not None and self.server.history_store is not None:
+                    saved_history = self.server.history_store.recent_context(identifier)
+                    result = self.server.engine.ask(data.get("message"), saved_history)
+                    self.server.history_store.append_exchange(identifier, data["message"].strip(), result["answer"])
+                    result["conversation_id"] = identifier
+                else:
+                    # Legacy isolated HTTP tests may still pass bounded history.
+                    result = self.server.engine.ask(data.get("message"), data.get("history", []))
         except (ValueError, json.JSONDecodeError) as exc:
             self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
         except Exception as exc:
@@ -238,6 +269,29 @@ class ChatHandler(BaseHTTPRequestHandler):
         else:
             self._json(result)
 
+    def do_DELETE(self) -> None:
+        if not self._valid_host():
+            self._json({"error": "Host não permitido."}, HTTPStatus.FORBIDDEN)
+            return
+        port = self.server.server_address[1]
+        accepted = {f"http://127.0.0.1:{port}", f"http://localhost:{port}"}
+        if self.headers.get("Origin") not in accepted:
+            self._json({"error": "Origem não permitida."}, HTTPStatus.FORBIDDEN)
+            return
+        path = urlsplit(self.path).path
+        if self.server.history_store is None or not path.startswith("/api/conversations/"):
+            self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
+            return
+        try:
+            deleted = self.server.history_store.delete(path.removeprefix("/api/conversations/"))
+        except ValueError as exc:
+            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            return
+        self._json({"deleted": deleted}, HTTPStatus.OK if deleted else HTTPStatus.NOT_FOUND)
 
-def create_chat_server(engine: ChatEngine, static_dir: Path, port: int = 8766) -> ChatHttpServer:
-    return ChatHttpServer(("127.0.0.1", port), engine, static_dir)
+
+def create_chat_server(
+    engine: ChatEngine, static_dir: Path, port: int = 8766,
+    history_store: ChatHistory | None = None,
+) -> ChatHttpServer:
+    return ChatHttpServer(("127.0.0.1", port), engine, static_dir, history_store)
