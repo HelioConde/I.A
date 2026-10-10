@@ -62,6 +62,7 @@ def download_verified(url: str, destination: Path, *, sha256: str,
         raise FileExistsError("Destino já existe; nada foi sobrescrito.")
     staged = destination.parent / (".brainssd-staging-" + uuid.uuid4().hex)
     total = 0
+    last_report_mib = 0
     digest = hashlib.sha256()
     try:
         request = urllib.request.Request(url, headers={"User-Agent": "BrainSSD-Installer/1"})
@@ -72,6 +73,10 @@ def download_verified(url: str, destination: Path, *, sha256: str,
                     raise ValueError("Download ultrapassou o limite esperado.")
                 digest.update(chunk)
                 output.write(chunk)
+                completed_mib = total // (64 * 1024 * 1024)
+                if completed_mib > last_report_mib:
+                    last_report_mib = completed_mib
+                    print(f"Recebidos {total // (1024 * 1024)} MiB; verificacao SHA-256 ao concluir.", flush=True)
         if (exact_size is not None and total != exact_size) or digest.hexdigest() != sha256:
             raise ValueError("SHA-256 ou tamanho divergente; arquivo não instalado.")
         os.replace(staged, destination)
