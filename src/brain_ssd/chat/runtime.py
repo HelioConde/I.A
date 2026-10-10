@@ -88,17 +88,23 @@ class LocalChatRuntime:
             try:
                 self._completion_path = resolve_llama_executable(self.root)
             except FileNotFoundError:
-                pass  # Optional SSD retrieval is unavailable without the frozen CLI.
+                try:
+                    # Chat retrieval is noncanonical: use the official CPU binary
+                    # when the historically frozen research binary is absent.
+                    self._completion_path = resolve_chat_completion(self.root)
+                except FileNotFoundError:
+                    pass  # No CLI available for optional retrieval.
         else:
             try:
                 executable = resolve_chat_completion(self.root)
             except FileNotFoundError as exc:
                 raise ChatStartupError("CORE_MISSING") from exc
             try:
-                # The research-grade SSD corpus still uses the frozen Core.
+                # Prefer the frozen research executable when installed; keep
+                # the official binary as a chat-only retrieval fallback.
                 self._completion_path = resolve_llama_executable(self.root)
             except FileNotFoundError:
-                self._completion_path = None
+                self._completion_path = executable
             self.core_backend = SubprocessPerQueryCore(
                 executable, self.model_path,
                 threads=int(settings["threads"]), context_size=int(settings["context_size"]),
@@ -116,9 +122,15 @@ class LocalChatRuntime:
             "prompt_budget_bytes": self.prompt_budget_bytes,
             "knowledge_cache": "per_query" if self.profile == "economia" else "session",
             "knowledge_available": available,
+            "retrieval_runtime": (
+                "official_cpu_distribution"
+                if self._completion_path is not None
+                and self._completion_path.parent == (self.root / COMMUNITY_RUNTIME).resolve()
+                else "frozen_checkout" if self._completion_path is not None else "unavailable"
+            ),
             "knowledge_note": (
-                "Conhecimento SSD disponível"
-                if available else "Base de conhecimento SSD opcional ausente; conversa ainda disponível"
+                "Arquivos SSD e executável de recuperação encontrados; ainda é necessário validar uma consulta real"
+                if available else "Recuperação SSD indisponível; o chat simples continua disponível"
             ),
         }
 
