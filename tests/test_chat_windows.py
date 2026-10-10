@@ -94,6 +94,35 @@ class TestChatEngine(unittest.TestCase):
         self.assertLessEqual(used, len(history))
         self.assertGreaterEqual(evidence, 0)
 
+    def test_self_knowledge_is_specific_and_documented(self):
+        memory_prompt = build_chat_prompt("Explique como você usa o SSD e a RAM.", [], "")
+        self.assertIn("brain.dat", memory_prompt)
+        self.assertIn("cache de arquivos", memory_prompt)
+        self.assertIn("não altera pesos do Qwen", memory_prompt)
+        capabilities = build_chat_prompt("O que você consegue fazer?", [], "")
+        self.assertIn("Capacidades documentadas", capabilities)
+        self.assertIn("Não tem internet", capabilities)
+        self.assertNotIn("Fatos do Brain-SSD", capabilities)
+
+    def test_self_knowledge_not_injected_into_unrelated_questions(self):
+        for question in (
+            "Como funciona um SSD?",
+            "Quero programar em Python",
+            "Como usar memoria RAM em um jogo?",
+        ):
+            with self.subTest(question=question):
+                prompt = build_chat_prompt(question, [], "")
+                self.assertNotIn("Capacidades documentadas", prompt)
+                self.assertNotIn("Fatos do Brain-SSD", prompt)
+
+    def test_self_explanation_respects_economy_prompt_budget(self):
+        prompt, history_count, evidence_bytes = bounded_chat_prompt(
+            "Explique como você usa o SSD e a RAM.", [], "Texto não relacionado", 3600
+        )
+        self.assertLessEqual(len(prompt.encode("utf-8")), 3600)
+        self.assertEqual(history_count, 0)
+        self.assertGreaterEqual(evidence_bytes, 0)
+
     def test_large_question_fails_instead_of_being_silently_cut(self):
         with self.assertRaisesRegex(ValueError, "Mensagem longa"):
             bounded_chat_prompt("x" * 2200, [], "", 1000)
