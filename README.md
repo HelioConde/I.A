@@ -72,6 +72,30 @@ python tools/validate_chat_windows.py --profile economia
 
 O teste grava um relatório local em `results/chat_validation/latest-local-windows.json`. **Somente executá-lo com o modelo verdadeiro comprova inferência naquela máquina.** Veja instruções detalhadas em [CHAT_WINDOWS.md](docs/CHAT_WINDOWS.md).
 
+### Quando o modelo não inicia no Windows
+
+Se a interface abrir mas mostrar **"Não foi possível iniciar o modelo local"**,
+isso indica uma falha na preparação do Core — **não** confirma que o Qwen está
+funcionando. Atualize o código e use `DIAGNOSTICAR-CHAT-WINDOWS.bat`.
+Os dois scripts de chat executam agora o mesmo preflight automaticamente:
+
+```powershell
+git pull --ff-only
+py -3 tools/doctor_chat.py --profile economia --probe
+```
+
+Confira `model_gguf_valid_header`, `model_plausible_size`,
+`cpu_runtime_found` e `probe_passed`. Se faltar o modelo, coloque
+`Qwen3-0.6B-Q8_0.gguf` na pasta `models/`. Se faltar
+`llama-completion.exe`, prepare o runtime CPU-only conforme
+[WINDOWS_NATIVE_RUNTIME.md](docs/WINDOWS_NATIVE_RUNTIME.md).
+**O GitHub Actions não distribui o GGUF nem garante DLLs nativas no seu PC.**
+
+O terminal e `/api/status` exibem códigos permitidos de erro, sem revelar
+pastas pessoais. Caso o problema continue, gere
+`python tools/export_diagnostics.py` e anexe o ZIP sanitizado para análise.
+As memórias episódicas e o histórico são preservados.
+
 ### Perfis de execução
 
 | Perfil | Threads | Contexto configurado | Estratégia |
