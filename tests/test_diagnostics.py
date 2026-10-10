@@ -133,6 +133,50 @@ class TestDiagnosticLogger(unittest.TestCase):
         self.assertEqual(report["native_peak_working_set_bytes"]["maximum"], 102400)
         self.assertEqual(report["python_working_set_bytes"]["maximum"], 204800)
 
+    def test_native_inference_failure_is_logged_without_private_exception(self):
+        class FailingCore:
+            def generate(self,request):
+                raise RuntimeError("SENHA_DE_TESTE está no erro do llama.cpp")
+
+        class FailingRuntime(DummyRuntime):
+            def __init__(self):
+                super().__init__()
+                self.core_backend=FailingCore()
+
+        engine=ChatEngine(FailingRuntime,diagnostics=self.log)
+        engine.start()
+        try:
+            with self.assertRaises(RuntimeError):
+                engine.ask("Pergunta confidencial que não pode vazar",[])
+        finally:
+            engine.close()
+        records,_=inspect_events(self.log.files())
+        self.assertIn("inference.error",[row["event"] for row in records])
+        self.assertIn("chat.error",[row["event"] for row in records])
+        self.assertNotIn("inference.done",[row["event"] for row in records])
+        raw=self.log.file.read_text(encoding="utf-8")
+        self.assertNotIn("SENHA_DE_TESTE",raw)
+        self.assertNotIn("Pergunta confidencial",raw)
+
+    def test_return_code_failure_does_not_count_as_inference_success(self):
+        class ErrorCore:
+            def generate(self,request):
+                return {"return_code":2,"stdout":"","metrics":{"latency_ms":3}}
+        class ErrorRuntime(DummyRuntime):
+            def __init__(self):
+                super().__init__()
+                self.core_backend=ErrorCore()
+        engine=ChatEngine(ErrorRuntime,diagnostics=self.log)
+        engine.start()
+        try:
+            with self.assertRaises(RuntimeError):
+                engine.ask("Olá",[])
+        finally:
+            engine.close()
+        records,_=inspect_events(self.log.files())
+        self.assertIn("inference.error",[row["event"] for row in records])
+        self.assertNotIn("inference.done",[row["event"] for row in records])
+
     def test_errors_are_types_not_raw_messages(self):
         class BrokenRuntime:
             def __init__(self):

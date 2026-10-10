@@ -48,14 +48,6 @@ def _scalar(summary: dict, name: str, key: str) -> tuple[float, int] | None:
     return float(val), n
 
 
-def _verified_real_run(summary: dict) -> bool:
-    # CI runs may contain simulated "inference.done" events. Merely recording
-    # memory/TTFT values is NOT evidence of Qwen on a physical computer.
-    # A session qualifies only when an exported event was explicitly marked
-    # as verified by a *real* Windows validation. Summary alone is insufficient.
-    return False
-
-
 def compare(base: dict, candidate: dict) -> dict:
     differences = {}
     for metric, key, unit, better in METRICS:

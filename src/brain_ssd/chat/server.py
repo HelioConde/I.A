@@ -317,12 +317,28 @@ class ChatEngine:
                     episodes=sum(1 for episode in episodes if episode["id"] in prompt))
             generation = GenerationRequest(prompt=prompt, max_tokens=180, temperature=0.35)
             infer_started = time.monotonic()
-            if on_chunk is None:
-                measured = self._runtime.core_backend.generate(generation)
-            else:
-                if cancel_event is None:
-                    raise ValueError("Evento de cancelamento obrigatório para streaming.")
-                measured = generate_streamed(self._runtime.core_backend, generation, on_chunk, cancel_event)
+            try:
+                if on_chunk is None:
+                    measured = self._runtime.core_backend.generate(generation)
+                else:
+                    if cancel_event is None:
+                        raise ValueError("Evento de cancelamento obrigatório para streaming.")
+                    measured = generate_streamed(self._runtime.core_backend, generation, on_chunk, cancel_event)
+            except GenerationCancelled:
+                raise
+            except Exception as exc:
+                if self.diagnostics:
+                    self.diagnostics.emit("inference.error", request_id=request_id,
+                        duration_ms=(time.monotonic() - infer_started) * 1000,
+                        error_type=type(exc).__name__, status="ERROR")
+                raise
+            if measured.get("return_code") != 0:
+                if self.diagnostics:
+                    self.diagnostics.emit("inference.error", request_id=request_id,
+                        duration_ms=(time.monotonic() - infer_started) * 1000,
+                        return_code=measured.get("return_code"), status="FAIL",
+                        error_type="RuntimeError")
+                raise RuntimeError("O mecanismo local falhou ao gerar a resposta. Consulte o terminal.")
             if self.diagnostics:
                 _metrics = measured.get("metrics") or {}
                 self.diagnostics.emit("inference.done", request_id=request_id,
@@ -333,8 +349,6 @@ class ChatEngine:
                     working_set_bytes_max=_metrics.get("working_set_bytes_max"),
                     private_bytes_max=_metrics.get("private_bytes_max"),
                     physical_read_bytes=_metrics.get("physical_read_bytes"))
-            if measured.get("return_code") != 0:
-                raise RuntimeError("O mecanismo local falhou ao gerar a resposta. Consulte o terminal.")
             if cancel_event is not None and cancel_event.is_set():
                 raise GenerationCancelled()
             answer = clean_answer(str(measured.get("stdout", "")))
