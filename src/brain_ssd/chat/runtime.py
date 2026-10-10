@@ -4,7 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from brain_ssd.local_runtime.backend import resolve_llama_executable
+from brain_ssd.backend import GenerationRequest
+from brain_ssd.local_runtime.backend import LocalLlamaCppBackend, resolve_llama_executable
 from brain_ssd.chat.startup_diagnostics import ChatStartupError
 from brain_ssd.local_runtime.core_backend import (
     PersistentCoreBackend, SubprocessPerQueryCore, resolve_server_executable,
@@ -40,6 +41,27 @@ PROFILES = {
     "equilibrado": {"threads": 4, "context_size": 4096, "mode": "subprocess", "knowledge_budget": 3500, "prompt_budget_bytes": 7600},
     "rapido": {"threads": 4, "context_size": 4096, "mode": "persistent", "knowledge_budget": 3500, "prompt_budget_bytes": 7600},
 }
+
+
+class ChatLlamaCppBackend(LocalLlamaCppBackend):
+    """Chat-only Qwen sampling/template settings; frozen research Core unchanged."""
+
+    def command(self, request: GenerationRequest):
+        base = super().command(request)
+        # llama-completion already formats the supplied message as a user turn.
+        # --jinja uses the GGUF's Qwen3 chat template rather than role labels
+        # manually embedded in request.prompt.
+        return (*base, "--jinja", "--top-p", "0.8", "--top-k", "20", "--min-p", "0")
+
+
+class ChatSubprocessCore(SubprocessPerQueryCore):
+    """Keeps native subprocess streaming/cancellation, using Qwen chat flags."""
+
+    def __init__(self, executable: Path, model: Path, *, threads: int, context_size: int):
+        super().__init__(executable, model, threads=threads, context_size=context_size)
+        self.backend = ChatLlamaCppBackend(
+            executable, model, threads=threads, context_size=context_size
+        )
 
 
 class LocalChatRuntime:
@@ -105,7 +127,7 @@ class LocalChatRuntime:
                 self._completion_path = resolve_llama_executable(self.root)
             except FileNotFoundError:
                 self._completion_path = executable
-            self.core_backend = SubprocessPerQueryCore(
+            self.core_backend = ChatSubprocessCore(
                 executable, self.model_path,
                 threads=int(settings["threads"]), context_size=int(settings["context_size"]),
             )
