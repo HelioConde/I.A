@@ -56,3 +56,14 @@ candidatos de atenção. Isso não altera o prompt, não descarta fontes do Core
 nem atualiza os pesos do modelo. Sem a flag, não há processamento extra.
 O BAT INICIAR-CHAT-MEMORIA-WINDOWS.bat ativa explicitamente os experimentos;
 o BAT comum continua usando o chat básico.
+
+## Reforço tabular no mundo fechado
+
+`TabularActionLearner` usa Q-learning simples com estado formado apenas
+pela posição observada pelo agente, ações up/down/left/right, recompensa
+do ambiente e atualização por diferença entre valor esperado e observado.
+O treino tem limite de 500 episódios de até 100 ações cada. A avaliação
+executa uma política gulosa nova sem novas atualizações e registra sucessos,
+ações e quantos parâmetros tabulares mudaram. Isso é aprendizagem real,
+mas **somente dentro do mundo sintético**, sem acesso a programas, rede,
+sensores reais ou pesos do Qwen. Não é simulação de cérebro humano.

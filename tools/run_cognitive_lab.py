@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.cognitive_lab import (
     GridWorld, prediction_error, propose_associations,
-    replay_preview, select_attention, working_state,
+    replay_preview, select_attention, working_state, TabularActionLearner,
 )
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.plasticity import PlasticityLedger
@@ -46,6 +46,10 @@ def evaluate() -> dict:
         ledger.revoke(events[0])
         after_revert = ledger.shadow_bias(first["id"])
         expectation = prediction_error(0.7, True)
+        agent = TabularActionLearner(seed=17)
+        policy_before = agent.evaluate()
+        learned = agent.train(episodes=400,epsilon=.3)
+        policy_after = agent.evaluate()
         world = GridWorld()
         trace = [world.step(a) for a in ["right"] * 4 + ["down"] * 4]
         return {
@@ -64,6 +68,7 @@ def evaluate() -> dict:
                            "weights_updated": False},
             "prediction": {"expected": expectation.probability,
                            "actual": expectation.observed, "brier": expectation.brier},
+            "learning_cycle": {"greedy_before": policy_before, "training": learned, "greedy_after": policy_after, "only_sandbox_weights_modified": True},
             "perception_action": {"steps": len(trace), "goal_reached": world.finished,
                                   "final_position": list(world.position),
                                   "outside_machine_actions": False},
@@ -81,5 +86,6 @@ if __name__ == "__main__":
     if not (report["perception_action"]["goal_reached"]
             and report["episodic"]["individual_ids_retained"]
             and report["plasticity"]["bias_after_revoke"] == 0
-            and not report["replay"]["writes_to_model"]):
+            and not report["replay"]["writes_to_model"]
+            and report["learning_cycle"]["greedy_after"]["goal_reached"]):
         raise SystemExit(1)

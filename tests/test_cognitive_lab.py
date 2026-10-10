@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from brain_ssd.chat.cognitive_lab import (
     select_attention, working_state, propose_associations,
-    replay_preview, prediction_error, GridWorld,
+    replay_preview, prediction_error, GridWorld, TabularActionLearner,
 )
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.plasticity import PlasticityLedger, PredictionJournal
@@ -169,3 +169,29 @@ class TestPredictionJournal(unittest.TestCase):
             with self.assertRaises(ValueError):
                 journal.observe("my password is 123", True)
             self.assertEqual(journal.predict("grid_reach_goal")["observations"],0)
+
+
+class TestLearningInClosedWorld(unittest.TestCase):
+    def test_updates_prediction_error_and_learns_greedy_policy(self):
+        agent=TabularActionLearner(seed=17)
+        baseline=agent.evaluate()
+        trained=agent.train(episodes=400,epsilon=.3)
+        after=agent.evaluate()
+        self.assertGreater(trained["reached_goal"],0)
+        self.assertGreater(trained["updates"],0)
+        self.assertLessEqual(trained["q_values"],30*30*4)
+        self.assertTrue(after["goal_reached"])
+        self.assertLessEqual(after["steps"],20)
+        self.assertFalse(trained["model_weights_changed"])
+        self.assertEqual(after["q_updates_during_evaluation"],0)
+
+    def test_invalid_learning_outcomes_are_rejected(self):
+        agent=TabularActionLearner()
+        world=GridWorld()
+        before=world.observe()
+        with self.assertRaises(ValueError):
+            agent.learn(before,"open_web_browser",1,before,False)
+        with self.assertRaises(ValueError):
+            agent.learn(before,"up",float("nan"),before,False)
+        with self.assertRaises(ValueError):
+            agent.train(episodes=10000)
