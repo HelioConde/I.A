@@ -1,6 +1,6 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[] };
+const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false };
 const composer = $("messageInput");
 const log = $("messages");
 
@@ -110,6 +110,8 @@ async function refreshStatus() {
 }
 function updateSend() {
   $("sendButton").disabled = !app.ready || app.sending || !composer.value.trim();
+  $("sendButton").hidden = app.sending;
+  $("stopButton").hidden = !app.sending;
 }
 function fitComposer() {
   composer.style.height = "auto";
@@ -177,41 +179,126 @@ function updateMetrics(data) {
 async function send() {
   const question = composer.value.trim();
   if (!app.ready || app.sending || !question) return;
-  const history = app.messages.slice(-8);
   app.sending = true;
+  app.streamStarted = false;
+  app.requestId = null;
+  app.abortController = new AbortController();
   composer.value = "";
   fitComposer();
   addMessage("user", question);
   app.messages.push({role:"user", content:question});
   const pending = addThinking();
   updateSend();
+  let completed = false;
+  let interrupted = false;
   try {
     if (!app.conversationId) {
       const created = await requestJson("/api/conversations", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body:"{}"
+        method:"POST", headers:{"Content-Type":"application/json"}, body:"{}"
       });
       app.conversationId = created.conversation.id;
     }
-    const response = await fetch("/api/chat", {
+    if (app.abortController.signal.aborted) throw new DOMException("Interrompido", "AbortError");
+    app.requestId = crypto.randomUUID();
+    const response = await fetch("/api/chat/stream", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:question, conversation_id:app.conversationId})
+      signal:app.abortController.signal,
+      body:JSON.stringify({
+        message:question, conversation_id:app.conversationId,
+        request_id:app.requestId
+      })
     });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || "Não foi possível gerar a resposta.");
-    pending.querySelector(".message-content").textContent = payload.answer;
-    app.messages.push({role:"assistant", content:payload.answer});
-    updateMetrics(payload);
-    await refreshConversations();
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || "Falha ao iniciar a geração local.");
+    }
+    if (!response.body) throw new Error("O navegador não suporta o canal de resposta.");
+    const stream = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let partial = "";
+    const output = pending.querySelector(".message-content");
+    output.textContent = "";
+    const applyEvent = (packet) => {
+      const lines = packet.split(/\r?\n/);
+      const event = lines.find(line => line.startsWith("event:"))?.slice(6).trim();
+      const data = lines.filter(line => line.startsWith("data:")).map(line => line.slice(5)).join("\n");
+      if (!event || !data) return;
+      const payload = JSON.parse(data);
+      if (event === "started") app.streamStarted = true;
+      if (event === "delta") {
+        partial += payload.text || "";
+        output.textContent = partial;
+        scrollBottom();
+      } else if (event === "done") {
+        output.textContent = payload.answer;
+        app.messages.push({role:"assistant", content:payload.answer});
+        updateMetrics(payload);
+        completed = true;
+      } else if (event === "cancelled") {
+        interrupted = true;
+        output.textContent = "Resposta interrompida. A geração foi encerrada.";
+        pending.classList.add("interrupted");
+      } else if (event === "error") {
+        throw new Error(payload.error || "Erro na geração de resposta.");
+      }
+    };
+    try {
+      while (true) {
+        const {value, done} = await stream.read();
+        if (done) break;
+        buffer += decoder.decode(value, {stream:true});
+        while (true) {
+          const match = /\r?\n\r?\n/.exec(buffer);
+          if (!match) break;
+          const packet = buffer.slice(0, match.index);
+          buffer = buffer.slice(match.index + match[0].length);
+          applyEvent(packet);
+        }
+        if (completed || interrupted) break;
+      }
+    } finally {
+      await stream.cancel().catch(() => {});
+    }
+    if (!completed && !interrupted) throw new Error("A conexão foi interrompida antes do fim da resposta.");
+    if (completed) await refreshConversations();
   } catch (error) {
-    pending.remove();
-    addMessage("assistant", "Não consegui responder: " + error.message, "error");
+    if (error.name === "AbortError") {
+      interrupted = true;
+      pending.querySelector(".message-content").textContent = "Resposta interrompida.";
+      pending.classList.add("interrupted");
+    } else {
+      pending.remove();
+      addMessage("assistant", "Não consegui responder: " + error.message, "error");
+    }
   } finally {
     app.sending = false;
+    app.requestId = null;
+    app.streamStarted = false;
+    app.abortController = null;
     updateSend();
     scrollBottom();
     composer.focus();
+  }
+}
+async function stopGeneration() {
+  if (!app.sending || !app.abortController) return;
+  if (!app.streamStarted || !app.requestId) {
+    app.abortController.abort();
+    return;
+  }
+  $("stopButton").disabled = true;
+  try {
+    const result = await requestJson("/api/chat/cancel", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({request_id:app.requestId})
+    });
+    if (!result.cancelled) app.abortController.abort();
+  } catch (_) {
+    app.abortController.abort();
+  } finally {
+    $("stopButton").disabled = false;
   }
 }
 function resetChat() {
@@ -261,6 +348,7 @@ $("closeDetails").addEventListener("click", () => {
   $("detailsPanel").hidden = true;
   $("showDetails").setAttribute("aria-expanded","false");
 });
+$("stopButton").addEventListener("click", stopGeneration);
 fitComposer();
 refreshStatus();
 refreshConversations();

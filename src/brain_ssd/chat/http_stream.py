@@ -32,6 +32,8 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
         handler.send_header("Content-Type", "text/event-stream; charset=utf-8")
         handler.send_header("Cache-Control", "no-cache, no-transform")
         handler.send_header("X-Accel-Buffering", "no")
+        handler.send_header("Connection", "close")
+        handler.close_connection = True
         handler.send_header("X-Content-Type-Options", "nosniff")
         handler.send_header("Referrer-Policy", "no-referrer")
         handler.end_headers()
