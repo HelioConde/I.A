@@ -43,6 +43,18 @@ class EpisodicTests(unittest.TestCase):
         self.assertEqual(len(hits),2)
         self.assertNotEqual(hits[0]["id"],hits[1]["id"])
 
+    def test_sqlite_confirmed_field_is_boolean_after_reopen(self):
+        self.mem.add("Reunião do projeto rover terça na biblioteca")
+        self.mem.add("Reunião do projeto rover quinta na biblioteca")
+        reopened=EpisodicMemory(self.file)
+        listed=reopened.list()
+        self.assertEqual(len(listed),2)
+        self.assertTrue(all(row["confirmed"] is True for row in listed))
+        from brain_ssd.chat.cognitive_lab import replay_preview, propose_associations
+        preview=replay_preview(listed)
+        self.assertEqual(len(preview.candidate_ids),2)
+        self.assertEqual(len(propose_associations(listed)),1)
+
     def test_invalid_and_long_note_rejected(self):
         for note in ("  ","A"*501, {"text":"x"}):
             with self.assertRaises(ValueError):

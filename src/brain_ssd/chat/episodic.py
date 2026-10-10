@@ -116,7 +116,9 @@ class EpisodicMemory:
             rows = db.execute("SELECT id,content,created_at,source,confirmed FROM episodes "
                               "ORDER BY created_at DESC,id DESC LIMIT ?",
                               (max(1,min(int(limit),100)),)).fetchall()
-        return [dict(row) for row in rows]
+        # SQLite stores CHECK(confirmed=1) as integer 1; external cognitive
+        # modules require an actual bool ("is True"), not truthy 1.
+        return [{**dict(row), "confirmed": bool(row["confirmed"])} for row in rows]
 
     def delete(self, item_id: Any) -> bool:
         identifier = self._id(item_id)

@@ -65,6 +65,16 @@ class TestMemoryReplayAndPrediction(unittest.TestCase):
         self.assertEqual(set(preview.candidate_ids),{"1","2","3"})
         self.assertEqual(preview.mode,"READ_ONLY_OFFLINE_PREVIEW")
 
+    def test_real_sqlite_episodes_are_associated_and_replayed(self):
+        with tempfile.TemporaryDirectory() as folder:
+            mem=EpisodicMemory(Path(folder)/"episodes.sqlite3")
+            mem.add("Reunião projeto rover terça biblioteca norte")
+            mem.add("Reunião projeto rover quinta biblioteca norte")
+            notes=mem.list()
+            self.assertTrue(all(row["confirmed"] is True for row in notes))
+            self.assertEqual(len(propose_associations(notes)),1)
+            self.assertEqual(len(replay_preview(notes).candidate_ids),2)
+
     def test_prediction_error_requires_ground_truth(self):
         good=prediction_error(.8,True)
         bad=prediction_error(.8,False)
