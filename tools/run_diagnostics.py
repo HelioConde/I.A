@@ -29,6 +29,7 @@ CHAT_SUITES = [
     ("chat_stream", "test_chat_stream.py"),
     ("chat_doctor", "test_chat_doctor.py"),
     ("chat_episodic", "test_chat_episodic.py"),
+    ("memory_safety", "test_memory_safety.py"),
     ("chat_episodic_http", "test_chat_episodic_http.py"),
     ("cognitive_lab", "test_cognitive_lab.py"),
     ("consolidation", "test_consolidation.py"),
@@ -46,6 +47,7 @@ CORE_SUITES = [
 ]
 LAB_TOOLS = [
     ("bench_episodic_memory", "tools/bench_episodic_memory.py"),
+    ("memory_quality", "tools/bench_memory_quality.py"),
     ("run_cognitive_lab", "tools/run_cognitive_lab.py"),
 ]
 

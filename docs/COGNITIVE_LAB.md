@@ -86,3 +86,27 @@ Com memórias já salvas no chat opt-in:
 
 Sem flags de mutação, o comando apenas lista candidatos. Não é sono
 biológico nem consolidação cortical; é um fluxo humano de revisão.
+
+## Verificação de memórias potencialmente divergentes (2026-10-10)
+
+O chat experimental agora sinaliza quando **duas notas episódicas
+confirmadas** compartilham assunto, mas registram dias da semana
+diferentes. O aviso diz apenas que podem ser eventos distintos;
+não escolhe uma fonte por ser mais recente, não apaga nem reescreve notas
+e pede esclarecimento caso a pergunta não identifique qual evento.
+
+A verificação não identifica todas as contradições, mudanças de endereço,
+valores monetários ou paráfrases sem termos comuns. Ela é deliberadamente
+conservadora e não comprova que o Qwen obedecerá ao aviso.
+
+Rode `python tools/bench_memory_quality.py` para executar o conjunto
+**pequeno e sintético** de 24 consultas positivas, 20 perguntas negativas,
+5 cenários de ambiguidade e 1 verificação de exclusão/reabertura.
+O benchmark não usa modelos de linguagem nem mede raciocínio ou qualidade
+de conversação. Não promover mudanças para sistemas canônicos apenas com
+esse resultado.
+
+Feedbacks guardados no laboratório de plasticidade passam a fornecer viés
+**zero** se sua memória de origem tiver sido excluída. A exclusão lógica
+não remove automaticamente backups nem registros históricos da fila de
+revisão; esse tratamento exige auditoria específica de retenção.
