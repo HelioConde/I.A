@@ -14,6 +14,8 @@ on:
       - "INICIAR-CHAT-MEMORIA-WINDOWS.bat"
       - "tests/test_chat_history.py"
       - "tests/test_chat_doctor.py"
+      - "tests/test_startup_diagnostics.py"
+      - "INICIAR-CHAT-WINDOWS.bat"
       - "tests/test_chat_stream.py"
       - "tests/test_chat_episodic.py"
       - "tests/test_episodic_integrity.py"
@@ -52,7 +54,7 @@ jobs:
         run: node --check chat/app.js
       - name: Verify syntax
         shell: pwsh
-        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/doctor_chat.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_episodic_integrity.py tools/audit_episodic_db.py tests/test_memory_safety.py tests/test_semantic_bridge.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tools/bench_semantic_bridge.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py
+        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/doctor_chat.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_startup_diagnostics.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_episodic_integrity.py tools/audit_episodic_db.py tests/test_memory_safety.py tests/test_semantic_bridge.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tools/bench_semantic_bridge.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py
       - name: Test the Windows UI and independent chat adapter (mock Core)
         shell: pwsh
         run: |
@@ -60,6 +62,7 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_runtime.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
           python -m unittest discover -s tests -p "test_chat_doctor.py" -v
+          python -m unittest discover -s tests -p "test_startup_diagnostics.py" -v
           python -m unittest discover -s tests -p "test_chat_stream.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic.py" -v
           python -m unittest discover -s tests -p "test_episodic_integrity.py" -v
