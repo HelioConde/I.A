@@ -42,18 +42,6 @@ def brain_ssd_self_context(question: str) -> str:
     refers_to_app = bool(re.search(r"\b(voce|seu|sua|seus|suas|brain[- ]?ssd|teu|tua)\b", normalized))
     if not refers_to_app:
         return ""
-    if any(word in normalized for word in ("ssd", "ram", "memoria", "arquitetura", "funciona", "funcionamento")):
-        return (
-            "Fatos do Brain-SSD (descreva sem prometer resultados medidos): "
-            "o modelo Qwen3-0.6B Q8_0 fica em um arquivo GGUF no disco e o llama.cpp faz inferência pela CPU. "
-            "A RAM é usada pelo processo, buffers e páginas mantidas pelo sistema operacional; RAM não é zero. "
-            "A base SSD de conhecimento contém documentos Python e SQLite, um índice e páginas brain.dat; "
-            "quando a recuperação está disponível e encontra conteúdo, apenas trechos selecionados entram no contexto. "
-            "No perfil economia, o processo de inferência termina após a resposta e a recuperação é aberta por consulta; "
-            "o cache de arquivos do Windows ainda pode manter dados na RAM. "
-            "Histórico e lembranças salvas voluntariamente ficam em SQLite local; isso não altera pesos do Qwen. "
-            "Não diga que consultou o SSD ou acessou uma fonte nesta resposta sem evidência de recuperação."
-        )
     if any(phrase in normalized for phrase in (
         "consegue fazer", "pode fazer", "sabe fazer", "capacidades", "funcionalidades",
         "funcoes", "recursos", "no que pode ajudar", "o que faz",
@@ -66,6 +54,18 @@ def brain_ssd_self_context(question: str) -> str:
             "Não tem internet, serviços remotos, acesso automático a arquivos pessoais ou controle do PC; "
             "não treina os pesos durante a conversa. É experimental e pode errar. "
             "Ao responder, apresente exemplos concretos do que faz e os limites, sem apenas oferecer ajuda."
+        )
+    if re.search(r"\b(ssd|ram|memoria|memorias|arquitetura|funciona|funcionamento)\b", normalized):
+        return (
+            "Fatos do Brain-SSD (descreva sem prometer resultados medidos): "
+            "o modelo Qwen3-0.6B Q8_0 fica em um arquivo GGUF no disco e o llama.cpp faz inferência pela CPU. "
+            "A RAM é usada pelo processo, buffers e páginas mantidas pelo sistema operacional; RAM não é zero. "
+            "A base SSD de conhecimento contém documentos Python e SQLite, um índice e páginas brain.dat; "
+            "quando a recuperação está disponível e encontra conteúdo, apenas trechos selecionados entram no contexto. "
+            "No perfil economia, o processo de inferência termina após a resposta e a recuperação é aberta por consulta; "
+            "o cache de arquivos do Windows ainda pode manter dados na RAM. "
+            "Histórico e lembranças salvas voluntariamente ficam em SQLite local; isso não altera pesos do Qwen. "
+            "Não diga que consultou o SSD ou acessou uma fonte nesta resposta sem evidência de recuperação."
         )
     return ""
 
