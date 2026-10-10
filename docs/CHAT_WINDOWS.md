@@ -237,16 +237,27 @@ se o preflight falhar, mostram itens ausentes e encerram sem iniciar um
 chat inutilizável. O comando não carrega o Qwen completo e não mexe em
 histórico/memórias.
 
-Execute manualmente no PowerShell, a partir da raiz do projeto:
+No Windows, **prefira duplo clique em `DIAGNOSTICAR-CHAT-WINDOWS.bat`**,
+localizado ao lado do atalho de memória. O BAT resolve a própria pasta do
+projeto e mostra qual interpretador foi selecionado.
+
+Se preferir PowerShell, entre **primeiro** na pasta real onde o projeto
+foi baixado (não apenas em `C:Users...Documents`):
 
 ```powershell
-py -3 tools/doctor_chat.py --profile economia --probe
+cd "C:\CAMINHO\REAL\DO\I.A"
+py -3.11 .\tools\doctor_chat.py --profile economia --probe
 ```
+
+O teste deve abrir o arquivo a partir de `tools`. Um erro
+`can't open file 'C:Users...Documents	oolsdoctor_chat.py'`
+é apenas **diretório errado**, não prova de GGUF corrompido. Se 3.11
+não estiver instalado, use o BAT ou o Python do ambiente virtual.
 
 
 No caso de erro, verifique `model_gguf_valid_header`,
 `model_plausible_size`, `cpu_runtime_found` e
-`native_probe_passed`. O terminal do chat e a resposta de status
+`probe_passed`. O terminal do chat e a resposta de status
 exibem códigos seguros como `MODEL_MISSING`, `MODEL_INVALID`,
 `CORE_MISSING` e `RUNTIME_UNREADABLE`.
 

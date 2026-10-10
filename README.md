@@ -77,12 +77,29 @@ O teste grava um relatório local em `results/chat_validation/latest-local-windo
 Se a interface abrir mas mostrar **"Não foi possível iniciar o modelo local"**,
 isso indica uma falha na preparação do Core — **não** confirma que o Qwen está
 funcionando. Atualize o código e use `DIAGNOSTICAR-CHAT-WINDOWS.bat`.
-Os dois scripts de chat executam agora o mesmo preflight automaticamente:
+Os atalhos de chat já fazem o diagnóstico automaticamente. **Não execute
+`tools/doctor_chat.py` a partir de `Documents` ou outra pasta sem antes
+entrar na raiz do repositório:** o caminho relativo pertence ao Brain-SSD.
+
+A opção mais simples é **abrir `DIAGNOSTICAR-CHAT-WINDOWS.bat` por duplo
+clique na pasta do projeto**. Ele próprio localiza a raiz, informa qual
+Python foi escolhido e verifica o GGUF e o llama.cpp.
+
+Para usar PowerShell manualmente, substitua o caminho ilustrativo pela pasta
+real que contém `tools` e `INICIAR-CHAT-MEMORIA-WINDOWS.bat`:
 
 ```powershell
+cd "C:\CAMINHO\REAL\DO\I.A"
 git pull --ff-only
-py -3 tools/doctor_chat.py --profile economia --probe
+py -3.11 .\tools\doctor_chat.py --profile economia --probe
 ```
+
+
+Se `py -3.11` não estiver instalado, você pode usar o ambiente
+`.venvScriptspython.exe` (quando existente) ou executar o BAT, que
+escolhe um Python disponível. `py -3` pode selecionar o Python 3.14;
+isso **não explica** um erro de arquivo ausente, mas a versão testada no CI
+é Python 3.11.
 
 Confira `model_gguf_valid_header`, `model_plausible_size`,
 `cpu_runtime_found` e `probe_passed`. Se faltar o modelo, coloque
