@@ -35,12 +35,12 @@ class TestOptionalSSD(unittest.TestCase):
         community=self.root/"third_party/llama.cpp/runtime-win-cpu-x64/bin/llama-completion.exe"
         community.parent.mkdir(parents=True)
         community.write_bytes(b"MZ community binary")
-        self.assertEqual(resolve_chat_completion(self.root),community)
+        self.assertEqual(resolve_chat_completion(self.root),community.resolve())
         frozen=resolve_llama_executable(self.root)
         self.assertNotEqual(frozen,community)
         runtime=LocalChatRuntime(self.root,profile="economia")
         try:
-            self.assertEqual(runtime.core_backend.runtime_path,community)
+            self.assertEqual(runtime.core_backend.runtime_path,community.resolve())
             self.assertEqual(runtime._completion_path,frozen)
         finally:
             runtime.close()

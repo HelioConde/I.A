@@ -93,7 +93,7 @@ class TestInstallationDoctor(unittest.TestCase):
                 report=inspect_installation(root,probe=True)
             self.assertFalse(report["probe_passed"])
             self.assertFalse(report["ready_for_test"])
-            self.assertTrue(any("executável está presente" in x for x in report["recommendations"]))
+            self.assertTrue(any("executável foi encontrado mas falhou" in x for x in report["recommendations"]))
             with patch("doctor_chat.MIN_PLAUSIBLE_GGUF_BYTES",1024),patch(
                 "doctor_chat.probe_llama", return_value={
                     "version_return_code":0,"devices_return_code":0,
