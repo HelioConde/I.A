@@ -9,6 +9,7 @@ on:
       - "src/brain_ssd/chat/**"
       - "tools/run_chat.py"
       - "tools/validate_chat_windows.py"
+      - "tools/validate_chat_quality_windows.py"
       - "tools/doctor_chat.py"
       - "tools/install_windows_chat.py"
       - "tests/test_install_windows_chat.py"
@@ -81,6 +82,9 @@ jobs:
           python -m unittest discover -s tests -p "test_compare_diagnostics.py" -v
           python -m unittest discover -s tests -p "test_chat_static_ui.py" -v
           python -m unittest discover -s tests -p "test_windows_launchers.py" -v
+      - name: Assert runtime unit tests independently
+        shell: pwsh
+        run: python -m unittest discover -s tests -p "test_chat_runtime.py" -v
       - name: Synthetic episodic negative controls
         shell: pwsh
         run: |
