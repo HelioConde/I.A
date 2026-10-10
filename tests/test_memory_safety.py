@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"src"))
 
 from brain_ssd.chat.episodic import EpisodicMemory
-from brain_ssd.chat.memory_safety import check_memory_ambiguities, _day_names
+from brain_ssd.chat.memory_safety import check_memory_ambiguities, _day_names, _calendar_dates, _times, _prices
 
 
 def episode(identifier, message):
@@ -51,6 +51,60 @@ class TestMemorySafety(unittest.TestCase):
              "confirmed":False,"source":"model_guess"},
         ]
         self.assertEqual(check_memory_ambiguities(records),[])
+
+    def test_different_calendar_dates_need_clarification(self):
+        notes=[
+            episode("a","Consulta veterinária gato 04/11/2026 na clínica"),
+            episode("b","Consulta veterinária gato 2026-11-05 na clínica"),
+        ]
+        issues=check_memory_ambiguities(notes)
+        self.assertEqual([x.category for x in issues],["POSSIBLE_DIFFERENT_DATE"])
+        self.assertEqual(_calendar_dates("31/02/2026"),frozenset())
+        self.assertEqual(_calendar_dates("2026-11-04"),frozenset({"2026-11-04"}))
+
+    def test_clock_formats_are_compared_conservatively(self):
+        notes=[
+            episode("a","Reunião projeto rover na biblioteca às 14h30"),
+            episode("b","Reunião projeto rover na biblioteca às 15:30"),
+        ]
+        self.assertEqual([x.category for x in check_memory_ambiguities(notes)],
+                         ["POSSIBLE_DIFFERENT_TIME"])
+        self.assertEqual(_times("14h00"),_times("14:00"))
+        self.assertEqual(_times("14h"),frozenset({"14:00"}))
+
+    def test_prices_are_brl_only_and_never_infer_truth(self):
+        notes=[
+            episode("a","Preço arroz integral marca norte R$ 12,50"),
+            episode("b","Preço arroz integral marca norte R$ 13,90"),
+        ]
+        issues=check_memory_ambiguities(notes)
+        self.assertEqual(len(issues),1)
+        self.assertEqual(issues[0].category,"POSSIBLE_DIFFERENT_PRICE")
+        self.assertEqual(_prices("R$ 1.299,90"),frozenset({129990}))
+        self.assertEqual(_prices("US$ 9,90"),frozenset())
+        self.assertEqual(_prices("R$ 12,50"),frozenset({1250}))
+
+    def test_multi_values_and_disconnected_topics_do_not_trigger(self):
+        notes=[
+            episode("a","Preço arroz integral marca norte R$ 12,50 ou R$ 13,90"),
+            episode("b","Preço arroz integral marca norte R$ 15,00"),
+        ]
+        self.assertEqual(check_memory_ambiguities(notes),[])
+        unrelated=[
+            episode("a","Reunião do conselho bairro 14h"),
+            episode("b","Consulta médica rotina 15h"),
+        ]
+        self.assertEqual(check_memory_ambiguities(unrelated),[])
+
+    def test_duplicate_day_and_price_conflicts_are_only_warnings(self):
+        notes=[
+            episode("a","Oferta arroz integral terça R$ 12,50"),
+            episode("b","Oferta arroz integral quinta R$ 14,50"),
+        ]
+        issues=check_memory_ambiguities(notes)
+        self.assertEqual({x.category for x in issues},
+                         {"POSSIBLE_DIFFERENT_WEEKDAY","POSSIBLE_DIFFERENT_PRICE"})
+        self.assertEqual(len(notes),2)
 
     def test_deleted_notes_no_longer_participate(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -300,7 +300,7 @@ async function send() {
         if (Number(payload.episodic_ambiguities_detected) > 0) {
           const notice = document.createElement("p");
           notice.className = "memory-conflict-warning";
-          notice.textContent = "Há lembranças com datas possivelmente diferentes. Confirme a qual evento a pergunta se refere.";
+          notice.textContent = "Há lembranças com datas, horários ou valores possivelmente diferentes. Confirme a qual evento ou informação a pergunta se refere.";
           pending.querySelector(".message-body").appendChild(notice);
         }
         app.messages.push({role:"assistant", content:payload.answer});

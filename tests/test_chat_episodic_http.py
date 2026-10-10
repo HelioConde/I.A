@@ -131,6 +131,24 @@ class TestEngine(unittest.TestCase):
         with self.assertRaises(ValueError):
             ChatEngine(FakeRuntime,memory_aliases=True)
 
+    def test_prices_warn_with_two_confirmed_notes_in_prompt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            mem=EpisodicMemory(Path(temp)/"notes.sqlite3")
+            first=mem.add("Preço arroz integral marca norte R$ 12,50")
+            second=mem.add("Preço arroz integral marca norte R$ 13,90")
+            core=FakeRuntime()
+            engine=ChatEngine(lambda:core,episodic_store=mem)
+            engine.start()
+            try:
+                result=engine.ask("Qual preço arroz integral marca norte?",[])
+                self.assertEqual(result["episodic_ambiguities_detected"],1)
+                text=core.core_backend.prompts[-1]
+                self.assertIn("preços diferentes",text)
+                self.assertIn(first["id"],text)
+                self.assertIn(second["id"],text)
+            finally:
+                engine.close()
+
     def test_disabled_by_default(self):
         engine=ChatEngine(FakeRuntime)
         engine.start()

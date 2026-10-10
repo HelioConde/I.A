@@ -131,3 +131,14 @@ original. A quantidade de notas trazidas apenas por sinônimos aparece nas
 métricas da resposta e no JSONL local como contagem — sem conteúdo textual.
 O recurso precisa de testes A/B e validação com o Qwen físico antes de uma
 eventual promoção para padrão.
+
+### Alertas adicionais de conflito (conservadores)
+
+Além de dias da semana, o diagnóstico reconhece diferenças entre duas
+memórias explicitamente confirmadas sobre o **mesmo assunto aparente** em
+datas ISO/DD/MM/AAAA, horários (ex.: 14h30 × 15:30) e preços com prefixo
+`R$` brasileiro. A regra exige pelo menos dois termos de assunto comuns
+e exatamente um valor explícito de cada categoria por nota. Isso reduz
+alertas incorretos, mas perde casos sem texto coincidente.
+Não interpreta valores em moedas estrangeiras, não reconcilia eventos,
+não prova inconsistência factual e não escolhe uma das notas como verdadeira.
