@@ -142,3 +142,12 @@ e exatamente um valor explícito de cada categoria por nota. Isso reduz
 alertas incorretos, mas perde casos sem texto coincidente.
 Não interpreta valores em moedas estrangeiras, não reconcilia eventos,
 não prova inconsistência factual e não escolhe uma das notas como verdadeira.
+
+### Proteção quando o contexto é insuficiente
+
+Um orçamento reduzido pode permitir colocar **apenas uma** das duas notas
+possivelmente divergentes no prompt. O chat agora evita escolher
+silenciosamente uma delas: se não couberem as duas fontes **e o aviso**
+de incerteza, retira as notas disputadas do prompt e informa no retorno
+`episodic_ambiguities_withheld=true`. Esse mecanismo sacrifica cobertura
+para não apresentar evidência parcial como verdade única.

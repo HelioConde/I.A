@@ -317,13 +317,39 @@ class ChatEngine:
                 for item in episodes
             )
             if ambiguities:
-                # Explicit uncertainty, no automatic truth selection or edits.
+                # Explain competing notes instead of blindly selecting the
+                # highest-ranked or most recent episode as the single truth.
                 episode_text = AMBIGUITY_PROMPT + "\n" + episode_text
+            budget = getattr(self._runtime, "prompt_budget_bytes", 8000)
             prompt, history_used, evidence_bytes = bounded_chat_prompt(
-                question, history, knowledge,
-                getattr(self._runtime, "prompt_budget_bytes", 8000),
+                question, history, knowledge, budget,
                 episode_context=episode_text,
             )
+            withheld_conflicts = False
+            if ambiguities:
+                # With limited context the prompt builder may retain just ONE
+                # of two differing notes. That would silently favor it.
+                # Keep a disputed pair ONLY when *both* notes and the
+                # uncertainty notice actually survived prompt budgeting.
+                enough_evidence = (
+                    AMBIGUITY_PROMPT in prompt and
+                    all(all(source_id in prompt for source_id in warning.source_ids)
+                        for warning in ambiguities)
+                )
+                if not enough_evidence:
+                    withheld_conflicts = True
+                    disputed_ids = {
+                        source_id for warning in ambiguities
+                        for source_id in warning.source_ids
+                    }
+                    safe_text = "\n".join(
+                        "[episodio=" + item["id"] + "] " + json.dumps(item["content"], ensure_ascii=False)
+                        for item in episodes if item["id"] not in disputed_ids
+                    )
+                    prompt, history_used, evidence_bytes = bounded_chat_prompt(
+                        question, history, knowledge, budget,
+                        episode_context=safe_text,
+                    )
             if self.diagnostics:
                 self.diagnostics.emit("chat.prompt", request_id=request_id,
                     prompt_utf8_bytes=len(prompt.encode("utf-8")),
@@ -380,6 +406,7 @@ class ChatEngine:
                 "sources_from_ssd": len(retrieval.get("sources", [])) if (retrieval and evidence_bytes) else 0,
                 "episodic_memories_used": sum(1 for episode in episodes if episode["id"] in prompt),
                 "episodic_ambiguities_detected": len(ambiguities),
+                "episodic_ambiguities_withheld": withheld_conflicts,
                 "episodic_alias_matches_used": sum(
                     item.get("match_mode") == "SEMANTIC_ALIAS" and item["id"] in prompt
                     for item in episodes),

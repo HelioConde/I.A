@@ -149,6 +149,52 @@ class TestEngine(unittest.TestCase):
             finally:
                 engine.close()
 
+    def test_conflicting_notes_are_withheld_if_warning_cannot_fit(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store=EpisodicMemory(Path(temp)/"memory.sqlite3")
+            long_tail=" detalhes" * 42
+            a=store.add("Reunião projeto rover terça biblioteca norte" + long_tail)
+            b=store.add("Reunião projeto rover quinta biblioteca norte" + long_tail)
+            runtime=FakeRuntime()
+            runtime.prompt_budget_bytes=950
+            engine=ChatEngine(lambda:runtime,episodic_store=store)
+            engine.start()
+            try:
+                result=engine.ask("Qual dia da reunião projeto rover biblioteca?",[])
+                prompt=runtime.core_backend.prompts[-1]
+                self.assertEqual(result["episodic_ambiguities_detected"],1)
+                self.assertTrue(result["episodic_ambiguities_withheld"])
+                self.assertNotIn(a["id"],prompt)
+                self.assertNotIn(b["id"],prompt)
+                self.assertEqual(result["episodic_memories_used"],0)
+                self.assertLessEqual(len(prompt.encode("utf-8")),950)
+            finally:
+                engine.close()
+
+    def test_persisted_alias_memory_survives_engine_restart_and_deletion(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/"episodic.sqlite3"
+            first_store=EpisodicMemory(path)
+            item=first_store.add("A reunião do cachorro será no sábado")
+            engine1=ChatEngine(FakeRuntime,episodic_store=first_store,memory_aliases=True)
+            engine1.start()
+            self.assertEqual(engine1.ask("Quando é o encontro do cão?",[])["episodic_memories_used"],1)
+            engine1.close()
+            reopened=EpisodicMemory(path)
+            second_runtime=FakeRuntime()
+            engine2=ChatEngine(lambda:second_runtime,episodic_store=reopened,memory_aliases=True)
+            engine2.start()
+            try:
+                result=engine2.ask("Quando é o encontro do cão?",[])
+                self.assertEqual(result["episodic_memories_used"],1)
+                self.assertIn(item["id"],second_runtime.core_backend.prompts[-1])
+                self.assertTrue(reopened.delete(item["id"]))
+                later=engine2.ask("Quando é o encontro do cão?",[])
+                self.assertEqual(later["episodic_memories_used"],0)
+                self.assertNotIn(item["id"],second_runtime.core_backend.prompts[-1])
+            finally:
+                engine2.close()
+
     def test_disabled_by_default(self):
         engine=ChatEngine(FakeRuntime)
         engine.start()
