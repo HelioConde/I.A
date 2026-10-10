@@ -36,6 +36,33 @@ class TestInstallationDoctor(unittest.TestCase):
             self.assertFalse(second["optional_ssd"]["available"])
             self.assertEqual(second["status"], "READY_FOR_REAL_INFERENCE_TEST")
 
+    def test_existing_executable_can_fail_to_start(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            model=root/"models"/"Qwen3-0.6B-Q8_0.gguf"
+            model.parent.mkdir(parents=True)
+            model.write_bytes(b"GGUF"+b"\0"*2048)
+            exe=root/"third_party/llama.cpp/build-win/bin/llama-completion.exe"
+            exe.parent.mkdir(parents=True)
+            exe.write_bytes(b"MZ")
+            exe.with_suffix("").write_bytes(b"ELF")
+            with patch("doctor_chat.MIN_PLAUSIBLE_GGUF_BYTES",1024),patch(
+                "doctor_chat.probe_llama", return_value={
+                    "version_return_code":1,"devices_return_code":1,
+                    "cpu_only_build":False,"error":"native DLL absent"
+                }):
+                report=inspect_installation(root,probe=True)
+            self.assertFalse(report["probe_passed"])
+            self.assertFalse(report["ready_for_test"])
+            self.assertTrue(any("executável está presente" in x for x in report["recommendations"]))
+            with patch("doctor_chat.MIN_PLAUSIBLE_GGUF_BYTES",1024),patch(
+                "doctor_chat.probe_llama", return_value={
+                    "version_return_code":0,"devices_return_code":0,
+                    "cpu_only_build":True
+                }):
+                ok=inspect_installation(root,probe=True)
+            self.assertTrue(ok["ready_for_test"])
+
 
 if __name__ == "__main__":
     unittest.main()

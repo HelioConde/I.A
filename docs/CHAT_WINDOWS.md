@@ -222,3 +222,37 @@ A API do chat e os eventos de streaming não incluem mensagens brutas de
 exceções do `llama.cpp` ou caminhos locais. Erros inesperados retornam
 mensagens genéricas; o log diagnóstico registra **apenas o tipo da falha**.
 Erros de validação de notas permanecem legíveis para permitir correção do usuário.
+
+## Erro "Não foi possível iniciar o modelo local" (diagnóstico seguro)
+
+**O servidor HTTP abrir não significa que o modelo GGUF foi carregado.**
+O chat inicia o Core em uma thread separada e o estado `error` pode
+resultar de modelo GGUF ausente/corrompido, binário llama-completion
+ausente ou erro de execução/dependência no Windows.
+
+Os arquivos **INICIAR-CHAT-WINDOWS.bat** e
+**INICIAR-CHAT-MEMORIA-WINDOWS.bat** agora executam o preflight com
+`doctor_chat.py --profile economia --probe` **antes** de abrir o navegador;
+se o preflight falhar, mostram itens ausentes e encerram sem iniciar um
+chat inutilizável. O comando não carrega o Qwen completo e não mexe em
+histórico/memórias.
+
+Execute manualmente no PowerShell, a partir da raiz do projeto:
+
+```powershell
+py -3 tools/doctor_chat.py --profile economia --probe
+```
+
+
+No caso de erro, verifique `model_gguf_valid_header`,
+`model_plausible_size`, `cpu_runtime_found` e
+`native_probe_passed`. O terminal do chat e a resposta de status
+exibem códigos seguros como `MODEL_MISSING`, `MODEL_INVALID`,
+`CORE_MISSING` e `RUNTIME_UNREADABLE`.
+
+**Não baixe um GGUF do GitHub Actions:** os artefatos de CI contêm o
+launcher .NET e diagnósticos simulados, não o modelo ou as dependências
+nativas do llama.cpp. Se o preflight passar e a inferência falhar, envie
+somente o ZIP gerado por `python tools/export_diagnostics.py`
+para analisar as categorias de erro. Não compartilhe senhas ou caminhos
+privados em capturas de terminal. O teste com o Qwen real continua necessário.

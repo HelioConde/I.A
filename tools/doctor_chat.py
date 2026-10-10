@@ -45,6 +45,12 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
             }
         except (OSError, TimeoutError) as exc:
             runtime_probe = {"error": str(exc)}
+    probe_passed = True
+    if probe:
+        probe_passed = bool(runtime_probe is not None
+                            and not runtime_probe.get("error")
+                            and runtime_probe.get("version_return_code") == 0
+                            and runtime_probe.get("devices_return_code") == 0)
     manifest = (root / MANIFEST_RELATIVE).is_file()
     index = (root / INDEX_RELATIVE).is_file()
     data_file = (root / MANIFEST_RELATIVE).with_name("brain.dat").is_file()
@@ -67,11 +73,14 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
         recommendations.append("O corpus SSD está incompleto. O chat simples ainda poderá funcionar; a recuperação de conhecimento ficará desativada.")
     if model_exists and model_size < MIN_PLAUSIBLE_GGUF_BYTES:
         recommendations.append("O arquivo GGUF está pequeno demais para o Qwen3-0.6B Q8_0; confirme download completo.")
+    if probe and not probe_passed:
+        recommendations.append("O executável está presente mas falhou ao iniciar ou responder ao probe. Verifique DLLs do Visual C++/antivírus e a compilação do llama.cpp.")
     if runtime_probe and (runtime_probe.get("error") or runtime_probe.get("cpu_only_build") is False):
         recommendations.append("Verifique se o binário executa corretamente e está compilado em modo CPU-only.")
     return {
-        "status": "READY_FOR_REAL_INFERENCE_TEST" if all(required.values()) else "MISSING_REQUIREMENTS",
-        "ready_for_test": all(required.values()),
+        "status": "READY_FOR_REAL_INFERENCE_TEST" if all(required.values()) and probe_passed else "MISSING_REQUIREMENTS",
+        "ready_for_test": all(required.values()) and probe_passed,
+        "probe_passed": probe_passed if probe else None,
         "profile": profile,
         "runtime_mode": mode,
         "platform": sys.platform,
