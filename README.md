@@ -42,3 +42,11 @@ Para testar uma pergunta verdadeira localmente, execute:
     python tools/validate_chat_windows.py --profile economia
 
 O CI simula o Core e não prova qualidade nem inferência com o GGUF.
+
+## Chat incremental e interrupção
+
+O chat exibe progressivamente o texto emitido pelo Core e dispõe do botão **Parar**.
+O backend encerra a geração e não salva respostas interrompidas. O histórico
+permanece somente no SQLite local. Consulte [CHAT_WINDOWS.md](docs/CHAT_WINDOWS.md).
+O CI valida o protocolo com backends de teste e encerramento real de processos,
+mas não possui o modelo Qwen; ainda falta um teste completo no Windows do usuário.

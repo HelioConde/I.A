@@ -16,11 +16,12 @@ congelados das Fases 1–4D, sem reivindicar a validação física 4E.
 ## Iniciar no Windows
 
 Requisitos: Windows 10/11 x64; Python 3.11+; o projeto completo; runtime
-llama.cpp CPU-only e modelo Qwen3-0.6B-Q8_0.gguf locais; corpus/índice Brain-SSD.
+llama.cpp CPU-only e modelo Qwen3-0.6B-Q8_0.gguf locais. O corpus/índice
+Brain-SSD é opcional para conversar, mas necessário para retrieval SSD.
 
 1. Dê dois cliques em **INICIAR-CHAT-WINDOWS.bat**, na raiz do projeto.
 2. O terminal inicia o servidor em loopback e abre o navegador.
-3. Acesse **http://127.0.0.1:8766**. Quando aparecer "Modelo local pronto",
+3. Acesse **http://127.0.0.1:8766**. Quando aparecer "Modelo encontrado",
    digite "Olá" e pressione Enter. A resposta virá da IA local.
 4. Mantenha o terminal aberto. Ctrl+C encerra a aplicação.
 
@@ -44,16 +45,16 @@ em Program.cs. Até recompilar, use o arquivo .bat.
 
 - Frontend e API: apenas 127.0.0.1:8766; POST exige Origin local. Não
   exponha a porta por túnel ou encaminhamento.
-- Histórico temporário só na aba; a UI envia até 8 mensagens recentes para
-  o prompt local. Não há armazenamento de conversas em nuvem.
+- Histórico SQLite local persistente, salvo fora do GitHub. O servidor inclui
+  até 8 mensagens recentes no prompt. Nenhuma conversa vai para a nuvem.
 - O Core executa CPU-only com --device none. RAM e velocidade reais
   dependem da máquina e da pergunta. GPU dedicada não é necessária.
 - O modo subprocesso recarrega o modelo por pergunta (mais lento).
   --core-mode persistent é experimental e depende de llama-server local.
 - Medidas de working set não comprovam leitura física do SSD.
 - Se o runtime estiver ausente, a tela informa a falha; não simula respostas.
-- O MVP ainda não tem streaming de tokens, cancelamento no meio da geração,
-  nem instalador autônomo.
+- O chat tem streaming incremental e botão Parar. Ainda não possui
+  instalador autônomo, nem medição validada de desempenho em hardware alvo.
 
 ## Arquivos e teste
 
@@ -97,7 +98,7 @@ A mensagem inicial de modelo encontrado significa apenas preflight de arquivos;
 a confirmação de inferência aparece depois da primeira resposta verdadeira.
 A Action de Windows executa testes simulados e compila o launcher .NET,
 mas não contém Qwen/llama.cpp; ela não substitui o teste real.
-O instalador autônomo e o streaming de tokens continuam pendentes.
+O instalador autônomo permanece pendente.
 
 
 ## Histórico persistente e conversas locais
@@ -114,7 +115,7 @@ Se desejar outro local, inicie com --history-db "C:\meus-dados\brain.sqlite3".
 A exclusão remove a conversa do banco, mas não garante eliminação forense
 dos blocos físicos no SSD. Não sincronize nem versiona este arquivo por engano.
 
-A interface continua sem streaming real de tokens e sem instalador independente.
+O streaming de tokens está implementado na interface. Ainda não existe instalador independente.
 
 
 ## Diagnóstico de instalação em um clique
