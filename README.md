@@ -1,5 +1,7 @@
 # Brain-SSD
 
+**Auditoria e próximas prioridades:** [Reavaliação geral (10/10/2026)](docs/AUDITORIA_GERAL_2026-10-10.md)
+
 ## Objetivo 1: Chat visual no Windows
 
 Para conversar com a IA local, abra **INICIAR-CHAT-WINDOWS.bat** e digite
