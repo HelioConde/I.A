@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MIN_PLAUSIBLE_GGUF_BYTES = 64 * 1024 * 1024
 sys.path.insert(0, str(ROOT / "src"))
 
-from brain_ssd.chat.runtime import PROFILES
+from brain_ssd.chat.runtime import PROFILES, resolve_chat_completion, resolve_chat_server
 from brain_ssd.local_runtime.backend import probe_llama, resolve_llama_executable
 from brain_ssd.local_runtime.core_backend import resolve_server_executable
 from brain_ssd.local_runtime.pipeline import INDEX_RELATIVE, MANIFEST_RELATIVE, MODEL_RELATIVE
@@ -40,7 +40,7 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
             pass
     mode = PROFILES[profile]["mode"]
     try:
-        executable = resolve_server_executable(root) if mode == "persistent" else resolve_llama_executable(root)
+        executable = resolve_chat_server(root) if mode == "persistent" else resolve_chat_completion(root)
         runtime_present = True
         runtime_error = None
     except FileNotFoundError as exc:
@@ -84,12 +84,14 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
         recommendations.append("O arquivo de modelo existe, mas não tem cabeçalho GGUF válido.")
     if not runtime_present:
         recommendations.append("Configure/compile o llama.cpp CPU-only (" + ("llama-server.exe" if mode == "persistent" else "llama-completion.exe") + ").")
+    if not model_exists or not runtime_present:
+        recommendations.append("Preparação opcional: execute PREPARAR-CHAT-WINDOWS.bat na raiz do projeto, com sua confirmação.")
     if not (manifest and index and data_file):
         recommendations.append("O corpus SSD está incompleto. O chat simples ainda poderá funcionar; a recuperação de conhecimento ficará desativada.")
     if model_exists and model_size < MIN_PLAUSIBLE_GGUF_BYTES:
         recommendations.append("O arquivo GGUF está pequeno demais para o Qwen3-0.6B Q8_0; confirme download completo.")
-    if probe and not probe_passed:
-        recommendations.append("O executável está presente mas falhou ao iniciar ou responder ao probe. Verifique DLLs do Visual C++/antivírus e a compilação do llama.cpp.")
+    if probe and runtime_present and not probe_passed:
+        recommendations.append("O executável foi encontrado mas falhou no probe. Verifique DLLs do Visual C++/antivírus e a compilação do llama.cpp.")
     if runtime_probe and (runtime_probe.get("error") or runtime_probe.get("cpu_only_build") is False):
         recommendations.append("Verifique se o binário executa corretamente e está compilado em modo CPU-only.")
     return {
@@ -101,7 +103,9 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
         "platform": sys.platform,
         "root": str(root),
         "model": {"path": str(expected_model), "present": model_exists, "size_bytes": model_size, "gguf_header": model_magic},
-        "runtime": {"path": str(executable) if executable else None, "found": runtime_present, "error": runtime_error, "probe": runtime_probe},
+        "runtime": {"path": str(executable) if executable else None, "found": runtime_present,
+                    "distribution": ("official_cpu" if executable and "runtime-win-cpu-x64" in executable.parts else "frozen_or_legacy"),
+                    "error": runtime_error, "probe": runtime_probe},
         "optional_ssd": {"manifest": manifest, "index": index, "brain_data": data_file, "available": manifest and index and data_file},
         "required": required,
         "recommendations": recommendations,

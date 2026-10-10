@@ -14,6 +14,26 @@ from brain_ssd.local_runtime.pipeline import (
 )
 
 MIN_PLAUSIBLE_GGUF_BYTES = 64 * 1024 * 1024
+COMMUNITY_RUNTIME = Path("third_party/llama.cpp/runtime-win-cpu-x64/bin")
+
+
+def resolve_chat_completion(root: Path) -> Path:
+    """Interactive chat supports a verified official release as fallback.
+
+    The frozen research backend still resolves its own pinned checkout;
+    the community release is isolated from those canonical measurements.
+    """
+    candidate = Path(root) / COMMUNITY_RUNTIME / "llama-completion.exe"
+    if candidate.is_file():
+        return candidate.resolve()
+    return resolve_llama_executable(root)
+
+
+def resolve_chat_server(root: Path) -> Path:
+    candidate = Path(root) / COMMUNITY_RUNTIME / "llama-server.exe"
+    if candidate.is_file():
+        return candidate.resolve()
+    return resolve_server_executable(root)
 
 PROFILES = {
     "economia": {"threads": 2, "context_size": 2048, "mode": "subprocess", "knowledge_budget": 1200, "prompt_budget_bytes": 3600},
@@ -58,7 +78,7 @@ class LocalChatRuntime:
         )
         if self.core_mode == "persistent":
             try:
-                executable = resolve_server_executable(self.root)
+                executable = resolve_chat_server(self.root)
             except FileNotFoundError as exc:
                 raise ChatStartupError("SERVER_MISSING") from exc
             self.core_backend = PersistentCoreBackend(
@@ -71,11 +91,16 @@ class LocalChatRuntime:
                 pass  # Optional SSD retrieval is unavailable without the frozen CLI.
         else:
             try:
-                self._completion_path = resolve_llama_executable(self.root)
+                executable = resolve_chat_completion(self.root)
             except FileNotFoundError as exc:
                 raise ChatStartupError("CORE_MISSING") from exc
+            try:
+                # The research-grade SSD corpus still uses the frozen Core.
+                self._completion_path = resolve_llama_executable(self.root)
+            except FileNotFoundError:
+                self._completion_path = None
             self.core_backend = SubprocessPerQueryCore(
-                self._completion_path, self.model_path,
+                executable, self.model_path,
                 threads=int(settings["threads"]), context_size=int(settings["context_size"]),
             )
 
@@ -84,6 +109,9 @@ class LocalChatRuntime:
         return {
             "profile": self.profile,
             "core_mode": self.core_mode,
+            "interactive_runtime": ("official_cpu_distribution"
+                if COMMUNITY_RUNTIME in self.core_backend.runtime_path.parents
+                else "frozen_checkout"),
             "threads": PROFILES[self.profile]["threads"],
             "prompt_budget_bytes": self.prompt_budget_bytes,
             "knowledge_cache": "per_query" if self.profile == "economia" else "session",

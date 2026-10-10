@@ -29,6 +29,38 @@ class TestOptionalSSD(unittest.TestCase):
     def tearDown(self):
         self.directory.cleanup()
 
+    def test_official_runtime_fallback_is_isolated_from_frozen_backend(self):
+        from brain_ssd.chat.runtime import resolve_chat_completion
+        from brain_ssd.local_runtime.backend import resolve_llama_executable
+        community=self.root/"third_party/llama.cpp/runtime-win-cpu-x64/bin/llama-completion.exe"
+        community.parent.mkdir(parents=True)
+        community.write_bytes(b"MZ community binary")
+        self.assertEqual(resolve_chat_completion(self.root),community)
+        frozen=resolve_llama_executable(self.root)
+        self.assertNotEqual(frozen,community)
+        runtime=LocalChatRuntime(self.root,profile="economia")
+        try:
+            self.assertEqual(runtime.core_backend.runtime_path,community)
+            self.assertEqual(runtime._completion_path,frozen)
+        finally:
+            runtime.close()
+
+    def test_community_runtime_works_without_frozen_checkout(self):
+        from brain_ssd.chat.runtime import resolve_chat_completion
+        frozen=self.root/"third_party/llama.cpp/build-win/bin/llama-completion.exe"
+        frozen.unlink()
+        community=self.root/"third_party/llama.cpp/runtime-win-cpu-x64/bin/llama-completion.exe"
+        community.parent.mkdir(parents=True)
+        community.write_bytes(b"MZ community binary")
+        self.assertEqual(resolve_chat_completion(self.root),community)
+        runtime=LocalChatRuntime(self.root,profile="economia")
+        try:
+            self.assertIsNone(runtime._completion_path)
+            self.assertFalse(runtime.status()["knowledge_available"])
+            self.assertEqual(runtime.core_backend.runtime_path,community)
+        finally:
+            runtime.close()
+
     def test_all_profiles_have_complete_budgets(self):
         for name, values in PROFILES.items():
             with self.subTest(profile=name):

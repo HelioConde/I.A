@@ -36,6 +36,26 @@ class TestInstallationDoctor(unittest.TestCase):
             self.assertFalse(second["optional_ssd"]["available"])
             self.assertEqual(second["status"], "READY_FOR_REAL_INFERENCE_TEST")
 
+    def test_absent_runtime_does_not_claim_it_failed_to_start(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            report=inspect_installation(root,probe=True)
+            text=" ".join(report["recommendations"])
+            self.assertFalse(report["runtime"]["found"])
+            self.assertNotIn("executável está presente mas falhou",text)
+            self.assertNotIn("executável foi encontrado mas falhou",text)
+            self.assertIn("PREPARAR-CHAT-WINDOWS.bat",text)
+
+    def test_community_runtime_is_discovered_without_frozen_build(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            community=root/"third_party/llama.cpp/runtime-win-cpu-x64/bin/llama-completion.exe"
+            community.parent.mkdir(parents=True)
+            community.write_bytes(b"MZ")
+            result=inspect_installation(root,probe=False)
+            self.assertTrue(result["runtime"]["found"])
+            self.assertEqual(result["runtime"]["distribution"],"official_cpu")
+
     def test_unreadable_gguf_is_reported_without_crashing(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
