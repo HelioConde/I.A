@@ -1,6 +1,7 @@
 """Consolidation never promotes or fabricates knowledge without human review."""
 from __future__ import annotations
 import sys
+import contextlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -82,7 +83,7 @@ class TestOfflineConsolidation(unittest.TestCase):
         root=Path(self.temp.name)
         legacy=root/"legacy-review.sqlite3"
         candidate=str(uuid.uuid4())
-        with sqlite3.connect(legacy) as db:
+        with contextlib.closing(sqlite3.connect(legacy)) as db:
             db.execute("CREATE TABLE review_candidates (id TEXT PRIMARY KEY, "
                        "source_ids TEXT NOT NULL, shared_cues TEXT NOT NULL, "
                        "summary TEXT, state TEXT NOT NULL, created_at INTEGER NOT NULL, "
@@ -98,7 +99,7 @@ class TestOfflineConsolidation(unittest.TestCase):
         created=migrated.create_draft([self.a["id"],self.b["id"]])
         reviewed=migrated.review(created["id"],"approve","Resumo novo e conferido")
         self.assertEqual(reviewed["effective_state"],"REVIEWED")
-        with sqlite3.connect(legacy) as db:
+        with contextlib.closing(sqlite3.connect(legacy)) as db:
             self.assertIn("source_versions",{row[1] for row in db.execute("PRAGMA table_info(review_candidates)")})
 
     def test_rejection_and_reopen_are_persistent(self):

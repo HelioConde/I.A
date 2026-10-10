@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+import contextlib
 import tempfile
 import time
 import unittest
@@ -175,7 +176,7 @@ class TestReversiblePlasticity(unittest.TestCase):
         import sqlite3
         import uuid
         legacy=Path(self.tmp.name)/"legacy-feedback.sqlite3"
-        with sqlite3.connect(legacy) as db:
+        with contextlib.closing(sqlite3.connect(legacy)) as db:
             db.execute("CREATE TABLE feedback (id TEXT PRIMARY KEY, episode_id TEXT NOT NULL, "
                        "signal INTEGER NOT NULL, created_at INTEGER NOT NULL, revoked_at INTEGER)")
             db.execute("INSERT INTO feedback VALUES (?,?,?,?,NULL)",
@@ -185,7 +186,7 @@ class TestReversiblePlasticity(unittest.TestCase):
         for _ in range(3):
             migrated.add_feedback(self.a["id"],-1)
         self.assertLess(migrated.shadow_bias(self.a["id"])["bias"],0)
-        with sqlite3.connect(legacy) as db:
+        with contextlib.closing(sqlite3.connect(legacy)) as db:
             self.assertIn("source_version",{row[1] for row in db.execute("PRAGMA table_info(feedback)")})
 
     def test_bad_feedback_and_unknown_memory(self):
