@@ -10,6 +10,7 @@ on:
       - "tests/test_install_windows_chat.py"
       - "PREPARAR-CHAT-WINDOWS.bat"
       - "tests/test_chat_windows.py"
+      - "tests/test_chat_local_actions.py"
       - "tests/test_chat_history.py"
       - "tests/test_chat_doctor.py"
       - "tests/test_startup_diagnostics.py"
@@ -48,6 +49,7 @@ on:
       - "src/brain_ssd/chat/**"
       - "tools/run_chat.py"
       - "tests/test_chat_windows.py"
+      - "tests/test_chat_local_actions.py"
 jobs:
   chat-unit:
     runs-on: ubuntu-latest
@@ -63,6 +65,7 @@ jobs:
       - name: Test HTTP and chat adapter with mock CPU Core
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
+          python -m unittest discover -s tests -p "test_chat_local_actions.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
           python -m unittest discover -s tests -p "test_chat_doctor.py" -v
           python -m unittest discover -s tests -p "test_install_windows_chat.py" -v
