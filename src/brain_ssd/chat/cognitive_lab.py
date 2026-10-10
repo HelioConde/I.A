@@ -236,3 +236,90 @@ class GridWorld:
                   "goal_reached": reached, "finished": self.finished}
         self.trace.append(result)
         return result
+
+
+class TabularActionLearner:
+    """Tiny Q-learner restricted to the synthetic GridWorld action vocabulary.
+
+    Learns task-specific action values from observations and rewards; does NOT
+    learn natural language, control devices or inspect the user's computer.
+    """
+    def __init__(self, seed: int = 17, learning_rate: float = .35,
+                 discount: float = .95) -> None:
+        import random
+        if not 0 < learning_rate <= 1 or not 0 <= discount <= 1:
+            raise ValueError("Invalid learning parameters")
+        self.random = random.Random(seed)
+        self.learning_rate = learning_rate
+        self.discount = discount
+        self.q: dict[tuple[int, int, str], float] = {}
+        self.updates = 0
+        self.actions = tuple(GridWorld._MOVES)
+        self._max_states = 30 * 30 * 4
+
+    @staticmethod
+    def state(observation: dict[str, Any]) -> tuple[int, int]:
+        return tuple(observation["position"])
+
+    def choose(self, observation: dict[str, Any], epsilon: float = 0) -> str:
+        if not 0 <= epsilon <= 1:
+            raise ValueError("Invalid exploration rate")
+        state = self.state(observation)
+        if self.random.random() < epsilon:
+            return self.random.choice(self.actions)
+        # Stable tie-breaking. Policy has no access to the world wall map.
+        return max(self.actions, key=lambda a: self.q.get((*state, a), 0.0))
+
+    def learn(self, observation: dict[str, Any], action: str, reward: float,
+              next_observation: dict[str, Any], terminal: bool) -> dict[str, float]:
+        if action not in self.actions:
+            raise ValueError("Invalid sandbox action")
+        if not math.isfinite(reward) or not -1 <= reward <= 1:
+            raise ValueError("Invalid feedback reward")
+        key = (*self.state(observation), action)
+        value = self.q.get(key, 0.0)
+        target = reward
+        if not terminal:
+            state = self.state(next_observation)
+            target += self.discount * max(self.q.get((*state, a), 0.0) for a in self.actions)
+        delta = target - value
+        if len(self.q) < self._max_states or key in self.q:
+            self.q[key] = value + self.learning_rate * delta
+        else:
+            raise ValueError("Sandbox learning budget exhausted")
+        self.updates += 1
+        return {"prediction_error": delta, "old_value": value, "new_value": self.q[key]}
+
+    def train(self, episodes: int = 300, epsilon: float = .25) -> dict[str, Any]:
+        if not 1 <= episodes <= 500 or not 0 <= epsilon <= 1:
+            raise ValueError("Training budget exceeded")
+        completed = 0
+        for _ in range(episodes):
+            world = GridWorld()
+            for step in range(100):
+                before = world.observe()
+                action = self.choose(before,epsilon)
+                outcome = world.step(action)
+                next_state = world.observe()
+                self.learn(before,action,outcome["reward"],next_state,world.finished)
+                if world.finished:
+                    completed += int(outcome["goal_reached"])
+                    break
+        return {"episodes": episodes, "reached_goal": completed,
+                "updates": self.updates, "q_values": len(self.q),
+                "environment": "SYNTHETIC_GRIDWORLD_ONLY",
+                "model_weights_changed": False}
+
+    def evaluate(self) -> dict[str, Any]:
+        """Run a fresh *greedy* episode, without exploration or Q updates."""
+        world = GridWorld()
+        actions: list[str] = []
+        for _ in range(100):
+            action = self.choose(world.observe(),epsilon=0)
+            outcome=world.step(action)
+            actions.append(action)
+            if world.finished:
+                break
+        return {"goal_reached": world.position == world.goal,
+                "steps": len(actions), "actions": actions,
+                "q_updates_during_evaluation": 0}
