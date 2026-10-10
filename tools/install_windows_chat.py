@@ -92,8 +92,9 @@ def install_model(root: Path = ROOT) -> str:
         )
     download_verified(MODEL_URL, target, sha256=MODEL_SHA256,
                       exact_size=MODEL_BYTES, max_size=MODEL_BYTES)
-    if target.open("rb").read(4) != b"GGUF":
-        raise ValueError("Assinatura GGUF inválida após instalação.")
+    with target.open("rb") as verified_model:
+        if verified_model.read(4) != b"GGUF":
+            raise ValueError("Assinatura GGUF inválida após instalação.")
     return "GGUF oficial instalado, íntegro e pronto para o diagnóstico."
 
 
