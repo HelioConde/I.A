@@ -266,6 +266,7 @@ class ChatEngine:
             "startup_error_code": self._startup_error_code if self._state == "error" else None,
             "experimental": True,
             "episodic_memory_enabled": self.episodic_store is not None,
+            "assistant_name": (self.episodic_store.get_assistant_name() if self.episodic_store else None) or "Brain-SSD",
             "episodic_aliases_enabled": self.memory_aliases,
             "cognitive_shadow_enabled": self.cognitive_shadow,
         }
