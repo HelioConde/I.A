@@ -25,11 +25,19 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
         raise ValueError(f"Perfil inválido: {profile}")
     expected_model = root / MODEL_RELATIVE
     model_exists = expected_model.is_file()
-    model_size = expected_model.stat().st_size if model_exists else 0
+    model_size = 0
     model_magic = False
+    model_readable = False
     if model_exists:
-        with expected_model.open("rb") as stream:
-            model_magic = stream.read(4) == b"GGUF"
+        try:
+            model_size = expected_model.stat().st_size
+            with expected_model.open("rb") as stream:
+                model_magic = stream.read(4) == b"GGUF"
+            model_readable = True
+        except OSError:
+            # Avoid a traceback containing Windows usernames or paths when
+            # an antivirus or file permission blocks the model.
+            pass
     mode = PROFILES[profile]["mode"]
     try:
         executable = resolve_server_executable(root) if mode == "persistent" else resolve_llama_executable(root)
@@ -47,10 +55,15 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
             runtime_probe = {"error": str(exc)}
     probe_passed = True
     if probe:
-        probe_passed = bool(runtime_probe is not None
-                            and not runtime_probe.get("error")
-                            and runtime_probe.get("version_return_code") == 0
-                            and runtime_probe.get("devices_return_code") == 0)
+        if mode == "persistent":
+            # The current doctor only checks llama-server file presence.
+            # Do not pretend to have probed it as if it were llama-completion.
+            probe_passed = True
+        else:
+            probe_passed = bool(runtime_probe is not None
+                                and not runtime_probe.get("error")
+                                and runtime_probe.get("version_return_code") == 0
+                                and runtime_probe.get("devices_return_code") == 0)
     manifest = (root / MANIFEST_RELATIVE).is_file()
     index = (root / INDEX_RELATIVE).is_file()
     data_file = (root / MANIFEST_RELATIVE).with_name("brain.dat").is_file()
@@ -63,6 +76,8 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
     recommendations: list[str] = []
     if not required["python_3_11_or_newer"]:
         recommendations.append("Instale Python 3.11+ para Windows.")
+    if model_exists and not model_readable:
+        recommendations.append("O modelo existe, mas não pôde ser lido. Verifique permissões e antivírus.")
     if not model_exists:
         recommendations.append(f"Coloque o modelo Qwen3-0.6B-Q8_0.gguf em: {expected_model}")
     elif not model_magic:
@@ -80,7 +95,7 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
     return {
         "status": "READY_FOR_REAL_INFERENCE_TEST" if all(required.values()) and probe_passed else "MISSING_REQUIREMENTS",
         "ready_for_test": all(required.values()) and probe_passed,
-        "probe_passed": probe_passed if probe else None,
+        "probe_passed": probe_passed if probe and mode == "subprocess" else None,
         "profile": profile,
         "runtime_mode": mode,
         "platform": sys.platform,

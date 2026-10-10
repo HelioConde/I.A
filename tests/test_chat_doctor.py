@@ -36,6 +36,23 @@ class TestInstallationDoctor(unittest.TestCase):
             self.assertFalse(second["optional_ssd"]["available"])
             self.assertEqual(second["status"], "READY_FOR_REAL_INFERENCE_TEST")
 
+    def test_unreadable_gguf_is_reported_without_crashing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            model=root/"models"/"Qwen3-0.6B-Q8_0.gguf"
+            model.parent.mkdir(parents=True)
+            model.write_bytes(b"GGUF"+b"\0"*2048)
+            # Patch Path.open for a single specific model file.
+            real_open=Path.open
+            def denied(path,*args,**kwargs):
+                if path == model:
+                    raise PermissionError("private data must not escape")
+                return real_open(path,*args,**kwargs)
+            with patch("doctor_chat.MIN_PLAUSIBLE_GGUF_BYTES",1024),patch.object(Path,"open",denied):
+                report=inspect_installation(root)
+            self.assertFalse(report["ready_for_test"])
+            self.assertTrue(any("não pôde ser lido" in x for x in report["recommendations"]))
+
     def test_existing_executable_can_fail_to_start(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
