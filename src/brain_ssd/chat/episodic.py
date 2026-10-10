@@ -74,6 +74,16 @@ class EpisodicMemory:
                     PRIMARY KEY(episode_id, term)
                 );
                 CREATE INDEX IF NOT EXISTS episode_terms_lookup ON episode_terms(term);
+                CREATE TABLE IF NOT EXISTS episode_revisions (
+                    id TEXT PRIMARY KEY,
+                    episode_id TEXT NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+                    old_content TEXT NOT NULL,
+                    new_content TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    operation TEXT NOT NULL CHECK(operation IN ('EDIT','RESTORE'))
+                );
+                CREATE INDEX IF NOT EXISTS revisions_by_episode
+                    ON episode_revisions(episode_id,created_at DESC,id DESC);
             """)
 
     @contextmanager
@@ -104,14 +114,7 @@ class EpisodicMemory:
         return raw
 
     def add(self, content: Any) -> dict[str, Any]:
-        if not isinstance(content, str):
-            raise ValueError("A lembrança deve ser texto.")
-        content = " ".join(content.split())
-        if not content or len(content) > MAX_NOTE_CHARS:
-            raise ValueError("Escreva uma nota de 1 a 500 caracteres.")
-        terms = sorted(words(content))
-        if not terms:
-            raise ValueError("Inclua palavras identificáveis na memória.")
+        content, terms = self._validated_note(content)
         item = {"id": str(uuid.uuid4()), "content": content, "created_at": int(time.time()),
                 "source": "explicit_user", "confirmed": True}
         with self._connect() as db:
@@ -122,6 +125,95 @@ class EpisodicMemory:
                        (item["id"], content, item["created_at"], item["source"]))
             db.executemany("INSERT INTO episode_terms VALUES(?,?)", ((item["id"], term) for term in terms))
         return item
+
+    @staticmethod
+    def _validated_note(content: Any) -> tuple[str, list[str]]:
+        if not isinstance(content, str):
+            raise ValueError("A lembrança deve ser texto.")
+        normalized = " ".join(content.split())
+        if not normalized or len(normalized) > MAX_NOTE_CHARS:
+            raise ValueError("Escreva uma nota de 1 a 500 caracteres.")
+        indexed = sorted(words(normalized))
+        if not indexed:
+            raise ValueError("Inclua palavras identificáveis na memória.")
+        return normalized, indexed
+
+    def _replace_locked(self, db: sqlite3.Connection, identity: str,
+                        content: Any, expected: Any, operation: str) -> dict[str, Any]:
+        """Atomically revise note and its search index with optimistic locking."""
+        if not isinstance(expected, str):
+            raise ValueError("Informe o texto atual para proteger contra edição concorrente.")
+        normalized, terms = self._validated_note(content)
+        row = db.execute(
+            "SELECT id,content,created_at FROM episodes WHERE id=? AND confirmed=1",
+            (identity,)
+        ).fetchone()
+        if row is None:
+            raise ValueError("Memória não encontrada.")
+        if row["content"] != expected:
+            raise ValueError("Memória alterada em outra janela. Atualize antes de editar.")
+        if row["content"] == normalized:
+            return {"id":identity,"content":normalized,
+                    "created_at":row["created_at"],
+                    "source":"explicit_user","confirmed":True,"changed":False}
+        revision_id = str(uuid.uuid4())
+        db.execute("UPDATE episodes SET content=? WHERE id=?", (normalized, identity))
+        db.execute("DELETE FROM episode_terms WHERE episode_id=?", (identity,))
+        db.executemany(
+            "INSERT INTO episode_terms(episode_id,term) VALUES (?,?)",
+            ((identity, term) for term in terms)
+        )
+        db.execute(
+            "INSERT INTO episode_revisions VALUES (?,?,?,?,?,?)",
+            (revision_id, identity, row["content"], normalized, int(time.time()), operation)
+        )
+        # Retain at most 20 prior versions per episode. Never silently grow
+        # indefinitely on a constrained local SSD.
+        db.execute(
+            "DELETE FROM episode_revisions WHERE episode_id=? "
+            "AND id NOT IN (SELECT id FROM episode_revisions "
+            "WHERE episode_id=? ORDER BY created_at DESC,id DESC LIMIT 20)",
+            (identity, identity)
+        )
+        return {"id":identity, "content":normalized,
+                "created_at":row["created_at"],"source":"explicit_user",
+                "confirmed":True,"changed":True,"revision_id":revision_id}
+
+    def replace(self, item_id: Any, new_content: Any, *,
+                expected_content: Any) -> dict[str, Any]:
+        """Explicit user correction. Does not infer facts or update Qwen."""
+        identity = self._id(item_id)
+        with self._connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            return self._replace_locked(db, identity, new_content,
+                                        expected_content, "EDIT")
+
+    def revisions(self, item_id: Any, limit: int = 20) -> list[dict[str, Any]]:
+        """Read past versions locally. Deleting an episode cascades to history."""
+        identity = self._id(item_id)
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT id,episode_id,old_content,new_content,created_at,operation "
+                "FROM episode_revisions WHERE episode_id=? "
+                "ORDER BY created_at DESC,id DESC LIMIT ?",
+                (identity,max(1,min(int(limit),20)))
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def restore(self, item_id: Any, revision_id: Any, *,
+                expected_content: Any) -> dict[str, Any]:
+        """Explicit restoration from one selected historical version."""
+        identity, target = self._id(item_id), self._id(revision_id)
+        with self._connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute(
+                "SELECT old_content FROM episode_revisions "
+                "WHERE episode_id=? AND id=?", (identity,target)
+            ).fetchone()
+            if row is None:
+                raise ValueError("Revisão não encontrada.")
+            return self._replace_locked(db, identity, row["old_content"],
+                                        expected_content, "RESTORE")
 
     def list(self, limit: int = 80) -> list[dict[str, Any]]:
         with self._connect() as db:
