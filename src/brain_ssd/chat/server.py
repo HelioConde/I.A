@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import re
 import threading
+import time
 import uuid
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -12,6 +13,7 @@ from typing import Any, Callable
 from urllib.parse import urlsplit
 
 from brain_ssd.chat.history import ChatHistory
+from brain_ssd.chat.diagnostics import DiagnosticLogger
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -115,10 +117,11 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None) -> None:
         self._runtime_factory = runtime_factory
         self.episodic_store = episodic_store
         self.cognitive_shadow = bool(cognitive_shadow)
+        self.diagnostics = diagnostics
         self._runtime: Any | None = None
         self._error: str | None = None
         self._state = "starting"
@@ -134,9 +137,15 @@ class ChatEngine:
         except Exception as exc:
             self._error = f"{type(exc).__name__}: {exc}"
             self._state = "error"
+            if self.diagnostics:
+                self.diagnostics.emit("runtime.error", error_type=type(exc).__name__)
         else:
             self._runtime = runtime
             self._state = "ready"
+            if self.diagnostics:
+                status = runtime.status() if hasattr(runtime, "status") else {}
+                self.diagnostics.emit("runtime.ready", profile=status.get("profile", "not_applicable"),
+                    core_mode=status.get("core_mode", "not_applicable"), cpu_threads=status.get("threads"))
 
     def close(self) -> None:
         with self._stream_lock:
@@ -191,7 +200,38 @@ class ChatEngine:
 
     def ask(self, question: str, raw_history: Any, *,
             on_chunk: Callable[[str], None] | None = None,
-            cancel_event: threading.Event | None = None) -> dict[str, Any]:
+            cancel_event: threading.Event | None = None,
+            request_id: str | None = None) -> dict[str, Any]:
+        started = time.monotonic()
+        trace_id = request_id or str(uuid.uuid4())
+        if self.diagnostics:
+            self.diagnostics.emit("chat.start", request_id=trace_id,
+                question_chars=len(question) if isinstance(question, str) else 0,
+                history_messages=len(raw_history) if isinstance(raw_history, list) else 0)
+        try:
+            result = self._ask_inner(question, raw_history, on_chunk=on_chunk,
+                                     cancel_event=cancel_event, request_id=trace_id)
+        except GenerationCancelled:
+            if self.diagnostics:
+                self.diagnostics.emit("chat.cancelled", request_id=trace_id,
+                    duration_ms=(time.monotonic() - started) * 1000, status="CANCELLED")
+            raise
+        except Exception as exc:
+            if self.diagnostics:
+                self.diagnostics.emit("chat.error", request_id=trace_id,
+                    duration_ms=(time.monotonic() - started) * 1000,
+                    error_type=type(exc).__name__, status="ERROR")
+            raise
+        if self.diagnostics:
+            self.diagnostics.emit("chat.complete", request_id=trace_id,
+                duration_ms=(time.monotonic() - started) * 1000, status="PASS",
+                answer_chars=len(result["answer"]), inference_verified=self._inference_verified)
+        return result
+
+    def _ask_inner(self, question: str, raw_history: Any, *,
+                   on_chunk: Callable[[str], None] | None,
+                   cancel_event: threading.Event | None,
+                   request_id: str) -> dict[str, Any]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Digite uma mensagem.")
         question = question.strip()
@@ -205,12 +245,24 @@ class ChatEngine:
             # conversational adapter on top of the existing runtime and SSD retrieval.
             retrieval: dict[str, Any] | None = None
             knowledge = ""
+            retrieval_started = time.monotonic()
             if not _GREETING.fullmatch(question):
                 retrieval = self._runtime.retrieve(question)
                 if retrieval.get("status") == "OK":
                     context = retrieval.get("context", {})
                     knowledge = str(context.get("text", ""))[:getattr(self._runtime, "knowledge_budget", 5_000)]
+            if self.diagnostics:
+                self.diagnostics.emit("retrieval.done", request_id=request_id,
+                    duration_ms=(time.monotonic() - retrieval_started) * 1000,
+                    status=(retrieval or {}).get("status", "NOT_APPLICABLE"),
+                    sources=len((retrieval or {}).get("sources", [])),
+                    pages=len((retrieval or {}).get("activated_pages", [])))
+            recall_started = time.monotonic()
             episodes = self.episodic_store.recall(question) if (self.episodic_store and not _GREETING.fullmatch(question)) else []
+            if self.diagnostics:
+                self.diagnostics.emit("memory.recall", request_id=request_id,
+                    duration_ms=(time.monotonic() - recall_started) * 1000,
+                    episodes=len(episodes))
             # Shadow-only: no modifications to Qwen prompt or retrieval.
             shadow = None
             if self.cognitive_shadow:
@@ -239,13 +291,29 @@ class ChatEngine:
                 getattr(self._runtime, "prompt_budget_bytes", 8000),
                 episode_context=episode_text,
             )
+            if self.diagnostics:
+                self.diagnostics.emit("chat.prompt", request_id=request_id,
+                    prompt_utf8_bytes=len(prompt.encode("utf-8")),
+                    history_messages=history_used, evidence_utf8_bytes=evidence_bytes,
+                    episodes=sum(1 for episode in episodes if episode["id"] in prompt))
             generation = GenerationRequest(prompt=prompt, max_tokens=180, temperature=0.35)
+            infer_started = time.monotonic()
             if on_chunk is None:
                 measured = self._runtime.core_backend.generate(generation)
             else:
                 if cancel_event is None:
                     raise ValueError("Evento de cancelamento obrigatório para streaming.")
                 measured = generate_streamed(self._runtime.core_backend, generation, on_chunk, cancel_event)
+            if self.diagnostics:
+                _metrics = measured.get("metrics") or {}
+                self.diagnostics.emit("inference.done", request_id=request_id,
+                    duration_ms=(time.monotonic() - infer_started) * 1000,
+                    return_code=measured.get("return_code"),
+                    ttft_ms=_metrics.get("ttft_ms"),
+                    tokens_per_second=_metrics.get("tokens_per_second"),
+                    working_set_bytes_max=_metrics.get("working_set_bytes_max"),
+                    private_bytes_max=_metrics.get("private_bytes_max"),
+                    physical_read_bytes=_metrics.get("physical_read_bytes"))
             if measured.get("return_code") != 0:
                 raise RuntimeError("O mecanismo local falhou ao gerar a resposta. Consulte o terminal.")
             if cancel_event is not None and cancel_event.is_set():
