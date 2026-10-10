@@ -328,3 +328,29 @@ fontes SSD; nenhuma pergunta ou resposta é salva por padrão. Adicione
 usa critérios heurísticos e **não garante precisão, qualidade geral nem
 vantagem do Brain-SSD**. A integração com o hardware real ainda deve ser
 validada antes de considerar o bug encerrado.
+
+
+## Comandos explícitos de memória pelo próprio chat (10/10/2026)
+
+Com o chat iniciado com `--episodic-memory` (ou pelo iniciador COM MEMÓRIA),
+algumas frases intencionais são executadas **pelo aplicativo Python e SQLite**,
+sem gerar resposta do modelo:
+
+- `salve na memória que seu nome é Luna`: grava o nome escolhido para o
+  assistente no SQLite local. `qual é seu nome?`, `/nome` e
+  `oi, qual é seu nome?` consultam a preferência salva, inclusive após
+  reiniciar e em novas conversas.
+- `salve na memória que meu jogo favorito é xadrez`: guarda uma nota
+  episódica explícita (até 500 caracteres).
+- `/memorias`: lista até dez notas recentes e o painel lateral permite
+  corrigir, restaurar ou apagar as lembranças.
+- `/ajuda` ou `quais comandos você tem?`: exibe capacidades e limites reais.
+
+Uma frase casual como `seu nome é Luna` **não** é considerada consentimento
+automático para persistir memória. Ação local não é inferência do Qwen nem
+aprendizado dos pesos. Se a memória estiver desligada, o comando informa
+claramente que nada foi salvo. Cada resposta de ação local exibe uma marcação
+explicativa e o nome escolhido pode ser exibido como rótulo do assistente.
+
+Para executar somente os testes sintéticos (sem Qwen e sem alterar memórias
+pessoais): `py -3 -m unittest discover -s tests -p "test_chat_local_actions.py" -v`.
