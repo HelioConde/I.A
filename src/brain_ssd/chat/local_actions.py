@@ -49,6 +49,7 @@ def _name_from_memory_request(note: str) -> str | None:
 def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any] | None:
     """Return a truthful app action; None means let the real Qwen answer."""
     simple = re.sub(r"[?.!]+\s*$", "", plain(question)).strip()
+    simple = re.sub(r"^(?:oi|ola|bom dia|boa tarde|boa noite)[,\s]+", "", simple)
     save = _parse_save_request(question)
     answer: str | None = None
     action: str | None = None
@@ -76,6 +77,7 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
     elif simple in (
         "qual seu nome", "qual e seu nome", "como voce se chama",
         "qual o seu nome", "qual e o seu nome", "quem e voce",
+        "qual nome voce recebeu", "qual nome eu te dei",
     ):
         action = "assistant_name"
         name = store.get_assistant_name() if store else None
