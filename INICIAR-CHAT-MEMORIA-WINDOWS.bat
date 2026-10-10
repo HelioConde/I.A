@@ -37,7 +37,8 @@ if errorlevel 1 (
 title Brain-SSD - Chat com memoria
 echo.
 echo BRAIN-SSD - Experimento de memoria episodica
-echo As notas so serao salvas se voce usar "Guardar uma lembranca".
+echo Notas so sao salvas com seu pedido explicito: botao "Guardar uma lembranca"
+echo ou comando no chat: salve na memoria que ...
 echo Arquivo privado: %%LOCALAPPDATA%%\BrainSSD\episodic-notes.sqlite3
 echo.
 echo [1/2] Verificando GGUF e llama.cpp. Sem carregar o modelo...
