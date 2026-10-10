@@ -18,7 +18,8 @@ from brain_ssd.chat.cognitive_lab import (
     replay_preview, select_attention, working_state, TabularActionLearner,
 )
 from brain_ssd.chat.episodic import EpisodicMemory
-from brain_ssd.chat.plasticity import PlasticityLedger
+from brain_ssd.chat.plasticity import PlasticityLedger, PredictionJournal
+from brain_ssd.chat.consolidation import ConsolidationQueue
 
 
 def evaluate() -> dict:
@@ -45,6 +46,16 @@ def evaluate() -> dict:
         before_revert = ledger.shadow_bias(first["id"])
         ledger.revoke(events[0])
         after_revert = ledger.shadow_bias(first["id"])
+        prediction_journal=PredictionJournal(Path(temp) / "predictions.sqlite3")
+        prediction_before=prediction_journal.predict("grid_goal_success")
+        prediction_observation=prediction_journal.observe("grid_goal_success",True)
+        prediction_after=prediction_journal.predict("grid_goal_success")
+        prediction_journal.revoke(prediction_observation["id"])
+        prediction_reverted=prediction_journal.predict("grid_goal_success")
+        queue=ConsolidationQueue(Path(temp) / "reviews.sqlite3",memory)
+        review_draft=queue.create_draft([first["id"], second["id"]])
+        review=queue.review(review_draft["id"],"approve","Duas reuniões diferentes sobre Python")
+        queue.revoke(review_draft["id"])
         expectation = prediction_error(0.7, True)
         agent = TabularActionLearner(seed=17)
         policy_before = agent.evaluate()
@@ -66,6 +77,8 @@ def evaluate() -> dict:
                            "bias_with_3_explicit_signals": before_revert["bias"],
                            "bias_after_revoke": after_revert["bias"],
                            "weights_updated": False},
+            "consolidation": {"review_was_explicit": review["state"] == "REVIEWED", "reversible": queue.list()[0]["state"] == "REVOKED", "promoted_to_qwen": False},
+            "online_prediction_learning": {"before":prediction_before["probability"], "after_verified_outcome":prediction_after["probability"], "after_revoke":prediction_reverted["probability"], "qwen_weights_changed":False},
             "prediction": {"expected": expectation.probability,
                            "actual": expectation.observed, "brier": expectation.brier},
             "learning_cycle": {"greedy_before": policy_before, "training": learned, "greedy_after": policy_after, "only_sandbox_weights_modified": True},
@@ -87,5 +100,7 @@ if __name__ == "__main__":
             and report["episodic"]["individual_ids_retained"]
             and report["plasticity"]["bias_after_revoke"] == 0
             and not report["replay"]["writes_to_model"]
-            and report["learning_cycle"]["greedy_after"]["goal_reached"]):
+            and report["learning_cycle"]["greedy_after"]["goal_reached"]
+            and report["online_prediction_learning"]["after_revoke"] == 0.5
+            and report["consolidation"]["reversible"]):
         raise SystemExit(1)

@@ -15,6 +15,8 @@ on:
       - "tools/bench_episodic_memory.py"
       - "tools/run_cognitive_lab.py"
       - "tests/test_cognitive_lab.py"
+      - "tests/test_consolidation.py"
+      - "tools/review_cognitive_memory.py"
       - ".github/workflows/chat-smoke.yml"
   pull_request:
     paths:
@@ -31,7 +33,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Verify syntax
-        run: python -m compileall -q tools/run_chat.py tools/doctor_chat.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_chat_episodic_http.py tests/test_cognitive_lab.py tools/run_cognitive_lab.py
+        run: python -m compileall -q tools/run_chat.py tools/doctor_chat.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_chat_episodic_http.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py
       - name: Test HTTP and chat adapter with mock CPU Core
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
@@ -41,6 +43,7 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_episodic.py" -v
           python -m unittest discover -s tests -p "test_chat_episodic_http.py" -v
           python -m unittest discover -s tests -p "test_cognitive_lab.py" -v
+          python -m unittest discover -s tests -p "test_consolidation.py" -v
       - name: Synthetic episodic negative controls (not a human memory benchmark)
         run: |
           python tools/bench_episodic_memory.py

@@ -67,3 +67,22 @@ executa uma política gulosa nova sem novas atualizações e registra sucessos,
 ações e quantos parâmetros tabulares mudaram. Isso é aprendizagem real,
 mas **somente dentro do mundo sintético**, sem acesso a programas, rede,
 sensores reais ou pesos do Qwen. Não é simulação de cérebro humano.
+
+## Consolidação revisada manualmente (sem treinar pesos)
+
+O módulo consolidation.py recebe entre duas e seis notas episódicas já
+confirmadas, exige duas pistas em comum, preserva IDs de origem e cria
+apenas um rascunho. A revisão exige um resumo escrito pelo usuário.
+Rejeição, revogação e exclusão podem ser feitas depois. O resumo aprovado
+fica numa fila SQLite SEPARADA e não se torna conhecimento factual
+do Qwen ou do corpus SSD automaticamente.
+
+Com memórias já salvas no chat opt-in:
+
+    python tools/review_cognitive_memory.py
+    python tools/review_cognitive_memory.py --propose EPISODE_ID_1 EPISODE_ID_2
+    python tools/review_cognitive_memory.py --approve DRAFT_ID --summary "Resumo revisado"
+    python tools/review_cognitive_memory.py --revoke REVIEWED_ID
+
+Sem flags de mutação, o comando apenas lista candidatos. Não é sono
+biológico nem consolidação cortical; é um fluxo humano de revisão.
