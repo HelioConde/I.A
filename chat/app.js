@@ -235,6 +235,7 @@ function updateMetrics(data) {
   $("detailPages").textContent = Number.isFinite(data.active_pages) ? String(data.active_pages) : "—";
   $("detailSources").textContent = Number.isFinite(data.sources_from_ssd) ? String(data.sources_from_ssd) : "—";
   $("detailEpisodes").textContent = Number.isFinite(data.episodic_memories_used) ? String(data.episodic_memories_used) : "—";
+  $("detailMemoryWarnings").textContent = Number.isFinite(data.episodic_ambiguities_detected) ? String(data.episodic_ambiguities_detected) : "—";
   const shadow = data.cognitive_shadow;
   $("detailAttention").textContent = shadow ? shadow.attention_selected_candidates + " candidatos / " + shadow.attention_candidate_bytes + " B" : "desativado";
   $("detailWorking").textContent = shadow ? shadow.working_memory_bytes + " B · " + shadow.working_topics.length + " tópicos" : "desativado";
@@ -296,6 +297,12 @@ async function send() {
         scrollBottom();
       } else if (event === "done") {
         output.textContent = payload.answer;
+        if (Number(payload.episodic_ambiguities_detected) > 0) {
+          const notice = document.createElement("p");
+          notice.className = "memory-conflict-warning";
+          notice.textContent = "Há lembranças com datas possivelmente diferentes. Confirme a qual evento a pergunta se refere.";
+          pending.querySelector(".message-body").appendChild(notice);
+        }
         app.messages.push({role:"assistant", content:payload.answer});
         updateMetrics(payload);
         completed = true;

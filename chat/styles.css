@@ -52,3 +52,15 @@
 .episodic-item button{background:transparent;border:0;color:#bdcad9;font-size:18px;min-width:28px;min-height:28px}
 .episodic-item button:hover{color:#ff9b9b}
 .episodic-item button:focus-visible,.save-memory:focus-visible{outline:2px solid #8bcaff;outline-offset:2px}
+
+/* Episodic-memory uncertainties are visible, never silently resolved. */
+.memory-conflict-warning {
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 9px 11px;
+  margin: 10px 0 0;
+  border-inline-start: 3px solid #b69c64;
+  border-radius: 5px;
+  color: #e5d4b2;
+  background: rgba(165, 133, 73, 0.11);
+}
