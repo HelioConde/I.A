@@ -65,7 +65,7 @@ class TestIntegrity(unittest.TestCase):
 
     def test_orphan_revisions_detected(self):
         db=EpisodicMemory(self.db)
-        with sqlite3.connect(self.db) as conn:
+        with closing(sqlite3.connect(self.db)) as conn:
             conn.execute("PRAGMA foreign_keys=OFF")
             conn.execute("INSERT INTO episode_revisions VALUES(?,?,?,?,?,?)",
                          ("00000000-0000-0000-0000-000000000001",
