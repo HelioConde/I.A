@@ -110,3 +110,24 @@ Feedbacks guardados no laboratório de plasticidade passam a fornecer viés
 **zero** se sua memória de origem tiver sido excluída. A exclusão lógica
 não remove automaticamente backups nem registros históricos da fila de
 revisão; esse tratamento exige auditoria específica de retenção.
+
+## Ponte de sinônimos PT-BR — experimento opt-in
+
+A camada `semantic_bridge.py` contém **10 grupos de sinônimos estreitos e
+auditáveis** (por exemplo, *reunião/encontro* e *cachorro/cão*).
+Ela amplia pistas sem transferir dados a serviços externos e exige, em casos
+exclusivamente semânticos, pelo menos dois conceitos distintos em comum.
+Não se trata de embeddings, compreensão semântica geral, aprendizagem dos
+pesos ou decodificação cerebral.
+
+**Padrão: DESATIVADO.** No chat:
+
+```powershell
+python tools/run_chat.py --profile economia --episodic-memory --memory-aliases
+```
+
+Use sem `--memory-aliases` para obter exatamente a recuperação lexical
+original. A quantidade de notas trazidas apenas por sinônimos aparece nas
+métricas da resposta e no JSONL local como contagem — sem conteúdo textual.
+O recurso precisa de testes A/B e validação com o Qwen físico antes de uma
+eventual promoção para padrão.

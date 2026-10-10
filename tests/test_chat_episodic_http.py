@@ -102,6 +102,35 @@ class TestEngine(unittest.TestCase):
             finally:
                 engine.close()
 
+    def test_alias_bridge_only_changes_opt_in_chat(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store=EpisodicMemory(Path(temp)/"memory.sqlite3")
+            store.add("A reunião do cachorro será no sábado")
+            plain_runtime=FakeRuntime()
+            alias_runtime=FakeRuntime()
+            plain=ChatEngine(lambda:plain_runtime,episodic_store=store)
+            enabled=ChatEngine(lambda:alias_runtime,episodic_store=store,memory_aliases=True)
+            plain.start()
+            enabled.start()
+            try:
+                prompt="Quando ocorre o encontro do cão?"
+                bare=plain.ask(prompt,[])
+                bridged=enabled.ask(prompt,[])
+                self.assertEqual(bare["episodic_memories_used"],0)
+                self.assertEqual(bare["episodic_alias_matches_used"],0)
+                self.assertEqual(bridged["episodic_alias_matches_used"],1)
+                self.assertEqual(bridged["episodic_memories_used"],1)
+                self.assertTrue(enabled.status()["episodic_aliases_enabled"])
+                self.assertIn("cachorro", alias_runtime.core_backend.prompts[-1])
+                self.assertNotIn("cachorro", plain_runtime.core_backend.prompts[-1])
+            finally:
+                plain.close()
+                enabled.close()
+
+    def test_alias_bridge_requires_explicit_store(self):
+        with self.assertRaises(ValueError):
+            ChatEngine(FakeRuntime,memory_aliases=True)
+
     def test_disabled_by_default(self):
         engine=ChatEngine(FakeRuntime)
         engine.start()

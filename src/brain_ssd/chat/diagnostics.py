@@ -34,7 +34,7 @@ EVENTS = frozenset({
 NUMERIC = frozenset({
     "duration_ms", "ttft_ms", "tokens_per_second", "working_set_bytes_max",
     "private_bytes_max", "physical_read_bytes", "sources", "pages",
-    "episodes", "history_messages", "prompt_utf8_bytes", "evidence_utf8_bytes",
+    "episodes", "alias_matches", "history_messages", "prompt_utf8_bytes", "evidence_utf8_bytes",
     "answer_chars", "question_chars", "return_code", "cpu_threads", "count",
     "exit_code", "context_size", "activated_bytes",
     "process_working_set_bytes", "process_private_bytes", "cpu_time_ms",

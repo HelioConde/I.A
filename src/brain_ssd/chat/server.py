@@ -118,9 +118,12 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False) -> None:
         self._runtime_factory = runtime_factory
+        if memory_aliases and episodic_store is None:
+            raise ValueError("A recuperação por sinônimos exige memória episódica explícita.")
         self.episodic_store = episodic_store
+        self.memory_aliases = bool(memory_aliases)
         self.cognitive_shadow = bool(cognitive_shadow)
         self.diagnostics = diagnostics
         self._runtime: Any | None = None
@@ -185,6 +188,7 @@ class ChatEngine:
             "error": self._error if self._state == "error" else None,
             "experimental": True,
             "episodic_memory_enabled": self.episodic_store is not None,
+            "episodic_aliases_enabled": self.memory_aliases,
             "cognitive_shadow_enabled": self.cognitive_shadow,
         }
 
@@ -278,11 +282,16 @@ class ChatEngine:
                     sources=len((retrieval or {}).get("sources", [])),
                     pages=len((retrieval or {}).get("activated_pages", [])))
             recall_started = time.monotonic()
-            episodes = self.episodic_store.recall(question) if (self.episodic_store and not _GREETING.fullmatch(question)) else []
+            episodes = (self.episodic_store.recall(question, experimental_aliases=True)
+                        if (self.episodic_store and self.memory_aliases and not _GREETING.fullmatch(question))
+                        else self.episodic_store.recall(question)
+                        if (self.episodic_store and not _GREETING.fullmatch(question))
+                        else [])
             if self.diagnostics:
                 self.diagnostics.emit("memory.recall", request_id=request_id,
                     duration_ms=(time.monotonic() - recall_started) * 1000,
-                    episodes=len(episodes))
+                    episodes=len(episodes),
+                    alias_matches=sum(item.get("match_mode") == "SEMANTIC_ALIAS" for item in episodes))
             # Shadow-only: no modifications to Qwen prompt or retrieval.
             shadow = None
             if self.cognitive_shadow:
@@ -371,6 +380,9 @@ class ChatEngine:
                 "sources_from_ssd": len(retrieval.get("sources", [])) if (retrieval and evidence_bytes) else 0,
                 "episodic_memories_used": sum(1 for episode in episodes if episode["id"] in prompt),
                 "episodic_ambiguities_detected": len(ambiguities),
+                "episodic_alias_matches_used": sum(
+                    item.get("match_mode") == "SEMANTIC_ALIAS" and item["id"] in prompt
+                    for item in episodes),
                 "context_budget": {"prompt_utf8_bytes": len(prompt.encode("utf-8")), "history_messages": history_used, "evidence_utf8_bytes": evidence_bytes},
                 "active_pages": len(retrieval.get("activated_pages", [])) if retrieval else 0,
                 "metrics": {
