@@ -7,13 +7,13 @@ echo  BRAIN-SSD - Chat visual no Windows
 echo  CPU-only, sem API externa. O navegador abrira automaticamente.
 echo.
 if exist ".venv\Scripts\python.exe" (
-    ".venv\Scripts\python.exe" "tools\run_chat.py"
+    ".venv\Scripts\python.exe" "tools\run_chat.py" --profile economia
 ) else (
     where py >nul 2>nul
     if not errorlevel 1 (
-        py -3 "tools\run_chat.py"
+        py -3 "tools\run_chat.py" --profile economia
     ) else (
-        python "tools\run_chat.py"
+        python "tools\run_chat.py" --profile economia
     )
 )
 if errorlevel 1 (

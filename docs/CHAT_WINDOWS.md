@@ -68,3 +68,33 @@ Execute: python -m unittest discover -s tests -p "test_chat_windows.py" -v
 
 Validar no Windows real uma conversa com "Olá", aferir tempo, RAM e qualidade,
 e comparar o modo persistente com o modo de processo por consulta.
+
+## Melhorias do chat Windows (10/10/2026)
+
+O chat simples não exige mais os arquivos opcionais do cérebro SSD para
+responder a uma saudação. Exige o modelo GGUF local e um binário de inferência
+CPU-only. Para recuperação seletiva de conhecimento, manifesto, índice e
+brain.dat precisam estar presentes. Caso contrário, o Core ainda conversa
+sem inventar fontes SSD.
+
+Perfis disponíveis:
+
+- Economia: 2 threads, janela de 2048, Core descarregado entre perguntas.
+- Equilibrado: 4 threads, janela de 4096, Core descarregado entre perguntas.
+- Rápido: 4 threads, janela de 4096, Core persistente na RAM; requer llama-server.exe.
+
+O arquivo INICIAR-CHAT-WINDOWS.bat escolhe Economia por padrão.
+Para trocar: python tools/run_chat.py --profile equilibrado
+ou python tools/run_chat.py --profile rapido.
+Esses nomes não prometem quantidades fixas de RAM: faça medições reais.
+
+Validação de verdade em Windows (não simulada):
+
+    python tools/validate_chat_windows.py --profile economia
+
+O relatório local é salvo em results/chat_validation/latest-local-windows.json.
+A mensagem inicial de modelo encontrado significa apenas preflight de arquivos;
+a confirmação de inferência aparece depois da primeira resposta verdadeira.
+A Action de Windows executa testes simulados e compila o launcher .NET,
+mas não contém Qwen/llama.cpp; ela não substitui o teste real.
+O instalador autônomo e o streaming de tokens continuam pendentes.

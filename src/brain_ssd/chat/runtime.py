@@ -47,6 +47,7 @@ class LocalChatRuntime:
         self.has_knowledge_files = (
             (self.root / MANIFEST_RELATIVE).is_file()
             and (self.root / INDEX_RELATIVE).is_file()
+            and (self.root / MANIFEST_RELATIVE).with_name("brain.dat").is_file()
         )
         if self.core_mode == "persistent":
             executable = resolve_server_executable(self.root)

@@ -4,11 +4,11 @@ const app = { ready:false, sending:false, messages:[] };
 const composer = $("messageInput");
 const log = $("messages");
 
-function setConnection(state, detail = "") {
+function setConnection(state, detail = "", verified = false) {
   app.ready = state === "ready";
   const banner = $("connectionBanner");
   banner.className = "connection-banner " + (state === "ready" ? "ready" : state === "error" ? "error" : "");
-  $("connectionText").textContent = state === "ready" ? "Modelo local pronto para conversar" :
+  $("connectionText").textContent = state === "ready" ? (verified ? "IA local validada nesta sessão" : "Modelo encontrado — faça sua primeira pergunta") :
     state === "error" ? (detail || "Não foi possível carregar o modelo local.") :
     "Preparando o modelo local...";
   $("sidebarStatus").textContent = state === "ready" ? "Modelo pronto" : state === "error" ? "Requer configuração" : "Iniciando...";
@@ -20,7 +20,9 @@ async function refreshStatus() {
     const res = await fetch("/api/status", {cache:"no-store"});
     if (!res.ok) throw new Error("servidor indisponível");
     const data = await res.json();
-    setConnection(data.status, data.error);
+    setConnection(data.status, data.error, Boolean(data.inference_verified));
+    $("modeInfo").textContent = data.profile ? ("Perfil: " + data.profile) : "Perfil: —";
+    $("knowledgeInfo").textContent = data.knowledge_note || "Conhecimento SSD: verificando";
   } catch (_) {
     setConnection("error", "Servidor local desconectado. Abra o iniciador do Brain-SSD.");
   }
@@ -55,6 +57,17 @@ function addMessage(role, content, extraClass = "") {
   text.className = "message-content";
   text.textContent = content;
   body.appendChild(text);
+  if (role === "assistant" && !extraClass) {
+    const copy = document.createElement("button");
+    copy.className = "copy-message";
+    copy.type = "button";
+    copy.textContent = "Copiar resposta";
+    copy.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(text.textContent || ""); copy.textContent = "Copiado!"; }
+      catch (_) { copy.textContent = "Cópia indisponível"; }
+    });
+    body.appendChild(copy);
+  }
   row.appendChild(body);
   $("welcome")?.remove();
   log.appendChild(row);

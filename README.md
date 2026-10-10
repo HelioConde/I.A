@@ -33,3 +33,12 @@ PYTHONPATH=src python3 benchmarks/baseline.py --help
 O benchmark aceita qualquer executável compatível por meio de um backend de processo. A configuração de referência usa `llama-completion`, CPU-only, uma thread e um modelo GGUF fornecido explicitamente. Modelos, builds de terceiros e resultados não são versionados.
 
 Veja [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/BENCHMARKS.md](docs/BENCHMARKS.md) e [docs/REQUIREMENTS_TRACEABILITY.md](docs/REQUIREMENTS_TRACEABILITY.md).
+## Atualização do chat Windows
+O primeiro marco tem três perfis (economia, equilibrado, rapido),
+opera sem o corpus SSD opcional e mostra se a primeira inferência real
+foi validada. O launcher Windows é compilado em uma GitHub Action separada.
+Para testar uma pergunta verdadeira localmente, execute:
+
+    python tools/validate_chat_windows.py --profile economia
+
+O CI simula o Core e não prova qualidade nem inferência com o GGUF.
