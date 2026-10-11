@@ -94,6 +94,38 @@ class TestSearchProviders(unittest.TestCase):
         self.assertEqual(request.call_count, 1)
         self.assertIn("generator=search", request.call_args.args[0])
 
+    def test_repeated_search_uses_short_cache_without_network(self):
+        service = WebSearchService("wikipedia")
+        with patch.object(service, "_request", return_value={"query": {"pages": {
+            "19": {"title": "Estrela", "index": 1,
+                   "extract": "Uma estrela é um astro luminoso."}
+        }}}) as request:
+            first = service.search("O que é uma estrela?")
+            self.assertFalse(service.was_cached())
+            second = service.search("O que é uma estrela?")
+            self.assertTrue(service.was_cached())
+        self.assertEqual(first, second)
+        self.assertEqual(request.call_count, 1)
+        first[0]["snippet"] = "Alterado localmente"
+        self.assertNotEqual(first, service.search("O que é uma estrela?"))
+
+    def test_news_cache_expires_faster_and_never_caches_failed_requests(self):
+        service = WebSearchService("auto")
+        with patch.object(service, "_latest_brazil_news", return_value=[{
+            "title": "Notícia", "url": "https://agenciabrasil.ebc.com.br/teste",
+            "snippet": "Publicado em 2026-10-11. Informações da notícia."
+        }]) as fetch:
+            service.search("Como está a situação do Brasil hoje?")
+            service.search("Como está a situação do Brasil hoje?")
+            self.assertEqual(fetch.call_count, 1)
+            self.assertTrue(service.was_cached())
+            with service._cache_lock:
+                for key,(expires, items) in list(service._cache.items()):
+                    service._cache[key] = (0, items)
+            service.search("Como está a situação do Brasil hoje?")
+            self.assertEqual(fetch.call_count, 2)
+            self.assertFalse(service.was_cached())
+
     def test_brave_key_stays_in_header_and_never_in_results(self):
         key = "TEST_FAKE_API_SECRET_DO_NOT_LOG"
         search = WebSearchService("brave", brave_key=key)
@@ -154,6 +186,43 @@ class TestWebEngine(unittest.TestCase):
             self.assertIn("Meu dado privado", runtime.core_backend.prompts[-1])
             engine.ask("Outro assunto", [])
             self.assertEqual(len(service.calls), 1)
+        finally:
+            engine.close()
+
+    def test_fast_web_responds_from_sources_without_model_generation(self):
+        runtime = Runtime()
+        service = FakeWeb()
+        engine = ChatEngine(lambda: runtime, web_search_service=service)
+        engine.start()
+        try:
+            reply = engine.ask("O que é astronomia?", [], web_search=True, fast_web=True)
+            self.assertEqual(reply["local_action"], "web_brief")
+            self.assertEqual(reply["mode"], "local_command")
+            self.assertIn("sem geração pelo Qwen", reply["answer"])
+            self.assertIn("https://example.org/noticia", reply["answer"])
+            self.assertEqual(reply["web_search_status"], "ok")
+            self.assertGreaterEqual(reply["web_search_ms"], 0)
+            self.assertEqual(runtime.core_backend.prompts, [])
+            self.assertFalse(engine.status()["inference_verified"])
+            with self.assertRaises(ValueError):
+                engine.ask("Teste", [], fast_web=True)
+            with self.assertRaises(ValueError):
+                engine.ask("Teste", [], web_search=True, fast_web="yes")
+            self.assertEqual(service.calls, ["O que é astronomia?"])
+        finally:
+            engine.close()
+
+    def test_fast_web_without_sources_does_not_invent_facts(self):
+        runtime = Runtime()
+        service = FakeWeb(fail=True)
+        engine = ChatEngine(lambda: runtime, web_search_service=service)
+        engine.start()
+        try:
+            reply = engine.ask("Que aconteceu agora?", [], web_search=True, fast_web=True)
+            self.assertEqual(reply["web_search_status"], "unavailable")
+            self.assertEqual(reply["web_sources"], [])
+            self.assertIn("Não obtive fontes verificáveis", reply["answer"])
+            self.assertEqual(runtime.core_backend.prompts, [])
         finally:
             engine.close()
 
