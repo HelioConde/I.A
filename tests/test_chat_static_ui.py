@@ -104,6 +104,9 @@ class TestStaticUI(unittest.TestCase):
         self.assertIn('value="96"', self.html)
         self.assertIn('value="256"', self.html)
         self.assertIn('response_tokens:responseTokens', self.js)
+        self.assertIn('payload.needs_continuation', self.js)
+        self.assertIn('continueButton.textContent = "Continuar resposta"', self.js)
+        self.assertIn('className = "generation-incomplete"', self.js)
 
     def test_static_assets_are_local_and_no_inline_handlers(self):
         self.assertEqual(self.inventory.scripts,["/app.js"])
