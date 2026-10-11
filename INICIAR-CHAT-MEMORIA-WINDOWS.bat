@@ -43,10 +43,17 @@ echo Arquivo privado: %%LOCALAPPDATA%%\BrainSSD\episodic-notes.sqlite3
 echo.
 echo [1/2] Verificando GGUF e llama.cpp. Sem carregar o modelo...
 %PYTHON_CMD% "tools\doctor_chat.py" --profile economia --probe
-if errorlevel 1 goto :not_ready
+if errorlevel 1 goto :auto_setup
 echo.
 echo [2/2] Iniciando chat com memoria opt-in...
 %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow
+if errorlevel 1 goto :not_ready
+goto :end
+:auto_setup
+echo.
+echo Faltam componentes para o modelo padrao.
+echo Abrindo o novo instalador com escolha de 0.6B, 1.7B e 4B...
+call "%~dp0INICIAR-BRAIN-SSD.bat"
 if errorlevel 1 goto :not_ready
 goto :end
 :not_ready
