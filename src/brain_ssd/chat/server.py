@@ -29,6 +29,7 @@ from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PRO
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
 from brain_ssd.chat.completion_quality import classify_completion, select_output_budget
 from brain_ssd.chat.http_stream import serve_stream
+from brain_ssd.chat.copilot import LocalCopilot, CopilotPermissionError
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
 
@@ -982,7 +983,7 @@ class ChatHttpServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, address: tuple[str, int], engine: ChatEngine, static_dir: Path, history_store: ChatHistory | None = None, episodic_store: EpisodicMemory | None = None):
+    def __init__(self, address: tuple[str, int], engine: ChatEngine, static_dir: Path, history_store: ChatHistory | None = None, episodic_store: EpisodicMemory | None = None, copilot: LocalCopilot | None = None):
         if address[0] != "127.0.0.1":
             raise ValueError("O chat deve usar apenas 127.0.0.1.")
         super().__init__(address, ChatHandler)
@@ -990,6 +991,7 @@ class ChatHttpServer(ThreadingHTTPServer):
         self.static_dir = static_dir
         self.history_store = history_store
         self.episodic_store = episodic_store
+        self.copilot = copilot
 
     def handle_error(self, request: Any, client_address: tuple[str, int]) -> None:
         # A browser can close a connection during a request.
@@ -1028,6 +1030,10 @@ class ChatHandler(BaseHTTPRequestHandler):
             self._json({"error": "Host não permitido."}, HTTPStatus.FORBIDDEN)
             return
         path = urlsplit(self.path).path
+        if path == "/api/copilot/status":
+            copilot = self.server.copilot
+            self._json(copilot.status() if copilot else {"enabled": False, "files_enabled": False, "screen_enabled": False, "roots": []})
+            return
         if path in ("/api/health", "/api/status"):
             self._json(self.server.engine.status())
             return
@@ -1087,7 +1093,7 @@ class ChatHandler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         memory_mutation = (path.startswith("/api/memories/") and
                            (path.endswith("/edit") or path.endswith("/restore")))
-        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel", "/api/memories") and not memory_mutation:
+        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel", "/api/memories", "/api/copilot") and not memory_mutation:
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
             return
         if (path == "/api/memories" or memory_mutation) and self.server.episodic_store is None:
@@ -1110,7 +1116,25 @@ class ChatHandler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(size))
             if not isinstance(data, dict):
                 raise ValueError("JSON inválido.")
-            if path == "/api/memories":
+            if path == "/api/copilot":
+                copilot = self.server.copilot
+                if copilot is None:
+                    self._json({"error": "Copiloto local não ativado."}, HTTPStatus.FORBIDDEN)
+                    return
+                action = data.get("action")
+                if action == "list":
+                    result = copilot.list_directory(data.get("path"))
+                elif action == "read":
+                    result = copilot.read_file(data.get("path"))
+                elif action == "image":
+                    result = copilot.preview_image(data.get("path"))
+                elif action == "system":
+                    result = copilot.system_info()
+                elif action == "screen":
+                    result = copilot.capture_screen(data.get("monitor", 1))
+                else:
+                    raise CopilotPermissionError("Ação local não permitida.")
+            elif path == "/api/memories":
                 result = {"memory": self.server.episodic_store.add(data.get("content"))}
             elif memory_mutation:
                 endpoint = "edit" if path.endswith("/edit") else "restore"
@@ -1186,5 +1210,6 @@ def create_chat_server(
     engine: ChatEngine, static_dir: Path, port: int = 8766,
     history_store: ChatHistory | None = None,
     episodic_store: EpisodicMemory | None = None,
+    copilot: LocalCopilot | None = None,
 ) -> ChatHttpServer:
-    return ChatHttpServer(("127.0.0.1", port), engine, static_dir, history_store, episodic_store)
+    return ChatHttpServer(("127.0.0.1", port), engine, static_dir, history_store, episodic_store, copilot)
