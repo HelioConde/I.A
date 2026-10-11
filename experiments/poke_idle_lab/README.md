@@ -45,3 +45,9 @@ Para o GameAgent, clone o original e rode sua suíte de testes com Python e as d
 2. Pedir autorização à staff do World antes de qualquer automação ou uso de extensão não autorizada.
 3. Revisar o código da extensão oficial para IO anunciada no Discord e implementar um adaptador com ações limitadas, logs e botão de parar; sem automatizar pagamentos/saques.
 4. Comparar dados observados, vendas concluídas, custos e saques recebidos; nunca tratar ganho fictício como renda comprovada.
+
+## Automatização dos testes offline de projetos existentes
+
+Execute no PowerShell: powershell -ExecutionPolicy Bypass -File .\testar_projetos.ps1
+
+O script baixa o projeto original do Companion e executa apenas seus testes de matemática com Node, sem iniciar jogo ou bot. Opcional: acrescente -IncluirGameAgent para instalar as dependências do GameAgent e tentar executar sua suíte de testes; isso requer rede e pode consumir tempo/recursos. A action de CI testa o Companion em um commit fixado, evitando mudanças inesperadas na execução. Nenhum dos comandos acessa uma conta de jogo.
