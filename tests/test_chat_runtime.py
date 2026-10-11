@@ -137,7 +137,7 @@ class TestOptionalSSD(unittest.TestCase):
 
     def test_installed_gguf_can_be_selected_without_replacing_default(self):
         alt = self.root / "models" / "Qwen3-4B-Instruct-Q4_K_M.gguf"
-        alt.write_bytes(b"GGUF" + b"\\0" * 32)
+        alt.write_bytes(b"GGUF" + b"\0" * 32)
         runtime = LocalChatRuntime(
             self.root, profile="economia", model_file=alt.name
         )
