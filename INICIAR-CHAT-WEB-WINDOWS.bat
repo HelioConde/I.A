@@ -46,8 +46,8 @@ echo [1/2] Verificando GGUF e llama.cpp. Sem carregar o modelo...
 if errorlevel 1 goto :auto_setup
 echo.
 echo [2/2] Iniciando chat com memoria e pesquisa web opcional...
-echo A pesquisa deve ser marcada para CADA pergunta. Provedor: Wikipedia PT.
-%PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider wikipedia
+echo A pesquisa deve ser marcada para CADA pergunta. Provedor: auto (Wikipedia + noticias Brasil recentes).
+%PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto
 if errorlevel 1 goto :not_ready
 goto :end
 :auto_setup
