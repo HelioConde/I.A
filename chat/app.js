@@ -263,7 +263,13 @@ async function refreshStatus() {
     if (!res.ok) throw new Error("servidor indisponível");
     const data = await res.json();
     setConnection(data.status, data.error, Boolean(data.inference_verified));
-    $("modeInfo").textContent = data.profile ? ("Perfil: " + data.profile) : "Perfil: —";
+    $("modeInfo").textContent = data.profile
+      ? ("Perfil: " + data.profile +
+        (data.core_mode === "persistent" ? " · Modelo mantido em RAM"
+          : data.core_mode === "subprocess" ? " · Recarrega modelo por resposta" : "") +
+        (data.threads ? " · " + data.threads + " threads" : "") +
+        (data.max_output_tokens ? " · até " + data.max_output_tokens + " tokens" : ""))
+      : "Perfil: —";
     $("knowledgeInfo").textContent = data.knowledge_note || "Conhecimento SSD: verificando";
     $("learningInfo").textContent = data.learning_enabled
       ? "Aprendizado local ativo: /ensinar Olá => Olá! (use /aprendizados para revisar)"
