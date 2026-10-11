@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import os
+import ipaddress
 from pathlib import Path
 import re
 import sqlite3
@@ -50,11 +51,12 @@ def normalize(text: str) -> str:
 
 
 def terms(text: str) -> frozenset[str]:
-    # Deliberate conservative lexical retrieval: no approximate private-data
-    # matching or model-generated pseudo-facts.
+    # Normalize simple PT/EN plurals while avoiding query terms as fabricated
+    # evidence. This is lexical matching, NOT semantic understanding.
+    words = re.findall(r"[a-z0-9]{3,}", normalize(text))
     return frozenset(
-        token for token in re.findall(r"[a-z0-9]{3,}", normalize(text))
-        if token not in _STOP and not token.isdecimal()
+        (token[:-1] if token.endswith("s") and len(token) >= 5 else token)
+        for token in words if token not in _STOP and not token.isdecimal()
     )
 
 
@@ -72,7 +74,16 @@ def _valid_source(item: dict[str, Any]) -> bool:
         return False
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
         return False
-    if not re.fullmatch(r"[a-z0-9.-]+", parsed.hostname.lower()):
+    hostname = parsed.hostname.lower()
+    if not re.fullmatch(r"[a-z0-9.-]+", hostname):
+        return False
+    if hostname in ("localhost",) or hostname.endswith((".localhost", ".local", ".internal", ".invalid")):
+        return False
+    try:
+        ipaddress.ip_address(hostname)
+    except ValueError:
+        pass
+    else:
         return False
     return len(title.strip()) > 2 and len(snippet.strip()) >= 25
 
@@ -138,7 +149,13 @@ class WebKnowledge:
                         continue
                 except (ValueError, OverflowError):
                     continue
-            record_terms = sorted(topic_terms | terms(item["title"]) | terms(item["snippet"][:MAX_EXCERPT]))
+            # Only index words PRESENT IN THE SOURCE. Previously including all
+            # query words here caused unrelated search hits to be recalled as
+            # apparent evidence for a topic they did not actually mention.
+            source_terms = terms(item["title"]) | terms(item["snippet"][:MAX_EXCERPT])
+            if not (topic_terms & source_terms):
+                continue
+            record_terms = sorted(source_terms)
             accepted.append((
                 item["url"], question, " ".join(record_terms), provider,
                 item["title"][:180], item["snippet"][:MAX_EXCERPT],
@@ -190,7 +207,13 @@ class WebKnowledge:
                     continue
                 ratio = overlap / len(query_terms)
                 if overlap < 2 and len(query_terms) > 1:
-                    continue
+                    # Broad "situação do Brasil" questions can legitimately
+                    # match a Brazil news headline with one topical keyword,
+                    # but only if the document is dated and fresh.
+                    if not (current and "brasil" in query_terms
+                            and "brasil" in row["tokens"].split()
+                            and row["published_at"]):
+                        continue
                 if ratio < 0.45:
                     continue
                 rows.append((overlap, ratio, row))
@@ -220,12 +243,14 @@ class WebKnowledge:
     def list_recent(self, limit: int = 8) -> list[dict[str, str]]:
         with self._connect() as db:
             rows = db.execute(
-                "SELECT topic,title,url,expires_at FROM web_knowledge "
+                "SELECT topic,title,url,provider,saved_at,expires_at FROM web_knowledge "
                 "ORDER BY saved_at DESC LIMIT ?", (min(max(limit, 1), 20),)
             ).fetchall()
         now = int(time.time())
-        return [{"topic": r["topic"], "title": r["title"],
-                 "url": r["url"], "fresh": r["expires_at"] > now} for r in rows]
+        return [{"topic": r["topic"], "title": r["title"], "url": r["url"],
+                 "provider": r["provider"],
+                 "saved_at": datetime.fromtimestamp(r["saved_at"], timezone.utc).date().isoformat(),
+                 "fresh": r["expires_at"] > now} for r in rows]
 
 
 def knowledge_command(question: str, store: WebKnowledge | None) -> dict[str, Any] | None:
@@ -237,9 +262,14 @@ def knowledge_command(question: str, store: WebKnowledge | None) -> dict[str, An
             items = store.list_recent()
             answer = (
                 "Fontes públicas guardadas (podem expirar):\n" +
-                "\n".join(f"{i}. {r['title']} — {r['topic']}" for i, r in enumerate(items, 1))
+                "\n".join(
+                    f"{i}. {r['title']} — {r['topic']} "
+                    f"(consultado em {r['saved_at']}; "
+                    f"{'válido' if r['fresh'] else 'expirado'})\n{r['url']}"
+                    for i, r in enumerate(items, 1)
+                )
                 if items else
-                "Ainda não há fontes pesquisadas guardadas. Autorize uma busca e marque 'Guardar fontes'."
+                "Ainda não há fontes pesquisadas guardadas. Use /estudar [assunto] ou autorize uma pesquisa com 'Aprender com as fontes'."
             )
         return _local(answer, "knowledge_list")
     match = re.fullmatch(r"/esquecer-pesquisa\s+(.+)", question.strip(), re.I)
