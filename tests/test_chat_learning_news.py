@@ -248,8 +248,8 @@ class TestBrazilNews(unittest.TestCase):
         service = WebSearchService("auto")
         with patch.object(service, "_latest_brazil_news", return_value=[]) as rss:
             with patch.object(service, "_request", return_value={
-                "query": {"search": [{"title": "Capivara",
-                                      "snippet": "animal típico"}]}
+                "query": {"pages": {"99": {"title": "Capivara", "index": 1,
+                 "extract": "A capivara é um roedor semiaquático da América do Sul."}}}
             }) as wiki:
                 self.assertEqual(service.search("Como está a situação do Brasil?"), [])
                 rss.assert_called_once()
