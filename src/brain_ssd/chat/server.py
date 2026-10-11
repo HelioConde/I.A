@@ -22,7 +22,7 @@ from brain_ssd.chat.local_actions import is_local_action_answer, local_command
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
-from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research
+from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, current_game_request
 from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format_cached_context
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
@@ -538,6 +538,40 @@ class ChatEngine:
                     "episodic_ambiguities_withheld": False,
                     "cognitive_shadow": None,
                 }
+            if local_result is None and current_game_request(question):
+                # The zero-key provider searches Wikipedia (encyclopedia), not
+                # live Overwatch/Valorant/LoL patch notes. Never pass stale
+                # biographical entries to the model as current game news.
+                limited = (
+                    web_search and self.web_search_service is not None
+                    and self.web_search_service.provider in ("auto", "wikipedia")
+                )
+                if not web_search or limited:
+                    message = (
+                        "O provedor automático usa Wikipédia para esse jogo e "
+                        "não confirma patches nem notícias recentes. Para "
+                        "atualizações atuais de Overwatch, Valorant ou League "
+                        "of Legends, configure Brave Search (com chave) ou "
+                        "uma instância local SearXNG; depois autorize a pesquisa."
+                        if limited else
+                        "Para responder com atualizações recentes de jogos, "
+                        "preciso de pesquisa web autorizada em um provedor de "
+                        "notícias como Brave Search ou SearXNG. O Qwen local "
+                        "não deve inventar atualizações atuais."
+                    )
+                    local_result = {
+                        "answer": message, "mode": "local_command",
+                        "local_action": "research_provider_limited",
+                        "web_search_status": "provider_limited" if limited else "not_requested",
+                        "web_search_provider": (
+                            self.web_search_service.provider if limited else None
+                        ),
+                        "web_sources": [], "metrics": {}, "active_pages": 0,
+                        "sources_from_ssd": 0, "episodic_memories_used": 0,
+                        "episodic_ambiguities_detected": 0,
+                        "episodic_ambiguities_withheld": False,
+                        "cognitive_shadow": None,
+                    }
             if local_result is None and needs_brazil_news(question) and not archived_sources:
                 if not web_search:
                     explanation = (
@@ -659,7 +693,7 @@ class ChatEngine:
                         "episodic_ambiguities_withheld": False,
                         "cognitive_shadow": None,
                     }
-                if needs_brazil_news(question) and not web_sources:
+                if (needs_brazil_news(question) or current_game_request(question)) and not web_sources:
                     # Do not let a small LLM invent current events when the
                     # authorized research produced no dated evidence.
                     message = (
