@@ -27,7 +27,7 @@ from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
-from brain_ssd.chat.completion_quality import classify_completion
+from brain_ssd.chat.completion_quality import classify_completion, select_output_budget
 from brain_ssd.chat.http_stream import serve_stream
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
@@ -146,6 +146,9 @@ def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: s
         "Use informações explícitas do histórico recente para responder a "
         "perguntas de acompanhamento. Não transforme suposições em fatos "
         "nem negue um detalhe que o usuário acabou de informar.",
+        "Prefira respostas objetivas com frases completas. Com limite de "
+        "geração curto, evite introduções, repetições e exemplos longos; "
+        "conclua a frase antes de começar outro tópico ou enumeração.",
     ]
     self_context = brain_ssd_self_context(question)
     if self_context:
@@ -850,7 +853,7 @@ class ChatEngine:
                     "parcial, não uma avaliação completa do Brasil. Evite "
                     "tom partidário e não invente indicadores econômicos."
                 ) if len(prompt.encode("utf-8")) + 350 < getattr(self._runtime, "prompt_budget_bytes", 3600) else ""
-            generation = GenerationRequest(prompt=prompt, max_tokens=(response_tokens if response_tokens is not None else int(getattr(self._runtime, "max_output_tokens", 256))), temperature=0.7)
+            generation = GenerationRequest(prompt=prompt, max_tokens=(response_tokens if response_tokens is not None else select_output_budget(question, int(getattr(self._runtime, "max_output_tokens", 256)))), temperature=0.7)
             infer_started = time.monotonic()
             try:
                 if on_chunk is None:
