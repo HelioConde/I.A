@@ -25,6 +25,23 @@ pedem autorização para consultar notícias datadas da Agência Brasil no modo
 
 ---
 
+## Respostas web rápidas e leitura em voz alta
+
+No chat, ao autorizar **Pesquisar na web**, a opção **Resposta rápida**
+apresenta imediatamente os trechos e URLs encontrados, sem esperar a
+geração CPU do Qwen. Desmarque-a quando quiser uma resposta sintetizada
+pelo modelo. O provedor usa um cache temporário curto e a interface
+separa o tempo de pesquisa do tempo de inferência.
+
+Em cada resposta do assistente há **🔊 Ouvir resposta** e **■ Parar áudio**,
+usando a Web Speech API do navegador, preferencialmente com voz pt-BR.
+O recurso só fala quando solicitado; vozes do navegador podem depender
+dos serviços disponíveis no sistema.
+
+[Guia da pesquisa e voz](docs/WEB_SEARCH.md)
+
+---
+
 ## Instalação automática e escolha de modelo (Windows)
 
 Abra **INICIAR-BRAIN-SSD.bat** na pasta do projeto. O menu oferece Qwen3
