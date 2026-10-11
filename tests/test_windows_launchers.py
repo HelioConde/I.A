@@ -11,6 +11,7 @@ SCRIPTS=[
     "DIAGNOSTICAR-CHAT-WINDOWS.bat",
     "INICIAR-CHAT-WINDOWS.bat",
     "INICIAR-CHAT-MEMORIA-WINDOWS.bat",
+    "INICIAR-CHAT-WEB-WINDOWS.bat",
 ]
 
 class TestBatchLaunchers(unittest.TestCase):
@@ -21,6 +22,11 @@ class TestBatchLaunchers(unittest.TestCase):
                 self.assertRegex(text,r'cd /d "%~dp0"')
                 self.assertIn('if not exist "tools\\doctor_chat.py"',text)
                 self.assertIn('"tools\\doctor_chat.py" --profile economia --probe',text)
+
+    def test_web_launcher_requires_explicit_search_opt_in(self):
+        text=(ROOT/"INICIAR-CHAT-WEB-WINDOWS.bat").read_text(encoding="utf-8")
+        self.assertIn("--web-search --web-provider wikipedia", text)
+        self.assertIn("--episodic-memory", text)
 
     def test_prefer_supported_python_but_allow_installed_version(self):
         for name in SCRIPTS:
