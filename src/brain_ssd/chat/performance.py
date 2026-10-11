@@ -90,3 +90,12 @@ def answer_token_limit(model_bytes: int, requested: int | None = None) -> int:
             raise ValueError("Limite de resposta deve estar entre 48 e 256 tokens.")
         return requested
     return 112 if model_bytes >= 2 * GiB else 160
+
+
+def compact_profile(profile: str, model_bytes: int, context_size: int,
+                    prompt_budget_bytes: int) -> tuple[int, int, int]:
+    """Reduce 4B CPU prefill without changing the experimental frozen Core."""
+    output_tokens = answer_token_limit(model_bytes)
+    if profile != "economia" and model_bytes >= 2 * GiB:
+        return min(context_size, 3072), min(prompt_budget_bytes, 5600), output_tokens
+    return context_size, prompt_budget_bytes, output_tokens
