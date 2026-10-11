@@ -73,6 +73,26 @@ class TestSearchProviders(unittest.TestCase):
         self.assertIn("Python", results[0]["snippet"])
         self.assertIn("srsearch=", mock.call_args.args[0])
 
+    def test_wikipedia_enriches_sources_from_fixed_official_api(self):
+        search = WebSearchService("wikipedia")
+        def fake_request(url, headers):
+            if "prop=extracts" in url:
+                return {"query": {"pages": {
+                    "212": {"extract": "Uma estrela é composta por plasma. "
+                                          "A fusão nuclear ocorre no seu interior e libera energia."}
+                }}}
+            return {"query": {"search": [
+                {"title": "Estrela", "pageid": 212,
+                 "snippet": "Pequena descrição de uma estrela."}
+            ]}}
+        with patch.object(search, "_request", side_effect=fake_request) as request:
+            results = search.search("Estrelas")
+        self.assertEqual(len(results), 1)
+        self.assertIn("fusão nuclear", results[0]["snippet"])
+        self.assertIn("pt.wikipedia.org/wiki/Estrela", results[0]["url"])
+        self.assertEqual(request.call_count, 2)
+        self.assertIn("pageids=212", request.call_args.args[0])
+
     def test_brave_key_stays_in_header_and_never_in_results(self):
         key = "TEST_FAKE_API_SECRET_DO_NOT_LOG"
         search = WebSearchService("brave", brave_key=key)
