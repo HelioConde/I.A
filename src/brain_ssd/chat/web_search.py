@@ -359,3 +359,23 @@ def format_web_context(results: list[dict[str, str]]) -> str:
     for index, item in enumerate(results[:MAX_RESULTS], 1):
         lines.append(f"[{index}] {item['title']}\nURL: {item['url']}\nTrecho: {item['snippet']}")
     return "\n\n".join(lines)
+
+def format_fast_web_answer(results: list[dict[str, str]]) -> str:
+    """Immediate extractive briefing, clearly NOT an LLM-generated summary."""
+    if not results:
+        return (
+            "Não obtive fontes verificáveis nesta consulta. "
+            "Tente novamente ou utilize outro provedor de pesquisa."
+        )
+    lines = ["Consulta rápida de fontes públicas (sem geração pelo Qwen):"]
+    for i, item in enumerate(results[:3], 1):
+        lines.append(
+            f"[{i}] {item['title']}\n"
+            f"{item['snippet'][:330]}\n"
+            f"Fonte: {item['url']}"
+        )
+    lines.append(
+        "São trechos das fontes, não uma análise completa ou verificação "
+        "independente. Abra os links para conferir o conteúdo."
+    )
+    return "\n\n".join(lines)
