@@ -32,7 +32,7 @@
       <div class="sidebar-panel">
         <span class="micro-title">EXECUÇÃO LOCAL</span>
         <div class="sidebar-row"><span class="status-dot" id="sidebarDot"></span><strong id="sidebarStatus">Iniciando...</strong></div>
-        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p><p id="learningInfo">Aprendizado: verificando</p><p id="webPrivacyInfo">Busca web desligada. Nenhuma pergunta é enviada à internet.</p>
+        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p><p id="learningInfo">Aprendizado: verificando</p><p id="researchInfo">Conhecimento pesquisado: verificando</p><p id="webPrivacyInfo">Busca web desligada. Nenhuma pergunta é enviada à internet.</p>
       </div>
       <div class="side-footer">Histórico privado neste computador · Brain-SSD V0</div>
     </aside>
@@ -83,6 +83,10 @@
               <label class="web-optin" id="webSearchControl" hidden>
                 <input type="checkbox" id="webSearchToggle">
                 <span>Pesquisar na web</span>
+              </label>
+              <label class="web-optin" id="webLearnControl" hidden title="Guardar trechos públicos e suas URLs no SQLite local para próximas conversas">
+                <input type="checkbox" id="webLearnToggle" checked>
+                <span>Aprender com as fontes</span>
               </label>
               <span class="web-provider-info" id="webProviderInfo" hidden></span>
             </div>
