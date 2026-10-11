@@ -55,7 +55,7 @@ class TestPerformancePolicy(unittest.TestCase):
             exe=root/"third_party"/"llama.cpp"/"runtime-win-cpu-x64"/"bin"/"llama-completion.exe"
             exe.parent.mkdir(parents=True)
             exe.write_bytes(b"MZ")
-            with patch("brain_ssd.chat.runtime.windows_memory", return_value=MemoryInfo(16*GiB,10*GiB)), patch("brain_ssd.chat.runtime.os.cpu_count", return_value=12):
+            with patch("brain_ssd.chat.runtime.MIN_PLAUSIBLE_GGUF_BYTES", 32), patch("brain_ssd.chat.runtime.windows_memory", return_value=MemoryInfo(16*GiB,10*GiB)), patch("brain_ssd.chat.runtime.os.cpu_count", return_value=12):
                 runtime=LocalChatRuntime(root, profile="equilibrado", core_mode="auto", model_file=model.name)
             try:
                 status=runtime.status()
@@ -78,7 +78,7 @@ class TestPerformancePolicy(unittest.TestCase):
             exe=root/"third_party"/"llama.cpp"/"runtime-win-cpu-x64"/"bin"/"llama-server.exe"
             exe.parent.mkdir(parents=True)
             exe.write_bytes(b"MZ")
-            with patch("brain_ssd.chat.runtime.windows_memory", return_value=MemoryInfo(16*GiB,10*GiB)), patch("brain_ssd.chat.runtime.os.cpu_count", return_value=12):
+            with patch("brain_ssd.chat.runtime.MIN_PLAUSIBLE_GGUF_BYTES", 32), patch("brain_ssd.chat.runtime.windows_memory", return_value=MemoryInfo(16*GiB,10*GiB)), patch("brain_ssd.chat.runtime.os.cpu_count", return_value=12):
                 runtime=LocalChatRuntime(root, profile="equilibrado", core_mode="auto", model_file=model.name)
             try:
                 self.assertEqual(runtime.core_mode, "persistent")
