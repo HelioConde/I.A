@@ -39,6 +39,18 @@ class TestBatchLaunchers(unittest.TestCase):
                 self.assertIn('%PYTHON_CMD% --version',text)
                 self.assertNotIn('py -3 "tools\\doctor_chat.py"',text)
 
+    def test_all_in_one_launcher_offers_model_selection_and_installs_missing(self):
+        text=(ROOT/"INICIAR-BRAIN-SSD.bat").read_text(encoding="utf-8")
+        self.assertIn('cd /d "%~dp0"',text)
+        self.assertIn('"tools\\auto_setup_chat_windows.py"',text)
+        self.assertIn("choice /C 123",text)
+        self.assertIn("set \"MODEL=0.6b\"",text)
+        self.assertIn("set \"MODEL=1.7b\"",text)
+        self.assertIn("set \"MODEL=4b\"",text)
+        self.assertIn("winget install --id Python.Python.3.11",text)
+        self.assertIn("--profile %PROFILE%",text)
+        self.assertIn("%WEB%",text)
+
     def test_chat_start_is_conditional_on_preflight(self):
         for name in SCRIPTS[1:]:
             with self.subTest(name=name):
