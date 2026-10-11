@@ -96,6 +96,9 @@ class TestWebKnowledgeStore(unittest.TestCase):
             self.assertEqual(store.save("Astronomia das estrelas", "auto", source), 1)
             self.assertEqual(len(store.retrieve("Astronomia e estrelas")), 1)
             self.assertEqual(len(store.retrieve("Astronomia e estrela")), 1)
+            self.assertEqual(
+                len(store.retrieve("O que você aprendeu sobre astronomia?")), 1
+            )
 
     def test_records_survive_restart_and_match_related_question(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -181,6 +184,9 @@ class TestResearchInChat(unittest.TestCase):
                 self.assertEqual(len(studied["web_sources"]), 2)
                 self.assertEqual(core.core_backend.prompts, [])
                 self.assertEqual(store.count(), 2)
+                learned = engine.ask("O que você aprendeu sobre astronomia?", [])
+                self.assertEqual(learned["research_status"], "archived")
+                self.assertTrue(learned["research_used_sources"])
                 reviewed = engine.ask("/conhecimento", [])
                 self.assertIn("https://pt.wikipedia.org/wiki/Estrela", reviewed["answer"])
                 self.assertIn("consultado em", reviewed["answer"])
