@@ -30,6 +30,7 @@ from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
 from brain_ssd.chat.completion_quality import classify_completion, select_output_budget
 from brain_ssd.chat.http_stream import serve_stream
 from brain_ssd.chat.copilot import LocalCopilot, CopilotPermissionError
+from brain_ssd.chat.copilot_queries import copilot_answer
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
 
@@ -65,8 +66,9 @@ def brain_ssd_self_context(question: str) -> str:
             "Possui pesquisa web opcional (Wikipédia, Google via Serper, Brave ou SearXNG) "
             "configurada pelo usuário, com autorização por pergunta; "
             "sem autorização, não consulta sites. "
-            "Não possui acesso autenticado ao GitHub do usuário nem aos "
-            "arquivos privados do PC. "
+            "Não possui acesso autenticado ao GitHub do usuário. "
+            "A leitura de arquivos do PC e de capturas está disponível somente "
+            "se autorizada no iniciador do Copiloto. "
             "Fontes externas devem ser verificadas e podem conter erros."
         )
     if any(phrase in normalized for phrase in (
@@ -242,13 +244,14 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None, web_knowledge: WebKnowledge | None = None) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None, web_knowledge: WebKnowledge | None = None, copilot: LocalCopilot | None = None) -> None:
         self._runtime_factory = runtime_factory
         if memory_aliases and episodic_store is None:
             raise ValueError("A recuperação por sinônimos exige memória episódica explícita.")
         self.episodic_store = episodic_store
         self.memory_aliases = bool(memory_aliases)
         self.web_search_service = web_search_service
+        self.copilot = copilot
         self.learned_store = learned_store
         self.web_knowledge = web_knowledge
         self.cognitive_shadow = bool(cognitive_shadow)
@@ -335,6 +338,7 @@ class ChatEngine:
             "learning_enabled": self.learned_store is not None,
             "research_memory_enabled": self.web_knowledge is not None,
             "research_memory_sources": self.web_knowledge.count() if self.web_knowledge else 0,
+            "copilot_enabled": self.copilot is not None and self.copilot.status()["enabled"],
             "web_search_enabled": self.web_search_service is not None,
             "web_search_provider": self.web_search_service.provider if self.web_search_service else None,
         }
@@ -426,6 +430,19 @@ class ChatEngine:
             raise ValueError("Memória de pesquisas desativada nesta sessão.")
         if web_search and self.web_search_service is None:
             raise ValueError("Pesquisa web desativada nesta sessão.")
+        # Explicit PC/screen intents have verified local-tool answers even if
+        # llama.cpp is loading or temporarily failing. Never send screenshots
+        # or machine window titles into the language model or web provider.
+        local_pc = copilot_answer(question, self.copilot)
+        if local_pc is not None:
+            if cancel_event is not None and cancel_event.is_set():
+                raise GenerationCancelled()
+            if on_chunk is not None:
+                on_chunk(local_pc["answer"])
+            if self.diagnostics:
+                self.diagnostics.emit("chat.local_action", request_id=request_id,
+                                      action=local_pc["local_action"], status="PASS")
+            return local_pc
         if self._state != "ready" or self._runtime is None:
             raise RuntimeError(self._error or "O modelo local ainda não está pronto.")
         history = normalize_history(raw_history)
