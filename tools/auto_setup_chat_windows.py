@@ -137,7 +137,7 @@ def start_chat(root: Path, spec: ModelSpec, *, web: bool, profile: str) -> int:
     args = [
         sys.executable, str(root / "tools" / "run_chat.py"),
         "--profile", profile, "--model-file", spec.filename,
-        "--episodic-memory",
+        "--episodic-memory", "--cognitive-shadow",
     ]
     if web:
         args.extend(["--web-search", "--web-provider", "auto"])
@@ -152,7 +152,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Preparar e iniciar Brain-SSD automaticamente")
     parser.add_argument("--model", choices=tuple(MODELS), required=True)
     parser.add_argument("--web", action="store_true",
-                        help="Habilita opcao de buscar na Wikipedia, por pergunta")
+                        help="Habilita o provedor auto (Wikipedia e noticias do Brasil), com autorizacao por pergunta")
     parser.add_argument("--profile", choices=("economia", "equilibrado"),
                         default="economia")
     parser.add_argument("--prepare-only", action="store_true",
