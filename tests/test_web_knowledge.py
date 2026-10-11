@@ -73,6 +73,30 @@ def dated_news():
 
 
 class TestWebKnowledgeStore(unittest.TestCase):
+    def test_irrelevant_results_do_not_learn_query_words_as_facts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = WebKnowledge(Path(tmp) / "research.sqlite3")
+            irrelevant = [{
+                "title": "Receita de bolo de chocolate",
+                "url": "https://example.org/bolo",
+                "snippet": "Receita culinária com ovos, farinha e preparo no forno."
+            }]
+            self.assertEqual(store.save("Astronomia e galáxias", "auto", irrelevant), 0)
+            self.assertEqual(store.count(), 0)
+            self.assertEqual(store.retrieve("O que são galáxias?"), [])
+
+    def test_plural_and_singular_forms_recall_same_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = WebKnowledge(Path(tmp) / "research.sqlite3")
+            source = [{
+                "title": "Estrela e astronomia",
+                "url": "https://example.org/estrela",
+                "snippet": "Uma estrela é um astro luminoso estudado na astronomia."
+            }]
+            self.assertEqual(store.save("Astronomia das estrelas", "auto", source), 1)
+            self.assertEqual(len(store.retrieve("Astronomia e estrelas")), 1)
+            self.assertEqual(len(store.retrieve("Astronomia e estrela")), 1)
+
     def test_records_survive_restart_and_match_related_question(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "research.sqlite3"
@@ -127,6 +151,52 @@ class TestWebKnowledgeStore(unittest.TestCase):
 
 
 class TestResearchInChat(unittest.TestCase):
+    def test_study_topic_works_without_qwen_and_requires_both_permissions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = WebKnowledge(Path(tmp) / "research.sqlite3")
+            service = FakeSearch(wiki_sources())
+            core = FakeRuntime()
+            engine = ChatEngine(lambda: core, web_search_service=service,
+                                web_knowledge=store,
+                                diagnostics=DiagnosticLogger(Path(tmp) / "diagnostics"))
+            engine.start()
+            try:
+                no_web = engine.ask("/estudar astronomia e estrelas", [])
+                self.assertEqual(no_web["local_action"], "research_study")
+                self.assertEqual(service.queries, [])
+                self.assertEqual(store.count(), 0)
+
+                no_memory = engine.ask("/estudar astronomia e estrelas", [],
+                                       web_search=True, remember_web=False)
+                self.assertEqual(no_memory["research_saved_sources"], 0)
+                self.assertEqual(service.queries, [])
+                self.assertEqual(store.count(), 0)
+
+                studied = engine.ask("/estudar astronomia e estrelas", [],
+                                     web_search=True, remember_web=True)
+                self.assertEqual(studied["local_action"], "research_study")
+                self.assertEqual(studied["research_saved_sources"], 2)
+                self.assertEqual(studied["research_save_status"], "saved")
+                self.assertEqual(service.queries, ["astronomia e estrelas"])
+                self.assertEqual(len(studied["web_sources"]), 2)
+                self.assertEqual(core.core_backend.prompts, [])
+                self.assertEqual(store.count(), 2)
+                reviewed = engine.ask("/conhecimento", [])
+                self.assertIn("https://pt.wikipedia.org/wiki/Estrela", reviewed["answer"])
+                self.assertIn("consultado em", reviewed["answer"])
+            finally:
+                engine.close()
+
+            reopened = ChatEngine(FakeRuntime, web_knowledge=WebKnowledge(store.path))
+            reopened.start()
+            try:
+                result = reopened.ask("Explique astronomia e estrelas", [])
+                self.assertEqual(result["research_status"], "archived")
+                self.assertGreaterEqual(len(result["research_used_sources"]), 1)
+                self.assertIn("consultado em", reopened._runtime.core_backend.prompts[-1])
+            finally:
+                reopened.close()
+
     def test_explicit_save_then_reuse_without_network_or_model_retraining(self):
         with tempfile.TemporaryDirectory() as tmp:
             location = Path(tmp) / "research.sqlite3"
