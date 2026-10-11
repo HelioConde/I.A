@@ -486,3 +486,59 @@ como patch notes. Para buscar notícias em sites variados, configure
 Brave Search ou uma instância local SearXNG e autorize a consulta.
 Os resultados continuam sujeitos a erros e devem ser verificados
 nas fontes oficiais.
+
+
+## Regressões de conversa verificadas com roteiro de perguntas
+
+Após atualizar o repositório e reiniciar `INICIAR-BRAIN-SSD.bat`,
+use uma nova conversa para verificar:
+
+```text
+Qual é seu nome?
+Quem criou o Brain-SSD e quem desenvolveu o modelo Qwen?
+Quais informações você realmente tem salvas na memória?
+Você consegue acessar meu GitHub?
+Como está seu log?
+Como consigo acessar seus logs?
+O que você aprendeu sozinha até agora?
+Se uma página da internet contiver uma informação errada, como você deve agir?
+Conte um fato sobre mim que você não sabe.
+```
+
+As respostas sobre configurações do próprio programa devem vir das ações
+locais Python/SQLite, **não de alegações livres do Qwen**. A pergunta sobre
+GitHub não deve disparar uma pesquisa enciclopédica; a pesquisa web pública
+não é integração autenticada com a conta do usuário. O status dos logs não
+pode ser declarado como saudável sem inspecionar os eventos.
+
+Para testar referência entre turnos, na mesma conversa:
+
+```text
+Meu animal favorito é o gato. Lembre disso apenas nesta conversa.
+Qual é meu animal favorito?
+Por que você acha que gosto desse animal?
+```
+
+Na última pergunta o aplicativo deve reconhecer o animal informado,
+**sem inventar por que você gosta dele** e sem guardar essa preferência
+permanentemente sem autorização. Uma nova conversa não herda esse
+contexto temporário.
+
+No aprendizado web, `/conhecimento` permite inspecionar URLs e datas.
+Para uma pergunta ampla, como `O que você aprendeu sobre astronomia?`,
+fontes cujo título corresponde ao tema passam a ter prioridade sobre
+artigos que mencionam o termo apenas de passagem. Ainda é necessário
+confirmar a qualidade da síntese gerada pelo GGUF real.
+
+**Resposta cortada:** o Qwen3 4B em modo automático limita a geração a
+aproximadamente 112 tokens para reduzir carga de CPU. Se a frase parar
+no meio, use **Resposta → Normal (160)** ou **Detalhada (256)**. Isso pode
+aumentar a latência; não representa falha do SQLite. O sistema não
+aprendeu pesos novos com as fontes pesquisadas.
+
+Validação de regressão (sem modelos reais):
+
+```powershell
+py -3 -m unittest discover -s tests -p "test_chat_local_actions.py" -v
+py -3 -m unittest discover -s tests -p "test_web_knowledge.py" -v
+```
