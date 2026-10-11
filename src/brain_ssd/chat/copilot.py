@@ -160,8 +160,8 @@ class LocalCopilot:
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
 
     def system_info(self) -> dict:
-        if not self.roots:
-            raise CopilotPermissionError("Autorize uma pasta antes de consultar o sistema.")
+        if not (self.roots or self.screen_enabled):
+            raise CopilotPermissionError("Ative o copiloto antes de consultar o sistema.")
         disks = []
         for root in self.roots:
             try:
