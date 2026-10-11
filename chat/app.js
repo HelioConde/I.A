@@ -442,6 +442,17 @@ async function send() {
                 anchor.rel = "noopener noreferrer";
                 anchor.textContent = String(source.title || link.hostname);
                 li.appendChild(anchor);
+                if (!searchThisQuestion && source.saved_at) {
+                  const saved = Number(source.saved_at);
+                  if (Number.isFinite(saved) && saved > 0) {
+                    const meta = document.createElement("small");
+                    const savedDate = new Date(saved * 1000).toLocaleDateString("pt-BR");
+                    meta.textContent = (source.published_at
+                      ? "Publicado em " + String(source.published_at) + " · " : "") +
+                      "Fonte guardada em " + savedDate + " (não consultada ao vivo)";
+                    li.appendChild(meta);
+                  }
+                }
                 if (source.snippet) {
                   const summary = document.createElement("p");
                   summary.textContent = String(source.snippet);
