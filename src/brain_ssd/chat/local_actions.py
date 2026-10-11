@@ -96,6 +96,7 @@ def is_local_action_answer(answer: str) -> bool:
 def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any] | None:
     """Return a truthful app action; None means let the real Qwen answer."""
     simple = re.sub(r"[?.!]+\s*$", "", plain(question)).strip()
+    greeting_text = simple
     simple = re.sub(r"^(?:oi|ola|bom dia|boa tarde|boa noite)[,\s]+", "", simple)
     save = _parse_save_request(question)
     direct_name = _direct_assistant_name_request(question) if save is None else None
@@ -122,11 +123,11 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
                     f"Lembrança salva no SQLite local: {saved['content']}. "
                     "Você pode revisar, editar ou apagar em Memórias."
                 )
-    elif simple in ("oi", "ola", "bom dia", "boa tarde", "boa noite") or (
+    elif greeting_text in ("oi", "ola", "bom dia", "boa tarde", "boa noite") or (
         store is not None
-        and simple.startswith(("oi ", "ola ", "bom dia ", "boa tarde ", "boa noite "))
+        and greeting_text.startswith(("oi ", "ola ", "bom dia ", "boa tarde ", "boa noite "))
         and (saved_name := plain(store.get_assistant_name() or "")) != ""
-        and simple in tuple(f"{g} {saved_name}" for g in
+        and greeting_text in tuple(f"{g} {saved_name}" for g in
                             ("oi", "ola", "bom dia", "boa tarde", "boa noite"))
     ):
         action = "greeting"
