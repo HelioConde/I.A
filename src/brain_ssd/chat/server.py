@@ -835,7 +835,7 @@ class ChatEngine:
                     "parcial, não uma avaliação completa do Brasil. Evite "
                     "tom partidário e não invente indicadores econômicos."
                 ) if len(prompt.encode("utf-8")) + 350 < getattr(self._runtime, "prompt_budget_bytes", 3600) else ""
-            generation = GenerationRequest(prompt=prompt, max_tokens=256, temperature=0.7)
+            generation = GenerationRequest(prompt=prompt, max_tokens=int(getattr(self._runtime, "max_output_tokens", 256)), temperature=0.7)
             infer_started = time.monotonic()
             try:
                 if on_chunk is None:
