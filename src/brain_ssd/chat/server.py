@@ -44,7 +44,7 @@ def brain_ssd_self_context(question: str) -> str:
     refers_to_app = bool(re.search(r"\b(voce|seu|sua|seus|suas|brain[- ]?ssd|teu|tua)\b", normalized))
     if not refers_to_app:
         return ""
-    if re.search(r"\b(criador|criou|criaram|autor|autoria|desenvolveu|desenvolvedor)\b", normalized):
+    if re.search(r"\b(criador|criou|criaram|autor|autoria|desenvolve|desenvolveu|desenvolvedor|desenvolvido)\b", normalized):
         return (
             "Identidade verificada do projeto: o repositório privado "
             "HelioConde/I.A pertence à conta @HelioConde (Hélio Conde). "
@@ -52,13 +52,20 @@ def brain_ssd_self_context(question: str) -> str:
             "llama.cpp é software de terceiros. Não atribua a autoria "
             "do Brain-SSD a uma pessoa não documentada."
         )
+    if re.search(r"\b(internet|web|sites|navegar|rede)\b", normalized):
+        return (
+            "O Brain-SSD roda localmente. Não acessa sites, a internet, "
+            "e-mails ou serviços externos por conta própria. "
+            "Só usa os dados locais fornecidos ao aplicativo; "
+            "não afirme acesso externo que não existe."
+        )
     if any(phrase in normalized for phrase in (
         "consegue fazer", "pode fazer", "sabe fazer", "capacidades", "funcionalidades",
         "funcoes", "recursos", "no que pode ajudar", "o que faz",
     )):
         return (
             "Capacidades documentadas do Brain-SSD: conversar em português, explicar conceitos, "
-            "ajudar a escrever textos e pequenos exemplos de código usando o Qwen3-0.6B local. "
+            "ajudar a escrever textos e pequenos exemplos de código usando o modelo local instalado. "
             "Pode consultar a base SSD de documentos Python e SQLite apenas quando a recuperação estiver ativa. "
             "Pode usar notas episódicas somente quando a pessoa escolher guardá-las; o histórico fica no computador. "
             "Não tem internet, serviços remotos, acesso automático a arquivos pessoais ou controle do PC; "
