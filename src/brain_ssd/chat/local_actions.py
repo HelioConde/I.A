@@ -154,7 +154,7 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
         action = "help"
         answer = (
             "Sou o Brain-SSD, uma IA local experimental. Posso conversar, explicar "
-            "conceitos e ajudar com textos e código (respostas do Qwen3 0.6B podem errar). "
+            "conceitos e ajudar com textos e código (o modelo local pode errar). "
             "Comandos locais reais: 'salve na memória que ...' (guarda uma nota somente "
             "quando você pedir), '/memorias' (lista notas salvas), '/nome' (mostra meu nome) "
             "e '/ajuda' (mostra estes comandos). "
