@@ -49,3 +49,35 @@ def strip_research_command(question: str) -> str:
         "", question, flags=re.I,
     ).strip()
     return trimmed or question
+
+# Games with frequent patches require a genuinely current news/search provider.
+# The no-key 'auto' provider falls back to encyclopedia results outside Brazil;
+# it must not present unrelated Wikipedia biographies as "latest updates".
+_GAME_RE = re.compile(r"\\b(overwatch|valorant|league\\s+of\\s+legends|lol)\\b")
+_FRESH_RE = re.compile(
+    r"\\b(ultim[aos]*|atualizac[a-z]*|notici[a-z]*|recent[a-z]*|hoje|"
+    r"agora|patch|patches|novidade[s]?|mudanca[s]?|temporada)\\b"
+)
+
+
+def current_game_request(question: str) -> bool:
+    if not isinstance(question, str):
+        return False
+    normalized = unicodedata.normalize("NFKD", question.casefold())
+    normalized = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return bool(_GAME_RE.search(normalized) and _FRESH_RE.search(normalized))
+
+
+def result_matches_game(question: str, title: str, snippet: str) -> bool:
+    """Reject clearly unrelated wiki hits from the current-games router."""
+    normalized = unicodedata.normalize("NFKD", question.casefold())
+    normalized = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    target = _GAME_RE.search(normalized)
+    if not target:
+        return True
+    content = unicodedata.normalize("NFKD", (title + " " + snippet).casefold())
+    content = "".join(ch for ch in content if not unicodedata.combining(ch))
+    name = target.group(1)
+    if name in ("lol", "league of legends"):
+        return bool(re.search(r"\\b(?:league\\s+of\\s+legends|lol|cblol)\\b", content))
+    return bool(re.search(r"\\b" + re.escape(name) + r"\\b", content))
