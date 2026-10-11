@@ -760,8 +760,9 @@ async function copilotStatus() {
       : "Desativado. Inicie com --copilot-root e/ou --copilot-screen.";
     $("copilotRoots").textContent = state.roots && state.roots.length
       ? "Pastas autorizadas: " + state.roots.join(" · ") : "Nenhuma pasta autorizada.";
-    ["copilotList", "copilotRead", "copilotImage", "copilotSystem"]
+    ["copilotList", "copilotRead", "copilotImage"]
       .forEach(id => { $(id).disabled = !state.files_enabled; });
+    $("copilotSystem").disabled = !state.enabled;
     $("copilotCapture").disabled = !state.screen_enabled;
     $("copilotLive").disabled = !state.screen_enabled;
   } catch (_) {
