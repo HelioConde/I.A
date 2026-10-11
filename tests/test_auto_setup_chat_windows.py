@@ -119,7 +119,7 @@ class TestModelCatalog(unittest.TestCase):
                 setup.start_chat(root, spec, web=True, profile="equilibrado")
                 cmd = invoke.call_args.args[0]
                 self.assertIn("--web-search", cmd)
-                self.assertIn("wikipedia", cmd)
+                self.assertIn("auto", cmd)
 
     def test_selected_model_doctor_accepts_gguf_inside_models_only(self):
         with tempfile.TemporaryDirectory() as tmp:
