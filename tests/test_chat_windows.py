@@ -194,6 +194,24 @@ class TestChatEngine(unittest.TestCase):
             bad.ask("Olá", [])
 
 
+class TestQualityHeuristics(unittest.TestCase):
+    def test_simple_arithmetic_checks_whole_number_not_substring(self):
+        from tools.validate_chat_quality_windows import check_response
+        self.assertTrue(check_response("basic_reasoning", "A resposta é 4."))
+        self.assertFalse(check_response("basic_reasoning", "A resposta é 24."))
+        self.assertFalse(check_response("basic_reasoning", "Não soube."))
+
+    def test_creator_requires_both_project_and_model_attribution(self):
+        from tools.validate_chat_quality_windows import check_response
+        self.assertTrue(check_response("creator", "Hélio Conde mantém o projeto; Qwen é da equipe Qwen."))
+        self.assertFalse(check_response("creator", "O projeto foi criado por alguém desconhecido."))
+
+    def test_short_context_recall_checks_answer(self):
+        from tools.validate_chat_quality_windows import check_response
+        self.assertTrue(check_response("context_recall", "Você mencionou gato."))
+        self.assertFalse(check_response("context_recall", "Você mencionou cachorro."))
+
+
 class TestLifecycle(unittest.TestCase):
     def test_close_during_async_start_never_leaves_runtime_alive(self):
         opened = threading.Event()
