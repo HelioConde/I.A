@@ -33,10 +33,14 @@ def main() -> int:
         if engine.status()["status"] != "ready":
             raise RuntimeError(engine.status().get("error") or "Falha no preflight")
         started = time.perf_counter()
-        response = engine.ask("Olá!", [])
+        # A bare greeting is served by a transparent local action. Use a
+        # genuine open-ended request so this test must execute Qwen/llama.cpp.
+        response = engine.ask("Explique em uma frase o que é Python.", [])
+        if response.get("mode") == "local_command" or not engine.status()["inference_verified"]:
+            raise RuntimeError("Não houve inferência real; apenas resposta local.")
         report.update({
-            "status": "PASS" if response["answer"].strip() else "FAIL",
-            "question_type": "greeting",
+            "status": "PASS" if response["answer"].strip() and response.get("mode") != "local_command" else "FAIL",
+            "question_type": "explanation",
             "answer_chars": len(response["answer"]),
             "elapsed_s": round(time.perf_counter() - started, 3),
             "metrics": response["metrics"],
