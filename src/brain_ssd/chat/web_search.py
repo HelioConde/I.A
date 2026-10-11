@@ -11,6 +11,9 @@ import html
 import json
 import os
 import re
+import hashlib
+import threading
+import time
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
@@ -26,7 +29,10 @@ MAX_BYTES = 256_000
 RSS_MAX_BYTES = 2 * 1024 * 1024  # Full-article feeds are larger than search JSON.
 MAX_QUERY = 280
 MAX_RESULTS = 4
-TIMEOUT_SECONDS = 7
+TIMEOUT_SECONDS = 5
+NEWS_CACHE_SECONDS = 75
+GENERAL_CACHE_SECONDS = 300
+MAX_CACHE_ENTRIES = 24
 PROVIDERS = ("wikipedia", "brave", "searxng", "auto")
 
 # Official Agencia Brasil RSS endpoints advertised at /feed/. No arbitrary fetch.
@@ -94,6 +100,9 @@ class WebSearchService:
         if provider not in PROVIDERS:
             raise ValueError("Provedor de pesquisa inválido.")
         self.provider = provider
+        self._cache_lock = threading.Lock()
+        self._cache: dict[str, tuple[float, list[dict[str, str]]]] = {}
+        self._cache_state = threading.local()
         self._brave_key = brave_key if brave_key is not None else os.environ.get("BRAVE_SEARCH_API_KEY", "")
         self._searxng = searxng_url if searxng_url is not None else os.environ.get("BRAINSSD_SEARXNG_URL", "")
         if provider == "brave" and not self._brave_key:
@@ -221,11 +230,45 @@ class WebSearchService:
         except (WebSearchError, ValueError):
             return {}
 
+    def was_cached(self) -> bool:
+        """Whether this thread received a cached search result."""
+        return bool(getattr(self._cache_state, "hit", False))
+
     def search(self, question: str) -> list[dict[str, str]]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Pergunta vazia.")
         query = " ".join(strip_research_command(question).split())[:MAX_QUERY]
-        if self.provider == "auto" and needs_brazil_news(question):
+        news = self.provider == "auto" and needs_brazil_news(question)
+        # Only a query explicitly authorized by the engine reaches this
+        # method. Cache *hashed* questions in process memory, never SQLite
+        # history or other user messages. Cache hit never triggers a network
+        # call and uses a very short TTL for news.
+        cache_key = hashlib.sha256(
+            (self.provider + "\x00" + query.casefold()).encode("utf-8")
+        ).hexdigest()
+        now = time.monotonic()
+        self._cache_state.hit = False
+        with self._cache_lock:
+            cached = self._cache.get(cache_key)
+            if cached and cached[0] > now:
+                self._cache_state.hit = True
+                return [dict(item) for item in cached[1]]
+        results = self._search_uncached(query, news=news)
+        if results:
+            ttl = NEWS_CACHE_SECONDS if news else GENERAL_CACHE_SECONDS
+            with self._cache_lock:
+                self._cache = {
+                    key: val for key, val in self._cache.items()
+                    if val[0] > now
+                }
+                if len(self._cache) >= MAX_CACHE_ENTRIES:
+                    oldest = next(iter(self._cache))
+                    self._cache.pop(oldest, None)
+                self._cache[cache_key] = (time.monotonic() + ttl, [dict(item) for item in results])
+        return results
+
+    def _search_uncached(self, query: str, *, news: bool) -> list[dict[str, str]]:
+        if news:
             return self._latest_brazil_news()
         if self.provider in ("wikipedia", "auto"):
             endpoint = "https://pt.wikipedia.org/w/api.php?"
