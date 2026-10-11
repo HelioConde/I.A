@@ -6,6 +6,7 @@ on:
       - "INICIAR-COPILOTO-WINDOWS.bat"
       - "tests/test_windows_launchers.py"
       - "tests/test_copilot.py"
+      - "tests/test_copilot_queries.py"
       - ".github/workflows/windows-chat.yml"
       - "src/brain_ssd/chat/copilot.py"
       - "tools/run_chat.py"
@@ -114,6 +115,7 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_static_ui.py" -v
           python -m unittest discover -s tests -p "test_windows_launchers.py" -v
           python -m unittest discover -s tests -p "test_copilot.py" -v
+          python -m unittest discover -s tests -p "test_copilot_queries.py" -v
       - name: Assert runtime unit tests independently
         shell: pwsh
         run: python -m unittest discover -s tests -p "test_chat_runtime.py" -v
