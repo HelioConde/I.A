@@ -87,13 +87,66 @@ class TestExplicitLocalCommands(unittest.TestCase):
             self.assertEqual(len(notes.list()), 1)
             self.assertEqual(len(notes.revisions(notes.list()[0]["id"])), 1)
 
-    def test_casual_statement_does_not_store_automatically(self):
+    def test_direct_explicit_name_change_persists_across_conversations_and_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            location = Path(tmp) / "notes.sqlite3"
+            notes = EpisodicMemory(location)
+            runtime = FakeRuntime()
+            engine = ChatEngine(lambda: runtime, episodic_store=notes)
+            engine.start()
+            try:
+                result = engine.ask("Seu nome a partir de hoje é Luna", [])
+                self.assertEqual(result["local_action"], "memory_save")
+                self.assertIn("Luna", result["answer"])
+                self.assertEqual(notes.get_assistant_name(), "Luna")
+                self.assertEqual(runtime.core_backend.prompts, [])
+                # This must go through the actual model adapter, not static help.
+                answer = engine.ask("Oi Luna", [
+                    {"role": "user", "content": "O que você consegue fazer?"},
+                    {"role": "assistant", "content": local_command("/ajuda", notes)["answer"]},
+                ])
+                self.assertNotIn("local_action", answer)
+                self.assertEqual(answer["answer"], "Resposta do modelo.")
+                prompt = runtime.core_backend.prompts[-1]
+                self.assertIn("Luna", prompt)
+                self.assertNotIn("Comandos locais reais:", prompt)
+                self.assertIn("Oi Luna", prompt)
+            finally:
+                engine.close()
+            reopened = EpisodicMemory(location)
+            fresh = ChatEngine(FakeRuntime, episodic_store=reopened)
+            fresh.start()
+            try:
+                self.assertIn("Luna", fresh.ask("/nome", [])["answer"])
+                self.assertIn("Luna", fresh.ask("Oi, qual é seu nome?", [])["answer"])
+                self.assertEqual(len(reopened.list()), 1)
+            finally:
+                fresh.close()
+
+    def test_nickname_instruction_variants_and_safety(self):
         with tempfile.TemporaryDirectory() as tmp:
             notes = EpisodicMemory(Path(tmp) / "notes.sqlite3")
-            for message in ("A partir de hoje seu nome é Luna", "Meu nome é Francisco",
-                            "O que significa salvar na memória?"):
+            for command, expected in (
+                ("A partir de hoje seu nome é Luna", "Luna"),
+                ("Quero te chamar de Sol", "Sol"),
+                ("Vou te chamar de Aurora!", "Aurora"),
+            ):
+                self.assertEqual(local_command(command, notes)["local_action"], "memory_save")
+                self.assertEqual(notes.get_assistant_name(), expected)
+            self.assertEqual(len(notes.list()), 1)
+            for message in (
+                "Meu nome é Francisco", "O que significa salvar na memória?",
+                "A partir de hoje seu nome é Luna?", "Acho que seu nome é Luna",
+                "No conto, seu nome a partir de hoje é Luna",
+                "Oi luna",
+            ):
                 self.assertIsNone(local_command(message, notes))
-            self.assertEqual(notes.list(), [])
+            self.assertEqual(len(notes.list()), 1)
+
+    def test_explicit_name_command_when_memory_disabled_never_claims_success(self):
+        response = local_command("Seu nome a partir de hoje é Luna", None)
+        self.assertEqual(response["local_action"], "memory_save")
+        self.assertIn("Não salvei nada", response["answer"])
 
     def test_regular_note_and_list_are_real_db_operations(self):
         with tempfile.TemporaryDirectory() as tmp:
