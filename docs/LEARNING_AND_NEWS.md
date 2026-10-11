@@ -70,3 +70,65 @@ Os testes usam SQLite temporário e RSS simulado; não enviam perguntas reais pa
     py -3 -m unittest discover -s tests -p "test_chat_learning_news.py" -v
 
 A inferência real e a disponibilidade do feed precisam ser conferidas no seu computador. O Brain-SSD **não ficou mais inteligente apenas por memorizar uma saudação**: respostas abertas continuam dependendo da capacidade do Qwen e da qualidade das fontes.
+
+
+## Aprendizado a partir de fontes públicas (pesquisa persistente)
+
+Agora há uma segunda memória, separada dos exemplos ensinados manualmente:
+`%LOCALAPPDATA%\BrainSSD\web-knowledge.sqlite3` (Windows).
+
+O fluxo é:
+
+1. Você escreve uma pergunta e marca **Pesquisar na web** (ou aceita a
+   confirmação mostrada para notícias atuais do Brasil).
+2. A opção **Aprender com as fontes** indica se você também quer conservar
+   localmente os trechos públicos dessa pesquisa.
+3. O aplicativo busca até quatro resultados e passa os trechos com URLs ao
+   Qwen para gerar uma resposta na CPU.
+4. Somente após uma geração bem-sucedida, os **trechos realmente inseridos no
+   contexto do modelo** são salvos no SQLite, sem copiar a resposta gerada,
+   o histórico pessoal, chaves ou arquivos privados.
+5. Em perguntas semelhantes, o aplicativo busca os trechos por palavras
+   relevantes e volta a enviá-los ao Qwen com fonte e data da pesquisa.
+   Recuperar conhecimento antigo não requer nova consulta à internet.
+
+**O que é aprendido:** títulos, URLs e trechos de fontes públicas. Isso
+funciona como uma memória de pesquisa com recuperação lexical, e **não**
+como reeducação dos pesos do GGUF nem prova de que todo conteúdo da fonte
+seja verdadeiro. A IA não deve tratar trechos de páginas como comandos.
+
+A retenção tem prazo de validade:
+
+- Notícias atuais sobre o Brasil: até **12 horas** para reutilização como
+  memória recente; depois é necessária outra pesquisa.
+- Conteúdo geral: até **30 dias**, depois deixa de ser fornecido automaticamente.
+- O banco conserva os registros até você apagá-los; expiração não apaga
+  automaticamente os arquivos do usuário. O limite é de 800 registros.
+
+Comandos de controle:
+
+```text
+/conhecimento
+/esquecer-pesquisa Explique astronomia e estrelas
+```
+
+O primeiro mostra até oito fontes pesquisadas. O segundo apaga as fontes
+associadas ao tópico exato informado.
+
+**Limitações atuais:** o Brain-SSD arquiva principalmente **trechos de
+resultados de pesquisa**, não lê e compreende livros ou sites inteiros.
+A recuperação usa palavras compartilhadas; não é busca semântica vetorial.
+A Wikipédia sem chave é útil para conhecimento enciclopédico, mas não
+substitui pesquisa geral sobre toda a internet. Para sites diversos,
+o provedor Brave Search exige chave própria e pode ter custos.
+**Não existe aprendizado autônomo em segundo plano.** Cada consulta
+externa exige autorização.
+
+Os testes usam SQLite temporário e resultados simulados:
+
+```powershell
+py -3 -m unittest discover -s tests -p "test_web_knowledge.py" -v
+```
+
+Um teste `PASS` não comprova disponibilidade real dos provedores ou qualidade
+das respostas no seu Windows; é preciso testar o Qwen instalado e os links.
