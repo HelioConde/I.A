@@ -36,7 +36,7 @@ def main() -> int:
     parser.add_argument("--history-db", type=Path, default=None, help="Banco SQLite das conversas (local)")
     parser.add_argument("--web-search", action="store_true", help="Permite buscar na internet por mensagem, sempre com autorização na interface")
     parser.add_argument("--web-provider", choices=PROVIDERS, default="auto", help="auto (Wikipédia + notícias Brasil), brave (API key), wikipedia ou searxng")
-    parser.add_argument("--core-mode", choices=("subprocess", "persistent"), default=None, help="Substitui o modo do perfil")
+    parser.add_argument("--core-mode", choices=("subprocess", "persistent", "auto"), default=None, help="auto escolhe modo persistente apenas com RAM livre suficiente")
     args = parser.parse_args()
     if args.memory_aliases and not args.episodic_memory:
         parser.error("--memory-aliases requer --episodic-memory.")
