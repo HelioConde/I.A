@@ -47,6 +47,7 @@ def load_cases(path: Path = BANK) -> list[dict]:
            or item.get("expectation") not in {
                "tool_system", "tool_screen", "installed_inventory", "running_inventory",
                "capability_truth", "security", "model_answer", "no_unauthorized_execution", "review",
+               "screen_vision", "screen_unavailable",
            } for item in cases):
         raise ValueError("Bateria contém pergunta ou expectativa inválida.")
     return cases
@@ -134,11 +135,26 @@ def assess(case: dict, result: dict | None, error: str | None) -> tuple[str, str
     if exp == "tool_system":
         return ("PASS", "API local de hardware") if action == "copilot_system" else (
             "FAIL", "Sem comprovação da consulta de hardware ao Windows")
-    if exp == "tool_screen":
+    if exp in ("tool_screen", "screen_vision", "screen_unavailable"):
         if action != "copilot_screen":
             return "FAIL", "Não utilizou a rota de monitor"
-        if not result.get("copilot_image_data_url"):
-            return "FAIL", "Nenhuma captura retornada; pode ser monitor indisponível"
+        has_image = isinstance(result.get("copilot_image_data_url"), str) and bool(
+            re.fullmatch(r"data:image/jpeg;base64,[A-Za-z0-9+/=]+",
+                         result["copilot_image_data_url"]))
+        if exp == "screen_unavailable":
+            # A monitor that does not exist is expected to be rejected safely.
+            # A missing image alone is NOT proof (it could be a broken driver).
+            if has_image:
+                return "REVIEW", "A captura ocorreu: confira se esse monitor realmente existe"
+            normalized = answer.casefold()
+            if ("monitor indispon" in normalized or "monitor inválido" in normalized
+                    or "monitor invalido" in normalized):
+                return "PASS", "Monitor inexistente recusado com mensagem apropriada"
+            return "FAIL", "Recusa não confirmou que o monitor era indisponível"
+        if not has_image:
+            return "FAIL", "Nenhuma captura válida retornada; recurso não comprovado"
+        if exp == "screen_vision":
+            return "PARTIAL", "Captura comprovada, mas leitura de pixels/OCR não integrada"
         return "PASS", "Captura executada; identificação de janelas requer revisão humana"
     if _UNVERIFIED_ACTION.search(answer) and not action.startswith("copilot_open"):
         return "FAIL", "Possível alegação falsa de abertura/execução de aplicativo"
@@ -252,7 +268,7 @@ def main() -> int:
         (folder / "answers_PRIVATE.json").write_text(
             json.dumps(private_answers, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nRelatório local: {report}")
-    print("PASS = rota verificada; GAP = recurso ausente; REVIEW = revisão humana necessária.")
+    print("PASS = integração comprovada; PARTIAL = captura sem visão/OCR; GAP = capacidade ausente; REVIEW = revisão humana.")
     return 1 if any(row["status"] == "FAIL" for row in results) else 0
 
 
