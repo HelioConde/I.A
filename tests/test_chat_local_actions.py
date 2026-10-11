@@ -143,6 +143,66 @@ class TestExplicitLocalCommands(unittest.TestCase):
                 self.assertIsNone(local_command(message, notes))
             self.assertEqual(len(notes.list()), 1)
 
+    def test_reported_user_chat_named_luna_is_committed_not_just_model_text(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "private-notes.sqlite3"
+            notes = EpisodicMemory(path)
+            engine = ChatEngine(FakeRuntime, episodic_store=notes)
+            engine.start()
+            try:
+                change = engine.ask("O seu nome padrão agora é Luna", [])
+                self.assertEqual(change["local_action"], "memory_save")
+                self.assertEqual(notes.get_assistant_name(), "Luna")
+                self.assertIn("Luna", change["answer"])
+                self.assertEqual(engine.ask("Qual é o seu nome?", [])["answer"], "Meu nome é Luna.")
+                self.assertIn("nome que você escolheu", engine.ask("Quem é Luna?", [])["answer"])
+                self.assertEqual(engine._runtime.core_backend.prompts, [])
+            finally:
+                engine.close()
+
+            reopened = ChatEngine(FakeRuntime, episodic_store=EpisodicMemory(path))
+            reopened.start()
+            try:
+                self.assertEqual(reopened.ask("Qual é seu nome?", [])["answer"], "Meu nome é Luna.")
+                self.assertIn("Luna", reopened.ask("/memorias", [])["answer"])
+            finally:
+                reopened.close()
+
+    def test_natural_memory_history_and_logs_are_grounded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            notes = EpisodicMemory(Path(tmp) / "notes.sqlite3")
+            engine = ChatEngine(FakeRuntime, episodic_store=notes)
+            engine.start()
+            try:
+                memories = engine.ask("Quais informações você tem na memória?", [])
+                self.assertEqual(memories["local_action"], "memory_list")
+                self.assertIn("Não há lembranças explícitas", memories["answer"])
+                self.assertEqual(engine.ask("Como acesso seu historico?", [])["local_action"], "history_access")
+                self.assertIn("barra lateral", engine.ask("Como acesso seu historico?", [])["answer"])
+                self.assertIn("chat-history.sqlite3", engine.ask("Como acesso seu historico?", [])["answer"])
+                self.assertEqual(engine.ask("Como acesso o Log ?", [])["local_action"], "diagnostics_access")
+                self.assertIn("events.jsonl", engine.ask("Como acesso o Log ?", [])["answer"])
+                overview = engine.ask("o que você aprendeu sozinho até esse momento ?", [])
+                self.assertEqual(overview["local_action"], "learning_overview")
+                self.assertIn("não treina os pesos", overview["answer"])
+                self.assertEqual(engine._runtime.core_backend.prompts, [])
+            finally:
+                engine.close()
+
+    def test_ambiguous_luna_does_not_create_fake_persona(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            notes = EpisodicMemory(Path(tmp) / "notes.sqlite3")
+            result = local_command("Quem é Luna?", notes)
+            self.assertEqual(result["local_action"], "identity_clarification")
+            self.assertIsNone(notes.get_assistant_name())
+            for message in (
+                "Quando pergunto seu nome, não responda Brain-SSD; diga Luna",
+                "Meu nome é Luna", "Acho que seu nome padrão agora é Luna",
+                "O seu nome padrão agora é Luna?",
+            ):
+                self.assertIsNone(local_command(message, notes), message)
+            self.assertIsNone(notes.get_assistant_name())
+
     def test_explicit_name_command_when_memory_disabled_never_claims_success(self):
         response = local_command("Seu nome a partir de hoje é Luna", None)
         self.assertEqual(response["local_action"], "memory_save")
