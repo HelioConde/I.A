@@ -99,3 +99,12 @@
 .web-sources a { color: #8fc7ff; overflow-wrap: anywhere; }
 .web-sources p { color: #a9b4c3; margin: 4px 0 0; line-height: 1.5; }
 .web-sources li small { display: block; color: #a7b5c2; margin-top: 3px; line-height: 1.5; }
+
+/* Compact and accessible speech controls; Web Speech needs no extra script. */
+.message-actions { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-top:9px; }
+.message-actions .copy-message { margin-top:0; }
+.voice-message { display:inline-flex; align-items:center; padding:5px 10px; background:transparent; border:1px solid #426070; border-radius:8px; color:#b3dfd7; font-size:11px; cursor:pointer; }
+.voice-message:hover:not(:disabled) { background:#244047; color:#fff; }
+.voice-message[aria-pressed="true"] { background:#29404a; border-color:#81d2c7; color:#fff; }
+.voice-message:disabled { opacity:.48; cursor:not-allowed; }
+.voice-message:focus-visible { outline:2px solid #8bcaff; outline-offset:2px; }
