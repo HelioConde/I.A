@@ -213,6 +213,10 @@ async function refreshStatus() {
     setConnection(data.status, data.error, Boolean(data.inference_verified));
     $("modeInfo").textContent = data.profile ? ("Perfil: " + data.profile) : "Perfil: —";
     $("knowledgeInfo").textContent = data.knowledge_note || "Conhecimento SSD: verificando";
+    $("learningInfo").textContent = data.learning_enabled
+      ? "Aprendizado local ativo: /ensinar Olá => Olá! (use /aprendizados para revisar)"
+      : "Aprendizado desligado: inicie com memória episódica.";
+    $("currentModelLabel").textContent = data.model || "Qwen local";
     const webEnabled = data.web_search_enabled === true;
     $("webSearchControl").hidden = !webEnabled;
     $("webProviderInfo").hidden = !webEnabled;
@@ -306,7 +310,19 @@ function updateMetrics(data) {
 async function send() {
   const question = composer.value.trim();
   if (!app.ready || app.sending || !question) return;
-  const searchThisQuestion = !$("webSearchControl").hidden && $("webSearchToggle").checked;
+  let searchThisQuestion = !$("webSearchControl").hidden && $("webSearchToggle").checked;
+  // Only a clear user action authorizes this ONE query to leave the machine.
+  // Current-affairs requests offer permission instead of silent web access.
+  const normalizedQuestion = question.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const needsCurrentBrazil = /\bbrasil\b/.test(normalizedQuestion) &&
+    /\b(situacao|atual|atualmente|hoje|agora|noticias?|economia|politica|governo|cenario|panorama)\b|como esta|como anda/.test(normalizedQuestion);
+  if (needsCurrentBrazil && !$("webSearchControl").hidden && !searchThisQuestion) {
+    searchThisQuestion = window.confirm(
+      "Para responder sobre o Brasil agora, preciso consultar notícias recentes. " +
+      "Autoriza enviar SOMENTE esta pergunta ao provedor de pesquisa? " +
+      "A resposta será gerada localmente."
+    );
+  }
   // Consent applies only to this one search, never to the next message.
   $("webSearchToggle").checked = false;
   app.sending = true;
@@ -375,7 +391,9 @@ async function send() {
         if (payload.local_action) {
           const actionNote = document.createElement("p");
           actionNote.className = "local-action-note";
-          actionNote.textContent = "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
+          actionNote.textContent = payload.local_action === "learned_reply"
+            ? "Resposta recuperada de um exemplo ensinado por você (SQLite local; não é treinamento do Qwen)."
+            : "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
           pending.querySelector(".message-body").appendChild(actionNote);
           if (payload.local_action === "memory_save") {
             void refreshEpisodicMemory();
