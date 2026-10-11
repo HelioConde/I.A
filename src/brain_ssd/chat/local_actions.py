@@ -88,6 +88,8 @@ def is_local_action_answer(answer: str) -> bool:
         "Não há lembranças explícitas salvas no SQLite local.",
         "A memória episódica está ",
         "Não salvei nada. A memória episódica",
+        "Olá! Eu sou ",
+        "O código do projeto Brain-SSD está no repositório GitHub ",
     ))
 
 
