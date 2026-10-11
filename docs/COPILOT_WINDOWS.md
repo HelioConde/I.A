@@ -27,6 +27,33 @@ py -3 .\tools\run_chat.py --profile economia --web-search --web-provider auto --
 
 É possível repetir `--copilot-root` para autorizar mais pastas.
 
+## Comandos em linguagem natural no chat
+
+Com o iniciador do Copiloto e as permissões explicitamente habilitadas,
+as perguntas abaixo são atendidas por ferramentas locais e **não pelo
+modelo Qwen**, para impedir respostas inventadas:
+
+- **"O que você sabe sobre meu computador?"** — lê Windows, CPU, RAM,
+  Python e espaço de armazenamento das raízes autorizadas.
+- **"Olhe para meu monitor 2 e identifique os programas abertos"** —
+  captura o monitor solicitado, exibe a imagem no chat e enumera os
+  títulos das janelas visíveis que se sobrepõem ao monitor via API Win32.
+- **"Olhe para meu monitor 1 e identifique o erro no Godot"** —
+  captura e exibe a imagem, mas não afirma ter lido o texto do erro.
+  Solicita o erro textual ou um arquivo do projeto para diagnóstico.
+
+As imagens são anexadas apenas à mensagem apresentada no navegador e
+não são inseridas no histórico SQLite de texto. Janelas minimizadas,
+sem título ou protegidas pelo Windows podem não aparecer na enumeração.
+Esses comandos nunca provocam uma pesquisa externa. Consulte o painel
+**▣** para ler arquivos de texto e código dentro de pastas autorizadas.
+
+Se a geração de uma pergunta geral falhar, execute
+`py -3 tools/validate_chat_windows.py --profile economia` no terminal
+na raiz do projeto, examine os logs locais e confira se a inferência
+com o modelo realmente termina. Uma geração aprovada anteriormente não
+garante que todas as mensagens posteriores funcionem sem erros.
+
 ## Pesquisa Google + Wikipedia
 
 O modo `auto` preserva Wikipédia e feeds de notícias sem chave. Para
