@@ -24,6 +24,9 @@ on:
       - "tests/test_chat_web_search.py"
       - "tests/test_copilot.py"
       - "tests/test_copilot_queries.py"
+      - "tests/test_copilot_question_battery.py"
+      - "tests/fixtures/copilot_question_battery.json"
+      - "tools/run_copilot_question_battery.py"
       - "tests/test_web_knowledge.py"
       - "tests/test_chat_learning_news.py"
       - "tests/test_chat_history.py"
@@ -100,6 +103,7 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_web_search.py" -v
           python -m unittest discover -s tests -p "test_copilot.py" -v
           python -m unittest discover -s tests -p "test_copilot_queries.py" -v
+          python -m unittest discover -s tests -p "test_copilot_question_battery.py" -v
           python -m unittest discover -s tests -p "test_web_knowledge.py" -v
           python -m unittest discover -s tests -p "test_chat_learning_news.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
