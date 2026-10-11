@@ -841,7 +841,18 @@ class ChatEngine:
             infer_started = time.monotonic()
             try:
                 if on_chunk is None:
-                    measured = self._runtime.core_backend.generate(generation)
+                    core = self._runtime.core_backend
+                    try:
+                        measured = core.generate(generation)
+                    except (OSError, RuntimeError, TimeoutError, ValueError):
+                        fallback = getattr(core, "_auto_fallback", None)
+                        if fallback is None or (cancel_event is not None and cancel_event.is_set()):
+                            raise
+                        core.close()
+                        activate = getattr(core, "_auto_fallback_activate", None)
+                        if activate is not None:
+                            activate()
+                        measured = fallback.generate(generation)
                 else:
                     if cancel_event is None:
                         raise ValueError("Evento de cancelamento obrigatório para streaming.")
