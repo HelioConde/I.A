@@ -511,6 +511,21 @@ async function send() {
             : "Há lembranças com datas, horários ou valores possivelmente diferentes. Confirme a qual evento ou informação a pergunta se refere.";
           pending.querySelector(".message-body").appendChild(notice);
         }
+        // The screenshot is an ephemeral image returned only for this
+        // explicit question. It is NOT inserted into conversation history.
+        if (payload.local_action === "copilot_screen" &&
+            typeof payload.copilot_image_data_url === "string" &&
+            /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(payload.copilot_image_data_url)) {
+          const image = document.createElement("img");
+          image.className = "message-screen-preview";
+          image.alt = "Captura local solicitada pelo usuário (sem análise visual pelo modelo)";
+          image.src = payload.copilot_image_data_url;
+          pending.querySelector(".message-body").appendChild(image);
+          const imageNote = document.createElement("p");
+          imageNote.className = "local-action-note";
+          imageNote.textContent = "Imagem capturada localmente; a IA de texto não consegue interpretar seu conteúdo.";
+          pending.querySelector(".message-body").appendChild(imageNote);
+        }
         app.messages.push({role:"assistant", content:payload.answer});
         if (payload.local_action) {
           const actionNote = document.createElement("p");
@@ -519,7 +534,9 @@ async function send() {
             ? "Resposta rápida baseada em trechos públicos, sem geração pelo Qwen. Desmarque 'Resposta rápida' para pedir uma síntese pela IA local."
             : payload.local_action === "learned_reply"
               ? "Resposta recuperada de um exemplo ensinado por você (SQLite local; não é treinamento do Qwen)."
-              : "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
+              : payload.local_action.startsWith("copilot_")
+                ? "Resposta de ferramentas locais do Windows (sem análise de pixels pelo Qwen)."
+                : "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
           pending.querySelector(".message-body").appendChild(actionNote);
           if (payload.local_action === "memory_save") {
             void refreshEpisodicMemory();
