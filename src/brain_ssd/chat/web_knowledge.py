@@ -25,13 +25,23 @@ MAX_EXCERPT = 800
 NEWS_MAX_AGE = 12 * 3600       # current affairs requires genuinely fresh news
 GENERAL_MAX_AGE = 30 * 86400   # evergreen info must eventually be rechecked
 
-_STOP = frozenset(
+# Normalize stopwords with the same rules as indexed words.
+# A question such as "O que você aprendeu sobre astronomia?" should match
+# astronomy sources rather than treating "aprendeu" as an unrelated topic.
+_STOP_RAW = (
     "a o as os um uma uns umas de da do das dos e em para por com sem "
-    "que qual quais como quando onde quem porque sobre sobrevoce você eu "
-    "me meu sua seu fala explique pode poderia mais agora hoje atual "
-    "atualmente pesquisa pesquise busque buscar pesquisar quero saber "
-    "me diga no na nos nas esta estao esta é".split()
+    "que qual quais como quando onde quem porque sobre voce eu "
+    "me meu minha suas seus sua seu fala fale explique explicacao "
+    "pode poderia mais agora hoje atual atualmente "
+    "pesquisa pesquise busque buscar pesquisar quero saber "
+    "me diga no na nos nas esta estao esse essa desse dessa "
+    "aprendeu aprendi aprende aprender conte contar resuma resumo "
+    "mostre mostrar cite citar informacao informacoes "
+    "lembra lembrar lembranca lembro recorda recorde "
+    "ja ainda algo conheceu descobriu conhecimento assunto "
 )
+_STOP = frozenset(_STOP_RAW.split())
+
 _PRIVATE = re.compile(
     r"\b(?:senha|password|token|chave\s+api|cpf|rg|cartao|cartão|"
     r"conta\s+bancaria|conta\s+bancária|secret|pin)\b", re.I
