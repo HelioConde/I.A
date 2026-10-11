@@ -137,7 +137,8 @@ class TestChatEngine(unittest.TestCase):
         self.assertIn("não altera pesos do Qwen", memory_prompt)
         capabilities = build_chat_prompt("O que você consegue fazer?", [], "")
         self.assertIn("Capacidades documentadas", capabilities)
-        self.assertIn("Não tem internet", capabilities)
+        self.assertIn("Pesquisa web é opcional", capabilities)
+        self.assertIn("autorização por mensagem", capabilities)
         self.assertNotIn("Fatos do Brain-SSD", capabilities)
 
     def test_self_knowledge_not_injected_into_unrelated_questions(self):
