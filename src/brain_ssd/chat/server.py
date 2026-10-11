@@ -62,7 +62,7 @@ def brain_ssd_self_context(question: str) -> str:
     if re.search(r"\b(internet|web|sites|navegar|rede)\b", normalized):
         return (
             "O Brain-SSD executa o modelo GGUF localmente na CPU. "
-            "Possui pesquisa web opcional (Wikipédia, Brave ou SearXNG) "
+            "Possui pesquisa web opcional (Wikipédia, Google via Serper, Brave ou SearXNG) "
             "configurada pelo usuário, com autorização por pergunta; "
             "sem autorização, não consulta sites. "
             "Não possui acesso autenticado ao GitHub do usuário nem aos "
@@ -563,14 +563,15 @@ class ChatEngine:
                 # biographical entries to the model as current game news.
                 limited = (
                     web_search and self.web_search_service is not None
-                    and self.web_search_service.provider in ("auto", "wikipedia")
+                    and not bool(getattr(self.web_search_service, "supports_general_web",
+                                         lambda: self.web_search_service.provider in ("brave", "searxng", "google"))())
                 )
                 if not web_search or limited:
                     message = (
                         "O provedor automático usa Wikipédia para esse jogo e "
                         "não confirma patches nem notícias recentes. Para "
                         "atualizações atuais de Overwatch, Valorant ou League "
-                        "of Legends, configure Brave Search (com chave) ou "
+                        "of Legends, configure Google via Serper, Brave Search (com chave) ou "
                         "uma instância local SearXNG; depois autorize a pesquisa."
                         if limited else
                         "Para responder com atualizações recentes de jogos, "
