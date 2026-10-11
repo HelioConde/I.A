@@ -22,7 +22,7 @@ MB de working set e 676–677 MB de memória privada.
 | Suíte completa após correção | APROVADO | 334 testes, 7 ignorados conscientemente |
 | Regressão da falha Qwen | APROVADO | `inference.truncated` é evento seguro e não interrompe a resposta |
 | Inferência real Windows | APROVADO | `validate_chat_windows --profile economia`: 2,932 s; TTFT 2,317 s; 26,92 tokens/s; pico 955 MB |
-| 20 perguntas reais SSE | PARCIAL, corrigido no fonte | 18/20 chegaram ao fim na instância anterior; as 2 falhas têm causa identificada e regressão aprovada. A instância aberta precisa ser reiniciada para carregar a correção |
+| 20 perguntas reais SSE | APROVADO APÓS CORREÇÃO | 18/20 chegaram ao fim na bateria original; as duas perguntas que falharam foram repetidas no servidor atualizado e ambas retornaram resposta, sem `LOCAL_CHAT_ERROR` |
 | Computador do usuário | APROVADO | rota local retornou dados atuais de Windows, arquitetura, CPU, RAM e discos autorizados; não foi resposta inventada pelo Qwen |
 | Copilot | APROVADO | Qwen respondeu sobre o recurso; o status confirmou Copilot, arquivos e captura autorizados |
 | Monitores 1 e 2 | APROVADO/PARCIAL | capturas efêmeras foram solicitadas e a API Windows listou janelas visíveis; não foi feita leitura de pixels |
@@ -31,7 +31,7 @@ MB de working set e 676–677 MB de memória privada.
 | Sem permissão | APROVADO | testes cobrem Copilot desativado, captura sem permissão e rota que não afirma acesso não concedido |
 | Segurança HTTP | APROVADO | origem atacante recebe HTTP 403; servidor restrito a loopback e valida Host/Origin |
 | Pesquisa externa | NÃO EXECUTADA | sem autorização por pergunta nem credenciais; testes mantêm fontes e instruções externas sob controle |
-| Interface visual/Playwright | BLOQUEADO | `browser-act` e `uv` não estão instalados; a instalação de `uv` requer confirmação explícita |
+| Interface visual | APROVADO/PARCIAL | `uv` e BrowserAct instalados com autorização; navegador isolado renderizou chat e painel Copilot, validou controles e `POST /api/copilot` de captura com HTTP 200 |
 
 ### Notas V2
 
@@ -41,6 +41,10 @@ MB de working set e 676–677 MB de memória privada.
   atual é prévia local; `vision_enabled` permanece `false`.
 - Não foram lidos documentos pessoais fora de uma pasta de fixtures nem feitas
   alterações em histórico, memórias ou dados do usuário.
+- A interface exibiu corretamente os avisos de privacidade, o escopo da pasta
+  autorizada, a exigência de clique para capturar e o aviso de que o Qwen não
+  interpreta pixels. A captura sob demanda respondeu HTTP 200 e exibiu
+  “Captura local pronta”; a imagem não foi exibida nem registrada no relatório.
 
 | Dimensão | Nota V2 |
 | --- | ---: |
@@ -50,7 +54,7 @@ MB de working set e 676–677 MB de memória privada.
 | Captura de tela | 5,0/10 |
 | Visão/OCR | 0,0/10 |
 | Pesquisa web | 7,0/10 |
-| Interface visual | 6,0/10 |
+| Interface visual | 7,5/10 |
 | Desempenho CPU | 7,0/10 |
 
 Para tornar o resultado 20/20 verificável na API real, reinicie o servidor
