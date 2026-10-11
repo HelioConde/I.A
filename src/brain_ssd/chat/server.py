@@ -27,6 +27,7 @@ from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
+from brain_ssd.chat.completion_quality import classify_completion
 from brain_ssd.chat.http_stream import serve_stream
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
@@ -899,6 +900,17 @@ class ChatEngine:
             answer = clean_answer(str(measured.get("stdout", "")))
             if not answer:
                 raise RuntimeError("O modelo não retornou uma resposta. Tente novamente.")
+            _generation_metrics = measured.get("metrics") or {}
+            quality = classify_completion(
+                answer, max_tokens=generation.max_tokens,
+                generated_tokens=_generation_metrics.get("generated_tokens"),
+                finish_reason=_generation_metrics.get("finish_reason"),
+            )
+            if self.diagnostics and quality["needs_continuation"]:
+                self.diagnostics.emit(
+                    "inference.truncated", request_id=request_id,
+                    status="WARNING", reason=quality["reason"],
+                )
             self._inference_verified = True
             stored = 0
             save_status = "not_requested"
@@ -920,6 +932,12 @@ class ChatEngine:
             metrics = measured.get("metrics") or {}
             return {
                 "answer": answer,
+                "generation_status": quality["status"],
+                "answer_complete": quality["answer_complete"],
+                "needs_continuation": quality["needs_continuation"],
+                "finish_reason": quality["reason"],
+                "generated_tokens": _generation_metrics.get("generated_tokens"),
+                "generation_limit": generation.max_tokens,
                 "model": getattr(getattr(self._runtime, "model_path", None), "name", MODEL_NAME),
                 "mode": "experimental_chat",
                 "web_search_status": web_status,
