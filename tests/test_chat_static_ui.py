@@ -79,7 +79,7 @@ class TestStaticUI(unittest.TestCase):
             with self.subTest(script=name):
                 self.assertIsNone(re.search(r"\beval\s*\(", source))
                 self.assertIsNone(re.search(r"\bnew\s+Function\s*\(", source))
-                self.assertIsNone(re.search(r"\bsetTimeout\s*\(\s*['\\"]", source))
+                self.assertIsNone(re.search(r"\bsetTimeout\s*\(\s*[\x27\x22]", source))
         self.assertIn('self.send_header("Content-Security-Policy"', server)
         self.assertIn("script-src 'self'", server)
         self.assertNotIn("'unsafe-eval'", server)
