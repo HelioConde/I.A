@@ -4,6 +4,26 @@ O **Qwen continua totalmente local**. Somente a pergunta marcada pelo usuário
 é enviada ao provedor de pesquisa externo. Histórico, memórias episódicas,
 arquivos pessoais e prompt completo não são enviados pelo módulo de pesquisa.
 
+## Modo automático: Wikipédia + notícias atuais do Brasil
+
+O provedor `auto` (selecionado por padrão no novo iniciador) responde a
+perguntas enciclopédicas usando a Wikipédia e, para questões sobre a situação
+**atual** do Brasil, tenta feeds RSS datados da Agência Brasil nas editorias
+economia, política e últimas notícias.
+
+Digite `Como está a situação do Brasil hoje?`. O navegador solicitará
+autorização antes de enviar **essa pergunta** à rede; se você negar, o Brain-SSD
+informará a falta de notícias recentes em vez de inventar fatos atuais.
+São até três manchetes recentes, não uma análise completa da situação do país.
+Quando os feeds não estiverem disponíveis ou as notícias forem antigas,
+o resultado não terá fontes.
+
+Para iniciar diretamente com esse provedor:
+
+```powershell
+py -3 .\tools\run_chat.py --profile economia --episodic-memory --web-search --web-provider auto
+```
+
 ## Começar sem chave: Wikipédia em português
 
 1. Execute `git pull --ff-only` na pasta do Brain-SSD.
