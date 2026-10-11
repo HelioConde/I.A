@@ -18,6 +18,7 @@ from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir
 from brain_ssd.chat.runtime import LocalChatRuntime, PROFILES
 from brain_ssd.chat.web_search import WebSearchService, PROVIDERS
 from brain_ssd.chat.learning import LearnedResponses, default_learning_path
+from brain_ssd.chat.web_knowledge import WebKnowledge, default_research_path
 
 
 def main() -> int:
@@ -51,8 +52,9 @@ def main() -> int:
             episodic_enabled=args.episodic_memory, shadow_enabled=args.cognitive_shadow)
     episodic_store = EpisodicMemory(args.episodic_db or default_episodic_path()) if args.episodic_memory else None
     learned_store = LearnedResponses(default_learning_path()) if args.episodic_memory else None
+    research_store = WebKnowledge(default_research_path()) if (args.web_search or args.episodic_memory) else None
     engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode, model_file=args.model_file), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases, web_search_service=web_service,
-        learned_store=learned_store,
+        learned_store=learned_store, web_knowledge=research_store,
         startup_reporter=lambda message: print("\n[Brain-SSD] " + message + "\n[Brain-SSD] Execute DIAGNOSTICAR-CHAT-WINDOWS.bat para verificar os requisitos.\n", file=sys.stderr, flush=True))
     history_store = ChatHistory(args.history_db or default_history_path())
     try:
@@ -73,6 +75,7 @@ def main() -> int:
     print(f"Histórico local privado: {history_store.path}")
     print(f"Memórias episódicas: {episodic_store.path if episodic_store else 'desativadas (opt-in --episodic-memory)'}")
     print(f"Aprendizado por correções: {learned_store.path if learned_store else 'desativado (use --episodic-memory)'}")
+    print(f"Conhecimento pesquisado: {research_store.path if research_store else 'desativado'}; apenas buscas autorizadas são gravadas.")
     print(f"Diagnóstico estruturado: {diagnostics.path if diagnostics else 'desativado'}")
     print(f"Sinônimos episódicos: {'experimento ativo' if args.memory_aliases else 'desativados (padrão)'}")
     print(f"Estado/atenção cognitiva: {'SHADOW ativo (sem afetar resposta)' if args.cognitive_shadow else 'desativados'}")
