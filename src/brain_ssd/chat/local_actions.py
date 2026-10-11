@@ -46,14 +46,59 @@ def _name_from_memory_request(note: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
+def _direct_assistant_name_request(message: str) -> str | None:
+    """Detect *deliberate* nickname changes, never infer from a question.
+
+    'Seu nome a partir de hoje é Luna' is an explicit instruction. A sentence
+    that merely discusses the assistant's name is not consent to save memory.
+    """
+    text = message.strip()
+    if not text or text.endswith("?"):
+        return None
+    patterns = (
+        r"(?:a\s+partir\s+de\s+hoje[,]?\s+(?:o\s+)?seu\s+nome"
+        r"|(?:o\s+)?seu\s+nome\s+a\s+partir\s+de\s+hoje)"
+        r"\s+(?:[eé]|ser[aá]|vai\s+ser)\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
+        r"(?:quero\s+te\s+chamar\s+de|vou\s+te\s+chamar\s+de"
+        r"|pode\s+se\s+chamar|te\s+chamarei\s+de)"
+        r"\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
+    )
+    for pattern in patterns:
+        match = re.fullmatch(pattern + r"\s*[.!]?", text, flags=re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    return None
+
+
+def is_local_action_answer(answer: str) -> bool:
+    """Recognize previously stored deterministic replies for prompt hygiene.
+
+    History stays on disk and visible to the user. Only Qwen prompt context
+    discards these Python/SQLite outputs to avoid repeated canned responses.
+    """
+    return answer.startswith((
+        "Sou o Brain-SSD, uma IA local experimental. Posso conversar, explicar ",
+        "Meu nome é Brain-SSD. Ainda não há apelido salvo.",
+        "Meu nome padrão é Brain-SSD. Nenhum apelido",
+        "Meu nome escolhido é ",
+        "Lembrança salva no SQLite local:",
+        "Salvei na memória local:",
+        "Últimas lembranças salvas explicitamente:",
+        "Não há lembranças explícitas salvas no SQLite local.",
+        "A memória episódica está ",
+        "Não salvei nada. A memória episódica",
+    ))
+
+
 def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any] | None:
     """Return a truthful app action; None means let the real Qwen answer."""
     simple = re.sub(r"[?.!]+\s*$", "", plain(question)).strip()
     simple = re.sub(r"^(?:oi|ola|bom dia|boa tarde|boa noite)[,\s]+", "", simple)
     save = _parse_save_request(question)
+    direct_name = _direct_assistant_name_request(question) if save is None else None
     answer: str | None = None
     action: str | None = None
-    if save is not None:
+    if save is not None or direct_name is not None:
         action = "memory_save"
         if store is None:
             answer = (
@@ -61,7 +106,7 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
                 "Abra o chat com --episodic-memory ou pelo iniciador COM MEMÓRIA."
             )
         else:
-            name = _name_from_memory_request(save)
+            name = _name_from_memory_request(save) if save is not None else direct_name
             if name is not None:
                 saved = store.remember_assistant_name(name)
                 answer = (
@@ -69,7 +114,7 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
                     "Continuará disponível em novas conversas e após reiniciar o programa."
                 )
             else:
-                saved = store.add(save)
+                saved = store.add(save)  # Non-nickname explicit note.
                 answer = (
                     f"Lembrança salva no SQLite local: {saved['content']}. "
                     "Você pode revisar, editar ou apagar em Memórias."
