@@ -22,6 +22,7 @@ from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context
 from brain_ssd.chat.learning import LearnedResponses, learned_action
 from brain_ssd.chat.current_affairs import needs_brazil_news
+from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format_cached_context
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -225,7 +226,7 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None, web_knowledge: WebKnowledge | None = None) -> None:
         self._runtime_factory = runtime_factory
         if memory_aliases and episodic_store is None:
             raise ValueError("A recuperação por sinônimos exige memória episódica explícita.")
@@ -233,6 +234,7 @@ class ChatEngine:
         self.memory_aliases = bool(memory_aliases)
         self.web_search_service = web_search_service
         self.learned_store = learned_store
+        self.web_knowledge = web_knowledge
         self.cognitive_shadow = bool(cognitive_shadow)
         self.diagnostics = diagnostics
         self._runtime: Any | None = None
@@ -315,6 +317,8 @@ class ChatEngine:
             "episodic_aliases_enabled": self.memory_aliases,
             "cognitive_shadow_enabled": self.cognitive_shadow,
             "learning_enabled": self.learned_store is not None,
+            "research_memory_enabled": self.web_knowledge is not None,
+            "research_memory_sources": self.web_knowledge.count() if self.web_knowledge else 0,
             "web_search_enabled": self.web_search_service is not None,
             "web_search_provider": self.web_search_service.provider if self.web_search_service else None,
         }
@@ -350,7 +354,7 @@ class ChatEngine:
             on_chunk: Callable[[str], None] | None = None,
             cancel_event: threading.Event | None = None,
             request_id: str | None = None,
-            web_search: bool = False) -> dict[str, Any]:
+            web_search: bool = False, remember_web: bool = False) -> dict[str, Any]:
         started = time.monotonic()
         started_cpu = time.process_time()
         trace_id = request_id or str(uuid.uuid4())
@@ -361,7 +365,7 @@ class ChatEngine:
         try:
             result = self._ask_inner(question, raw_history, on_chunk=on_chunk,
                                      cancel_event=cancel_event, request_id=trace_id,
-                                     web_search=web_search)
+                                     web_search=web_search, remember_web=remember_web)
         except GenerationCancelled:
             if self.diagnostics:
                 self.diagnostics.emit("chat.cancelled", request_id=trace_id,
@@ -384,14 +388,18 @@ class ChatEngine:
     def _ask_inner(self, question: str, raw_history: Any, *,
                    on_chunk: Callable[[str], None] | None,
                    cancel_event: threading.Event | None,
-                   request_id: str, web_search: bool = False) -> dict[str, Any]:
+                   request_id: str, web_search: bool = False, remember_web: bool = False) -> dict[str, Any]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Digite uma mensagem.")
         question = question.strip()
         if len(question) > MAX_MESSAGE:
             raise ValueError(f"Limite de {MAX_MESSAGE} caracteres por mensagem.")
-        if type(web_search) is not bool:
+        if type(web_search) is not bool or type(remember_web) is not bool:
             raise ValueError("Sinalização de pesquisa web inválida.")
+        if remember_web and not web_search:
+            raise ValueError("Para guardar conhecimento, autorize também uma pesquisa web.")
+        if remember_web and self.web_knowledge is None:
+            raise ValueError("Memória de pesquisas desativada nesta sessão.")
         if web_search and self.web_search_service is None:
             raise ValueError("Pesquisa web desativada nesta sessão.")
         if self._state != "ready" or self._runtime is None:
@@ -405,8 +413,16 @@ class ChatEngine:
             local_result = learned_action(question, self.learned_store,
                                           bypass_match=web_search or needs_brazil_news(question))
             if local_result is None:
+                local_result = knowledge_command(question, self.web_knowledge)
+            if local_result is None:
                 local_result = local_command(question, self.episodic_store)
-            if local_result is None and needs_brazil_news(question):
+            # No network calls here. Archive lookup reads public snippets from
+            # disk, never personal history or private episodic memories.
+            archived_sources = (
+                self.web_knowledge.retrieve(question, current=needs_brazil_news(question))
+                if self.web_knowledge and local_result is None else []
+            )
+            if local_result is None and needs_brazil_news(question) and not archived_sources:
                 if not web_search:
                     explanation = (
                         "Para avaliar a situação atual do Brasil preciso consultar "
@@ -456,7 +472,9 @@ class ChatEngine:
             # this particular message's explicit checkbox/JSON permission.
             web_sources: list[dict[str, str]] = []
             web_status = "not_requested"
-            web_context = ""
+            # Fresh sources have priority; archived snippets are added when
+            # no new sources were requested. Cached evidence is always dated.
+            web_context = format_cached_context(archived_sources) if not web_search else ""
             if web_search:
                 if cancel_event is not None and cancel_event.is_set():
                     raise GenerationCancelled()
@@ -649,6 +667,16 @@ class ChatEngine:
             if not answer:
                 raise RuntimeError("O modelo não retornou uma resposta. Tente novamente.")
             self._inference_verified = True
+            stored = 0
+            if remember_web and used_web_sources:
+                # Write only after successful local generation; no LLM output
+                # enters the research corpus.
+                stored = self.web_knowledge.save(
+                    question, self.web_search_service.provider, used_web_sources,
+                    current=needs_brazil_news(question),
+                )
+            # Only show archived URLs actually retained by the prompt budget.
+            used_archive = [item for item in archived_sources if item["url"] in prompt]
             metrics = measured.get("metrics") or {}
             return {
                 "answer": answer,
@@ -657,6 +685,11 @@ class ChatEngine:
                 "web_search_status": web_status,
                 "web_search_provider": self.web_search_service.provider if web_search else None,
                 "web_sources": used_web_sources,
+                "research_saved_sources": stored,
+                "research_used_sources": used_archive,
+                "research_status": ("archived" if used_archive and not web_search
+                                    else "new_sources" if used_web_sources
+                                    else "not_used"),
                 "cognitive_shadow": shadow,
                 "profile": getattr(self._runtime, "profile", "equilibrado"),
                 "core_mode": getattr(self._runtime, "core_mode", "subprocess"),
