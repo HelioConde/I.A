@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import sqlite3
 import threading
 import time
 import unicodedata
@@ -668,13 +669,20 @@ class ChatEngine:
                 raise RuntimeError("O modelo não retornou uma resposta. Tente novamente.")
             self._inference_verified = True
             stored = 0
-            if remember_web and used_web_sources:
-                # Write only after successful local generation; no LLM output
-                # enters the research corpus.
-                stored = self.web_knowledge.save(
-                    question, self.web_search_service.provider, used_web_sources,
-                    current=needs_brazil_news(question),
-                )
+            save_status = "not_requested"
+            if remember_web:
+                save_status = "no_sources"
+                if used_web_sources:
+                    # Optional disk persistence must never replace a successfully
+                    # generated answer with an unrelated I/O failure.
+                    try:
+                        stored = self.web_knowledge.save(
+                            question, self.web_search_service.provider, used_web_sources,
+                            current=needs_brazil_news(question),
+                        )
+                        save_status = "saved" if stored else "not_saved"
+                    except (sqlite3.Error, OSError, ValueError):
+                        save_status = "failed"
             # Only show archived URLs actually retained by the prompt budget.
             used_archive = [item for item in archived_sources if item["url"] in prompt]
             metrics = measured.get("metrics") or {}
@@ -686,6 +694,7 @@ class ChatEngine:
                 "web_search_provider": self.web_search_service.provider if web_search else None,
                 "web_sources": used_web_sources,
                 "research_saved_sources": stored,
+                "research_save_status": save_status,
                 "research_used_sources": used_archive,
                 "research_status": ("archived" if used_archive and not web_search
                                     else "new_sources" if used_web_sources
