@@ -25,6 +25,7 @@ def main() -> int:
     parser.add_argument("--no-diagnostics", action="store_true", help="Desativa a telemetria local")
     parser.add_argument("--no-open-browser", action="store_true")
     parser.add_argument("--profile", choices=tuple(PROFILES), default="economia")
+    parser.add_argument("--model-file", default=None, help="Nome do GGUF já instalado na pasta models/ (padrão: Qwen3 0.6B)")
     parser.add_argument("--cognitive-shadow", action="store_true", help="Mede atenção/memória de trabalho em shadow; sem alterar respostas")
     parser.add_argument("--memory-aliases", action="store_true", help="Sinônimos limitados PT-BR (experimental e opt-in; requer --episodic-memory)")
     parser.add_argument("--episodic-memory", action="store_true", help="Ativa memórias confirmadas pelo usuário; desativadas por padrão")
@@ -41,7 +42,7 @@ def main() -> int:
             cpu_threads=PROFILES[args.profile]["threads"],
             episodic_enabled=args.episodic_memory, shadow_enabled=args.cognitive_shadow)
     episodic_store = EpisodicMemory(args.episodic_db or default_episodic_path()) if args.episodic_memory else None
-    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases,
+    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode, model_file=args.model_file), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases,
         startup_reporter=lambda message: print("\n[Brain-SSD] " + message + "\n[Brain-SSD] Execute DIAGNOSTICAR-CHAT-WINDOWS.bat para verificar os requisitos.\n", file=sys.stderr, flush=True))
     history_store = ChatHistory(args.history_db or default_history_path())
     try:
@@ -53,6 +54,8 @@ def main() -> int:
     url = f"http://127.0.0.1:{server.server_address[1]}/"
     print(f"Brain-SSD Chat local: {url}")
     print(f"Perfil: {args.profile} | CPU-only | SSD opcional para conversar | sem API externa.")
+    if args.model_file:
+        print(f"Modelo selecionado: {args.model_file}")
     print(f"Histórico local privado: {history_store.path}")
     print(f"Memórias episódicas: {episodic_store.path if episodic_store else 'desativadas (opt-in --episodic-memory)'}")
     print(f"Diagnóstico estruturado: {diagnostics.path if diagnostics else 'desativado'}")
