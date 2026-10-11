@@ -59,6 +59,7 @@ def _direct_assistant_name_request(message: str) -> str | None:
         r"(?:a\s+partir\s+de\s+hoje[,]?\s+(?:o\s+)?seu\s+nome"
         r"|(?:o\s+)?seu\s+nome\s+a\s+partir\s+de\s+hoje)"
         r"\s+(?:[eé]|ser[aá]|vai\s+ser)\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
+        r"(?:o\s+)?seu\s+nome\s+(?:[eé]|ser[aá])\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
         r"(?:quero\s+te\s+chamar\s+de|vou\s+te\s+chamar\s+de"
         r"|pode\s+se\s+chamar|te\s+chamarei\s+de)"
         r"\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
