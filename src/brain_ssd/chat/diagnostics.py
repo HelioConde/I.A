@@ -29,7 +29,7 @@ EVENTS = frozenset({
     "session.start", "session.stop", "runtime.ready", "runtime.error",
     "chat.start", "retrieval.done", "memory.recall", "chat.prompt",
     "inference.done", "inference.error", "chat.complete", "chat.cancelled",
-    "chat.error", "test.start", "test.result", "test.error",
+    "chat.error", "chat.local_action", "test.start", "test.result", "test.error",
 })
 NUMERIC = frozenset({
     "duration_ms", "ttft_ms", "tokens_per_second", "working_set_bytes_max",
@@ -47,9 +47,10 @@ ENUMS = {
     "platform": {"Windows", "Linux", "macOS", "Other"},
     "profile": {"economia", "equilibrado", "rapido", "not_applicable"},
     "core_mode": {"subprocess", "persistent", "not_applicable"},
+    "action": {"help", "memory_save", "assistant_name", "memory_list", "memory_status"},
     "status": {"OK", "UNAVAILABLE", "FAIL", "PASS", "ERROR", "CANCELLED",
                "SKIP", "READY", "NOT_APPLICABLE", "UNKNOWN"},
-    "suite": {"chat_windows", "chat_runtime", "chat_history", "chat_stream",
+    "suite": {"chat_windows", "chat_local_actions", "chat_runtime", "chat_history", "chat_stream",
               "chat_doctor", "chat_episodic", "chat_episodic_http",
               "cognitive_lab", "consolidation", "core", "storage",
               "router_gating", "cache_policy", "hybrid", "progressive",
