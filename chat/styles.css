@@ -119,3 +119,35 @@
 .continue-answer { border:1px solid #d0a77d; background:#3b302c; color:#ffe6c8; font:inherit; border-radius:7px; padding:5px 9px; cursor:pointer; }
 .continue-answer:hover { background:#534034; }
 .continue-answer:focus-visible { outline:2px solid #9bcaff; outline-offset:2px; }
+
+
+/* Painel de copiloto, separado do chat; imagens só na memória do navegador. */
+.copilot-panel {
+  position:fixed; z-index:35; top:64px; right:0; bottom:0;
+  width:min(440px,100vw); overflow-y:auto; padding:18px;
+  background:#161d27; color:#e8edf4; border-left:1px solid #3a4758;
+  box-shadow:-15px 0 40px rgba(0,0,0,.28); display:block;
+}
+.copilot-panel[hidden] { display:none !important; }
+.copilot-head {display:flex;align-items:center;justify-content:space-between;gap:12px}
+.copilot-head h2 {margin:0;font-size:18px}
+.copilot-panel p {font-size:12px;line-height:1.55}
+.copilot-muted {color:#a9b8c8}
+.copilot-roots {font-size:11px;color:#abd5ff;overflow-wrap:anywhere}
+.copilot-block {border-top:1px solid #384455;margin-top:15px;padding-top:14px;display:grid;gap:8px}
+.copilot-block h3 {font-size:14px;margin:0}
+.copilot-block label {font-size:12px;color:#cfdae5}
+.copilot-block input:not([type="checkbox"]) {width:100%;background:#202c3a;color:#fff;border:1px solid #567087;border-radius:7px;padding:9px;min-height:38px}
+.copilot-actions {display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+.copilot-block button,.copilot-entry,#copilotUseChat {background:#263e50;color:#eaf4ff;border:1px solid #4b7792;border-radius:8px;padding:9px 11px;font-size:12px;cursor:pointer}
+.copilot-block button:disabled {opacity:.48;cursor:not-allowed}
+.copilot-block button:hover:not(:disabled),.copilot-entry:hover {background:#35566c}
+.copilot-live {display:flex;align-items:center;gap:6px}
+.copilot-result {max-height:50vh;overflow:auto;border:1px solid #354859;border-radius:9px;padding:10px;display:grid;gap:5px;margin-top:8px;overflow-wrap:anywhere}
+.copilot-result:empty {display:none}
+.copilot-result pre {white-space:pre-wrap;word-break:break-word;font-size:11px}
+.copilot-entry {text-align:left;width:100%;background:#202c3a}
+.copilot-preview {width:100%;height:auto;display:block;border-radius:6px}
+.copilot-feedback {color:#b5dcca}
+#copilotUseChat[hidden] {display:none}
+@media (max-width:620px) {.copilot-panel {top:0;z-index:60;width:100vw}}
