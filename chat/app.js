@@ -481,6 +481,28 @@ async function send() {
         output.textContent = payload.answer;
         const speak = pending.querySelector(".voice-message");
         if (speak && voiceSupported) speak.disabled = !payload.answer?.trim();
+        if (payload.needs_continuation && payload.mode === "experimental_chat") {
+          const note = document.createElement("div");
+          note.className = "generation-incomplete";
+          const warning = document.createElement("span");
+          warning.textContent = payload.generation_status === "truncated"
+            ? "Resposta possivelmente cortada pelo limite de tokens."
+            : "A resposta pode ter terminado antes da conclusão.";
+          note.appendChild(warning);
+          const continueButton = document.createElement("button");
+          continueButton.type = "button";
+          continueButton.className = "continue-answer";
+          continueButton.textContent = "Continuar resposta";
+          continueButton.setAttribute("aria-label", "Pedir continuação da resposta da IA");
+          continueButton.addEventListener("click", () => {
+            if (app.sending || !app.ready) return;
+            composer.value = "Continue a resposta anterior a partir do ponto em que parou. Não repita o começo; conclua o raciocínio em até três frases.";
+            fitComposer();
+            send();
+          });
+          note.appendChild(continueButton);
+          pending.querySelector(".message-body").appendChild(note);
+        }
         if (Number(payload.episodic_ambiguities_detected) > 0) {
           const notice = document.createElement("p");
           notice.className = "memory-conflict-warning";
