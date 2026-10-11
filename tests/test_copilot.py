@@ -21,6 +21,13 @@ from brain_ssd.chat.web_search import WebSearchService
 
 
 class TestCopilot(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Drive root is Windows-specific")
+    def test_drive_root_is_valid_when_explicitly_authorized(self):
+        drive = Path(os.environ.get("SystemDrive", "C:") + "\\\\.")
+        copilot = LocalCopilot([drive], screen=True)
+        self.assertTrue(copilot.status()["files_enabled"])
+        self.assertTrue(copilot.status()["screen_enabled"])
+
     def test_no_access_by_default(self):
         copilot = LocalCopilot()
         self.assertFalse(copilot.status()["enabled"])
@@ -30,7 +37,7 @@ class TestCopilot(unittest.TestCase):
             copilot.capture_screen()
 
     def test_read_only_allowed_root_and_size_limit(self):
-        with tempfile.TemporaryDirectory() as base:
+        with tempfile.TemporaryDirectory(dir=ROOT) as base:
             root = Path(base)
             (root / "codigo.py").write_text("print('ok')", encoding="utf-8")
             (root / "grande.txt").write_text("x" * 131073, encoding="utf-8")
@@ -54,7 +61,7 @@ class TestCopilot(unittest.TestCase):
                             copilot.system_info()["cpu_threads"] > 0)
 
     def test_symlink_outside_root_is_denied(self):
-        with tempfile.TemporaryDirectory() as base:
+        with tempfile.TemporaryDirectory(dir=ROOT) as base:
             base = Path(base)
             root = base / "allowed"
             root.mkdir()
@@ -81,7 +88,7 @@ class TestCopilot(unittest.TestCase):
 
 class TestCopilotHttp(unittest.TestCase):
     def test_origin_guard_and_file_access(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(dir=ROOT) as tmp:
             root = Path(tmp)
             (root / "help.md").write_text("conteúdo local", encoding="utf-8")
             engine = ChatEngine(lambda: None)
