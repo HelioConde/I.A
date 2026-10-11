@@ -41,6 +41,7 @@ on:
       - "DIAGNOSTICAR-CHAT-WINDOWS.bat"
       - "INICIAR-CHAT-WINDOWS.bat"
       - "INICIAR-CHAT-MEMORIA-WINDOWS.bat"
+      - "INICIAR-CHAT-WEB-WINDOWS.bat"
       - "tools/compare_diagnostics.py"
       - "GERAR-LOGS-WINDOWS.bat"
       - ".github/workflows/chat-smoke.yml"
