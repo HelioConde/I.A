@@ -89,6 +89,10 @@
                 <input type="checkbox" id="webLearnToggle" checked>
                 <span>Aprender com as fontes</span>
               </label>
+              <label class="web-optin" id="webFastControl" hidden title="Mostrar fontes e trechos em segundos, sem esperar o Qwen carregar; desmarque para resposta gerada pela IA">
+                <input type="checkbox" id="webFastToggle" checked>
+                <span>Resposta rápida</span>
+              </label>
               <span class="web-provider-info" id="webProviderInfo" hidden></span>
             </div>
             <div class="composer-actions"><button class="stop-button" id="stopButton" type="button" aria-label="Interromper resposta" title="Interromper resposta" hidden>■ Parar</button><button class="send-button" id="sendButton" aria-label="Enviar mensagem" type="submit" disabled>↑</button></div>
@@ -107,6 +111,8 @@
       <div><dt>Modelo</dt><dd>Qwen3-0.6B Q8_0</dd></div>
       <div><dt>Execução</dt><dd>CPU-only</dd></div>
       <div><dt>Latência</dt><dd id="detailLatency">—</dd></div>
+      <div><dt>Pesquisa web</dt><dd id="detailWebMs">—</dd></div>
+      <div><dt>Geração Qwen</dt><dd id="detailInferMs">—</dd></div>
       <div><dt>Até o primeiro token</dt><dd id="detailFirstToken">—</dd></div>
       <div><dt>Velocidade</dt><dd id="detailSpeed">—</dd></div>
       <div><dt>Pico de RAM do Core</dt><dd id="detailRam">—</dd></div>
