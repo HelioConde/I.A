@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.performance import (
     GiB, MemoryInfo, choose_mode, recommended_threads, answer_token_limit,
+    compact_profile,
 )
 from brain_ssd.chat.runtime import LocalChatRuntime
 from brain_ssd.chat.server import ChatEngine
@@ -37,6 +38,10 @@ class TestPerformancePolicy(unittest.TestCase):
         self.assertEqual(answer_token_limit(int(2.5*GiB)), 112)
         self.assertEqual(answer_token_limit(1*GiB), 160)
         self.assertEqual(answer_token_limit(int(2.5*GiB), 256), 256)
+        self.assertEqual(compact_profile("equilibrado", int(2.5*GiB), 4096, 7600),
+                         (3072, 5600, 112))
+        self.assertEqual(compact_profile("economia", int(2.5*GiB), 2048, 3600),
+                         (2048, 3600, 112))
         for illegal in (0, 512, "100", True, 22.5):
             with self.subTest(illegal=illegal), self.assertRaises(ValueError):
                 answer_token_limit(int(2.5*GiB), illegal)
@@ -46,9 +51,7 @@ class TestPerformancePolicy(unittest.TestCase):
             root=Path(folder)
             model=root/"models"/"Qwen3-4B-Q4_K_M.gguf"
             model.parent.mkdir(parents=True)
-            with model.open("wb") as out:
-                out.write(b"GGUF")
-                out.truncate(int(2.5*GiB))
+            model.write_bytes(b"GGUF" + b"0" * 128)
             exe=root/"third_party"/"llama.cpp"/"runtime-win-cpu-x64"/"bin"/"llama-completion.exe"
             exe.parent.mkdir(parents=True)
             exe.write_bytes(b"MZ")
@@ -59,9 +62,9 @@ class TestPerformancePolicy(unittest.TestCase):
                 self.assertEqual(status["core_mode"], "subprocess")
                 self.assertEqual(status["auto_mode_reason"], "server_not_installed")
                 self.assertEqual(status["threads"], 6)
-                self.assertEqual(status["context_size"], 3072)
-                self.assertEqual(status["prompt_budget_bytes"], 5600)
-                self.assertEqual(status["max_output_tokens"], 112)
+                self.assertEqual(status["context_size"], 4096)
+                self.assertEqual(status["prompt_budget_bytes"], 7600)
+                self.assertEqual(status["max_output_tokens"], 160)
                 self.assertEqual(runtime.core_backend.backend.threads, 6)
             finally:
                 runtime.close()
@@ -71,9 +74,7 @@ class TestPerformancePolicy(unittest.TestCase):
             root=Path(folder)
             model=root/"models"/"Qwen3-4B-Q4_K_M.gguf"
             model.parent.mkdir(parents=True)
-            with model.open("wb") as out:
-                out.write(b"GGUF")
-                out.truncate(int(2.5*GiB))
+            model.write_bytes(b"GGUF" + b"0" * 128)
             exe=root/"third_party"/"llama.cpp"/"runtime-win-cpu-x64"/"bin"/"llama-server.exe"
             exe.parent.mkdir(parents=True)
             exe.write_bytes(b"MZ")
@@ -82,8 +83,8 @@ class TestPerformancePolicy(unittest.TestCase):
             try:
                 self.assertEqual(runtime.core_mode, "persistent")
                 self.assertEqual(runtime.status()["auto_mode_reason"], "ram_headroom_sufficient")
-                self.assertEqual(runtime.core_backend.context_size, 3072)
-                self.assertEqual(runtime.max_output_tokens, 112)
+                self.assertEqual(runtime.core_backend.context_size, 4096)
+                self.assertEqual(runtime.max_output_tokens, 160)
             finally:
                 runtime.close()
 
