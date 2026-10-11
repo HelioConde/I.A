@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -19,11 +20,16 @@ from brain_ssd.local_runtime.core_backend import resolve_server_executable
 from brain_ssd.local_runtime.pipeline import INDEX_RELATIVE, MANIFEST_RELATIVE, MODEL_RELATIVE
 
 
-def inspect_installation(root: Path, profile: str = "economia", probe: bool = False) -> dict[str, Any]:
+def inspect_installation(root: Path, profile: str = "economia", probe: bool = False, model_file: str | None = None) -> dict[str, Any]:
     root = Path(root).resolve()
     if profile not in PROFILES:
         raise ValueError(f"Perfil inválido: {profile}")
-    expected_model = root / MODEL_RELATIVE
+    if model_file is not None and (
+        not isinstance(model_file, str)
+        or re.fullmatch(r"[A-Za-z0-9_.+-]+\.gguf", model_file, re.IGNORECASE) is None
+    ):
+        raise ValueError("Use apenas o nome de um arquivo .gguf da pasta models.")
+    expected_model = root / "models" / model_file if model_file else root / MODEL_RELATIVE
     model_exists = expected_model.is_file()
     model_size = 0
     model_magic = False
@@ -79,7 +85,7 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
     if model_exists and not model_readable:
         recommendations.append("O modelo existe, mas não pôde ser lido. Verifique permissões e antivírus.")
     if not model_exists:
-        recommendations.append(f"Coloque o modelo Qwen3-0.6B-Q8_0.gguf em: {expected_model}")
+        recommendations.append(f"Coloque o GGUF escolhido em: {expected_model}")
     elif not model_magic:
         recommendations.append("O arquivo de modelo existe, mas não tem cabeçalho GGUF válido.")
     if not runtime_present:
@@ -89,7 +95,7 @@ def inspect_installation(root: Path, profile: str = "economia", probe: bool = Fa
     if not (manifest and index and data_file):
         recommendations.append("O corpus SSD está incompleto. O chat simples ainda poderá funcionar; a recuperação de conhecimento ficará desativada.")
     if model_exists and model_size < MIN_PLAUSIBLE_GGUF_BYTES:
-        recommendations.append("O arquivo GGUF está pequeno demais para o Qwen3-0.6B Q8_0; confirme download completo.")
+        recommendations.append("O arquivo GGUF escolhido está pequeno demais; confirme o download completo.")
     if probe and runtime_present and not probe_passed:
         recommendations.append("O executável foi encontrado mas falhou no probe. Verifique DLLs do Visual C++/antivírus e a compilação do llama.cpp.")
     if runtime_probe and (runtime_probe.get("error") or runtime_probe.get("cpu_only_build") is False):
@@ -117,9 +123,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Brain-SSD Chat Windows — diagnóstico de instalação")
     parser.add_argument("--profile", choices=tuple(PROFILES), default="economia")
     parser.add_argument("--probe", action="store_true", help="Executar --version/--list-devices do llama-completion")
+    parser.add_argument("--model-file", default=None, help="GGUF ja instalado em models/")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
-    report = inspect_installation(ROOT, args.profile, args.probe)
+    report = inspect_installation(ROOT, args.profile, args.probe, model_file=args.model_file)
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False))
     else:
