@@ -320,14 +320,19 @@ async function send() {
   const normalizedQuestion = question.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const needsCurrentBrazil = /\bbrasil\b/.test(normalizedQuestion) &&
     /\b(situacao|atual|atualmente|hoje|agora|noticias?|economia|politica|governo|cenario|panorama)\b|como esta|como anda/.test(normalizedQuestion);
+  const studyCommand = /^\/estudar\s+\S/.test(normalizedQuestion.trim());
   const researchCommand = /^(?:\/pesquisar|pesquise(?:\s+na\s+internet)?|busque\s+na\s+(?:internet|web)|procure\s+na\s+web)\s+\S/.test(normalizedQuestion.trim());
-  if ((needsCurrentBrazil || researchCommand) && !$("webSearchControl").hidden && !searchThisQuestion) {
+  if ((needsCurrentBrazil || researchCommand || studyCommand) && !$("webSearchControl").hidden && !searchThisQuestion) {
     searchThisQuestion = window.confirm(
-      (needsCurrentBrazil
-        ? "Para responder sobre o Brasil agora, preciso consultar notícias recentes. "
-        : "Para pesquisar o assunto, preciso consultar fontes externas. ") +
+      (studyCommand
+        ? "Vou pesquisar e guardar trechos públicos sobre o assunto, sem precisar gerar texto com Qwen. "
+        : needsCurrentBrazil
+          ? "Para responder sobre o Brasil agora, preciso consultar notícias recentes. "
+          : "Para pesquisar o assunto, preciso consultar fontes externas. ") +
       "Autoriza enviar SOMENTE esta pergunta ao provedor de pesquisa? " +
-      "A resposta será gerada localmente."
+      (studyCommand
+        ? "Confira também a opção 'Aprender com as fontes'."
+        : "A resposta será gerada localmente.")
     );
   }
   // Source retention applies only when this individual network lookup is
