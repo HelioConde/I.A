@@ -116,6 +116,7 @@ class TestModelCatalog(unittest.TestCase):
                 self.assertEqual(cmd[cmd.index("--model-file")+1], spec.filename)
                 self.assertNotIn("--web-search", cmd)
                 self.assertIn("--episodic-memory", cmd)
+                self.assertIn("--cognitive-shadow", cmd)
                 setup.start_chat(root, spec, web=True, profile="equilibrado")
                 cmd = invoke.call_args.args[0]
                 self.assertIn("--web-search", cmd)
