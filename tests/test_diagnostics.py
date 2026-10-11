@@ -170,7 +170,7 @@ class TestDiagnosticLogger(unittest.TestCase):
         engine.start()
         try:
             with self.assertRaises(RuntimeError):
-                engine.ask("Olá",[])
+                engine.ask("Explique um algoritmo.",[])
         finally:
             engine.close()
         records,_=inspect_events(self.log.files())
