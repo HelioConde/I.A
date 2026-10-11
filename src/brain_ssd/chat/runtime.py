@@ -1,6 +1,7 @@
 """CPU-only Windows chat adapter, with optional SSD knowledge (noncanonical)."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -67,7 +68,7 @@ class ChatSubprocessCore(SubprocessPerQueryCore):
 class LocalChatRuntime:
     """Real llama.cpp inference; greeting does not require an SSD corpus."""
 
-    def __init__(self, root: Path, *, profile: str = "equilibrado", core_mode: str | None = None) -> None:
+    def __init__(self, root: Path, *, profile: str = "equilibrado", core_mode: str | None = None, model_file: str | None = None) -> None:
         if profile not in PROFILES:
             raise ValueError(f"Perfil desconhecido: {profile}")
         self.root = root.resolve()
@@ -78,7 +79,13 @@ class LocalChatRuntime:
             raise ValueError(f"Modo desconhecido: {self.core_mode}")
         self.knowledge_budget = int(settings["knowledge_budget"])
         self.prompt_budget_bytes = int(settings["prompt_budget_bytes"])
-        self.model_path = self.root / MODEL_RELATIVE
+        if model_file is not None and (
+            not isinstance(model_file, str)
+            or len(model_file) > 128
+            or re.fullmatch(r"[A-Za-z0-9_.+-]+\\.gguf", model_file, re.IGNORECASE) is None
+        ):
+            raise ValueError("Informe apenas o nome de um arquivo .gguf na pasta models.")
+        self.model_path = self.root / "models" / model_file if model_file else self.root / MODEL_RELATIVE
         if not self.model_path.is_file():
             raise ChatStartupError("MODEL_MISSING")
         try:
@@ -136,6 +143,7 @@ class LocalChatRuntime:
         available = self.has_knowledge_files and self._completion_path is not None
         return {
             "profile": self.profile,
+            "model": self.model_path.name,
             "core_mode": self.core_mode,
             "interactive_runtime": ("official_cpu_distribution"
                 if self.core_backend.runtime_path.parent == (self.root / COMMUNITY_RUNTIME).resolve()
