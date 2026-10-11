@@ -219,7 +219,29 @@ def generate_streamed(core: Any, request: GenerationRequest,
     if isinstance(core, SubprocessPerQueryCore):
         return _subprocess_stream(core, request, on_chunk, cancel)
     if isinstance(core, PersistentCoreBackend):
-        return _persistent_stream(core, request, on_chunk, cancel)
+        fallback = getattr(core, "_auto_fallback", None)
+        if fallback is None:
+            return _persistent_stream(core, request, on_chunk, cancel)
+        # Retry only BEFORE any text was emitted, otherwise the user would
+        # see a corrupted mixed answer. Explicit persistent mode has no retry.
+        emitted = False
+
+        def tracked(chunk: str) -> None:
+            nonlocal emitted
+            if chunk:
+                emitted = True
+                on_chunk(chunk)
+
+        try:
+            return _persistent_stream(core, request, tracked, cancel)
+        except (OSError, RuntimeError, TimeoutError, ValueError):
+            if cancel.is_set() or emitted:
+                raise
+            core.close()
+            activate = getattr(core, "_auto_fallback_activate", None)
+            if activate is not None:
+                activate()
+            return _subprocess_stream(fallback, request, on_chunk, cancel)
     # Support fake backends in unit tests. Production uses native backends above.
     measured = core.generate(request)
     if cancel.is_set():
