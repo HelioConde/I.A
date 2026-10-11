@@ -179,6 +179,7 @@ class TestExplicitLocalCommands(unittest.TestCase):
                 self.assertEqual(named["local_action"], "memory_save")
                 self.assertIn("Luna", engine.ask("/nome", [])["answer"])
                 self.assertIn("Luna", engine.ask("Oi", [])["answer"])
+                self.assertIn("Luna", engine.ask("Oi Luna", [])["answer"])
             finally:
                 engine.close()
 
