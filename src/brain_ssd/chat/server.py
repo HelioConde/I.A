@@ -400,6 +400,13 @@ class ChatEngine:
             if local_result is not None:
                 # Explicit app commands are performed by Python/SQLite, not Qwen.
                 # Do not claim an inference occurred or mark it validated.
+                if local_result["local_action"] == "help" and self.web_search_service:
+                    local_result["answer"] += (
+                        " Pesquisa web opcional disponível pelo provedor "
+                        + self.web_search_service.provider
+                        + ". Marque 'Pesquisar na web' para cada pergunta que "
+                        "desejar enviar ao provedor externo; desmarcado fica offline."
+                    )
                 if self.diagnostics:
                     self.diagnostics.emit("chat.local_action", request_id=request_id,
                         action=local_result["local_action"], status="PASS")
