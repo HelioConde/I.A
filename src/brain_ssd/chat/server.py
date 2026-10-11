@@ -874,7 +874,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result["conversation_id"] = identifier
                 else:
                     # Legacy isolated HTTP tests may still pass bounded history.
-                    result = self.server.engine.ask(data.get("message"), data.get("history", []), web_search=data.get("web_search", False))
+                    result = self.server.engine.ask(data.get("message"), data.get("history", []), web_search=data.get("web_search", False), remember_web=data.get("remember_web", False))
         except (ValueError, json.JSONDecodeError) as exc:
             if path in ("/api/chat", "/api/chat/stream"):
                 # Even a backend ValueError may embed prompts or local paths.
