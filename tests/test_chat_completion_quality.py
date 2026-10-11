@@ -62,7 +62,7 @@ class CompletionTests(unittest.TestCase):
         engine=ChatEngine(lambda:runtime)
         engine.start()
         try:
-            result=engine.ask("Explique a diferença entre memórias e histórico.",[])
+            result=engine.ask("Pergunta curta?",[])
             self.assertEqual(result["generation_status"],"truncated")
             self.assertFalse(result["answer_complete"])
             self.assertTrue(result["needs_continuation"])
