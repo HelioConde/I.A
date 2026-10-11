@@ -18,6 +18,7 @@ from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.local_actions import is_local_action_answer, local_command
+from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -111,11 +112,12 @@ def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: s
     this message: doing so nests two conflicting conversation formats.
     """
     parts = [
-        "Você é Brain-SSD, um assistente experimental executado localmente na CPU.",
-        "Responda à pergunta atual em português brasileiro com conteúdo concreto; explique ou dê exemplos quando pedidos.",
-        "Não repita uma saudação nem uma descrição de si mesmo em lugar da resposta.",
-        "Se precisar de informação ausente, diga qual é a limitação ou faça uma pergunta específica; não responda só 'Não soube'.",
-        "Não invente medições, lembranças, acesso à internet ou consultas a arquivos que não ocorreram.",
+        "/no_think",
+        "Você é Brain-SSD, assistente local em português brasileiro.",
+        "Responda somente à pergunta atual, com clareza e exemplos quando úteis. "
+        "Não substitua respostas por cumprimentos nem copie respostas anteriores.",
+        "Não invente fatos pessoais, nomes de autores, fontes SSD, memórias "
+        "ou acesso à internet. Se faltar informação, explique o limite.",
     ]
     self_context = brain_ssd_self_context(question)
     if self_context:
@@ -129,7 +131,7 @@ def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: s
         for item in history:
             who = "Usuário" if item["role"] == "user" else "Assistente"
             parts.append(f"{who}: {item['content']}")
-    parts.append("Pergunta atual do usuário:\n" + question + "\n/no_think")
+    parts.append("Pergunta atual do usuário:\n" + question)
     return "\n\n".join(parts)
 
 
@@ -367,7 +369,7 @@ class ChatEngine:
             retrieval: dict[str, Any] | None = None
             knowledge = ""
             retrieval_started = time.monotonic()
-            if not _GREETING.fullmatch(question):
+            if relevant_to_ssd_corpus(question):
                 retrieval = self._runtime.retrieve(question)
                 if retrieval.get("status") == "OK":
                     context = retrieval.get("context", {})
