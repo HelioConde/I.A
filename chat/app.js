@@ -320,9 +320,12 @@ async function send() {
   const normalizedQuestion = question.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const needsCurrentBrazil = /\bbrasil\b/.test(normalizedQuestion) &&
     /\b(situacao|atual|atualmente|hoje|agora|noticias?|economia|politica|governo|cenario|panorama)\b|como esta|como anda/.test(normalizedQuestion);
-  if (needsCurrentBrazil && !$("webSearchControl").hidden && !searchThisQuestion) {
+  const researchCommand = /^(?:\/pesquisar|pesquise(?:\s+na\s+internet)?|busque\s+na\s+(?:internet|web)|procure\s+na\s+web)\s+\S/.test(normalizedQuestion.trim());
+  if ((needsCurrentBrazil || researchCommand) && !$("webSearchControl").hidden && !searchThisQuestion) {
     searchThisQuestion = window.confirm(
-      "Para responder sobre o Brasil agora, preciso consultar notícias recentes. " +
+      (needsCurrentBrazil
+        ? "Para responder sobre o Brasil agora, preciso consultar notícias recentes. "
+        : "Para pesquisar o assunto, preciso consultar fontes externas. ") +
       "Autoriza enviar SOMENTE esta pergunta ao provedor de pesquisa? " +
       "A resposta será gerada localmente."
     );
