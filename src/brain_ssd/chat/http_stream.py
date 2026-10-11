@@ -43,6 +43,7 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
             on_chunk=lambda text: event("delta", {"text": text}),
             cancel_event=cancelled,
             request_id=request_id,
+            web_search=data.get("web_search", False),
         )
         if cancelled.is_set():
             from brain_ssd.chat.streaming import GenerationCancelled
