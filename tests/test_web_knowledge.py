@@ -243,6 +243,29 @@ class TestResearchInChat(unittest.TestCase):
             finally:
                 engine2.close()
 
+    def test_small_context_keeps_studied_sources_ahead_of_long_history(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = WebKnowledge(Path(tmp) / "research.sqlite3")
+            store.save("astronomia e estrelas", "auto", wiki_sources())
+            runtime = FakeRuntime()
+            runtime.prompt_budget_bytes = 3600
+            engine = ChatEngine(lambda: runtime, web_knowledge=store)
+            engine.start()
+            try:
+                history = []
+                for i in range(12):
+                    history.extend([
+                        {"role": "user", "content": "Conversa anterior " + str(i) + " z"*80},
+                        {"role": "assistant", "content": "Explicação antiga " + str(i) + " y"*80},
+                    ])
+                result = engine.ask("O que você aprendeu sobre astronomia?", history)
+                self.assertEqual(result["research_status"], "archived")
+                self.assertTrue(result["research_used_sources"])
+                self.assertIn("pt.wikipedia.org", runtime.core_backend.prompts[-1])
+                self.assertLessEqual(len(runtime.core_backend.prompts[-1].encode("utf-8")), 3600)
+            finally:
+                engine.close()
+
     def test_no_save_without_approval_even_if_lookup_enabled(self):
         with tempfile.TemporaryDirectory() as tmp:
             store = WebKnowledge(Path(tmp) / "research.sqlite3")
