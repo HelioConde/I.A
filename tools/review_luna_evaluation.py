@@ -73,15 +73,58 @@ def render_summary(review: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def locate_results(requested: Path | None, *, root: Path = ROOT) -> Path:
+    """Find the most recent Codex results without guessing a timestamped folder.
+
+    An explicit real file wins. A copied instructional placeholder is not a
+    path; use discovery instead. Never mutate the original benchmark JSON.
+    """
+    if requested is not None:
+        if requested.is_file():
+            return requested.resolve()
+        if "CAMINHO_DO_RELATORIO" not in str(requested).upper():
+            raise FileNotFoundError(
+                f"Arquivo não encontrado: {requested}\n"
+                'Localize com: dir /s /b resultados.json\n'
+                'Ou execute sem caminho: py -3 .\\tools\\review_luna_evaluation.py'
+            )
+    candidates = []
+    for folder in (root / "reports", root / "relatorios", root):
+        if not folder.is_dir():
+            continue
+        candidates.extend(folder.glob("resultados.json"))
+        # Do not crawl model files or the entire disk. Only report folders.
+        if folder != root:
+            candidates.extend(folder.glob("*/resultados.json"))
+            candidates.extend(folder.glob("*/*/resultados.json"))
+    candidates = [p for p in set(candidates) if p.is_file()]
+    if not candidates:
+        raise FileNotFoundError(
+            "Não encontrei resultados.json nas pastas reports/ ou relatorios/ "
+            "do Brain-SSD.\n"
+            "No CMD, execute: dir /s /b resultados.json\n"
+            "Depois passe o caminho real entre aspas."
+        )
+    return max(candidates, key=lambda p: p.stat().st_mtime).resolve()
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Auditar respostas sem executar Qwen.")
-    parser.add_argument("results", type=Path)
+    parser.add_argument("results", nargs="?", type=Path,
+                        help="Caminho para resultados.json (opcional: usa o mais recente em reports/).")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
-    data = json.loads(args.results.read_text(encoding="utf-8-sig"))
-    review = assess_report(data)
-    target = args.output or args.results.parent / "AUDITORIA_COMPLETUDE.md"
-    target.write_text(render_summary(review), encoding="utf-8")
+    try:
+        input_file = locate_results(args.results)
+        data = json.loads(input_file.read_text(encoding="utf-8-sig"))
+        review = assess_report(data)
+        target = args.output or input_file.parent / "AUDITORIA_COMPLETUDE.md"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(render_summary(review), encoding="utf-8")
+    except (FileNotFoundError, json.JSONDecodeError, ValueError, OSError) as exc:
+        print(f"Erro na auditoria: {exc}", file=sys.stderr)
+        return 2
+    print(f"Relatório analisado: {input_file}")
     print(f"Auditoria gerada: {target}")
     print(f"{review['needs_review']} respostas precisam de revisão. Relatório original preservado.")
     return 0
