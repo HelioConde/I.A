@@ -164,7 +164,10 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
         body = json.dumps({
             "messages": [{"role": "user", "content": request.prompt}],
             "max_tokens": request.max_tokens, "temperature": request.temperature,
-            "stream": True, "cache_prompt": False,
+            # In the optional persistent chat server, retain common prompt
+            # prefixes inside the existing context slot, reducing re-prefill.
+            # No remote model APIs or cross-user cache are involved.
+            "stream": True, "cache_prompt": True,
         }, ensure_ascii=False).encode("utf-8")
         req = urllib.request.Request(
             f"http://{core.host}:{core.port}/v1/chat/completions",
