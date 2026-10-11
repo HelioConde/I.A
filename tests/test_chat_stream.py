@@ -173,7 +173,7 @@ class TestHttpStreaming(unittest.TestCase):
     def test_live_events_and_history(self):
         conversation = self.store.create()
         token = str(uuid.uuid4())
-        with self.post("/api/chat/stream", {"message": "Olá!", "conversation_id": conversation["id"],
+        with self.post("/api/chat/stream", {"message": "Explique o que é um algoritmo.", "conversation_id": conversation["id"],
                                            "request_id": token}) as response:
             self.assertIn("text/event-stream", response.headers.get("Content-Type", ""))
             body = response.read().decode("utf-8")
@@ -197,7 +197,7 @@ class TestHttpStreaming(unittest.TestCase):
             raise GenerationCancelled()
 
         def read_stream():
-            with self.post("/api/chat/stream", {"message": "Olá!", "conversation_id": convo["id"],
+            with self.post("/api/chat/stream", {"message": "Explique o que é um algoritmo.", "conversation_id": convo["id"],
                                                "request_id": token}) as response:
                 response_chunks.append(response.read().decode("utf-8"))
 
