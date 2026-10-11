@@ -180,7 +180,11 @@ def bounded_chat_prompt(
 
     selected_history: list[dict[str, str]] = []
     # Reserve space for evidence and generation; prioritize newest complete turns.
-    history_ceiling = min(max_prompt_bytes, max(700, int(max_prompt_bytes * 0.65)))
+    # Previously long chat history consumed nearly all of the profile budget,
+    # so valuable archived web sources could be silently dropped. Prioritize
+    # authorized web evidence over older, recoverable conversation turns.
+    history_share = 0.30 if web_context else 0.65
+    history_ceiling = min(max_prompt_bytes, max(700, int(max_prompt_bytes * history_share)))
     for item in reversed(history):
         candidate = [item] + selected_history
         prompt = build_chat_prompt(question, candidate, "")
