@@ -409,7 +409,7 @@ class ChatEngine:
         with self._lock:
             if cancel_event is not None and cancel_event.is_set():
                 raise GenerationCancelled()
-            study_match = re.fullmatch(r"/estudar\\s+(.+)", question, flags=re.I | re.S)
+            study_match = re.fullmatch(r"/estudar\s+(.+)", question, flags=re.I | re.S)
             if study_match:
                 # Explicit research workflow: acquiring public knowledge must
                 # work even when the small Qwen model cannot produce an answer.
