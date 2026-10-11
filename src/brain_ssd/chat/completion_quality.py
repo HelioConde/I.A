@@ -38,3 +38,22 @@ def classify_completion(text: str, *, max_tokens: int,
                 "needs_continuation": True, "reason": "unfinished_text"}
     return {"status": "unverified", "answer_complete": None,
             "needs_continuation": False, "reason": "no_native_finish_reason"}
+
+
+def select_output_budget(question: str, default_tokens: int) -> int:
+    """For the 4B CPU model, allow enough text for open-ended questions.
+
+    Purely bounded token logic, no additional threads, model loads or RAM.
+    Explicit UI lengths always override this helper in the ChatEngine.
+    """
+    if default_tokens > 112:
+        return default_tokens
+    normalized = question.casefold()
+    open_ended = re.search(
+        r"\b(explique|explica|descreva|compare|crie|escreva|detalhe|"
+        r"diferença|diferenca|exemplo|aprendeu|funcionamento|"
+        r"maneiras|motivos|razões|razoes)\b", normalized,
+    )
+    if open_ended or len(question.strip()) > 85:
+        return 160
+    return default_tokens
