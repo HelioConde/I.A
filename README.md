@@ -10,6 +10,26 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Copiloto local Windows — primeira etapa (experimental)
+
+O atalho **INICIAR-COPILOTO-WINDOWS.bat** oferece permissões explícitas
+para ler **uma pasta escolhida**, examinar informações do computador e
+capturar a tela sob demanda. O painel **▣** também permite atualização
+visual a cada 3 segundos, interrompida ao fechar o painel. Nenhum
+arquivo é alterado e capturas não são salvas automaticamente.
+
+A busca opcional pode usar **resultados do Google via Serper**
+(`SERPER_API_KEY`), além de Wikipédia, Brave e SearXNG. O provedor
+automático preserva Wikipédia quando não há chave. Qualquer pesquisa
+externa requer autorização no chat para aquela pergunta.
+
+**Limite:** o Qwen de texto ainda não interpreta as imagens. A integração
+de visão computacional real é uma etapa futura.
+
+[Configuração, permissões e limites](docs/COPILOT_WINDOWS.md)
+
+---
+
 ## Aprendizado guiado e pesquisa de atualidades (experimental)
 
 O Brain-SSD pode aprender **respostas por exemplos corrigidos explicitamente**
