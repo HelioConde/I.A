@@ -89,7 +89,7 @@ def is_local_action_answer(answer: str) -> bool:
         "A memória episódica está ",
         "Não salvei nada. A memória episódica",
         "Olá! Eu sou ",
-        "O código do projeto Brain-SSD está no repositório GitHub ",
+        "O responsável pelo projeto Brain-SSD é ",
     ))
 
 
@@ -157,7 +157,12 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
         )
     elif simple in ("quem criou brain-ssd", "qual e o nome do seu criador"):
         action = "project_attribution"
-        answer = "O código do projeto Brain-SSD está no repositório GitHub @HelioConde/I.A. O repositório não informa autoria individual verificada."
+        answer = (
+            "O responsável pelo projeto Brain-SSD é Hélio Conde "
+            "(@HelioConde), proprietário do repositório GitHub "
+            "HelioConde/I.A. O modelo Qwen3 é desenvolvido "
+            "pela equipe Qwen, e o llama.cpp é um projeto independente."
+        )
     elif simple in ("/nome",):
         action = "assistant_name"
         name = store.get_assistant_name() if store else None
