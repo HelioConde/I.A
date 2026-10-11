@@ -30,7 +30,7 @@ pedem autorização para consultar notícias datadas da Agência Brasil no modo
 Abra **INICIAR-BRAIN-SSD.bat** na pasta do projeto. O menu oferece Qwen3
 **0.6B**, **1.7B** ou **4B**. O programa instala automaticamente o GGUF
 escolhido e o llama.cpp CPU-only apenas se faltarem, verifica SHA-256, roda
-o diagnóstico do modelo selecionado e inicia o chat. Nenhum modelo anterior,
+o diagnóstico do modelo selecionado e inicia o **chat completo** com memória, aprendizado, base pesquisada e pesquisa web disponível automaticamente (provedor `auto`). A internet só é consultada após autorização para cada pergunta. Nenhum modelo anterior,
 histórico ou memória é apagado. Python 3.11+ é necessário; se estiver
 ausente, o .bat oferece instalar via winget com confirmação.
 
