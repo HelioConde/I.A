@@ -3,6 +3,51 @@ const $ = id => document.getElementById(id);
 const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false, assistantName:"Brain-SSD" };
 const composer = $("messageInput");
 const log = $("messages");
+// Spoken answers use the browser Web Speech API. Speech starts only on click;
+// it may use installed OS voices or a browser-provided voice service.
+const voiceSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+const reader = {button:null, utterance:null};
+function resetVoiceButton() {
+  if (reader.button) {
+    reader.button.textContent = "🔊 Ouvir resposta";
+    reader.button.setAttribute("aria-label", "Ouvir resposta");
+    reader.button.setAttribute("aria-pressed", "false");
+  }
+  reader.button = null;
+  reader.utterance = null;
+}
+function stopSpeaking() {
+  if (!voiceSupported) return;
+  window.speechSynthesis.cancel();
+  resetVoiceButton();
+}
+function readAssistantText(button, content) {
+  if (!voiceSupported) return;
+  if (reader.button === button) {
+    stopSpeaking();
+    return;
+  }
+  stopSpeaking();
+  const message = (content || "").trim();
+  if (!message) return;
+  const utterance = new SpeechSynthesisUtterance(message.slice(0, 6000));
+  utterance.lang = "pt-BR";
+  utterance.rate = 1.02;
+  const voices = window.speechSynthesis.getVoices();
+  const localPtBR = voices.find(voice => voice.lang.toLowerCase() === "pt-br" && voice.localService);
+  const ptBR = voices.find(voice => voice.lang.toLowerCase() === "pt-br");
+  const pt = voices.find(voice => voice.lang.toLowerCase().startsWith("pt"));
+  if (localPtBR || ptBR || pt) utterance.voice = localPtBR || ptBR || pt;
+  reader.button = button;
+  reader.utterance = utterance;
+  button.textContent = "■ Parar áudio";
+  button.setAttribute("aria-label", "Parar leitura da resposta");
+  button.setAttribute("aria-pressed", "true");
+  utterance.onend = () => { if (reader.utterance === utterance) resetVoiceButton(); };
+  utterance.onerror = () => { if (reader.utterance === utterance) resetVoiceButton(); };
+  window.speechSynthesis.speak(utterance);
+}
+
 
 async function requestJson(path, options = {}) {
   const response = await fetch(path, options);
@@ -161,6 +206,7 @@ async function refreshConversations() {
 async function openConversation(identifier) {
   if (app.sending) return;
   try {
+  stopSpeaking();
     const result = await requestJson("/api/conversations/" + encodeURIComponent(identifier), {cache:"no-store"});
     app.conversationId = identifier;
     app.messages = result.messages || [];
@@ -270,6 +316,8 @@ function addMessage(role, content, extraClass = "") {
   text.textContent = content;
   body.appendChild(text);
   if (role === "assistant" && !extraClass) {
+    const actions = document.createElement("div");
+    actions.className = "message-actions";
     const copy = document.createElement("button");
     copy.className = "copy-message";
     copy.type = "button";
@@ -278,7 +326,20 @@ function addMessage(role, content, extraClass = "") {
       try { await navigator.clipboard.writeText(text.textContent || ""); copy.textContent = "Copiado!"; }
       catch (_) { copy.textContent = "Cópia indisponível"; }
     });
-    body.appendChild(copy);
+    actions.appendChild(copy);
+    const speak = document.createElement("button");
+    speak.className = "voice-message";
+    speak.type = "button";
+    speak.textContent = voiceSupported ? "🔊 Ouvir resposta" : "Voz indisponível";
+    speak.disabled = !voiceSupported || !content;
+    speak.title = voiceSupported
+      ? "Ler esta resposta em voz alta, em português"
+      : "Este navegador não oferece leitura de texto em voz alta";
+    speak.setAttribute("aria-label", speak.textContent);
+    speak.setAttribute("aria-pressed", "false");
+    speak.addEventListener("click", () => readAssistantText(speak, text.textContent));
+    actions.appendChild(speak);
+    body.appendChild(actions);
   }
   row.appendChild(body);
   $("welcome")?.remove();
@@ -396,6 +457,8 @@ async function send() {
         scrollBottom();
       } else if (event === "done") {
         output.textContent = payload.answer;
+        const speak = pending.querySelector(".voice-message");
+        if (speak && voiceSupported) speak.disabled = !payload.answer?.trim();
         if (Number(payload.episodic_ambiguities_detected) > 0) {
           const notice = document.createElement("p");
           notice.className = "memory-conflict-warning";
@@ -562,6 +625,7 @@ async function stopGeneration() {
   }
 }
 function resetChat() {
+  stopSpeaking();
   if (app.sending) return;
   app.messages = [];
   app.conversationId = null;
