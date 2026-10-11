@@ -140,7 +140,7 @@ def start_chat(root: Path, spec: ModelSpec, *, web: bool, profile: str) -> int:
         "--episodic-memory",
     ]
     if web:
-        args.extend(["--web-search", "--web-provider", "wikipedia"])
+        args.extend(["--web-search", "--web-provider", "auto"])
     print("Iniciando conversa local. Pressione Ctrl+C para encerrar.", flush=True)
     try:
         return subprocess.call(args, cwd=root)
