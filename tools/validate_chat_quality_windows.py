@@ -47,13 +47,14 @@ def check_response(case: str, answer: str) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Real Windows Qwen quality smoke test")
     parser.add_argument("--profile", choices=("economia", "equilibrado"), default="economia")
+    parser.add_argument("--model-file", default=None, help="GGUF local na pasta models/")
     parser.add_argument("--include-answers", action="store_true",
                         help="Print and save the generated answers locally (opt-in)")
     args = parser.parse_args()
     if os.name != "nt":
         print("Este teste exige Windows com Qwen3 real e llama.cpp instalados.")
         return 2
-    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile))
+    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, model_file=args.model_file))
     report = {"platform": "Windows", "profile": args.profile, "cases": [], "status": "FAIL"}
     answers = []
     try:
