@@ -409,6 +409,86 @@ class ChatEngine:
         with self._lock:
             if cancel_event is not None and cancel_event.is_set():
                 raise GenerationCancelled()
+            study_match = re.fullmatch(r"/estudar\\s+(.+)", question, flags=re.I | re.S)
+            if study_match:
+                # Explicit research workflow: acquiring public knowledge must
+                # work even when the small Qwen model cannot produce an answer.
+                # Neither the web nor the local database is touched without
+                # this message's web_search consent.
+                topic = study_match.group(1).strip()
+                if len(topic) > 280 or not topic:
+                    raise ValueError("Estude um tópico com até 280 caracteres.")
+                source_list: list[dict[str, str]] = []
+                saved = 0
+                research_status = "not_requested"
+                save_state = "not_requested"
+                if not web_search:
+                    answer = (
+                        "Autorize a opção 'Pesquisar na web' para estudar "
+                        "esse assunto. O material público poderá ser guardado "
+                        "localmente, sem treinar os pesos do Qwen."
+                    )
+                elif self.web_knowledge is None:
+                    answer = (
+                        "A memória de pesquisa está desativada. "
+                        "Inicie o Brain-SSD com memória de pesquisa habilitada."
+                    )
+                else:
+                    if cancel_event is not None and cancel_event.is_set():
+                        raise GenerationCancelled()
+                    try:
+                        source_list = self.web_search_service.search(topic)
+                        research_status = "ok" if source_list else "no_results"
+                    except WebSearchError:
+                        research_status = "unavailable"
+                    if cancel_event is not None and cancel_event.is_set():
+                        raise GenerationCancelled()
+                    if source_list:
+                        try:
+                            saved = self.web_knowledge.save(
+                                topic, self.web_search_service.provider,
+                                source_list, current=needs_brazil_news(topic),
+                            )
+                            save_state = "saved" if saved else "not_saved"
+                        except (sqlite3.Error, OSError, ValueError):
+                            save_state = "failed"
+                    else:
+                        save_state = "no_sources"
+                    answer = (
+                        f"Pesquisa concluída: {len(source_list)} fonte(s) encontrada(s), "
+                        f"{saved} guardada(s) para conversas futuras. "
+                        "Confira os links mostrados abaixo e use /conhecimento "
+                        "para revisar. O Qwen não precisou gerar este relatório."
+                        if source_list else
+                        "Não encontrei fontes para guardar. "
+                        "Verifique o provedor e tente outro assunto."
+                    )
+                    if source_list and not saved:
+                        answer += " Nenhuma fonte passou os critérios de relevância e validade."
+                result = {
+                    "answer": answer, "mode": "local_command",
+                    "local_action": "research_study",
+                    "source": "web_research_sqlite",
+                    "web_search_status": research_status,
+                    "web_search_provider": (
+                        self.web_search_service.provider if web_search else None
+                    ),
+                    "web_sources": source_list[:4],
+                    "research_saved_sources": saved,
+                    "research_save_status": save_state,
+                    "research_used_sources": [],
+                    "metrics": {}, "active_pages": 0, "sources_from_ssd": 0,
+                    "episodic_memories_used": 0,
+                    "episodic_ambiguities_detected": 0,
+                    "episodic_ambiguities_withheld": False,
+                    "cognitive_shadow": None,
+                }
+                if self.diagnostics:
+                    self.diagnostics.emit("chat.local_action", request_id=request_id,
+                                          action="research_study", status="PASS")
+                if on_chunk:
+                    on_chunk(answer)
+                return result
             # Explicitly taught examples are checked before generic local
             # greetings. They never intercept approved web research.
             local_result = learned_action(question, self.learned_store,
