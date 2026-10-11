@@ -268,6 +268,32 @@ class TestExplicitLocalCommands(unittest.TestCase):
             finally:
                 engine.close()
 
+    def test_memory_architecture_and_favorite_owner_are_grounded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            notes = EpisodicMemory(Path(tmp) / "notes.sqlite3")
+            architecture = local_command(
+                "Qual é a diferença entre seu histórico de conversa e sua memória permanente?",
+                notes,
+            )
+            self.assertEqual(architecture["local_action"], "memory_architecture")
+            self.assertIn("SQLite", architecture["answer"])
+            self.assertIn("reaberto", architecture["answer"])
+            self.assertIn("outro banco", architecture["answer"])
+            engine = ChatEngine(FakeRuntime, episodic_store=notes)
+            engine.start()
+            try:
+                history = [{"role": "user",
+                            "content": "Meu animal favorito é o gato. Lembre disso apenas nesta conversa."}]
+                result = engine.ask("Qual é meu animal favorito?", history)
+                self.assertEqual(result["local_action"], "conversation_context")
+                self.assertEqual(
+                    result["answer"],
+                    "Você disse nesta conversa que seu animal favorito é gato.",
+                )
+                self.assertEqual(notes.list(), [])
+            finally:
+                engine.close()
+
     def test_current_chat_preference_followup_does_not_invent_or_save_motive(self):
         with tempfile.TemporaryDirectory() as folder:
             notes = EpisodicMemory(Path(folder) / "notes.sqlite3")
