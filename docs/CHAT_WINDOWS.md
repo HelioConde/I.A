@@ -356,3 +356,51 @@ explicativa e o nome escolhido pode ser exibido como rótulo do assistente.
 
 Para executar somente os testes sintéticos (sem Qwen e sem alterar memórias
 pessoais): `py -3 -m unittest discover -s tests -p "test_chat_local_actions.py" -v`.
+
+
+## Revisão do chat: contexto, recuperação SSD e comparação de GGUF
+
+O chat separa os seguintes caminhos para evitar misturar respostas estáticas e geração:
+
+- **Ações locais (Python/SQLite):** comandos explícitos de memória, identificação,
+  ajuda e saudações simples. A UI identifica respostas que não são do Qwen.
+- **Conversa livre:** continua a executar o GGUF no llama.cpp, com prompt curto,
+  histórico filtrado e instrução Qwen3 `/no_think` antes da pergunta, sem
+  afirmar que respostas prontas sejam inferência.
+- **Conhecimento SSD:** a base atual contém apenas Python e SQLite. O módulo
+  `chat/retrieval_gate.py` só aciona recuperação em perguntas pertinentes,
+  evitando injetar documentação SQLite em conversas cotidianas. Isso é um
+  filtro lexical de escopo, **não** uma busca semântica geral.
+
+### Comparar outro GGUF já instalado
+
+O padrão continua sendo `models/Qwen3-0.6B-Q8_0.gguf`. Para testar um
+modelo Qwen3 alternativo, coloque-o **manualmente** dentro da pasta
+`models/` (sem apagar o modelo original). O projeto não baixa nem verifica
+automaticamente arquivos alternativos. Use o nome real do arquivo:
+
+```powershell
+cd "C:\\Users\\helio\\Documents\\I.A"
+py -3 .\\tools\\run_chat.py --profile economia --episodic-memory --model-file "SEU-MODELO-QWEN3.gguf"
+```
+
+O argumento `--model-file` aceita somente nomes de arquivos `.gguf` em
+`models/`, nunca caminhos arbitrários. Teste o modelo com a mesma sequência,
+sem usar memórias privadas:
+
+```powershell
+py -3 .\\tools\\validate_chat_windows.py --profile economia --model-file "SEU-MODELO-QWEN3.gguf"
+py -3 .\\tools\\validate_chat_quality_windows.py --profile economia --model-file "SEU-MODELO-QWEN3.gguf"
+```
+
+`validate_chat_windows.py` mede **inferência nativa real**, sem depender do
+corpus Python/SQLite nem de saudações automáticas. O teste de qualidade faz
+perguntas diferentes sobre capacidades, SSD/RAM, aritmética, origem e acesso à
+internet, mais **duas mensagens consecutivas** com dados sintéticos, sem usar
+histórico pessoal. Os critérios heurísticos podem ter falsos positivos e
+negativos: um resultado PASS não equivale a uma conversa perfeita.
+
+O GGUF alternativo pode exigir mais RAM e tempo de resposta; só escolha após
+verificar a capacidade do computador. `INICIAR-CHAT-MEMORIA-WINDOWS.bat`
+continua usando o modelo padrão, a menos que a inicialização seja feita pelo
+comando Python com `--model-file`.
