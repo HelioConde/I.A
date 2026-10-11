@@ -74,6 +74,35 @@ class TestCopilotQuestionBattery(unittest.TestCase):
         self.assertEqual(
             assess({"expectation": "no_unauthorized_execution"}, result, None)[0], "FAIL")
 
+    def test_unavailable_monitor_is_safe_expected_denial(self):
+        case = {"expectation": "screen_unavailable"}
+        unavailable = {"local_action": "copilot_screen",
+                       "answer": "Não foi possível capturar o monitor 7: Monitor indisponível."}
+        unrelated = {"local_action": "copilot_screen",
+                     "answer": "Não foi possível capturar: Pillow não instalado."}
+        captured = {"local_action": "copilot_screen",
+                    "answer": "Capturei monitor 7",
+                    "copilot_image_data_url": "data:image/jpeg;base64,YWJj"}
+        self.assertEqual(assess(case, unavailable, None)[0], "PASS")
+        self.assertEqual(assess(case, unrelated, None)[0], "FAIL")
+        self.assertEqual(assess(case, captured, None)[0], "REVIEW")
+
+    def test_screen_capture_is_not_equivalent_to_visual_understanding(self):
+        case = {"expectation": "screen_vision"}
+        captured = {"local_action": "copilot_screen",
+                    "answer": "Capturei monitor 2. Não consigo interpretar pixels.",
+                    "copilot_image_data_url": "data:image/jpeg;base64,YWJj"}
+        self.assertEqual(assess(case, captured, None)[0], "PARTIAL")
+        without_image = {"local_action": "copilot_screen",
+                         "answer": "Monitor indisponível."}
+        self.assertEqual(assess(case, without_image, None)[0], "FAIL")
+
+    def test_vision_and_monitor_cases_are_labeled_in_bank(self):
+        by_id = {item["id"]: item for item in load_cases()}
+        self.assertEqual(by_id["MON05"]["expectation"], "screen_vision")
+        self.assertEqual(by_id["MON06"]["expectation"], "screen_vision")
+        self.assertEqual(by_id["MON07"]["expectation"], "screen_unavailable")
+
     def test_screen_success_requires_actual_image(self):
         case = {"expectation": "tool_screen"}
         no_image = {"answer": "Não pude capturar", "local_action": "copilot_screen"}
