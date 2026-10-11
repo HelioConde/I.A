@@ -1,0 +1,25 @@
+name: Poke Idle Lab (offline)
+on:
+  pull_request:
+    paths:
+      - 'experiments/poke_idle_lab/**'
+      - '.github/workflows/poke-idle-lab-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/poke_idle_lab/**'
+      - '.github/workflows/poke-idle-lab-tests.yml'
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Testar comparador e planejador offline
+        working-directory: experiments/poke_idle_lab
+        run: |
+          python -m unittest -v test_lab.py
+          python lab.py exemplo_sintetico.csv --json
+          python decision.py hunts_sinteticas.csv
