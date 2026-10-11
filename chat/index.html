@@ -32,7 +32,7 @@
       <div class="sidebar-panel">
         <span class="micro-title">EXECUÇÃO LOCAL</span>
         <div class="sidebar-row"><span class="status-dot" id="sidebarDot"></span><strong id="sidebarStatus">Iniciando...</strong></div>
-        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p>
+        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p><p id="webPrivacyInfo">Busca web desligada. Nenhuma pergunta é enviada à internet.</p>
       </div>
       <div class="side-footer">Histórico privado neste computador · Brain-SSD V0</div>
     </aside>
@@ -76,7 +76,14 @@
           <label class="sr-only" for="messageInput">Mensagem para o Brain-SSD</label>
           <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Pergunte alguma coisa..." aria-label="Mensagem para o Brain-SSD"></textarea>
           <div class="composer-bottom">
-            <div class="composer-hints"><span class="cpu-badge">CPU</span> Sem API externa</div>
+            <div class="composer-hints">
+              <span class="cpu-badge">CPU</span><span>Modelo local</span>
+              <label class="web-optin" id="webSearchControl" hidden>
+                <input type="checkbox" id="webSearchToggle">
+                <span>Pesquisar na web</span>
+              </label>
+              <span class="web-provider-info" id="webProviderInfo" hidden></span>
+            </div>
             <div class="composer-actions"><button class="stop-button" id="stopButton" type="button" aria-label="Interromper resposta" title="Interromper resposta" hidden>■ Parar</button><button class="send-button" id="sendButton" aria-label="Enviar mensagem" type="submit" disabled>↑</button></div>
           </div>
         </form>
