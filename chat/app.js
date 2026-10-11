@@ -504,7 +504,17 @@ async function send() {
             void refreshStatus();
           }
         }
-        if (searchThisQuestion || (Array.isArray(payload.research_used_sources) && payload.research_used_sources.length)) {
+        // A checked web box is not proof that a network lookup happened:
+        // deterministic local answers (greetings, GitHub permissions, etc.)
+        // must never display a fabricated "Fontes da pesquisa web" panel.
+        const hasArchivedSources = Array.isArray(payload.research_used_sources) &&
+          payload.research_used_sources.length > 0;
+        const webWasAttempted = searchThisQuestion && (
+          ["ok", "cached", "no_results", "unavailable", "context_full", "provider_limited"]
+            .includes(payload.web_search_status) ||
+          (Array.isArray(payload.web_sources) && payload.web_sources.length > 0)
+        );
+        if (webWasAttempted || hasArchivedSources) {
           const sourcePanel = document.createElement("div");
           sourcePanel.className = "web-sources";
           const heading = document.createElement("strong");
