@@ -46,6 +46,7 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
             web_search=data.get("web_search", False),
             remember_web=data.get("remember_web", False),
             fast_web=data.get("fast_web", False),
+            response_tokens=data.get("response_tokens"),
         )
         if cancelled.is_set():
             from brain_ssd.chat.streaming import GenerationCancelled
