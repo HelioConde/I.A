@@ -98,3 +98,4 @@
 .web-sources li + li { margin-top: 7px; }
 .web-sources a { color: #8fc7ff; overflow-wrap: anywhere; }
 .web-sources p { color: #a9b4c3; margin: 4px 0 0; line-height: 1.5; }
+.web-sources li small { display: block; color: #a7b5c2; margin-top: 3px; line-height: 1.5; }
