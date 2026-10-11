@@ -49,7 +49,23 @@ class TestBatchLaunchers(unittest.TestCase):
         self.assertIn("set \"MODEL=4b\"",text)
         self.assertIn("winget install --id Python.Python.3.11",text)
         self.assertIn("--profile %PROFILE%",text)
-        self.assertIn("%WEB%",text)
+        # The main launcher now always exposes the complete feature set.
+        # Only the actual external query still needs per-question consent.
+        self.assertIn(' --web',text)
+        self.assertNotIn("choice /C SN /N /M \"Pesquisa opcional",text)
+        self.assertNotIn("%WEB%",text)
+
+    def test_every_legacy_chat_launcher_opens_full_features(self):
+        for name in (
+            "INICIAR-CHAT-WINDOWS.bat",
+            "INICIAR-CHAT-MEMORIA-WINDOWS.bat",
+            "INICIAR-CHAT-WEB-WINDOWS.bat",
+        ):
+            with self.subTest(launcher=name):
+                content=(ROOT/name).read_text(encoding="utf-8")
+                self.assertIn("--episodic-memory",content)
+                self.assertIn("--web-search --web-provider auto",content)
+                self.assertIn("--cognitive-shadow",content)
 
     def test_chat_start_is_conditional_on_preflight(self):
         for name in SCRIPTS[1:]:
