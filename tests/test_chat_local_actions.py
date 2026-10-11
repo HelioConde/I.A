@@ -101,7 +101,7 @@ class TestExplicitLocalCommands(unittest.TestCase):
                 self.assertEqual(notes.get_assistant_name(), "Luna")
                 self.assertEqual(runtime.core_backend.prompts, [])
                 # This must go through the actual model adapter, not static help.
-                answer = engine.ask("Oi Luna", [
+                answer = engine.ask("O que é Python?", [
                     {"role": "user", "content": "O que você consegue fazer?"},
                     {"role": "assistant", "content": local_command("/ajuda", notes)["answer"]},
                 ])
@@ -110,7 +110,7 @@ class TestExplicitLocalCommands(unittest.TestCase):
                 prompt = runtime.core_backend.prompts[-1]
                 self.assertIn("Luna", prompt)
                 self.assertNotIn("Comandos locais reais:", prompt)
-                self.assertIn("Oi Luna", prompt)
+                self.assertIn("O que é Python?", prompt)
             finally:
                 engine.close()
             reopened = EpisodicMemory(location)
