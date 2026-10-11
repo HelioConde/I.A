@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+captures/
+.local-io-profile/
+minhas_sessoes.csv
+*.sqlite3
+.env
