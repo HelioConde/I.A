@@ -72,6 +72,42 @@ class TestChatEngine(unittest.TestCase):
         self.assertEqual(data["sources_from_ssd"], 1)
         self.assertIn("SSD: dados recuperados", self.runtime.core_backend.prompts[0])
 
+    def test_unrelated_requests_do_not_load_unrelated_ssd_corpus(self):
+        for question in (
+            "Oi, tudo bem hoje?",
+            "Quem criou este programa e o modelo?",
+            "Me ajude a escrever um conto sobre gatos.",
+            "Quanto é 2 + 2?",
+        ):
+            with self.subTest(question=question):
+                count = len(self.runtime.queries)
+                response = self.engine.ask(question, [])
+                self.assertEqual(response["mode"], "experimental_chat")
+                self.assertEqual(len(self.runtime.queries), count)
+                self.assertEqual(response["active_pages"], 0)
+                self.assertEqual(response["sources_from_ssd"], 0)
+
+    def test_sqlite_python_questions_still_use_real_knowledge(self):
+        from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
+        for question in (
+            "Qual é o PRAGMA journal_mode do SQLite?",
+            "Como instalar bibliotecas Python com pip?",
+            "O que é um banco de dados SQL?",
+        ):
+            self.assertTrue(relevant_to_ssd_corpus(question), question)
+        for question in (
+            "Como está minha memória SSD?",
+            "Escreva um poema sobre pipas.",
+            "Qual seu criador?",
+            "Como está minha vida?",
+        ):
+            self.assertFalse(relevant_to_ssd_corpus(question), question)
+
+    def test_creator_context_never_invents_names(self):
+        prompt = build_chat_prompt("Quem foi seu criador?", [], "")
+        self.assertIn("Hélio Conde", prompt)
+        self.assertIn("equipe Qwen", prompt)
+
     def test_prompt_and_history_bounded(self):
         self.assertEqual(normalize_history({"role": "user"}), [])
         self.assertEqual(len(normalize_history([{"role": "user", "content": "x"}] * 50)), 8)
@@ -131,7 +167,8 @@ class TestChatEngine(unittest.TestCase):
         self.assertIn("Pergunta atual do usuário:", prompt)
         self.assertIn("/no_think", prompt)
         self.assertNotIn("\n\nAssistente:\n\n/no_think", prompt)
-        self.assertTrue(prompt.endswith("/no_think"))
+        self.assertTrue(prompt.startswith("/no_think\n\n"))
+        self.assertTrue(prompt.endswith("Explique como o SSD é usado."))
         self.assertIn("Assistente: Bom dia", prompt)
 
     def test_repetitive_failed_legacy_answers_are_not_reinjected(self):
