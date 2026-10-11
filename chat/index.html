@@ -93,6 +93,15 @@
                 <input type="checkbox" id="webFastToggle" checked>
                 <span>Resposta rápida</span>
               </label>
+              <label class="response-size-control" for="responseSize" title="Respostas longas levam mais tempo na CPU">
+                <span>Resposta</span>
+                <select id="responseSize" aria-label="Tamanho da resposta">
+                  <option value="auto" selected>Automática</option>
+                  <option value="96">Curta</option>
+                  <option value="160">Normal</option>
+                  <option value="256">Detalhada (mais lenta)</option>
+                </select>
+              </label>
               <span class="web-provider-info" id="webProviderInfo" hidden></span>
             </div>
             <div class="composer-actions"><button class="stop-button" id="stopButton" type="button" aria-label="Interromper resposta" title="Interromper resposta" hidden>■ Parar</button><button class="send-button" id="sendButton" aria-label="Enviar mensagem" type="submit" disabled>↑</button></div>
