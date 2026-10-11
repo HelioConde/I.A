@@ -57,14 +57,14 @@ class TestChatEngine(unittest.TestCase):
     def tearDown(self):
         self.engine.close()
 
-    def test_greeting_uses_real_core_response_without_fake_fallback(self):
+    def test_short_greeting_is_an_explicit_local_action(self):
         data = self.engine.ask("Olá!", [])
         self.assertIn("Olá!", data["answer"])
-        self.assertEqual(data["mode"], "experimental_chat")
+        self.assertEqual(data["mode"], "local_command")
+        self.assertEqual(data["local_action"], "greeting")
         self.assertEqual(data["active_pages"], 0)
         self.assertEqual(self.runtime.queries, [])
-        self.assertEqual(len(self.runtime.core_backend.prompts), 1)
-        self.assertIn("Olá!", self.runtime.core_backend.prompts[0])
+        self.assertEqual(len(self.runtime.core_backend.prompts), 0)
 
     def test_technical_query_uses_ssd_context(self):
         data = self.engine.ask("Como funciona Python?", [{"role": "user", "content": "Oi"}])
