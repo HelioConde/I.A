@@ -7,7 +7,7 @@ Use o arquivo **INICIAR-BRAIN-SSD.bat** como iniciador principal no Windows 10/1
 1. Atualize o projeto executando **git pull --ff-only**.
 2. Abra **INICIAR-BRAIN-SSD.bat** com dois cliques.
 3. Escolha **1** (Qwen3 0.6B), **2** (Qwen3 1.7B) ou **3** (Qwen3 4B).
-4. Escolha se quer habilitar a opção de pesquisa na Wikipédia; cada pergunta continua exigindo autorização na interface.
+4. A versão completa já habilita automaticamente memória, aprendizado, diagnóstico e pesquisa web no provedor `auto` (Wikipédia e notícias recentes do Brasil). Não há mais pergunta de ativação da pesquisa no `.bat`; cada consulta externa continua exigindo sua autorização na interface.
 5. O instalador verifica e baixa somente os arquivos ausentes, valida o SHA-256, executa o diagnóstico e inicia o chat.
 
 | Seleção | Modelo | Download aproximado | RAM sugerida |
