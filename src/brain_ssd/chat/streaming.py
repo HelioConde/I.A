@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.core_backend import PersistentCoreBackend, SubprocessPerQueryCore
-from brain_ssd.local_runtime.windows_metrics import windows_process_snapshot, _perf_number
+from brain_ssd.local_runtime.windows_metrics import windows_process_snapshot, _perf_number, _perf_tokens
 
 
 class GenerationCancelled(Exception):
@@ -106,6 +106,8 @@ def _subprocess_stream(core: SubprocessPerQueryCore, request: GenerationRequest,
             "latency_ms": (time.monotonic() - started) * 1000,
             "ttft_ms": (first_at - started) * 1000 if first_at else None,
             "tokens_per_second": _perf_number(err, "eval time"),
+            "generated_tokens": _perf_tokens(err, "eval time"),
+            "finish_reason": None,
             "working_set_bytes_max": _max_ram(samples, "working_set_bytes"),
             "private_bytes_max": _max_ram(samples, "private_bytes"),
             "physical_read_bytes": None,
@@ -129,6 +131,7 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
     output: list[str] = []
     samples: deque[Any] = deque(maxlen=4096)
     timings: dict = {}
+    finish_reason: str | None = None
 
     def watch() -> None:
         while not done.wait(0.05):
@@ -184,6 +187,8 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
                     break
                 msg = json.loads(data)
                 choices = msg.get("choices") or []
+                if choices and choices[0].get("finish_reason"):
+                    finish_reason = str(choices[0]["finish_reason"])
                 delta = choices[0].get("delta", {}) if choices else {}
                 text = str(delta.get("content") or msg.get("content") or "")
                 if text:
@@ -200,6 +205,8 @@ def _persistent_stream(core: PersistentCoreBackend, request: GenerationRequest,
             "latency_ms": (time.monotonic() - started) * 1000,
             "ttft_ms": (first_at - started) * 1000 if first_at else None,
             "tokens_per_second": timings.get("predicted_per_second"),
+            "generated_tokens": timings.get("predicted_n"),
+            "finish_reason": finish_reason,
             "working_set_bytes_max": _max_ram(samples, "working_set_bytes"),
             "private_bytes_max": _max_ram(samples, "private_bytes"),
             "physical_read_bytes": None,
