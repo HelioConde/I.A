@@ -143,8 +143,7 @@ class TestChatEngine(unittest.TestCase):
             {"role": "user", "content": "O que você consegue fazer?"},
         ]
         cleaned = normalize_history(old)
-        self.assertEqual(len(cleaned), 3)
-        self.assertTrue(all(row["role"] == "user" for row in cleaned))
+        self.assertEqual(cleaned, [{"role": "user", "content": "O que você consegue fazer?"}])
 
     def test_large_question_fails_instead_of_being_silently_cut(self):
         with self.assertRaisesRegex(ValueError, "Mensagem longa"):
