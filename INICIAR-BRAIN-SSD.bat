@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 cd /d "%~dp0"
-title Brain-SSD - Instalar e escolher modelo
+title Brain-SSD - Completo com memoria e pesquisa web
 if not exist "tools\auto_setup_chat_windows.py" (
   echo ERRO: Atualize o projeto completo. Faltou tools\auto_setup_chat_windows.py.
   pause
@@ -41,7 +41,7 @@ if errorlevel 1 goto :python_missing
 :menu
 cls
 echo ==================================================
-echo       BRAIN-SSD  -  INSTALADOR AUTOMATICO
+echo       BRAIN-SSD  -  VERSAO COMPLETA
 echo ==================================================
 echo.
 echo Modelos locais (CPU, GGUF):
@@ -54,6 +54,15 @@ echo O instalador baixa APENAS o que estiver faltando:
 echo - Modelo selecionado, com SHA-256 verificado;
 echo - llama.cpp oficial CPU x64, se ausente.
 echo.
+echo Recursos ativados automaticamente:
+echo - Memoria de conversas e aprendizado local;
+echo - Pesquisa web auto - Wikipedia e noticias Brasil;
+echo - Conhecimento pesquisado persistente em SQLite;
+echo - Diagnosticos e analise cognitiva em modo shadow.
+echo.
+echo A INTERNET SO E CONSULTADA COM AUTORIZACAO
+echo PARA CADA PERGUNTA NO NAVEGADOR.
+echo.
 echo Nada substitui os modelos anteriores nem apaga
 echo conversas, memorias ou arquivos do SSD.
 echo Para modelos maiores, confira sua RAM e espaco livre.
@@ -63,30 +72,19 @@ if errorlevel 3 goto :model4b
 if errorlevel 2 goto :model17
 set "MODEL=0.6b"
 set "PROFILE=economia"
-goto :web
+goto :run
 :model17
 set "MODEL=1.7b"
 set "PROFILE=equilibrado"
-goto :web
+goto :run
 :model4b
 set "MODEL=4b"
 set "PROFILE=equilibrado"
-
-:web
-echo.
-echo Deseja habilitar pesquisas da Wikipedia neste chat?
-echo A pesquisa fica DESMARCADA ate voce autorizar cada pergunta.
-choice /C SN /N /M "Pesquisa opcional [S/N]: "
-if errorlevel 2 goto :offline
-set "WEB=--web"
-goto :run
-:offline
-set "WEB="
 :run
 echo.
 echo Preparando o ambiente, se necessario.
 echo Na primeira execucao o download pode demorar.
-%PYTHON_CMD% "tools\auto_setup_chat_windows.py" --model %MODEL% --profile %PROFILE% %WEB%
+%PYTHON_CMD% "tools\auto_setup_chat_windows.py" --model %MODEL% --profile %PROFILE% --web
 set "EXIT_CODE=%ERRORLEVEL%"
 if not "%EXIT_CODE%"=="0" (
   echo.
