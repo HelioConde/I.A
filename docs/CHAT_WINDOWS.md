@@ -380,8 +380,8 @@ modelo Qwen3 alternativo, coloque-o **manualmente** dentro da pasta
 automaticamente arquivos alternativos. Use o nome real do arquivo:
 
 ```powershell
-cd "C:\\Users\\helio\\Documents\\I.A"
-py -3 .\\tools\\run_chat.py --profile economia --episodic-memory --model-file "SEU-MODELO-QWEN3.gguf"
+cd "C:\Users\helio\Documents\I.A"
+py -3 .\tools\run_chat.py --profile economia --episodic-memory --model-file "SEU-MODELO-QWEN3.gguf"
 ```
 
 O argumento `--model-file` aceita somente nomes de arquivos `.gguf` em
@@ -389,8 +389,8 @@ O argumento `--model-file` aceita somente nomes de arquivos `.gguf` em
 sem usar memórias privadas:
 
 ```powershell
-py -3 .\\tools\\validate_chat_windows.py --profile economia --model-file "SEU-MODELO-QWEN3.gguf"
-py -3 .\\tools\\validate_chat_quality_windows.py --profile economia --model-file "SEU-MODELO-QWEN3.gguf"
+py -3 .\tools\validate_chat_windows.py --profile economia --model-file "SEU-MODELO-QWEN3.gguf"
+py -3 .\tools\validate_chat_quality_windows.py --profile economia --model-file "SEU-MODELO-QWEN3.gguf"
 ```
 
 `validate_chat_windows.py` mede **inferência nativa real**, sem depender do
