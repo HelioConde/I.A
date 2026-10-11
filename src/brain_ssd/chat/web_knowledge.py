@@ -15,6 +15,7 @@ import re
 import sqlite3
 import time
 import unicodedata
+from contextlib import contextmanager
 from urllib.parse import urlsplit
 from typing import Any
 
@@ -108,7 +109,7 @@ class WebKnowledge:
     def __init__(self, path: Path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        with self._connection() as db:
             db.execute("""
                 CREATE TABLE IF NOT EXISTS web_knowledge (
                     url TEXT PRIMARY KEY,
@@ -128,6 +129,19 @@ class WebKnowledge:
         db = sqlite3.connect(self.path, timeout=8)
         db.row_factory = sqlite3.Row
         return db
+
+    @contextmanager
+    def _connection(self):
+        """Close SQLite handles, which ``Connection.__exit__`` alone does not."""
+        db = self._connect()
+        try:
+            yield db
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
 
     def save(self, question: str, provider: str,
              sources: list[dict[str, str]], *, current: bool = False) -> int:
@@ -174,7 +188,7 @@ class WebKnowledge:
             ))
         if not accepted:
             return 0
-        with self._connect() as db:
+        with self._connection() as db:
             db.execute("BEGIN IMMEDIATE")
             db.executemany("""
                 INSERT INTO web_knowledge (
@@ -202,7 +216,7 @@ class WebKnowledge:
             return []
         now = int(time.time())
         rows = []
-        with self._connect() as db:
+        with self._connection() as db:
             for row in db.execute(
                 "SELECT topic,tokens,provider,title,url,excerpt,published_at,saved_at,"
                 " expires_at FROM web_knowledge WHERE expires_at > ?"
@@ -243,14 +257,14 @@ class WebKnowledge:
         ]
 
     def count(self) -> int:
-        with self._connect() as db:
+        with self._connection() as db:
             return int(db.execute("SELECT count(*) FROM web_knowledge").fetchone()[0])
 
     def forget(self, query: str) -> int:
         if not isinstance(query, str) or not query.strip() or len(query) > MAX_TOPIC:
             raise ValueError("Informe o tópico que deseja remover.")
         needle = normalize(query.strip())
-        with self._connect() as db:
+        with self._connection() as db:
             rows = db.execute("SELECT url,topic FROM web_knowledge").fetchall()
             remove = [r["url"] for r in rows if normalize(r["topic"]) == needle]
             if remove:
@@ -258,7 +272,7 @@ class WebKnowledge:
         return len(remove)
 
     def list_recent(self, limit: int = 8) -> list[dict[str, str]]:
-        with self._connect() as db:
+        with self._connection() as db:
             rows = db.execute(
                 "SELECT topic,title,url,provider,saved_at,expires_at FROM web_knowledge "
                 "ORDER BY saved_at DESC LIMIT ?", (min(max(limit, 1), 20),)

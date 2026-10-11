@@ -87,9 +87,14 @@ class LocalCopilot:
             path = Path(user_path).expanduser().resolve(strict=True)
         except (OSError, ValueError, RuntimeError):
             raise CopilotPermissionError("Arquivo ou pasta inexistente.") from None
-        if not any(path.is_relative_to(root) for root in self.roots):
+        root = next((root for root in self.roots if path.is_relative_to(root)), None)
+        if root is None:
             raise CopilotPermissionError("Caminho fora das pastas autorizadas.")
-        if not self._safe_parts(path):
+        # Check only the user-authorized subtree.  An allowed folder may
+        # legitimately live below a protected Windows ancestor such as
+        # AppData\\Local\\Temp; denying the full absolute path would make the
+        # explicit permission ineffective.
+        if not self._safe_parts(path.relative_to(root)):
             raise CopilotPermissionError("Arquivo ou pasta protegida.")
         return path
 
@@ -105,9 +110,8 @@ class LocalCopilot:
                 # Resolve symlinks so entries outside approved roots stay hidden.
                 try:
                     resolved = child.resolve(strict=True)
-                    if not self._safe_parts(child) or not any(
-                        resolved.is_relative_to(root) for root in self.roots
-                    ):
+                    root = next((root for root in self.roots if resolved.is_relative_to(root)), None)
+                    if root is None or not self._safe_parts(resolved.relative_to(root)):
                         continue
                     is_dir = child.is_dir()
                 except (OSError, RuntimeError):

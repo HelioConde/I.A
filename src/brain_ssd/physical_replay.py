@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import mmap
 import os
-import resource
 import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import replace
 from pathlib import Path
+
+try:  # ``resource`` is a POSIX module and is absent on Windows.
+    import resource
+except ModuleNotFoundError:  # pragma: no cover - exercised by Windows import smoke tests
+    resource = None
 
 from brain_ssd.cache_policy import CognitiveCacheV0, LFUPolicy, LRFUPolicy, LRUPolicy, NoCachePolicy
 from brain_ssd.cache_simulator import percentile
@@ -62,6 +66,8 @@ def _delta(before: dict, after: dict, key: str):
 def run_physical_replay(manifest_path: Path, trace_path: Path, workload: str, universe_pages: int,
                         policy_name: str, budget_mib: int, controller_mode: str,
                         observability: bool = True, snapshot_turns: int = 20) -> dict:
+    if resource is None:
+        raise OSError("A reprodução física com contadores de falha requer POSIX.")
     manifest = json.loads(manifest_path.read_text())
     page_size = manifest["page_size_bytes"]
     data_path = manifest_path.parent / manifest["data_file"]

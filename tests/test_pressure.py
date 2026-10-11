@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import mmap
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -34,6 +35,7 @@ class PressureTests(unittest.TestCase):
         self.assertEqual(classify_container_result(0, False, {"cgroup_events_delta":{"oom":0}}), "VALID")
         self.assertEqual(classify_container_result(0, False, {"cgroup_events_delta":{"oom":1}}), "OOM_INVALID")
 
+    @unittest.skipUnless(os.name == "posix", "madvise de páginas é específico de POSIX")
     def test_cold_hint_is_aligned_one_shot_and_never_pageout(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)/"data"; path.write_bytes(b"\0"*(2*1024**2))

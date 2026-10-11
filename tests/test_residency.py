@@ -14,6 +14,7 @@ from brain_ssd.cache_policy import CacheEvent
 from brain_ssd.physical_replay import expand_trace
 
 
+@unittest.skipUnless(os.name == "posix", "residência de páginas via mincore é específica de POSIX")
 class ResidencyTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()

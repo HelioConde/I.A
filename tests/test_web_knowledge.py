@@ -142,7 +142,7 @@ class TestWebKnowledgeStore(unittest.TestCase):
             store = WebKnowledge(Path(tmp) / "research.sqlite3")
             store.save("Explique astronomia e estrelas", "auto", wiki_sources())
             self.assertEqual(store.retrieve("O que é microbiologia?"), [])
-            with store._connect() as db:
+            with store._connection() as db:
                 db.execute("UPDATE web_knowledge SET expires_at=?", (int(time.time()) - 1,))
             self.assertEqual(store.retrieve("Explique astronomia e estrelas"), [])
             self.assertEqual(store.count(), 2)  # never erase user data just because TTL expired
@@ -155,7 +155,7 @@ class TestWebKnowledgeStore(unittest.TestCase):
             self.assertEqual(store.save("Como está a situação do Brasil hoje?", "auto",
                                         dated_news(), current=True), 1)
             self.assertEqual(len(store.retrieve("Como está a situação do Brasil hoje?", current=True)), 1)
-            with store._connect() as db:
+            with store._connection() as db:
                 db.execute("UPDATE web_knowledge SET expires_at=?", (int(time.time()) - 1,))
             self.assertEqual(store.retrieve("Como está a situação do Brasil?", current=True), [])
 
