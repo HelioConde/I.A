@@ -120,6 +120,10 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
                     f"Lembrança salva no SQLite local: {saved['content']}. "
                     "Você pode revisar, editar ou apagar em Memórias."
                 )
+    elif simple in ("oi", "ola", "bom dia", "boa tarde", "boa noite"):
+        action = "greeting"
+        chosen = (store.get_assistant_name() if store else None) or "Brain-SSD"
+        answer = f"Olá! Eu sou {chosen}. Em que posso ajudar?"
     elif simple in (
         "qual seu nome", "qual e seu nome", "como voce se chama",
         "qual o seu nome", "qual e o seu nome", "quem e voce",
