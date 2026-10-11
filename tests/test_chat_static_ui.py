@@ -87,6 +87,20 @@ class TestStaticUI(unittest.TestCase):
         self.assertNotIn("visualize.js", self.html)
         self.assertNotIn("visualize.js", self.js)
 
+    def test_browser_speech_button_and_fast_web_consent_contracts(self):
+        # Read aloud only on a direct click, never from a received message.
+        # The browser API does not need unsafe-eval or external scripts.
+        self.assertIn('new SpeechSynthesisUtterance(', self.js)
+        self.assertIn('speak.addEventListener("click"', self.js)
+        self.assertIn('window.speechSynthesis.cancel()', self.js)
+        self.assertIn('utterance.lang = "pt-BR"', self.js)
+        self.assertIn('speak.disabled = !voiceSupported', self.js)
+        self.assertIn('id="webFastControl"', self.html)
+        self.assertIn('id="webFastToggle"', self.html)
+        self.assertIn('fast_web:fastThisSearch', self.js)
+        self.assertIn('id="detailWebMs"', self.html)
+        self.assertIn('id="detailInferMs"', self.html)
+
     def test_static_assets_are_local_and_no_inline_handlers(self):
         self.assertEqual(self.inventory.scripts,["/app.js"])
         self.assertEqual(self.inventory.styles,["/styles.css"])
