@@ -50,6 +50,7 @@ on:
       - "tests/test_chat_runtime.py"
       - "tests/test_chat_local_actions.py"
       - "tests/test_chat_web_search.py"
+      - "tests/test_chat_learning_news.py"
       - "tests/test_chat_history.py"
       - "launcher/**"
       - "tools/build_windows_launcher.ps1"
@@ -66,13 +67,14 @@ jobs:
         run: node --check chat/app.js
       - name: Verify syntax
         shell: pwsh
-        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/validate_chat_quality_windows.py tools/doctor_chat.py tools/install_windows_chat.py tools/auto_setup_chat_windows.py tests/test_install_windows_chat.py tests/test_auto_setup_chat_windows.py tests/test_chat_windows.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_startup_diagnostics.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_episodic_integrity.py tools/audit_episodic_db.py tests/test_memory_safety.py tests/test_semantic_bridge.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tools/bench_semantic_bridge.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py tests/test_windows_launchers.py
+        run: python -m compileall -q src/brain_ssd/chat tools/run_chat.py tools/validate_chat_windows.py tools/validate_chat_quality_windows.py tools/doctor_chat.py tools/install_windows_chat.py tools/auto_setup_chat_windows.py tests/test_install_windows_chat.py tests/test_auto_setup_chat_windows.py tests/test_chat_windows.py tests/test_chat_learning_news.py tests/test_chat_runtime.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_startup_diagnostics.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_episodic_integrity.py tools/audit_episodic_db.py tests/test_memory_safety.py tests/test_semantic_bridge.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tools/bench_semantic_bridge.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py tests/test_windows_launchers.py
       - name: Test the Windows UI and independent chat adapter (mock Core)
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
           python -m unittest discover -s tests -p "test_chat_local_actions.py" -v
           python -m unittest discover -s tests -p "test_chat_web_search.py" -v
+          python -m unittest discover -s tests -p "test_chat_learning_news.py" -v
           python -m unittest discover -s tests -p "test_chat_runtime.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
           python -m unittest discover -s tests -p "test_chat_doctor.py" -v
