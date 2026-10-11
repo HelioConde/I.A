@@ -67,6 +67,26 @@ class TestStaticUI(unittest.TestCase):
         self.assertIn('id="messageInput"',self.html)
         self.assertIn('aria-label="Mensagem para o Brain-SSD"',self.html)
 
+    def test_no_dynamic_eval_and_protective_csp(self):
+        # A console error mentioning "visualize.js" is not a Brain-SSD
+        # asset: our UI serves only app.js. Do not weaken CSP to quiet
+        # JavaScript injected by browser extensions.
+        server = (ROOT / "src" / "brain_ssd" / "chat" / "server.py").read_text(
+            encoding="utf-8"
+        )
+        hud = (ROOT / "hud" / "app.js").read_text(encoding="utf-8")
+        for name, source in (("chat/app.js", self.js), ("hud/app.js", hud)):
+            with self.subTest(script=name):
+                self.assertIsNone(re.search(r"\\beval\\s*\\(", source))
+                self.assertIsNone(re.search(r"\\bnew\\s+Function\\s*\\(", source))
+                self.assertIsNone(re.search(r"\\bsetTimeout\\s*\\(\\s*['\\\"]", source))
+        self.assertIn('self.send_header("Content-Security-Policy"', server)
+        self.assertIn("script-src 'self'", server)
+        self.assertNotIn("'unsafe-eval'", server)
+        self.assertNotIn("'unsafe-inline'", server)
+        self.assertNotIn("visualize.js", self.html)
+        self.assertNotIn("visualize.js", self.js)
+
     def test_static_assets_are_local_and_no_inline_handlers(self):
         self.assertEqual(self.inventory.scripts,["/app.js"])
         self.assertEqual(self.inventory.styles,["/styles.css"])
