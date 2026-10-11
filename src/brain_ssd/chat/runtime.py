@@ -82,7 +82,7 @@ class LocalChatRuntime:
         if model_file is not None and (
             not isinstance(model_file, str)
             or len(model_file) > 128
-            or re.fullmatch(r"[A-Za-z0-9_.+-]+\\.gguf", model_file, re.IGNORECASE) is None
+            or re.fullmatch(r"[A-Za-z0-9_.+-]+\.gguf", model_file, re.IGNORECASE) is None
         ):
             raise ValueError("Informe apenas o nome de um arquivo .gguf na pasta models.")
         self.model_path = self.root / "models" / model_file if model_file else self.root / MODEL_RELATIVE
