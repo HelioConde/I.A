@@ -42,7 +42,7 @@ set "COPILOT_ROOT_ARG=%COPILOT_ROOT%"
 if defined COPILOT_ROOT (
   rem O Windows interpreta "C:\\" como argumento com aspa escapada.
   rem Acrescente ponto apenas no argumento de caminhos que terminam em barra.
-  if "%COPILOT_ROOT:~-1%"=="\\" set "COPILOT_ROOT_ARG=%COPILOT_ROOT%."
+  if "%COPILOT_ROOT:~-1%"=="\" set "COPILOT_ROOT_ARG=%COPILOT_ROOT%."
 )
 :ask_screen
 set "COPILOT_SCREEN="
