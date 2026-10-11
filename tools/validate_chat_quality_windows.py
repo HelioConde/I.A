@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -26,6 +27,8 @@ CASES = (
     ("capabilities", "Dê dois exemplos de como uma IA local pode ajudar com programação."),
     ("ssd_ram", "Explique como você usa o SSD e a RAM."),
     ("basic_reasoning", "Quanto é 2 + 2? Responda com o resultado."),
+    ("creator", "Quem desenvolve o Brain-SSD e quem desenvolve o Qwen?"),
+    ("no_internet", "Você consegue acessar sites na internet neste chat?"),
 )
 
 
@@ -40,7 +43,15 @@ def check_response(case: str, answer: str) -> bool:
     if case == "ssd_ram":
         return len(content) >= 60 and "ssd" in content and "ram" in content
     if case == "basic_reasoning":
-        return "4" in content
+        return bool(re.search(r"\\b4\\b", content))
+    if case == "creator":
+        return ("helio" in content or "hélio" in content) and "qwen" in content
+    if case == "no_internet":
+        return ("internet" in content or "sites" in content) and (
+            "não" in content or "nao" in content or "sem acesso" in content
+        )
+    if case == "context_recall":
+        return "gato" in content
     return False
 
 
@@ -84,7 +95,37 @@ def main() -> int:
                 report["cases"].append({
                     "case": name, "passed_heuristic": False, "error_type": type(exc).__name__
                 })
-        unique = len({answer.casefold().strip() for answer in answers}) == len(CASES)
+        # Two real generations test short-term conversational context without
+        # reading any private conversation, memory, or episodic notes.
+        try:
+            question = "Nesta conversa, meu animal favorito é o gato. Entendeu?"
+            first = engine.ask(question, [])
+            follow = engine.ask(
+                "Qual animal eu disse que era meu favorito?",
+                [
+                    {"role": "user", "content": question},
+                    {"role": "assistant", "content": first["answer"]},
+                ],
+            )
+            answer = follow["answer"].strip()
+            answers.append(answer)
+            item = {
+                "case": "context_recall", "chars": len(answer),
+                "passed_heuristic": check_response("context_recall", answer)
+                    and follow.get("mode") != "local_command",
+                "model_generated": first.get("mode") != "local_command"
+                    and follow.get("mode") != "local_command",
+                "dialogue_turns": 2,
+            }
+            if args.include_answers:
+                item["answer"] = answer
+            report["cases"].append(item)
+        except Exception as exc:
+            report["cases"].append({
+                "case": "context_recall", "passed_heuristic": False,
+                "error_type": type(exc).__name__,
+            })
+        unique = len({answer.casefold().strip() for answer in answers}) == len(answers) and len(answers) == len(CASES) + 1
         report["distinct_answers"] = unique
         report["status"] = ("PASS" if unique and all(item["passed_heuristic"] for item in report["cases"]) else "FAIL")
         report["note"] = (
