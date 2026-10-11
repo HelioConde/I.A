@@ -5,3 +5,5 @@ captures/
 minhas_sessoes.csv
 *.sqlite3
 .env
+
+third_party/
