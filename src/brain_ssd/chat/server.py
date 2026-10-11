@@ -760,12 +760,12 @@ class ChatHandler(BaseHTTPRequestHandler):
                 identifier = data.get("conversation_id")
                 if identifier is not None and self.server.history_store is not None:
                     saved_history = self.server.history_store.recent_context(identifier)
-                    result = self.server.engine.ask(data.get("message"), saved_history)
+                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False))
                     self.server.history_store.append_exchange(identifier, data["message"].strip(), result["answer"])
                     result["conversation_id"] = identifier
                 else:
                     # Legacy isolated HTTP tests may still pass bounded history.
-                    result = self.server.engine.ask(data.get("message"), data.get("history", []))
+                    result = self.server.engine.ask(data.get("message"), data.get("history", []), web_search=data.get("web_search", False))
         except (ValueError, json.JSONDecodeError) as exc:
             if path in ("/api/chat", "/api/chat/stream"):
                 # Even a backend ValueError may embed prompts or local paths.
