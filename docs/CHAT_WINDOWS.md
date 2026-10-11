@@ -542,3 +542,51 @@ Validação de regressão (sem modelos reais):
 py -3 -m unittest discover -s tests -p "test_chat_local_actions.py" -v
 py -3 -m unittest discover -s tests -p "test_web_knowledge.py" -v
 ```
+
+
+## Qualidade das respostas: corte por tokens e continuação
+
+O benchmark real de 11/10/2026 com Qwen3 4B encontrou respostas que
+terminavam no meio de uma frase mesmo com SSE concluído (por exemplo,
+"Memória permanente, por outro lado,"). O sinal de sucesso da API **não**
+confirma que o conteúdo tenha terminado.
+
+O Brain-SSD agora retorna também os campos:
+
+- generation_status: complete (motivo nativo de parada), truncated,
+  suspected_truncated ou unverified.
+- answer_complete: true, false ou null (ausência de confirmação).
+- needs_continuation: indicação conservadora para mostrar o botão.
+- generated_tokens e generation_limit: telemetria e limite da geração.
+- finish_reason: motivo interpretado pelo programa; não é sempre
+  uma indicação nativa fornecida pelo GGUF.
+
+No modo subprocesso, a contagem de tokens é extraída da saída de
+desempenho do llama.cpp quando presente. No servidor persistente,
+usa-se o motivo de parada do streaming. Se o backend não relatar motivo
+ou contagem, a completude pode permanecer desconhecida: não se deve
+considerá-la automaticamente comprovada.
+
+O chat exibe **Continuar resposta** quando há indícios de corte, mas
+**não inicia outra inferência sozinho**, pois isso poderia dobrar o
+tempo de CPU e competir com o Windows. O botão envia uma mensagem
+de acompanhamento na mesma conversa, sem repetir o início. Perguntas
+explicativas recebem até 160 tokens em modo automático, enquanto
+perguntas curtas usam o limite menor do perfil; a escolha manual
+Curta / Normal / Detalhada sempre prevalece.
+
+Para auditar um relatório do Codex já salvo no computador:
+
+    py -3 .\tools\review_luna_evaluation.py "C:\caminho\para\resultados.json"
+
+O utilitário escreve AUDITORIA_COMPLETUDE.md ao lado do JSON.
+O arquivo original NÃO é alterado; perguntas antigas com complete=true
+e resposta interrompida recebem sinalização de possível corte. Para
+resultados futuros, o executor deve conservar generation_status,
+answer_complete, needs_continuation, generated_tokens e generation_limit.
+Não classifique a resposta como correta com base apenas no status HTTP.
+
+Os testes de regressão são locais e não exigem carregar o Qwen:
+
+    py -3 -m unittest discover -s tests -p "test_chat_completion_quality.py" -v
+    py -3 -m unittest discover -s tests -p "test_luna_report_review.py" -v
