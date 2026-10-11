@@ -46,6 +46,45 @@ Testar o instalador sem baixar nenhum arquivo:
     py -3 -m unittest discover -s tests -p "test_auto_setup_chat_windows.py" -v
     py -3 -m unittest discover -s tests -p "test_windows_launchers.py" -v
 
+## Desempenho no CPU e proteção da memória (novo)
+
+O `INICIAR-BRAIN-SSD.bat` agora usa `--core-mode auto` no chat:
+
+- Se houver **pelo menos 12 GB de RAM total**, memória livre suficiente
+  e o `llama-server.exe` da distribuição CPU estiver disponível,
+  o Brain-SSD pode **reutilizar o modelo** entre respostas. Para um GGUF de
+  2,5 GB, exige cerca de **6,5 GB de RAM física disponível** antes de escolher
+  esse modo. A memória ainda ficará ocupada enquanto o chat estiver aberto.
+- Se não houver espaço suficiente, executa em **subprocesso por pergunta**:
+  o modelo é descarregado ao terminar, para proteger o Windows.
+- Em CPUs com 12 ou mais processadores lógicos, a configuração equilibrada
+  usa no máximo 6 threads; mantém núcleos livres para outras aplicações.
+  Esse ajuste é experimental e nem sempre acelera a geração, pois depende
+  da largura de banda da memória e do processador.
+- Com um GGUF de 4B, reduz o contexto de 4096 para 3072, reserva menos texto
+  para a preparação do prompt e usa por padrão **112 tokens de resposta**.
+  A interface permite mudar, em cada pergunta, entre
+  **Automática / Curta (96) / Normal (160) / Detalhada (256)**.
+  Quanto maior a resposta, maior poderá ser a latência.
+- Se o servidor persistente selecionado automaticamente não conseguir iniciar,
+  a geração pode voltar ao subprocesso CPU **antes de emitir qualquer texto**.
+  O programa não mistura respostas parciais nem modifica o GGUF.
+- O modo `economia` continua liberando recursos ao fim da consulta.
+
+Exemplo de comparação manual (sem descarregar ou instalar outro modelo):
+
+```powershell
+py -3 .\tools\run_chat.py --profile equilibrado --model-file Qwen3-4B-Q4_K_M.gguf --core-mode auto --episodic-memory --web-search
+```
+
+Na interface, compare a métrica **Geração Qwen** para a mesma pergunta
+com o seletor **Automática**. Se a pesquisa usar cache local (0,0 s), esse
+número corresponde ao carregamento/execução do modelo, não à internet.
+
+**Não há garantia de desempenho:** a geração de um 4B em CPU pode continuar
+levando dezenas de segundos. Os testes CI são simulados, não substituem
+medição real do Windows com o modelo instalado.
+
 ## Limitações
 
 Os testes automáticos usam arquivos e runtime simulados. O download, o probe e a geração de texto com um modelo real ainda devem ser testados no computador Windows. Os componentes nativos podem depender do Visual C++ Runtime e de permissões do antivírus. O instalador não altera os benchmarks congelados do Brain-SSD.
