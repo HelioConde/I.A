@@ -265,6 +265,7 @@ async function refreshStatus() {
     $("currentModelLabel").textContent = data.model || "Qwen local";
     const webEnabled = data.web_search_enabled === true;
     $("webSearchControl").hidden = !webEnabled;
+    $("webFastControl").hidden = !webEnabled;
     $("webLearnControl").hidden = !webEnabled || !data.research_memory_enabled;
     $("researchInfo").textContent = data.research_memory_enabled
       ? "Pesquisa guardada: " + (data.research_memory_sources || 0) + " fonte(s); /conhecimento para revisar"
@@ -361,6 +362,8 @@ function humanMemory(value) { return Number.isFinite(value) ? (value / (1024 * 1
 function updateMetrics(data) {
   const m = data.metrics || {};
   $("detailLatency").textContent = humanTime(m.latency_ms);
+  $("detailWebMs").textContent = humanTime(data.web_search_ms);
+  $("detailInferMs").textContent = humanTime(data.inference_ms);
   $("detailFirstToken").textContent = humanTime(m.ttft_ms);
   $("detailSpeed").textContent = Number.isFinite(m.tokens_per_second) ? m.tokens_per_second.toFixed(1) + " tokens/s" : "—";
   $("detailRam").textContent = humanMemory(m.working_set_bytes_max);
@@ -400,6 +403,8 @@ async function send() {
   // explicitly authorized; never silently save regular chats.
   const rememberThisSearch = searchThisQuestion && !$("webLearnControl").hidden &&
     $("webLearnToggle").checked;
+  const fastThisSearch = searchThisQuestion && !$("webFastControl").hidden &&
+    $("webFastToggle").checked;
   // Consent applies only to this one search, never to the next message.
   $("webSearchToggle").checked = false;
   app.sending = true;
@@ -430,7 +435,8 @@ async function send() {
       body:JSON.stringify({
         message:question, conversation_id:app.conversationId,
         request_id:app.requestId, web_search:searchThisQuestion,
-        remember_web:rememberThisSearch
+        remember_web:rememberThisSearch,
+        fast_web:fastThisSearch
       })
     });
     if (!response.ok) {
@@ -471,9 +477,11 @@ async function send() {
         if (payload.local_action) {
           const actionNote = document.createElement("p");
           actionNote.className = "local-action-note";
-          actionNote.textContent = payload.local_action === "learned_reply"
-            ? "Resposta recuperada de um exemplo ensinado por você (SQLite local; não é treinamento do Qwen)."
-            : "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
+          actionNote.textContent = payload.local_action === "web_brief"
+            ? "Resposta rápida baseada em trechos públicos, sem geração pelo Qwen. Desmarque 'Resposta rápida' para pedir uma síntese pela IA local."
+            : payload.local_action === "learned_reply"
+              ? "Resposta recuperada de um exemplo ensinado por você (SQLite local; não é treinamento do Qwen)."
+              : "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
           pending.querySelector(".message-body").appendChild(actionNote);
           if (payload.local_action === "memory_save") {
             void refreshEpisodicMemory();
@@ -485,7 +493,7 @@ async function send() {
           sourcePanel.className = "web-sources";
           const heading = document.createElement("strong");
           heading.textContent = searchThisQuestion
-            ? "Fontes da pesquisa web"
+            ? (payload.web_cache_hit ? "Fontes reutilizadas do cache recente" : "Fontes da pesquisa web")
             : "Fontes recuperadas do conhecimento local (verifique a data)";
           sourcePanel.appendChild(heading);
           const sources = (searchThisQuestion
@@ -556,6 +564,16 @@ async function send() {
             " fonte(s) pública(s) guardada(s) no SQLite para futuras perguntas. Comando: /conhecimento";
           pending.querySelector(".message-body").appendChild(retained);
           void refreshStatus();
+        }
+        if (searchThisQuestion && Number.isFinite(payload.web_search_ms)) {
+          const timing = document.createElement("p");
+          timing.className = "local-action-note";
+          timing.textContent = "Pesquisa: " + humanTime(payload.web_search_ms) +
+            (payload.web_cache_hit ? " (cache local)" : "") +
+            (Number.isFinite(payload.inference_ms)
+              ? " · Geração Qwen: " + humanTime(payload.inference_ms)
+              : " · Sem espera de geração do Qwen");
+          pending.querySelector(".message-body").appendChild(timing);
         }
         updateMetrics(payload);
         completed = true;
