@@ -10,6 +10,21 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Aprendizado guiado e pesquisa de atualidades (experimental)
+
+O Brain-SSD pode aprender **respostas por exemplos corrigidos explicitamente**
+no SQLite (por exemplo, `/ensinar Olá => Olá!`), persistir as correções,
+listá-las com `/aprendizados` e excluir com `/desaprender Olá`. Isso
+**não altera os pesos do Qwen** e não aprende automaticamente de cada conversa.
+
+Com pesquisa web ativada, perguntas como *Como está a situação do Brasil hoje?*
+pedem autorização para consultar notícias datadas da Agência Brasil no modo
+`auto`. Resultados são parciais, citados e podem estar indisponíveis.
+
+[Como ensinar e consultar notícias](docs/LEARNING_AND_NEWS.md)
+
+---
+
 ## Instalação automática e escolha de modelo (Windows)
 
 Abra **INICIAR-BRAIN-SSD.bat** na pasta do projeto. O menu oferece Qwen3
