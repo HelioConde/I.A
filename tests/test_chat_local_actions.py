@@ -159,6 +159,29 @@ class TestExplicitLocalCommands(unittest.TestCase):
             self.assertNotIn("Luna", listed["answer"])
             self.assertEqual(local_command("qual seu nome?", store)["local_action"], "assistant_name")
 
+    def test_short_greeting_and_attribution_are_grounded_local_actions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            memory = EpisodicMemory(Path(tmp) / "notes.sqlite3")
+            engine = ChatEngine(FakeRuntime, episodic_store=memory,
+                                diagnostics=DiagnosticLogger(Path(tmp) / "diagnostics"))
+            engine.start()
+            try:
+                greeting = engine.ask("Oi", [])
+                self.assertEqual(greeting["local_action"], "greeting")
+                self.assertIn("Brain-SSD", greeting["answer"])
+                self.assertFalse(engine.status()["inference_verified"])
+                who = engine.ask("Qual é o nome do seu criador", [])
+                self.assertEqual(who["local_action"], "project_attribution")
+                self.assertIn("Hélio Conde", who["answer"])
+                self.assertIn("Qwen", who["answer"])
+                self.assertFalse(engine.status()["inference_verified"])
+                named = engine.ask("Seu nome é Luna", [])
+                self.assertEqual(named["local_action"], "memory_save")
+                self.assertIn("Luna", engine.ask("/nome", [])["answer"])
+                self.assertIn("Luna", engine.ask("Oi", [])["answer"])
+            finally:
+                engine.close()
+
     def test_memories_are_off_by_default_and_no_write_is_claimed(self):
         response = local_command("salve na memória que seu nome é Luna", None)
         self.assertIn("Não salvei", response["answer"])
