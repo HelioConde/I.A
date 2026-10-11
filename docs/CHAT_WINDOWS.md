@@ -404,3 +404,38 @@ O GGUF alternativo pode exigir mais RAM e tempo de resposta; só escolha após
 verificar a capacidade do computador. `INICIAR-CHAT-MEMORIA-WINDOWS.bat`
 continua usando o modelo padrão, a menos que a inicialização seja feita pelo
 comando Python com `--model-file`.
+
+
+## Aviso de CSP no navegador (`visualize.js`)
+
+Se o console do Chrome mostrar:
+
+```text
+visualize.js:17 Evaluating a string as JavaScript violates ...
+script-src 'self' ... 'unsafe-eval' is not an allowed source ...
+```
+
+A política CSP do Brain-SSD **está funcionando conforme o projeto**:
+`script-src 'self'` impede `eval()` e `new Function()`. Os scripts
+versionados do chat são `chat/app.js` e `hud/app.js` e a interface não
+inclui `visualize.js`. Não adicione `'unsafe-eval'` ao servidor para
+esconder esse aviso.
+
+Para identificar a origem, com o Brain-SSD aberto em
+`http://127.0.0.1:8766`:
+
+1. Pressione **F12 → Console** e clique em `visualize.js:17`.
+2. No painel **Sources**, consulte a URL completa do arquivo. Se iniciar em
+   `chrome-extension://` ou `moz-extension://`, vem de uma extensão.
+   Se iniciar no domínio de outro site, o erro pode não ser do Brain-SSD.
+3. Abra uma janela de **Convidado** ou **Anônima sem extensões** e teste
+   novamente. Se desaparecer, desative ou atualize a extensão responsável.
+4. Se a URL for realmente `http://127.0.0.1:8766/visualize.js`, capture a
+   URL, o painel **Network** e o trecho de código indicado pela linha 17:
+   esse arquivo não pertence à interface versionada e precisamos descobrir
+   quem o está disponibilizando.
+
+O aviso pode ser causado por script de terceiros sem interferir na conversa,
+mas só podemos confirmar o impacto se soubermos a URL de origem. O teste
+`test_chat_static_ui.py` verifica que a interface não usa execução dinâmica
+nem afrouxa a política CSP.
