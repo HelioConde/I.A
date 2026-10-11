@@ -11,16 +11,30 @@ import html
 import json
 import os
 import re
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone, timedelta
+from email.utils import parsedate_to_datetime
+from concurrent.futures import ThreadPoolExecutor
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit, quote
 from urllib.request import Request, build_opener, HTTPRedirectHandler
+
+from brain_ssd.chat.current_affairs import needs_brazil_news
 
 
 MAX_BYTES = 256_000
 MAX_QUERY = 280
 MAX_RESULTS = 4
 TIMEOUT_SECONDS = 7
-PROVIDERS = ("wikipedia", "brave", "searxng")
+PROVIDERS = ("wikipedia", "brave", "searxng", "auto")
+
+# Official Agencia Brasil RSS endpoints advertised at /feed/. No arbitrary fetch.
+NEWS_FEEDS = (
+    "https://agenciabrasil.ebc.com.br/rss/economia/feed.xml",
+    "https://agenciabrasil.ebc.com.br/rss/politica/feed.xml",
+    "https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml",
+)
+
 
 
 class WebSearchError(RuntimeError):
@@ -107,11 +121,83 @@ class WebSearchService:
         except (OSError, ValueError, UnicodeError, json.JSONDecodeError) as exc:
             raise WebSearchError("O provedor web está indisponível.") from exc
 
+    def _request_feed(self, url: str) -> bytes:
+        """Fetch one fixed RSS endpoint only; never arbitrary links or redirects."""
+        if url not in NEWS_FEEDS:
+            raise WebSearchError("Fonte RSS não permitida.")
+        request = Request(url, headers={
+            "User-Agent": "BrainSSD-LocalWebSearch/0.1",
+            "Accept": "application/rss+xml, application/xml, text/xml",
+        })
+        try:
+            with build_opener(_NoRedirect()).open(request, timeout=TIMEOUT_SECONDS) as response:
+                raw = response.read(MAX_BYTES + 1)
+                if len(raw) > MAX_BYTES:
+                    raise WebSearchError("RSS excedeu limite de tamanho.")
+                return raw
+        except (OSError, ValueError) as exc:
+            raise WebSearchError("Feed de notícias indisponível.") from exc
+
+    def _news_feed_items(self, url: str) -> list[dict[str, str]]:
+        try:
+            root = ET.fromstring(self._request_feed(url))
+        except (ET.ParseError, ValueError) as exc:
+            raise WebSearchError("Feed RSS inválido.") from exc
+        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+        future = datetime.now(timezone.utc) + timedelta(days=1)
+        result = []
+        for item in root.findall(".//channel/item")[:40]:
+            published = item.findtext("pubDate") or ""
+            try:
+                stamp = parsedate_to_datetime(published)
+                if stamp.tzinfo is None:
+                    stamp = stamp.replace(tzinfo=timezone.utc)
+                stamp = stamp.astimezone(timezone.utc)
+            except (ValueError, TypeError, IndexError):
+                continue
+            if not (cutoff <= stamp <= future):
+                continue
+            link = item.findtext("link", default="")
+            # Ignore any injected RSS link outside this official origin.
+            if urlsplit(link).hostname != "agenciabrasil.ebc.com.br":
+                continue
+            description = _plain(item.findtext("description", default=""), 330)
+            snippet = "Publicado em " + stamp.date().isoformat() + ". " + description
+            news = _safe_result(item.findtext("title"), link, snippet)
+            if news:
+                result.append(news)
+            if len(result) >= 4:
+                break
+        return result
+
+    def _latest_brazil_news(self) -> list[dict[str, str]]:
+        """Recent, dated headlines in several subject areas, not a full country report."""
+        found: list[dict[str, str]] = []
+        # Concurrent bounded requests cap typical latency to a single timeout.
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            jobs = [pool.submit(self._news_feed_items, url) for url in NEWS_FEEDS]
+            for job in jobs:
+                try:
+                    items = job.result()
+                except WebSearchError:
+                    items = []
+                # Keep editorial diversity by taking one from each feed.
+                found.extend(items[:1])
+        unique = []
+        seen = set()
+        for item in found:
+            if item["url"] not in seen:
+                unique.append(item)
+                seen.add(item["url"])
+        return unique[:MAX_RESULTS]
+
     def search(self, question: str) -> list[dict[str, str]]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Pergunta vazia.")
         query = " ".join(question.split())[:MAX_QUERY]
-        if self.provider == "wikipedia":
+        if self.provider == "auto" and needs_brazil_news(question):
+            return self._latest_brazil_news()
+        if self.provider in ("wikipedia", "auto"):
             endpoint = "https://pt.wikipedia.org/w/api.php?"
             params = urlencode({"action": "query", "list": "search", "srsearch": query,
                                 "srnamespace": 0, "srlimit": MAX_RESULTS, "format": "json"})
