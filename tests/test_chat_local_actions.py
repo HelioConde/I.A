@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from brain_ssd.chat.episodic import EpisodicMemory
+from brain_ssd.chat.diagnostics import DiagnosticLogger
 from brain_ssd.chat.local_actions import local_command
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 
@@ -124,6 +125,33 @@ class TestExplicitLocalCommands(unittest.TestCase):
             self.assertTrue(engine.status()["inference_verified"])
         finally:
             engine.close()
+
+    def test_privacy_safe_diagnostics_do_not_crash_local_help_or_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            logger = DiagnosticLogger(directory / "diagnostics")
+            store = EpisodicMemory(directory / "notes.sqlite3")
+            engine = ChatEngine(FakeRuntime, episodic_store=store, diagnostics=logger)
+            engine.start()
+            try:
+                chunks = []
+                help_result = engine.ask(
+                    "O que você consegue fazer?", [], on_chunk=chunks.append,
+                    cancel_event=threading.Event(),
+                )
+                self.assertEqual(help_result["local_action"], "help")
+                self.assertEqual("".join(chunks), help_result["answer"])
+                self.assertFalse(engine.status()["inference_verified"])
+                name = engine.ask("salve na memória que seu nome é Luna", [])
+                self.assertEqual(name["local_action"], "memory_save")
+                self.assertEqual(store.get_assistant_name(), "Luna")
+                records = [json.loads(line) for line in logger.file.read_text(encoding="utf-8").splitlines()]
+                actions = [row.get("action") for row in records if row["event"] == "chat.local_action"]
+                self.assertEqual(actions, ["help", "memory_save"])
+                self.assertNotIn("Luna", logger.file.read_text(encoding="utf-8"))
+                self.assertNotIn("O que você consegue", logger.file.read_text(encoding="utf-8"))
+            finally:
+                engine.close()
 
     def test_sse_route_streams_and_saves_explicit_memory(self):
         with tempfile.TemporaryDirectory() as tmp:
