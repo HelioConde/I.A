@@ -456,6 +456,17 @@ async function send() {
           }
           pending.querySelector(".message-body").appendChild(sourcePanel);
         }
+        if (rememberThisSearch && payload.research_save_status &&
+            payload.research_save_status !== "saved") {
+          const note = document.createElement("p");
+          note.className = "local-action-note";
+          note.textContent = payload.research_save_status === "failed"
+            ? "A resposta foi gerada, mas houve uma falha ao guardar as fontes no SQLite."
+            : payload.research_save_status === "no_sources"
+              ? "Nenhuma fonte foi incorporada ao contexto, então não houve aprendizado."
+              : "As fontes não puderam ser guardadas. Verifique o tópico, seu tamanho e as fontes.";
+          pending.querySelector(".message-body").appendChild(note);
+        }
         if (payload.research_saved_sources > 0) {
           const retained = document.createElement("p");
           retained.className = "local-action-note";
