@@ -283,7 +283,7 @@ class TestHttpUI(unittest.TestCase):
 
             sse = urllib.request.Request(
                 origin + "/api/chat/stream", method="POST",
-                data=json.dumps({"message": "Olá", "history": [],
+                data=json.dumps({"message": "Explique algoritmos.", "history": [],
                                  "request_id": str(uuid.uuid4())}).encode(),
                 headers={"Origin": origin, "Content-Type": "application/json"},
             )
