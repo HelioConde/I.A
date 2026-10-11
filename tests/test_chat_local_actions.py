@@ -156,7 +156,8 @@ class TestExplicitLocalCommands(unittest.TestCase):
     def test_sse_route_streams_and_saves_explicit_memory(self):
         with tempfile.TemporaryDirectory() as tmp:
             memory = EpisodicMemory(Path(tmp) / "notes.sqlite3")
-            engine = ChatEngine(FakeRuntime, episodic_store=memory)
+            diagnostics = DiagnosticLogger(Path(tmp) / "diagnostics")
+            engine = ChatEngine(FakeRuntime, episodic_store=memory, diagnostics=diagnostics)
             engine.start()
             server = create_chat_server(engine, ROOT / "chat", port=0, episodic_store=memory)
             thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -177,6 +178,22 @@ class TestExplicitLocalCommands(unittest.TestCase):
                 self.assertIn("event: done", events)
                 self.assertIn('"local_action":"memory_save"', events)
                 self.assertEqual(memory.get_assistant_name(), "Luna")
+                req = urllib.request.Request(
+                    origin + "/api/chat/stream", method="POST",
+                    data=json.dumps({
+                        "message": "O que você consegue fazer?",
+                        "request_id": str(uuid.uuid4()),
+                    }).encode("utf-8"),
+                    headers={"Content-Type": "application/json", "Origin": origin},
+                )
+                with urllib.request.urlopen(req, timeout=5) as reply:
+                    help_events = reply.read().decode("utf-8")
+                self.assertIn('"local_action":"help"', help_events)
+                self.assertIn("event: done", help_events)
+                self.assertNotIn("event: error", help_events)
+                events = diagnostics.file.read_text(encoding="utf-8")
+                self.assertIn('"event":"chat.local_action"', events)
+                self.assertNotIn("Luna", events)
             finally:
                 server.shutdown()
                 server.server_close()
