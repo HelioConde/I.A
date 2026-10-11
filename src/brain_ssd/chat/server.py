@@ -68,7 +68,7 @@ def brain_ssd_self_context(question: str) -> str:
     if re.search(r"\b(ssd|ram|memoria|memorias|arquitetura|funciona|funcionamento)\b", normalized):
         return (
             "Fatos do Brain-SSD (descreva sem prometer resultados medidos): "
-            "o modelo Qwen3-0.6B Q8_0 fica em um arquivo GGUF no disco e o llama.cpp faz inferência pela CPU. "
+            "o modelo local em formato GGUF fica em um arquivo no disco, e o llama.cpp faz inferência pela CPU. "
             "A RAM é usada pelo processo, buffers e páginas mantidas pelo sistema operacional; RAM não é zero. "
             "A base SSD de conhecimento contém documentos Python e SQLite, um índice e páginas brain.dat; "
             "quando a recuperação está disponível e encontra conteúdo, apenas trechos selecionados entram no contexto. "
@@ -275,7 +275,7 @@ class ChatEngine:
             **details,
             "inference_verified": self._inference_verified,
             "status": self._state,
-            "model": MODEL_NAME,
+            "model": details.get("model", MODEL_NAME),
             "execution": "CPU-only",
             "local": True,
             "error": self._error if self._state == "error" else None,
@@ -517,7 +517,7 @@ class ChatEngine:
             metrics = measured.get("metrics") or {}
             return {
                 "answer": answer,
-                "model": MODEL_NAME,
+                "model": getattr(getattr(self._runtime, "model_path", None), "name", MODEL_NAME),
                 "mode": "experimental_chat",
                 "cognitive_shadow": shadow,
                 "profile": getattr(self._runtime, "profile", "equilibrado"),
