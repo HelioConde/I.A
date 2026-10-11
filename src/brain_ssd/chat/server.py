@@ -69,8 +69,9 @@ def brain_ssd_self_context(question: str) -> str:
             "ajudar a escrever textos e pequenos exemplos de código usando o modelo local instalado. "
             "Pode consultar a base SSD de documentos Python e SQLite apenas quando a recuperação estiver ativa. "
             "Pode usar notas episódicas somente quando a pessoa escolher guardá-las; o histórico fica no computador. "
-            "Não tem internet, serviços remotos, acesso automático a arquivos pessoais ou controle do PC; "
-            "não treina os pesos durante a conversa. É experimental e pode errar. "
+            "Pesquisa web é opcional, requer configuração no servidor e autorização por mensagem; "
+            "não tem acesso automático a arquivos pessoais nem controle do PC. "
+            "Não treina os pesos durante a conversa. É experimental e pode errar. "
             "Ao responder, apresente exemplos concretos do que faz e os limites, sem apenas oferecer ajuda."
         )
     if re.search(r"\b(ssd|ram|memoria|memorias|arquitetura|funciona|funcionamento)\b", normalized):
