@@ -138,7 +138,30 @@ class LocalChatRuntime:
             self.core_backend = PersistentCoreBackend(
                 executable, self.model_path,
                 threads=self.threads, context_size=self.context_size,
+                ready_timeout_s=45.0 if selected_mode == "auto" else 90.0,
             )
+            if selected_mode == "auto":
+                # An auto-selected llama-server may be incompatible with an
+                # older pinned runtime. If its *startup* fails before emitting
+                # any answer, safely fall back to the existing CPU executable.
+                try:
+                    cli = resolve_chat_completion(self.root)
+                except FileNotFoundError:
+                    pass
+                else:
+                    original = self.core_backend
+                    fallback = ChatSubprocessCore(
+                        cli, self.model_path,
+                        threads=self.threads, context_size=self.context_size,
+                    )
+                    original._auto_fallback = fallback
+
+                    def activate_fallback() -> None:
+                        self.core_backend = fallback
+                        self.core_mode = "subprocess"
+                        self.auto_mode_reason = "persistent_start_failed"
+
+                    original._auto_fallback_activate = activate_fallback
             try:
                 self._completion_path = resolve_llama_executable(self.root)
             except FileNotFoundError:
