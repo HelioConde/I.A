@@ -9,7 +9,7 @@ from typing import Any
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.backend import LocalLlamaCppBackend, resolve_llama_executable
 from brain_ssd.chat.startup_diagnostics import ChatStartupError
-from brain_ssd.chat.performance import windows_memory, choose_mode, recommended_threads, answer_token_limit
+from brain_ssd.chat.performance import windows_memory, choose_mode, recommended_threads, compact_profile
 from brain_ssd.local_runtime.core_backend import (
     PersistentCoreBackend, SubprocessPerQueryCore, resolve_server_executable,
 )
@@ -115,11 +115,13 @@ class LocalChatRuntime:
                 self.profile, model_bytes, server_available, windows_memory()
             )
             self.threads = recommended_threads(self.profile, os.cpu_count())
-            # Lower the CPU prefill cost and Windows KV allocation for 4B.
-            if model_bytes >= 2 * 1024 ** 3 and self.profile != "economia":
-                self.context_size = min(self.context_size, 3072)
-                self.prompt_budget_bytes = min(self.prompt_budget_bytes, 5600)
-            self.max_output_tokens = answer_token_limit(model_bytes)
+            # Conservative 4B output and prefill budgets, applied only
+            # to the automatic chat profile; legacy/frozen benchmarks unchanged.
+            (self.context_size, self.prompt_budget_bytes,
+             self.max_output_tokens) = compact_profile(
+                self.profile, model_bytes, self.context_size,
+                self.prompt_budget_bytes,
+            )
         self._completion_path: Path | None = None
         self._brain: LocalBrainSSD | None = None
         self._closed = False
