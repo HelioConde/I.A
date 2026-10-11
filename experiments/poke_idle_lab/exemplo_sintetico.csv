@@ -1,0 +1,5 @@
+game,minutes,xp,coins,gems_received_net,listings,sales,withdrawn_usd,operating_cost_brl,source
+world,60,12000,9000,0,1,0,0,0,demo
+world,30,5000,4500,0,0,0,0,0,demo
+io,60,14000,10000,0,1,0,0,0,demo
+io,30,6000,5000,0,0,0,0,0,demo
