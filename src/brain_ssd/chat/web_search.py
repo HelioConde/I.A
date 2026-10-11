@@ -57,7 +57,10 @@ def _plain(text: object, limit: int) -> str:
 def _safe_result(title: object, url: object, snippet: object) -> dict[str, str] | None:
     if not isinstance(url, str) or len(url) > 1900:
         return None
-    parts = urlsplit(url)
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return None
     if parts.scheme != "https" or not parts.hostname or parts.username or parts.password:
         return None
     if parts.hostname in ("localhost", "127.0.0.1", "::1"):
@@ -113,7 +116,8 @@ class WebSearchService:
             params = urlencode({"action": "query", "list": "search", "srsearch": query,
                                 "srnamespace": 0, "srlimit": MAX_RESULTS, "format": "json"})
             data = self._request(endpoint + params, {"Accept": "application/json"})
-            items = data.get("query", {}).get("search", [])
+            block = data.get("query")
+            items = block.get("search", []) if isinstance(block, dict) else None
             if not isinstance(items, list):
                 raise WebSearchError("Resultados inválidos.")
             raw = [(item.get("title"), "https://pt.wikipedia.org/wiki/" +
@@ -125,7 +129,8 @@ class WebSearchService:
                                 "safesearch": "moderate"})
             data = self._request(endpoint + params,
                                  {"Accept": "application/json", "X-Subscription-Token": self._brave_key})
-            items = data.get("web", {}).get("results", [])
+            block = data.get("web")
+            items = block.get("results", []) if isinstance(block, dict) else None
             if not isinstance(items, list):
                 raise WebSearchError("Resultados inválidos.")
             raw = [(i.get("title"), i.get("url"), i.get("description")) for i in items
