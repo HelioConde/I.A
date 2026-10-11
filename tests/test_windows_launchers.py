@@ -88,8 +88,7 @@ class TestBatchLaunchers(unittest.TestCase):
         end=launcher.index(":ask_screen",start)
         normalization=launcher[start:end]
         # This is a single literal backslash, not two.
-        self.assertIn('if "%COPILOT_ROOT:~-1%"=="\\"
-'.strip(),normalization)
+        self.assertIn('if "%COPILOT_ROOT:~-1%"=="\\"',normalization)
         self.assertIn('--copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN%',launcher)
         if os.name != "nt":
             return
