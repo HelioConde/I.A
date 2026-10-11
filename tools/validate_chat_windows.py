@@ -36,7 +36,7 @@ def main() -> int:
         started = time.perf_counter()
         # A bare greeting is served by a transparent local action. Use a
         # genuine open-ended request so this test must execute Qwen/llama.cpp.
-        response = engine.ask("Explique em uma frase o que é Python.", [])
+        response = engine.ask("Quanto é 2 mais 2? Responda com o resultado.", [])
         if response.get("mode") == "local_command" or not engine.status()["inference_verified"]:
             raise RuntimeError("Não houve inferência real; apenas resposta local.")
         report.update({
