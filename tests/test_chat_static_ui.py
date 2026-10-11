@@ -77,9 +77,9 @@ class TestStaticUI(unittest.TestCase):
         hud = (ROOT / "hud" / "app.js").read_text(encoding="utf-8")
         for name, source in (("chat/app.js", self.js), ("hud/app.js", hud)):
             with self.subTest(script=name):
-                self.assertIsNone(re.search(r"\\beval\\s*\\(", source))
-                self.assertIsNone(re.search(r"\\bnew\\s+Function\\s*\\(", source))
-                self.assertIsNone(re.search(r"\\bsetTimeout\\s*\\(\\s*['\\\"]", source))
+                self.assertIsNone(re.search(r"\beval\s*\(", source))
+                self.assertIsNone(re.search(r"\bnew\s+Function\s*\(", source))
+                self.assertIsNone(re.search(r"\bsetTimeout\s*\(\s*['\\"]", source))
         self.assertIn('self.send_header("Content-Security-Policy"', server)
         self.assertIn("script-src 'self'", server)
         self.assertNotIn("'unsafe-eval'", server)
