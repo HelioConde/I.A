@@ -47,7 +47,7 @@ ENUMS = {
     "platform": {"Windows", "Linux", "macOS", "Other"},
     "profile": {"economia", "equilibrado", "rapido", "not_applicable"},
     "core_mode": {"subprocess", "persistent", "not_applicable"},
-    "action": {"help", "memory_save", "assistant_name", "memory_list", "memory_status"},
+    "action": {"help", "memory_save", "assistant_name", "memory_list", "memory_status", "greeting", "project_attribution"},
     "status": {"OK", "UNAVAILABLE", "FAIL", "PASS", "ERROR", "CANCELLED",
                "SKIP", "READY", "NOT_APPLICABLE", "UNKNOWN"},
     "suite": {"chat_windows", "chat_local_actions", "chat_runtime", "chat_history", "chat_stream",
