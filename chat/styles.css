@@ -76,3 +76,25 @@
   line-height: 1.45;
   margin: 6px 0 0;
 }
+
+/* Web search is opt-in per message; no network query is automatic. */
+.web-optin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #c2e6e1;
+  padding: 4px 7px;
+  border: 1px solid #426968;
+  border-radius: 8px;
+}
+.web-optin[hidden], .web-provider-info[hidden] { display: none !important; }
+.web-optin input { accent-color: #5bcab5; }
+.web-provider-info { color: #94aaaf; font-size: 11px; }
+.web-sources { margin-top: 12px; padding: 10px 12px; border: 1px solid #34474e; border-radius: 10px; background: rgba(18, 30, 38, .55); font-size: 12px; }
+.web-sources strong { font-size: 12px; }
+.web-sources ul { margin: 8px 0 0; padding-left: 18px; }
+.web-sources li + li { margin-top: 7px; }
+.web-sources a { color: #8fc7ff; overflow-wrap: anywhere; }
+.web-sources p { color: #a9b4c3; margin: 4px 0 0; line-height: 1.5; }
