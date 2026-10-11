@@ -30,7 +30,7 @@ class ReportAuditTests(unittest.TestCase):
         self.assertEqual(result["results"][1]["quality_status"],"complete")
         self.assertEqual(result["results"][2]["quality_status"],"not_executed")
         self.assertEqual(result["results"][3]["quality_status"],"local_action_not_inference")
-        self.assertIn("Memória", render_summary(result))
+        self.assertIn("Diferença memória e histórico", render_summary(result))
 
 if __name__=="__main__":
     unittest.main()
