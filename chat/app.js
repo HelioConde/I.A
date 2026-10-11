@@ -412,6 +412,8 @@ async function send() {
     $("webLearnToggle").checked;
   const fastThisSearch = searchThisQuestion && !$("webFastControl").hidden &&
     $("webFastToggle").checked;
+  const responseSize = $("responseSize").value;
+  const responseTokens = responseSize === "auto" ? null : Number(responseSize);
   // Consent applies only to this one search, never to the next message.
   $("webSearchToggle").checked = false;
   app.sending = true;
@@ -443,7 +445,8 @@ async function send() {
         message:question, conversation_id:app.conversationId,
         request_id:app.requestId, web_search:searchThisQuestion,
         remember_web:rememberThisSearch,
-        fast_web:fastThisSearch
+        fast_web:fastThisSearch,
+        response_tokens:responseTokens
       })
     });
     if (!response.ok) {
