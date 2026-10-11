@@ -108,3 +108,8 @@
 .voice-message[aria-pressed="true"] { background:#29404a; border-color:#81d2c7; color:#fff; }
 .voice-message:disabled { opacity:.48; cursor:not-allowed; }
 .voice-message:focus-visible { outline:2px solid #8bcaff; outline-offset:2px; }
+
+/* Per-response CPU budget: compact on desktop and mobile. */
+.response-size-control { display:inline-flex; gap:6px; align-items:center; font-size:12px; color:var(--text-muted, #b6c6d0); }
+.response-size-control select { max-width:160px; min-height:29px; padding:3px 6px; border-radius:8px; border:1px solid #3d596a; background:#162d3a; color:#e3eef1; font:inherit; }
+.response-size-control select:focus-visible { outline:2px solid #93c8ff; outline-offset:2px; }
