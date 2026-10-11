@@ -1,5 +1,62 @@
 # Relatório de testes — Brain-SSD Copilot Windows
 
+## Atualização V2 — 2026-10-11
+
+Branch auditada: `feat/copilot-local-windows` (base `f53f722`; correção desta
+atualização pendente de reinício do servidor já aberto). Ambiente real:
+Windows 11, AMD64, 12 threads lógicas, 15,8 GiB de RAM, Python 3.14 e
+`Qwen3-0.6B-Q8_0.gguf` em CPU, perfil `economia`.
+
+Uma bateria sequencial de 20 perguntas reais foi enviada pelo transporte SSE,
+sem pesquisa externa e com uma conversa isolada por pergunta. Dezoito respostas
+foram concluídas (90%). As duas falhas ocorreram depois de o Qwen finalizar com
+sucesso: a classificação de resposta possivelmente truncada emitia o evento
+seguro `inference.truncated`, que não constava na lista permitida do logger e
+lançava `ValueError`. A lista agora aceita o evento, com teste de regressão.
+Não houve evidência de queda do `llama.cpp`, timeout ou pressão de memória:
+as duas execuções tinham código de retorno zero e picos aproximados de 958–964
+MB de working set e 676–677 MB de memória privada.
+
+| Área V2 | Resultado | Evidência |
+| --- | --- | --- |
+| Suíte completa após correção | APROVADO | 334 testes, 7 ignorados conscientemente |
+| Regressão da falha Qwen | APROVADO | `inference.truncated` é evento seguro e não interrompe a resposta |
+| Inferência real Windows | APROVADO | `validate_chat_windows --profile economia`: 2,932 s; TTFT 2,317 s; 26,92 tokens/s; pico 955 MB |
+| 20 perguntas reais SSE | PARCIAL, corrigido no fonte | 18/20 chegaram ao fim na instância anterior; as 2 falhas têm causa identificada e regressão aprovada. A instância aberta precisa ser reiniciada para carregar a correção |
+| Computador do usuário | APROVADO | rota local retornou dados atuais de Windows, arquitetura, CPU, RAM e discos autorizados; não foi resposta inventada pelo Qwen |
+| Copilot | APROVADO | Qwen respondeu sobre o recurso; o status confirmou Copilot, arquivos e captura autorizados |
+| Monitores 1 e 2 | APROVADO/PARCIAL | capturas efêmeras foram solicitadas e a API Windows listou janelas visíveis; não foi feita leitura de pixels |
+| Erro Godot no monitor 2 | LIMITAÇÃO CONFIRMADA | o fluxo informa que não pode ler texto/erro nem inferir arquivo sem OCR/visão; não alucinou diagnóstico |
+| Arquivos de teste autorizados | APROVADO | leitura/listagem de fixture `.gd` e nome com acento; traversal para `win.ini` bloqueado com HTTP 400 |
+| Sem permissão | APROVADO | testes cobrem Copilot desativado, captura sem permissão e rota que não afirma acesso não concedido |
+| Segurança HTTP | APROVADO | origem atacante recebe HTTP 403; servidor restrito a loopback e valida Host/Origin |
+| Pesquisa externa | NÃO EXECUTADA | sem autorização por pergunta nem credenciais; testes mantêm fontes e instruções externas sob controle |
+| Interface visual/Playwright | BLOQUEADO | `browser-act` e `uv` não estão instalados; a instalação de `uv` requer confirmação explícita |
+
+### Notas V2
+
+- Perguntas de tela foram tratadas por ferramentas locais; títulos de janelas e
+  capturas não foram enviados ao Qwen para interpretação.
+- Capturas não foram persistidas como artefatos deste relatório. A capacidade
+  atual é prévia local; `vision_enabled` permanece `false`.
+- Não foram lidos documentos pessoais fora de uma pasta de fixtures nem feitas
+  alterações em histórico, memórias ou dados do usuário.
+
+| Dimensão | Nota V2 |
+| --- | ---: |
+| Inferência e estabilidade | 8,0/10 |
+| Ferramentas locais/Copilot | 8,5/10 |
+| Arquivos e segurança | 9,0/10 |
+| Captura de tela | 5,0/10 |
+| Visão/OCR | 0,0/10 |
+| Pesquisa web | 7,0/10 |
+| Interface visual | 6,0/10 |
+| Desempenho CPU | 7,0/10 |
+
+Para tornar o resultado 20/20 verificável na API real, reinicie o servidor
+local após esta atualização e repita a bateria SSE; a correção não pode ser
+injetada no processo Python que já estava aberto durante a auditoria.
+
 Data da auditoria: 2026-10-11  
 Branch: `feat/copilot-local-windows` (`8b4746c` antes das correções desta auditoria)  
 Ambiente: Windows 11, AMD64, 12 threads lógicas, 15,8 GiB de RAM, Python 3.14.  

@@ -1,5 +1,7 @@
 """Regression checks for content truncation versus transport success."""
 import sys
+import tempfile
+import uuid
 from pathlib import Path
 import unittest
 
@@ -7,6 +9,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"src"))
 
 from brain_ssd.chat.completion_quality import classify_completion
+from brain_ssd.chat.diagnostics import DiagnosticLogger
 from brain_ssd.chat.server import ChatEngine
 
 class Core:
@@ -71,6 +74,13 @@ class CompletionTests(unittest.TestCase):
             self.assertEqual(result["answer"],"A memória permanente, por outro lado,")
         finally:
             engine.close()
+
+    def test_truncation_diagnostic_is_an_allowed_safe_event(self):
+        """A bounded completion must not fail merely because it is logged."""
+        with tempfile.TemporaryDirectory() as temporary:
+            logger=DiagnosticLogger(Path(temporary), session_id=str(uuid.uuid4()))
+            self.assertTrue(logger.emit("inference.truncated", status="WARNING",
+                                        reason="token_limit_probable"))
 
 if __name__=="__main__":
     unittest.main()
