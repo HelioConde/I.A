@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.learning import (
     LearnedResponses, learned_action, parse_lesson, normalize_trigger,
 )
-from brain_ssd.chat.current_affairs import needs_brazil_news
+from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, strip_research_command
 from brain_ssd.chat.server import ChatEngine
 from brain_ssd.chat.diagnostics import DiagnosticLogger
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, NEWS_FEEDS
@@ -148,6 +148,32 @@ class TestBrazilNews(unittest.TestCase):
                      "Qual é a capital do Brasil?", "O que é notícia?",
                      "Como está você?"):
             self.assertFalse(needs_brazil_news(text), text)
+
+    def test_explicit_research_command_requires_user_consent(self):
+        self.assertTrue(explicit_web_research("/pesquisar astronomia"))
+        self.assertTrue(explicit_web_research("Pesquise na internet sobre astronomia"))
+        self.assertFalse(explicit_web_research("Como faço para pesquisar astronomia?"))
+        self.assertEqual(strip_research_command("/pesquisar astronomia"), "astronomia")
+        self.assertEqual(strip_research_command("Pesquise na internet sobre astronomia"),
+                         "astronomia")
+        service = WebSearchService("auto")
+        with patch.object(service, "_request", return_value={
+            "query": {"search": [{"title": "Astronomia", "snippet": "Estudo do Universo."}]}
+        }) as request:
+            self.assertEqual(len(service.search("/pesquisar astronomia")), 1)
+        self.assertIn("srsearch=astronomia", request.call_args.args[0])
+
+        core = Runtime()
+        search = Source()
+        engine = ChatEngine(lambda: core, web_search_service=search)
+        engine.start()
+        try:
+            answer = engine.ask("/pesquisar astronomia", [])
+            self.assertEqual(answer["local_action"], "research_permission")
+            self.assertEqual(search.calls, [])
+            self.assertEqual(core.core_backend.prompts, [])
+        finally:
+            engine.close()
 
     def test_offline_does_not_fabricate_current_politics(self):
         runtime = Runtime()
