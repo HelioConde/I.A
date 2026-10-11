@@ -233,7 +233,7 @@ class TestHttpUI(unittest.TestCase):
         self.assertEqual(data["status"], "ready")
 
     def test_chat_post_uses_core_adapter(self):
-        data = json.dumps({"message": "Olá", "history": []}).encode("utf-8")
+        data = json.dumps({"message": "Explique um algoritmo.", "history": []}).encode("utf-8")
         req = urllib.request.Request(
             self.url + "/api/chat", data=data, method="POST",
             headers={"Origin": self.url, "Content-Type": "application/json"},
@@ -271,7 +271,7 @@ class TestHttpUI(unittest.TestCase):
         try:
             request = urllib.request.Request(
                 origin + "/api/chat", method="POST",
-                data=json.dumps({"message": "Olá", "history": []}).encode(),
+                data=json.dumps({"message": "Explique um algoritmo.", "history": []}).encode(),
                 headers={"Origin": origin, "Content-Type": "application/json"},
             )
             with self.assertRaises(urllib.error.HTTPError) as ctx:
