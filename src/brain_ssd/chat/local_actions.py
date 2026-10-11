@@ -262,6 +262,22 @@ def local_command(question: str, store: EpisodicMemory | None,
                 "Fontes públicas armazenadas não são necessariamente corretas."
             )
     elif simple in (
+        "qual e a diferenca entre seu historico de conversa e sua memoria permanente",
+        "qual a diferenca entre historico e memoria permanente",
+        "qual a diferenca entre historico de conversa e memoria",
+        "qual e a diferenca entre historico e memoria",
+    ):
+        action = "memory_architecture"
+        answer = (
+            "O histórico de conversas é salvo em SQLite e pode ser reaberto "
+            "pela barra lateral Conversas; não é apenas a sessão atual. "
+            "A memória episódica guarda notas explícitas em outro banco, "
+            "para consulta posterior entre chats. Exemplos ensinados e "
+            "fontes pesquisadas também possuem bases separadas. "
+            "Nem todo texto do histórico vira lembrança permanente. "
+            "Use /memorias e /conhecimento para verificar o que foi guardado."
+        )
+    elif simple in (
         "como acesso seu historico", "como acesso o seu historico",
         "onde vejo meu historico", "como vejo as conversas anteriores",
         "como acesso o historico", "onde fica o historico",
