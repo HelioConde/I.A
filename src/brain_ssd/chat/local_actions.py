@@ -10,6 +10,8 @@ import unicodedata
 from typing import Any
 
 from brain_ssd.chat.episodic import EpisodicMemory
+from brain_ssd.chat.history import default_history_path
+from brain_ssd.chat.diagnostics import default_diagnostics_dir
 
 
 def plain(text: str) -> str:
@@ -55,7 +57,17 @@ def _direct_assistant_name_request(message: str) -> str | None:
     text = message.strip()
     if not text or text.endswith("?"):
         return None
+    # Do not interpret statements ABOUT an assistant's name as a
+    # new assignment; only anchored, imperative wording may save it.
+    normalized = plain(text)
+    if "seu nome padrao" in normalized:
+        text = re.sub(r"(?i)padr[aã]o", "padrao", text)
     patterns = (
+        # "O seu nome padrão agora é Luna" is an explicit instruction:
+        # ordinary Qwen replies must NOT claim a name has been saved.
+        r"(?:o\s+)?seu\s+nome\s+(?:padrao\s+)?"
+        r"(?:(?:agora|a\s+partir\s+de\s+(?:agora|hoje))\s+)?"
+        r"(?:[eé]|vai\s+ser|ser[aá]|fica)\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
         r"(?:a\s+partir\s+de\s+hoje[,]?\s+(?:o\s+)?seu\s+nome"
         r"|(?:o\s+)?seu\s+nome\s+a\s+partir\s+de\s+hoje)"
         r"\s+(?:[eé]|ser[aá]|vai\s+ser)\s+([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ -]{0,39})",
@@ -82,6 +94,11 @@ def is_local_action_answer(answer: str) -> bool:
         "Meu nome é Brain-SSD. Ainda não há apelido salvo.",
         "Meu nome padrão é Brain-SSD. Nenhum apelido",
         "Meu nome escolhido é ",
+        "Meu nome é ",
+        "Luna é o nome que você escolheu",
+        "Para ver o histórico de conversas",
+        "Os diagnósticos locais ficam",
+        "O Brain-SSD não treina os pesos",
         "Lembrança salva no SQLite local:",
         "Salvei na memória local:",
         "Últimas lembranças salvas explicitamente:",
@@ -93,7 +110,8 @@ def is_local_action_answer(answer: str) -> bool:
     ))
 
 
-def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any] | None:
+def local_command(question: str, store: EpisodicMemory | None,
+                  *, learned_store: Any = None, web_knowledge: Any = None) -> dict[str, Any] | None:
     """Return a truthful app action; None means let the real Qwen answer."""
     simple = re.sub(r"[?.!]+\s*$", "", plain(question)).strip()
     greeting_text = simple
@@ -141,8 +159,8 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
         action = "assistant_name"
         name = store.get_assistant_name() if store else None
         answer = (
-            f"Meu nome escolhido é {name}. Ele está salvo na memória local."
-            if name else "Meu nome padrão é Brain-SSD. Nenhum apelido foi salvo na memória local."
+            f"Meu nome é {name}." if name
+            else "Meu nome é Brain-SSD. Nenhum apelido foi salvo na memória local."
         )
     elif simple in (
         "quais comandos voce tem", "qual comandos voce tem", "qual comandos tem",
@@ -180,17 +198,28 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
             "HelioConde/I.A. O modelo Qwen3 é desenvolvido "
             "pela equipe Qwen, e o llama.cpp é um projeto independente."
         )
+    elif simple == "quem e luna" and store is not None and plain(store.get_assistant_name() or "") == "luna":
+        action = "assistant_name"
+        answer = "Luna é o nome que você escolheu para mim. Ele está salvo na memória local."
+    elif simple == "quem e luna":
+        action = "identity_clarification"
+        answer = (
+            "Existem várias pessoas e personagens chamados Luna. "
+            "Você está falando do nome que quer dar a mim ou de outra Luna?"
+        )
     elif simple in ("/nome",):
         action = "assistant_name"
         name = store.get_assistant_name() if store else None
         answer = (
-            f"Meu nome escolhido é {name}. Esse nome está salvo em SQLite local."
-            if name else "Meu nome é Brain-SSD. Ainda não há apelido salvo."
+            f"Meu nome é {name}." if name
+            else "Meu nome é Brain-SSD. Ainda não há apelido salvo."
         )
     elif simple in (
         "/memorias", "/memoria", "liste minhas memorias", "mostre minhas memorias",
         "quais memorias voce salvou", "quais informacoes voce guardou na memoria",
-        "o que voce tem salvo na memoria",
+        "o que voce tem salvo na memoria", "quais informacoes voce tem na memoria",
+        "quais informacoes voce possui na memoria", "o que voce lembra de mim",
+        "o que voce tem na memoria",
     ):
         action = "memory_list"
         if store is None:
@@ -204,6 +233,47 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
                     answer += "\nExibindo no máximo as 10 mais recentes; use o painel Memórias para consultar as demais."
             else:
                 answer = "Não há lembranças explícitas salvas no SQLite local."
+    elif simple in (
+        "como acesso seu historico", "como acesso o seu historico",
+        "onde vejo meu historico", "como vejo as conversas anteriores",
+        "como acesso o historico", "onde fica o historico",
+    ):
+        action = "history_access"
+        answer = (
+            "Para ver o histórico de conversas, abra a barra lateral 'Conversas' "
+            "do chat e selecione uma conversa anterior. Mesmo ao iniciar um "
+            "novo chat, as anteriores continuam disponíveis nessa lista. "
+            "O arquivo SQLite privado fica em "
+            f"{default_history_path()}. Histórico não é memória episódica."
+        )
+    elif simple in (
+        "como acesso o log", "como acesso seu log", "onde vejo os logs",
+        "onde fica o log", "como acesso os logs", "como vejo os logs",
+    ):
+        action = "diagnostics_access"
+        answer = (
+            "Os diagnósticos locais ficam em "
+            f"{default_diagnostics_dir() / 'events.jsonl'} "
+            "quando a opção de diagnósticos está ativa. "
+            "Também é possível acompanhar mensagens de inicialização no "
+            "terminal do Brain-SSD. O log não contém o texto das perguntas."
+        )
+    elif simple in (
+        "o que voce aprendeu sozinho ate esse momento",
+        "o que voce aprendeu sozinho", "o que voce aprendeu ate agora",
+        "o que voce aprendeu ate esse momento",
+    ):
+        action = "learning_overview"
+        learned_count = len(learned_store.list(limit=20)) if learned_store else 0
+        research_count = web_knowledge.count() if web_knowledge else 0
+        answer = (
+            "O Brain-SSD não treina os pesos do Qwen nem aprende fatos sozinho "
+            "a partir de qualquer conversa. "
+            f"Há {learned_count} exemplo(s) explícito(s) entre os até 20 mais recentes "
+            f"e {research_count} fonte(s) pública(s) no banco de pesquisas. "
+            "Essas fontes podem estar desatualizadas e não são fatos confirmados. "
+            "Use /aprendizados, /conhecimento e /memorias para conferir os registros."
+        )
     elif simple in (
         "voce ainda nao salvou informacoes na memoria",
         "voce ainda nao salvar informacoes na memoria",
