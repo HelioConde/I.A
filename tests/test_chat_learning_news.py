@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.learning import (
     LearnedResponses, learned_action, parse_lesson, normalize_trigger,
 )
-from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, strip_research_command
+from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, strip_research_command, current_game_request
 from brain_ssd.chat.server import ChatEngine
 from brain_ssd.chat.diagnostics import DiagnosticLogger
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, NEWS_FEEDS
@@ -174,6 +174,38 @@ class TestBrazilNews(unittest.TestCase):
             self.assertEqual(core.core_backend.prompts, [])
         finally:
             engine.close()
+
+    def test_current_game_updates_need_real_news_not_wikipedia(self):
+        for question in (
+            "Me fale as últimas atualizações do jogo overwatch",
+            "notícias sobre league of legends",
+            "pesquise para mim as ultimas atualizacoes de valorant",
+        ):
+            self.assertTrue(current_game_request(question), question)
+        self.assertFalse(current_game_request("O que é Valorant?"))
+        source = Source()
+        engine = ChatEngine(Runtime, web_search_service=source)
+        engine.start()
+        try:
+            before = engine.ask("notícias sobre league of legends", [])
+            self.assertEqual(before["local_action"], "research_provider_limited")
+            self.assertEqual(source.calls, [])
+            self.assertIn("pesquisa web autorizada", before["answer"])
+        finally:
+            engine.close()
+        wiki = WebSearchService("auto")
+        engine2 = ChatEngine(Runtime, web_search_service=wiki)
+        engine2.start()
+        try:
+            with patch.object(wiki, "_request") as network:
+                news = engine2.ask("Últimas atualizações de Valorant?", [], web_search=True,
+                                   fast_web=True)
+            self.assertEqual(news["local_action"], "research_provider_limited")
+            self.assertEqual(news["web_search_status"], "provider_limited")
+            self.assertIn("Wikipédia", news["answer"])
+            network.assert_not_called()
+        finally:
+            engine2.close()
 
     def test_offline_does_not_fabricate_current_politics(self):
         runtime = Runtime()
