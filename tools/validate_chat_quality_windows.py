@@ -21,7 +21,9 @@ from brain_ssd.chat.server import ChatEngine
 
 
 CASES = (
-    ("capabilities", "O que você consegue fazer?"),
+    # Use a free-form question; "O que você consegue fazer?" is a Python
+    # /ajuda alias and would falsely pass without testing Qwen inference.
+    ("capabilities", "Dê dois exemplos de como uma IA local pode ajudar com programação."),
     ("ssd_ram", "Explique como você usa o SSD e a RAM."),
     ("basic_reasoning", "Quanto é 2 + 2? Responda com o resultado."),
 )
@@ -69,8 +71,9 @@ def main() -> int:
                 answers.append(answer)
                 item = {
                     "case": name, "chars": len(answer),
-                    "passed_heuristic": check_response(name, answer),
+                    "passed_heuristic": check_response(name, answer) and data.get("mode") != "local_command",
                     "inference_verified": bool(engine.status().get("inference_verified")),
+                    "model_generated": data.get("mode") != "local_command",
                     "sources_from_ssd": int(data.get("sources_from_ssd") or 0),
                 }
                 if args.include_answers:
