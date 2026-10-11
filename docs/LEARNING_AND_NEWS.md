@@ -72,6 +72,42 @@ Os testes usam SQLite temporário e RSS simulado; não enviam perguntas reais pa
 A inferência real e a disponibilidade do feed precisam ser conferidas no seu computador. O Brain-SSD **não ficou mais inteligente apenas por memorizar uma saudação**: respostas abertas continuam dependendo da capacidade do Qwen e da qualidade das fontes.
 
 
+## Estudar um assunto diretamente, sem depender do Qwen
+
+O comando `/estudar [assunto]` pesquisa, verifica a relação temática dos
+resultados e salva trechos públicos no SQLite **antes de qualquer tentativa de
+geração**. É útil quando um modelo pequeno não consegue responder.
+
+Exemplo:
+
+```text
+/estudar astronomia e estrelas
+/conhecimento
+Explique astronomia e estrelas
+```
+
+No primeiro envio, habilite **Pesquisar na web** e deixe marcado
+**Aprender com as fontes**. Se uma das opções não estiver autorizada, o
+comando não realiza acesso à internet nem altera o banco. A pesquisa é
+pontual, não um agente em segundo plano. A primeira resposta informa
+quantos resultados foram encontrados e armazenados; a pergunta seguinte
+usa os trechos arquivados como contexto para o modelo local.
+
+Para evitar falsas associações, o Brain-SSD só indexa termos presentes no
+**título ou trecho da fonte**, e não palavras copiadas artificialmente da
+pergunta. Fontes sem nenhuma correspondência com o assunto não são guardadas.
+A recuperação reconhece alguns plurais simples, como `estrela` e
+`estrelas`, mas não é uma busca semântica completa.
+
+O comando `/conhecimento` mostra URL, tópico e data da consulta, incluindo
+se cada fonte ainda pode ser reutilizada. Para apagar um tópico, use
+`/esquecer-pesquisa [tópico exato]`.
+
+**Importante:** os trechos vêm de provedores externos e ainda podem conter
+erros, desinformação ou informações incompletas. Guardá-los significa
+criar uma referência consultável, e não transformar seus conteúdos em
+verdades permanentes ou alterar os pesos do Qwen.
+
 ## Aprendizado a partir de fontes públicas (pesquisa persistente)
 
 Agora há uma segunda memória, separada dos exemplos ensinados manualmente:
@@ -85,9 +121,11 @@ O fluxo é:
    localmente os trechos públicos dessa pesquisa.
 3. O aplicativo busca até quatro resultados e passa os trechos com URLs ao
    Qwen para gerar uma resposta na CPU.
-4. Somente após uma geração bem-sucedida, os **trechos realmente inseridos no
-   contexto do modelo** são salvos no SQLite, sem copiar a resposta gerada,
-   o histórico pessoal, chaves ou arquivos privados.
+4. Em uma pesquisa normal, após uma geração bem-sucedida, os **trechos realmente
+   inseridos no contexto do modelo** podem ser salvos no SQLite. No comando
+   `/estudar`, os resultados podem ser salvos sem depender de geração.
+   A resposta gerada, o histórico privado e as notas pessoais não viram
+   fontes do banco automaticamente.
 5. Em perguntas semelhantes, o aplicativo busca os trechos por palavras
    relevantes e volta a enviá-los ao Qwen com fonte e data da pesquisa.
    Recuperar conhecimento antigo não requer nova consulta à internet.
