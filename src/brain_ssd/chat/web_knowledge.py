@@ -226,13 +226,20 @@ class WebKnowledge:
                         continue
                 if ratio < 0.45:
                     continue
-                rows.append((overlap, ratio, row))
-        rows.sort(key=lambda x: (-x[0], -x[1], -x[2]["saved_at"]))
+                title_overlap = len(query_terms & terms(row["title"]))
+                rows.append((overlap, title_overlap, ratio, row))
+        # A broad one-topic question ("astronomia") should preferentially
+        # receive the central article, not tangential historical pages that
+        # happen to mention the term in a snippet. If no titles match,
+        # snippet-only results remain a fallback.
+        if len(query_terms) == 1 and any(title_overlap for _, title_overlap, _, _ in rows):
+            rows = [candidate for candidate in rows if candidate[1] > 0]
+        rows.sort(key=lambda x: (-x[0], -x[1], -x[2], -x[3]["saved_at"]))
         return [
             {"title": r["title"], "url": r["url"], "snippet": r["excerpt"],
              "saved_at": str(r["saved_at"]), "published_at": r["published_at"] or "",
              "provider": r["provider"]}
-            for _, _, r in rows[:max(1, min(limit, 4))]
+            for _, _, _, r in rows[:max(1, min(limit, 4))]
         ]
 
     def count(self) -> int:
