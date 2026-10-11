@@ -101,3 +101,39 @@ py -3 -m unittest discover -s tests -p "test_chat_web_search.py" -v
 A pesquisa real deve ser conferida no seu Windows, com conexão e o provedor
 selecionado. Nenhum `PASS` de testes simulados comprova disponibilidade de
 rede no computador do usuário.
+
+## Pesquisa mais rápida e leitura em voz alta
+
+A interface agora possui a opção **Resposta rápida** (marcada por padrão
+quando a pesquisa web estiver disponível). Com ela:
+
+- Após você autorizar **Pesquisar na web**, o chat entrega títulos, trechos
+  e URLs dos resultados assim que a consulta termina, **sem recarregar o
+  Qwen para gerar a síntese**.
+- A resposta é identificada como **consulta rápida de fontes**, não como
+  texto elaborado pela IA. Para pedir uma síntese do Qwen, desmarque
+  **Resposta rápida** antes de enviar.
+- Pesquisas repetidas no mesmo processo podem reutilizar resultados em
+  cache: até **75 segundos** para notícias e **5 minutos** para assuntos
+  gerais. O cache é temporário, mantém apenas hashes das perguntas e
+  os resultados públicos, e não autoriza novas pesquisas automaticamente.
+- Na página e nos detalhes técnicos aparecem o tempo da pesquisa e,
+  quando houve inferência, o tempo de geração pelo Qwen.
+
+**Por que o Qwen pode continuar lento?** O perfil `economia` roda
+`llama.cpp` em um subprocesso por mensagem, descarregando o modelo entre
+perguntas para preservar RAM. Modelos maiores e respostas completas podem
+demorar a carregar e gerar texto. O modo rápido evita apenas esse custo
+quando uma resposta baseada nos trechos das fontes for suficiente; não
+aumenta a capacidade do modelo.
+
+**Ouvir a resposta:** cada mensagem do assistente apresenta
+**🔊 Ouvir resposta** e **■ Parar áudio**. O navegador usa a Web Speech API,
+preferindo uma voz `pt-BR` instalada localmente quando existir.
+A leitura só começa ao clicar no botão e não instala ferramentas de voz.
+Se o navegador não disponibilizar síntese de fala, o botão fica desativado.
+Algumas vozes de navegadores/sistemas operacionais podem depender de
+serviços de rede; para voz estritamente offline, selecione uma voz local
+nas configurações do Windows/navegador. O recurso não envia mensagens
+aos provedores de pesquisa por conta própria.
+
