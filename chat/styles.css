@@ -113,3 +113,9 @@
 .response-size-control { display:inline-flex; gap:6px; align-items:center; font-size:12px; color:var(--text-muted, #b6c6d0); }
 .response-size-control select { max-width:160px; min-height:29px; padding:3px 6px; border-radius:8px; border:1px solid #3d596a; background:#162d3a; color:#e3eef1; font:inherit; }
 .response-size-control select:focus-visible { outline:2px solid #93c8ff; outline-offset:2px; }
+
+/* Explicitly mark incomplete model generations without claiming the request failed. */
+.generation-incomplete { display:flex; flex-wrap:wrap; gap:8px; align-items:center; border:1px solid #9b7857; border-radius:9px; padding:9px; margin-top:10px; font-size:12px; color:#e9c49f; }
+.continue-answer { border:1px solid #d0a77d; background:#3b302c; color:#ffe6c8; font:inherit; border-radius:7px; padding:5px 9px; cursor:pointer; }
+.continue-answer:hover { background:#534034; }
+.continue-answer:focus-visible { outline:2px solid #9bcaff; outline-offset:2px; }
