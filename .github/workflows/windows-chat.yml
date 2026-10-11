@@ -49,6 +49,8 @@ on:
       - "GERAR-LOGS-WINDOWS.bat"
       - "tests/test_chat_runtime.py"
       - "tests/test_chat_completion_quality.py"
+      - "tests/test_luna_report_review.py"
+      - "tools/review_luna_evaluation.py"
       - "src/brain_ssd/chat/completion_quality.py"
       - "tests/test_chat_performance.py"
       - "src/brain_ssd/chat/performance.py"
@@ -78,6 +80,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
           python -m unittest discover -s tests -p "test_chat_completion_quality.py" -v
+          python -m unittest discover -s tests -p "test_luna_report_review.py" -v
           python -m unittest discover -s tests -p "test_chat_local_actions.py" -v
           python -m unittest discover -s tests -p "test_chat_web_search.py" -v
           python -m unittest discover -s tests -p "test_web_knowledge.py" -v
