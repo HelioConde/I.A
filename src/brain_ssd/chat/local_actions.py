@@ -391,3 +391,52 @@ def local_command(question: str, store: EpisodicMemory | None,
         "cognitive_shadow": None,
         "note": "Operação local do aplicativo: não houve geração do Qwen nesta resposta.",
     }
+
+
+def conversation_followup(question: str, history: list[dict[str, str]]) -> dict[str, Any] | None:
+    """Answer a narrow factual follow-up from THIS conversation, not SQLite.
+
+    Do not infer reasons for stated preferences. Never write the information
+    to permanent episodic memory without an explicit save request.
+    """
+    if not isinstance(question, str) or not isinstance(history, list):
+        return None
+    normalized = re.sub(r"[?.!]+$", "", plain(question)).strip()
+    if not re.fullmatch(
+        r"(?:por que |porque )?(?:voce |vc )?(?:acha |pensa )?"
+        r"(?:que )?(?:eu )?gosto (?:desse|deste|de tal|daquele) animal"
+        r"|(?:por que|porque) (?:voce )?acha que (?:eu )?gosto "
+        r"(?:desse|deste|daquele) animal",
+        normalized,
+    ):
+        return None
+    for item in reversed(history):
+        if not isinstance(item, dict) or item.get("role") != "user":
+            continue
+        content = item.get("content")
+        if not isinstance(content, str):
+            continue
+        source = plain(content)
+        fact = re.search(
+            r"\b(?:o )?meu animal favorito (?:e|eh) "
+            r"(?:(?:o|a|um|uma) )?([a-z-]{2,35})\b",
+            source,
+        )
+        if fact:
+            animal = fact.group(1)
+            answer = (
+                f"Você disse nesta conversa que seu animal favorito é {animal}, "
+                "mas não explicou por que gosta dele. Eu não tenho como saber "
+                "o motivo sem você contar; qualquer explicação seria hipótese."
+            )
+            return {
+                "answer": answer, "mode": "local_command",
+                "local_action": "conversation_context",
+                "source": "current_chat_history",
+                "metrics": {}, "active_pages": 0, "sources_from_ssd": 0,
+                "episodic_memories_used": 0,
+                "episodic_ambiguities_detected": 0,
+                "episodic_ambiguities_withheld": False,
+                "cognitive_shadow": None,
+            }
+    return None
