@@ -46,7 +46,7 @@ def load_cases(path: Path = BANK) -> list[dict]:
     if any(not isinstance(item.get("question"), str) or not item["question"].strip()
            or item.get("expectation") not in {
                "tool_system", "tool_screen", "installed_inventory", "running_inventory",
-               "capability_truth", "security", "model_answer", "no_unauthorized_execution",
+               "capability_truth", "security", "model_answer", "no_unauthorized_execution", "review",
            } for item in cases):
         raise ValueError("Bateria contém pergunta ou expectativa inválida.")
     return cases
