@@ -336,8 +336,10 @@ Com o chat iniciado com `--episodic-memory` (ou pelo iniciador COM MEMÓRIA),
 algumas frases intencionais são executadas **pelo aplicativo Python e SQLite**,
 sem gerar resposta do modelo:
 
-- `salve na memória que seu nome é Luna`: grava o nome escolhido para o
-  assistente no SQLite local. `qual é seu nome?`, `/nome` e
+- `salve na memória que seu nome é Luna` ou `Seu nome a partir de hoje é Luna`:
+  comandos explícitos que gravam o nome escolhido para o assistente no SQLite
+  local. A frase `Oi Luna` por si só **não grava** novas notas e segue para
+  a resposta real do Qwen. `qual é seu nome?`, `/nome` e
   `oi, qual é seu nome?` consultam a preferência salva, inclusive após
   reiniciar e em novas conversas.
 - `salve na memória que meu jogo favorito é xadrez`: guarda uma nota
