@@ -10,6 +10,19 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Instalação automática e escolha de modelo (Windows)
+
+Abra **INICIAR-BRAIN-SSD.bat** na pasta do projeto. O menu oferece Qwen3
+**0.6B**, **1.7B** ou **4B**. O programa instala automaticamente o GGUF
+escolhido e o llama.cpp CPU-only apenas se faltarem, verifica SHA-256, roda
+o diagnóstico do modelo selecionado e inicia o chat. Nenhum modelo anterior,
+histórico ou memória é apagado. Python 3.11+ é necessário; se estiver
+ausente, o .bat oferece instalar via winget com confirmação.
+
+[Guia completo do instalador automático](docs/AUTO_SETUP_WINDOWS.md)
+
+---
+
 ## A ideia
 
 A inspiração é funcional, não anatômica: seres humanos não precisam ativar todas as lembranças simultaneamente para responder a uma pergunta. O Brain-SSD pesquisa a mesma **seletividade computacional** por meio de roteamento, memória episódica, contexto limitado, associação e avaliação de custo.
@@ -42,7 +55,7 @@ As setas pontilhadas representam **experimentos de diagnóstico**, que **não al
 | Área | O que existe | Limite atual |
 | --- | --- | --- |
 | **Inferência local** | Adaptador para `llama.cpp` CPU-only com Qwen3-0.6B Q8_0 | GGUF e binários precisam estar instalados localmente; teste E2E no PC do usuário pendente |
-| **Chat Windows** | Interface, streaming, botão Parar, histórico SQLite e diagnósticos | Beta experimental; não há instalador autônomo completo |
+| **Chat Windows** | Interface, streaming, histórico SQLite e seletor .bat com download verificado | Beta experimental; download e geração com modelos maiores ainda exigem validação no Windows real |
 | **SSD seletivo** | Páginas lógicas, índice, roteamento e recuperação de `KnowledgeRecords` | O `brain.dat` completo é opcional para o chat, mas necessário para recuperar a base SSD |
 | **Atenção** | Seleção por pistas e orçamento de bytes | Mecanismo cognitivo em **shadow**; melhora de qualidade ainda não comprovada |
 | **Memória de trabalho** | Tópicos recentes em estado compacto e histórico limitado | Não equivale à memória de trabalho biológica |
