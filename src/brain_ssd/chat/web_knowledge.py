@@ -19,7 +19,7 @@ from typing import Any
 
 MAX_RECORDS = 800
 MAX_SOURCES_PER_SEARCH = 4
-MAX_TOPIC = 180
+MAX_TOPIC = 280
 MAX_EXCERPT = 800
 NEWS_MAX_AGE = 12 * 3600       # current affairs requires genuinely fresh news
 GENERAL_MAX_AGE = 30 * 86400   # evergreen info must eventually be rechecked
