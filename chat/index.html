@@ -48,6 +48,7 @@
         </div>
         <div class="top-right">
           <span class="privacy-pill"><span class="tiny-lock">◆</span> Local e privado</span>
+          <button class="icon-btn copilot-open" id="openCopilot" type="button" aria-label="Abrir copiloto local" aria-expanded="false" title="Arquivos, computador e tela">▣</button>
           <button class="icon-btn info-btn" id="showDetails" type="button" aria-label="Mostrar detalhes técnicos" aria-expanded="false">ⓘ</button>
         </div>
       </header>
@@ -113,6 +114,37 @@
   </div>
 
   <div class="backdrop" id="backdrop" hidden></div>
+  <aside class="copilot-panel" id="copilotPanel" aria-label="Copiloto local" hidden>
+    <div class="copilot-head"><h2>Copiloto Windows</h2><button class="icon-btn" id="closeCopilot" type="button" aria-label="Fechar copiloto">×</button></div>
+    <p id="copilotStatus" role="status">Verificando permissões locais...</p>
+    <p class="copilot-muted">Apenas leitura. As pastas e a captura precisam ser habilitadas ao iniciar o programa. Nenhum acesso é contínuo sem você ativar.</p>
+    <div id="copilotRoots" class="copilot-roots"></div>
+    <section class="copilot-block">
+      <h3>Arquivos e pastas</h3>
+      <label for="copilotPath">Caminho completo dentro das pastas autorizadas</label>
+      <input id="copilotPath" placeholder="C:\\Projetos\\meu-jogo" spellcheck="false">
+      <div class="copilot-actions">
+        <button type="button" id="copilotList">Listar pasta</button>
+        <button type="button" id="copilotRead">Ler texto</button>
+        <button type="button" id="copilotImage">Ver imagem</button>
+      </div>
+      <button type="button" id="copilotSystem">Informações do computador</button>
+    </section>
+    <section class="copilot-block">
+      <h3>Tela</h3>
+      <p class="copilot-muted">A tela só é capturada ao clicar. A atualização contínua fica ativa apenas enquanto esta janela está aberta e o controle estiver marcado.</p>
+      <label for="copilotMonitor">Monitor (0 = todos)</label>
+      <input id="copilotMonitor" type="number" min="0" max="16" value="1">
+      <div class="copilot-actions">
+        <button type="button" id="copilotCapture">Capturar agora</button>
+        <label class="copilot-live"><input type="checkbox" id="copilotLive"> Atualizar a cada 3 s</label>
+      </div>
+    </section>
+    <p class="copilot-feedback" id="copilotFeedback" role="status" aria-live="polite"></p>
+    <div id="copilotResult" class="copilot-result" aria-label="Resultado da leitura local"></div>
+    <button type="button" id="copilotUseChat" hidden>Usar texto no chat</button>
+    <p class="copilot-muted">Visualização não é interpretação: a versão atual do Qwen não enxerga imagens. Não cole senhas ou dados sensíveis no chat.</p>
+  </aside>
   <aside class="details-panel" id="detailsPanel" aria-label="Métricas técnicas" hidden>
     <div class="details-head"><h2>Diagnóstico local</h2><button class="icon-btn" id="closeDetails" type="button" aria-label="Fechar detalhes">×</button></div>
     <p>Dados da última resposta (quando disponíveis). Estes valores não representam validação física do SSD.</p>
