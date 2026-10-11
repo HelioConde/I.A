@@ -22,7 +22,7 @@ from brain_ssd.chat.local_actions import is_local_action_answer, local_command
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context
 from brain_ssd.chat.learning import LearnedResponses, learned_action
-from brain_ssd.chat.current_affairs import needs_brazil_news
+from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research
 from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format_cached_context
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
@@ -423,6 +423,23 @@ class ChatEngine:
                 self.web_knowledge.retrieve(question, current=needs_brazil_news(question))
                 if self.web_knowledge and local_result is None else []
             )
+            if local_result is None and explicit_web_research(question) and not web_search:
+                local_result = {
+                    "answer": (
+                        "Posso pesquisar esse assunto na internet e guardar as fontes "
+                        "para futuras conversas. "
+                        + ("Marque 'Pesquisar na web' e reenvie a pergunta; "
+                           "a opção 'Aprender com as fontes' controla o salvamento."
+                           if self.web_search_service else
+                           "Inicie com a opção de pesquisa web ativada.")
+                    ),
+                    "mode": "local_command", "local_action": "research_permission",
+                    "metrics": {}, "active_pages": 0, "sources_from_ssd": 0,
+                    "episodic_memories_used": 0,
+                    "episodic_ambiguities_detected": 0,
+                    "episodic_ambiguities_withheld": False,
+                    "cognitive_shadow": None,
+                }
             if local_result is None and needs_brazil_news(question) and not archived_sources:
                 if not web_search:
                     explanation = (
