@@ -268,7 +268,7 @@ async function refreshStatus() {
         (data.core_mode === "persistent" ? " · Modelo mantido em RAM"
           : data.core_mode === "subprocess" ? " · Recarrega modelo por resposta" : "") +
         (data.threads ? " · " + data.threads + " threads" : "") +
-        (data.max_output_tokens ? " · até " + data.max_output_tokens + " tokens" : ""))
+        (data.max_output_tokens ? " · " + data.max_output_tokens + " tokens base (até 160 em explicações)" : ""))
       : "Perfil: —";
     $("knowledgeInfo").textContent = data.knowledge_note || "Conhecimento SSD: verificando";
     $("learningInfo").textContent = data.learning_enabled
