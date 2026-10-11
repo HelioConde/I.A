@@ -219,6 +219,10 @@ async function refreshStatus() {
     $("currentModelLabel").textContent = data.model || "Qwen local";
     const webEnabled = data.web_search_enabled === true;
     $("webSearchControl").hidden = !webEnabled;
+    $("webLearnControl").hidden = !webEnabled || !data.research_memory_enabled;
+    $("researchInfo").textContent = data.research_memory_enabled
+      ? "Pesquisa guardada: " + (data.research_memory_sources || 0) + " fonte(s); /conhecimento para revisar"
+      : "Memória de pesquisa desativada.";
     $("webProviderInfo").hidden = !webEnabled;
     $("webProviderInfo").textContent = webEnabled ? "(" + data.web_search_provider + ")" : "";
     $("webPrivacyInfo").textContent = webEnabled
@@ -323,6 +327,10 @@ async function send() {
       "A resposta será gerada localmente."
     );
   }
+  // Source retention applies only when this individual network lookup is
+  // explicitly authorized; never silently save regular chats.
+  const rememberThisSearch = searchThisQuestion && !$("webLearnControl").hidden &&
+    $("webLearnToggle").checked;
   // Consent applies only to this one search, never to the next message.
   $("webSearchToggle").checked = false;
   app.sending = true;
@@ -352,7 +360,8 @@ async function send() {
       signal:app.abortController.signal,
       body:JSON.stringify({
         message:question, conversation_id:app.conversationId,
-        request_id:app.requestId, web_search:searchThisQuestion
+        request_id:app.requestId, web_search:searchThisQuestion,
+        remember_web:rememberThisSearch
       })
     });
     if (!response.ok) {
@@ -400,13 +409,18 @@ async function send() {
             void refreshStatus();
           }
         }
-        if (searchThisQuestion) {
+        if (searchThisQuestion || (Array.isArray(payload.research_used_sources) && payload.research_used_sources.length)) {
           const sourcePanel = document.createElement("div");
           sourcePanel.className = "web-sources";
           const heading = document.createElement("strong");
-          heading.textContent = "Fontes da pesquisa web";
+          heading.textContent = searchThisQuestion
+            ? "Fontes da pesquisa web"
+            : "Fontes recuperadas do conhecimento local (verifique a data)";
           sourcePanel.appendChild(heading);
-          const sources = Array.isArray(payload.web_sources) ? payload.web_sources.slice(0, 4) : [];
+          const sources = (searchThisQuestion
+            ? (Array.isArray(payload.web_sources) ? payload.web_sources : [])
+            : (Array.isArray(payload.research_used_sources) ? payload.research_used_sources : [])
+          ).slice(0, 4);
           if (sources.length) {
             const list = document.createElement("ul");
             for (const source of sources) {
@@ -441,6 +455,14 @@ async function send() {
             sourcePanel.appendChild(status);
           }
           pending.querySelector(".message-body").appendChild(sourcePanel);
+        }
+        if (payload.research_saved_sources > 0) {
+          const retained = document.createElement("p");
+          retained.className = "local-action-note";
+          retained.textContent = payload.research_saved_sources +
+            " fonte(s) pública(s) guardada(s) no SQLite para futuras perguntas. Comando: /conhecimento";
+          pending.querySelector(".message-body").appendChild(retained);
+          void refreshStatus();
         }
         updateMetrics(payload);
         completed = true;
