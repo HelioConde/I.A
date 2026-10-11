@@ -360,7 +360,7 @@ class ChatEngine:
             cancel_event: threading.Event | None = None,
             request_id: str | None = None,
             web_search: bool = False, remember_web: bool = False,
-            fast_web: bool = False) -> dict[str, Any]:
+            fast_web: bool = False, response_tokens: int | None = None) -> dict[str, Any]:
         started = time.monotonic()
         started_cpu = time.process_time()
         trace_id = request_id or str(uuid.uuid4())
@@ -372,7 +372,7 @@ class ChatEngine:
             result = self._ask_inner(question, raw_history, on_chunk=on_chunk,
                                      cancel_event=cancel_event, request_id=trace_id,
                                      web_search=web_search, remember_web=remember_web,
-                                     fast_web=fast_web)
+                                     fast_web=fast_web, response_tokens=response_tokens)
         except GenerationCancelled:
             if self.diagnostics:
                 self.diagnostics.emit("chat.cancelled", request_id=trace_id,
@@ -396,7 +396,7 @@ class ChatEngine:
                    on_chunk: Callable[[str], None] | None,
                    cancel_event: threading.Event | None,
                    request_id: str, web_search: bool = False, remember_web: bool = False,
-                   fast_web: bool = False) -> dict[str, Any]:
+                   fast_web: bool = False, response_tokens: int | None = None) -> dict[str, Any]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Digite uma mensagem.")
         question = question.strip()
@@ -405,6 +405,8 @@ class ChatEngine:
         if (type(web_search) is not bool or type(remember_web) is not bool
                 or type(fast_web) is not bool):
             raise ValueError("Sinalização de pesquisa web inválida.")
+        if response_tokens is not None and (type(response_tokens) is not int or response_tokens not in (96, 160, 256)):
+            raise ValueError("Escolha resposta automática, curta, normal ou detalhada.")
         if fast_web and not web_search:
             raise ValueError("Resposta rápida exige pesquisa web autorizada.")
         if remember_web and not web_search:
@@ -835,7 +837,7 @@ class ChatEngine:
                     "parcial, não uma avaliação completa do Brasil. Evite "
                     "tom partidário e não invente indicadores econômicos."
                 ) if len(prompt.encode("utf-8")) + 350 < getattr(self._runtime, "prompt_budget_bytes", 3600) else ""
-            generation = GenerationRequest(prompt=prompt, max_tokens=int(getattr(self._runtime, "max_output_tokens", 256)), temperature=0.7)
+            generation = GenerationRequest(prompt=prompt, max_tokens=(response_tokens if response_tokens is not None else int(getattr(self._runtime, "max_output_tokens", 256))), temperature=0.7)
             infer_started = time.monotonic()
             try:
                 if on_chunk is None:
@@ -1088,12 +1090,12 @@ class ChatHandler(BaseHTTPRequestHandler):
                 identifier = data.get("conversation_id")
                 if identifier is not None and self.server.history_store is not None:
                     saved_history = self.server.history_store.recent_context(identifier)
-                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False))
+                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False), response_tokens=data.get("response_tokens"))
                     self.server.history_store.append_exchange(identifier, data["message"].strip(), result["answer"])
                     result["conversation_id"] = identifier
                 else:
                     # Legacy isolated HTTP tests may still pass bounded history.
-                    result = self.server.engine.ask(data.get("message"), data.get("history", []), web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False))
+                    result = self.server.engine.ask(data.get("message"), data.get("history", []), web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False), response_tokens=data.get("response_tokens"))
         except (ValueError, json.JSONDecodeError) as exc:
             if path in ("/api/chat", "/api/chat/stream"):
                 # Even a backend ValueError may embed prompts or local paths.
