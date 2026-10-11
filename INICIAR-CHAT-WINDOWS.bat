@@ -34,17 +34,18 @@ if errorlevel 1 (
   pause
   exit /b 3
 )
-title Brain-SSD - Chat local
+title Brain-SSD - Chat completo
 echo.
 echo BRAIN-SSD - Chat visual no Windows
-echo CPU-only, sem API externa.
+echo Modelo local com memoria, aprendizado e pesquisa web opcional.
+echo Cada consulta externa exige autorizacao para a pergunta.
 echo.
 echo [1/2] Verificando GGUF e llama.cpp. Sem carregar o modelo...
 %PYTHON_CMD% "tools\doctor_chat.py" --profile economia --probe
 if errorlevel 1 goto :auto_setup
 echo.
-echo [2/2] Iniciando chat local...
-%PYTHON_CMD% "tools\run_chat.py" --profile economia
+echo [2/2] Iniciando chat completo com pesquisa web auto...
+%PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto
 if errorlevel 1 goto :not_ready
 goto :end
 :auto_setup
