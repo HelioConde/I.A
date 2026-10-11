@@ -137,7 +137,7 @@ def start_chat(root: Path, spec: ModelSpec, *, web: bool, profile: str) -> int:
     args = [
         sys.executable, str(root / "tools" / "run_chat.py"),
         "--profile", profile, "--model-file", spec.filename,
-        "--episodic-memory", "--cognitive-shadow",
+        "--episodic-memory", "--cognitive-shadow", "--core-mode", "auto",
     ]
     if web:
         args.extend(["--web-search", "--web-provider", "auto"])
