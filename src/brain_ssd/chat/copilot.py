@@ -159,6 +159,82 @@ class LocalCopilot:
         except (OSError, ValueError, UnidentifiedImageError):
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
 
+    def list_monitor_windows(self, monitor: int = 1) -> list[dict[str, str]]:
+        """List *visible window titles* intersecting one monitor on Windows.
+
+        This is not vision, OCR, a list of every background process, or a
+        substitute for reading text displayed inside an application.
+        """
+        if not self.screen_enabled:
+            raise CopilotPermissionError("Consulta de monitores não autorizada.")
+        if type(monitor) is not int or not 0 <= monitor <= 16:
+            raise CopilotPermissionError("Monitor inválido.")
+        if os.name != "nt":
+            raise CopilotPermissionError("Lista de janelas disponível somente no Windows.")
+        try:
+            from ctypes import wintypes
+            from mss import MSS
+        except ImportError:
+            raise CopilotPermissionError("Instale mss para identificar o monitor.") from None
+        try:
+            with MSS() as session:
+                if monitor >= len(session.monitors):
+                    raise CopilotPermissionError("Monitor indisponível.")
+                rect = dict(session.monitors[monitor])
+            bounds = (
+                rect["left"], rect["top"],
+                rect["left"] + rect["width"], rect["top"] + rect["height"],
+            )
+            user32 = ctypes.windll.user32
+            CALLBACK = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+            user32.EnumWindows.argtypes = (CALLBACK, wintypes.LPARAM)
+            user32.EnumWindows.restype = wintypes.BOOL
+            user32.IsWindowVisible.argtypes = (wintypes.HWND,)
+            user32.IsWindowVisible.restype = wintypes.BOOL
+            user32.IsIconic.argtypes = (wintypes.HWND,)
+            user32.IsIconic.restype = wintypes.BOOL
+            user32.GetWindowTextLengthW.argtypes = (wintypes.HWND,)
+            user32.GetWindowTextLengthW.restype = ctypes.c_int
+            user32.GetWindowTextW.argtypes = (wintypes.HWND, wintypes.LPWSTR, ctypes.c_int)
+            user32.GetWindowTextW.restype = ctypes.c_int
+            user32.GetWindowRect.argtypes = (wintypes.HWND, ctypes.POINTER(wintypes.RECT))
+            user32.GetWindowRect.restype = wintypes.BOOL
+            windows: list[dict[str, str]] = []
+            seen: set[str] = set()
+
+            @CALLBACK
+            def collect(hwnd: int, unused: int) -> bool:
+                if len(windows) >= 16:
+                    return False
+                if not user32.IsWindowVisible(hwnd) or user32.IsIconic(hwnd):
+                    return True
+                length = user32.GetWindowTextLengthW(hwnd)
+                if length <= 0 or length > 300:
+                    return True
+                title_buffer = ctypes.create_unicode_buffer(length + 1)
+                if not user32.GetWindowTextW(hwnd, title_buffer, length + 1):
+                    return True
+                title = " ".join(title_buffer.value.split())[:160]
+                if not title or title in seen:
+                    return True
+                window_rect = wintypes.RECT()
+                if not user32.GetWindowRect(hwnd, ctypes.byref(window_rect)):
+                    return True
+                left, top = max(window_rect.left, bounds[0]), max(window_rect.top, bounds[1])
+                right, bottom = min(window_rect.right, bounds[2]), min(window_rect.bottom, bounds[3])
+                if right - left < 80 or bottom - top < 50:
+                    return True
+                seen.add(title)
+                windows.append({"title": title})
+                return True
+
+            user32.EnumWindows(collect, 0)
+            return windows
+        except (OSError, ValueError, AttributeError, OverflowError) as exc:
+            if isinstance(exc, CopilotPermissionError):
+                raise
+            raise CopilotPermissionError("Não foi possível consultar as janelas do Windows.") from None
+
     def system_info(self) -> dict:
         if not (self.roots or self.screen_enabled):
             raise CopilotPermissionError("Ative o copiloto antes de consultar o sistema.")
@@ -171,7 +247,15 @@ class LocalCopilot:
             except OSError:
                 pass
         memory_gib = None
+        cpu_name = None
         if os.name == "nt":
+            try:
+                import winreg
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                        r"HARDWARE\DESCRIPTION\System\CentralProcessor\0") as key:
+                    cpu_name = str(winreg.QueryValueEx(key, "ProcessorNameString")[0])[:120]
+            except (OSError, ValueError):
+                pass
             class MemoryStatus(ctypes.Structure):
                 _fields_ = [("length", ctypes.c_ulong), ("load", ctypes.c_ulong),
                             ("total_phys", ctypes.c_ulonglong),
@@ -186,7 +270,8 @@ class LocalCopilot:
             if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
                 memory_gib = round(status.total_phys / 2**30, 1)
         return {"os": platform.system() + " " + platform.release(),
-                "architecture": platform.machine(), "cpu_threads": os.cpu_count(),
+                "architecture": platform.machine(), "cpu_name": cpu_name,
+                "cpu_threads": os.cpu_count(),
                 "ram_total_gib": memory_gib, "disks": disks,
                 "python": platform.python_version()}
 
