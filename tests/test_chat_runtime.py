@@ -135,6 +135,29 @@ class TestOptionalSSD(unittest.TestCase):
         finally:
             runtime.close()
 
+    def test_installed_gguf_can_be_selected_without_replacing_default(self):
+        alt = self.root / "models" / "Qwen3-4B-Instruct-Q4_K_M.gguf"
+        alt.write_bytes(b"GGUF" + b"\\0" * 32)
+        runtime = LocalChatRuntime(
+            self.root, profile="economia", model_file=alt.name
+        )
+        try:
+            self.assertEqual(runtime.model_path.resolve(), alt.resolve())
+            self.assertEqual(runtime.status()["model"], alt.name)
+            self.assertEqual(runtime.core_backend.backend.model, alt)
+            self.assertTrue((self.root / MODEL_RELATIVE).exists())
+        finally:
+            runtime.close()
+
+    def test_custom_gguf_disallows_paths_outside_models(self):
+        for value in (
+            "../secret.gguf", "C:\\\\secret.gguf",
+            "folder/test.gguf", "not-a-model.txt", "",
+        ):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    LocalChatRuntime(self.root, model_file=value)
+
     def test_balanced_profile(self):
         runtime = LocalChatRuntime(self.root, profile="equilibrado")
         try:
