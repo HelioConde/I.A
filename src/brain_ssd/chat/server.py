@@ -18,7 +18,7 @@ from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
-from brain_ssd.chat.local_actions import is_local_action_answer, local_command
+from brain_ssd.chat.local_actions import is_local_action_answer, local_command, conversation_followup
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
@@ -527,6 +527,8 @@ class ChatEngine:
                                                            if self.web_search_service else None),
                                              diagnostics_file=(self.diagnostics.file
                                                                if self.diagnostics else None))
+            if local_result is None:
+                local_result = conversation_followup(question, history)
             # No network calls here. Archive lookup reads public snippets from
             # disk, never personal history or private episodic memories.
             archived_sources = (
