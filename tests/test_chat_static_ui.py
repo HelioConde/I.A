@@ -100,6 +100,10 @@ class TestStaticUI(unittest.TestCase):
         self.assertIn('fast_web:fastThisSearch', self.js)
         self.assertIn('id="detailWebMs"', self.html)
         self.assertIn('id="detailInferMs"', self.html)
+        self.assertIn('id="responseSize"', self.html)
+        self.assertIn('value="96"', self.html)
+        self.assertIn('value="256"', self.html)
+        self.assertIn('response_tokens:responseTokens', self.js)
 
     def test_static_assets_are_local_and_no_inline_handlers(self):
         self.assertEqual(self.inventory.scripts,["/app.js"])
