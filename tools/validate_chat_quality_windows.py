@@ -43,7 +43,7 @@ def check_response(case: str, answer: str) -> bool:
     if case == "ssd_ram":
         return len(content) >= 60 and "ssd" in content and "ram" in content
     if case == "basic_reasoning":
-        return bool(re.search(r"\\b4\\b", content))
+        return bool(re.search(r"\b4\b", content))
     if case == "creator":
         return ("helio" in content or "hélio" in content) and "qwen" in content
     if case == "no_internet":
