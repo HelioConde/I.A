@@ -17,7 +17,7 @@ from brain_ssd.chat.history import ChatHistory
 from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
-from brain_ssd.chat.local_actions import local_command
+from brain_ssd.chat.local_actions import is_local_action_answer, local_command
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -72,29 +72,35 @@ def brain_ssd_self_context(question: str) -> str:
 
 
 def normalize_history(raw: Any) -> list[dict[str, str]]:
-    """Select recent useful context without mutating any stored conversation."""
+    """Select conversational turns without copying local command replies to Qwen.
+
+    All messages remain in SQLite and the visible UI. Generated output is less
+    likely to echo old deterministic help/status replies if their exchange
+    is omitted from the inference-only context.
+    """
     if not isinstance(raw, list):
         return []
     cleaned: list[dict[str, str]] = []
-    for item in reversed(raw):
-        if len(cleaned) >= MAX_HISTORY:
-            break
+    for item in raw[-MAX_HISTORY * 3:]:
         if not isinstance(item, dict) or item.get("role") not in ("user", "assistant"):
             continue
         value = item.get("content")
         if not isinstance(value, str) or not value.strip():
             continue
         value = value.strip()[:700]
-        # The previous prompt caused these specific non-answers to echo across turns.
-        # Ignore them only when building context; keep the SQLite history unchanged.
-        if item["role"] == "assistant" and (
-            value.casefold().strip(" .!?") == "não soube" or
-            value.casefold().startswith("não sou um assistente, estou apenas criando um modelo de ia experimental")
-        ):
+        is_bad_answer = item["role"] == "assistant" and (
+            is_local_action_answer(value)
+            or value.casefold().strip(" .!?") == "não soube"
+            or value.casefold().startswith(
+                "não sou um assistente, estou apenas criando um modelo de ia experimental"
+            )
+        )
+        if is_bad_answer:
+            if cleaned and cleaned[-1]["role"] == "user":
+                cleaned.pop()
             continue
         cleaned.append({"role": item["role"], "content": value})
-    cleaned.reverse()
-    return cleaned
+    return cleaned[-MAX_HISTORY:]
 
 
 def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: str, episode_context: str = "") -> str:
@@ -407,6 +413,16 @@ class ChatEngine:
                 "[episodio=" + item["id"] + "] " + json.dumps(item["content"], ensure_ascii=False)
                 for item in episodes
             )
+            # A chosen nickname is explicit user memory, distinct from Qwen
+            # training and independent of lexical retrieval keywords.
+            chosen_name = self.episodic_store.get_assistant_name() if self.episodic_store else None
+            name_context = (
+                "Nome do assistente escolhido pelo usuário e salvo localmente: "
+                + chosen_name + ". Se alguém te cumprimentar por esse nome, responda naturalmente."
+                if chosen_name else ""
+            )
+            if name_context:
+                episode_text = name_context + ("\n" + episode_text if episode_text else "")
             if ambiguities:
                 # Explain competing notes instead of blindly selecting the
                 # highest-ranked or most recent episode as the single truth.
@@ -437,6 +453,8 @@ class ChatEngine:
                         "[episodio=" + item["id"] + "] " + json.dumps(item["content"], ensure_ascii=False)
                         for item in episodes if item["id"] not in disputed_ids
                     )
+                    if name_context:
+                        safe_text = name_context + ("\n" + safe_text if safe_text else "")
                     prompt, history_used, evidence_bytes = bounded_chat_prompt(
                         question, history, knowledge, budget,
                         episode_context=safe_text,
