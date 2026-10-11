@@ -153,6 +153,9 @@ def local_command(question: str, store: EpisodicMemory | None) -> dict[str, Any]
             "consulta a essa base não significa navegação na internet. "
             "Não executo programas do PC nem acesso seus arquivos pessoais automaticamente."
         )
+    elif simple in ("quem criou brain-ssd", "qual e o nome do seu criador"):
+        action = "project_attribution"
+        answer = "O código do projeto Brain-SSD está no repositório GitHub @HelioConde/I.A. O repositório não informa autoria individual verificada."
     elif simple in ("/nome",):
         action = "assistant_name"
         name = store.get_assistant_name() if store else None
