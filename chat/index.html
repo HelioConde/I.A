@@ -32,7 +32,7 @@
       <div class="sidebar-panel">
         <span class="micro-title">EXECUÇÃO LOCAL</span>
         <div class="sidebar-row"><span class="status-dot" id="sidebarDot"></span><strong id="sidebarStatus">Iniciando...</strong></div>
-        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p><p id="webPrivacyInfo">Busca web desligada. Nenhuma pergunta é enviada à internet.</p>
+        <p>O modelo roda na sua máquina. Suas mensagens não são enviadas para uma API de IA externa.</p><p id="knowledgeInfo">Conhecimento SSD: verificando</p><p id="learningInfo">Aprendizado: verificando</p><p id="webPrivacyInfo">Busca web desligada. Nenhuma pergunta é enviada à internet.</p>
       </div>
       <div class="side-footer">Histórico privado neste computador · Brain-SSD V0</div>
     </aside>
@@ -43,7 +43,7 @@
           <button class="icon-btn menu-btn" id="openMenu" type="button" aria-label="Abrir menu">☰</button>
           <div>
             <div class="top-heading">Brain-SSD <span class="chevron">⌄</span></div>
-            <div class="top-subtitle">Qwen3-0.6B <span class="separator">·</span> CPU somente <span class="separator">·</span> <span id="modeInfo">Perfil: verificando</span></div>
+            <div class="top-subtitle"><span id="currentModelLabel">Qwen local</span> <span class="separator">·</span> CPU somente <span class="separator">·</span> <span id="modeInfo">Perfil: verificando</span></div>
           </div>
         </div>
         <div class="top-right">
@@ -66,6 +66,8 @@
               <button type="button" class="suggestion" data-prompt="Olá!">👋 <span>Diga olá</span></button>
               <button type="button" class="suggestion" data-prompt="O que você consegue fazer?">✦ <span>Suas capacidades</span></button>
               <button type="button" class="suggestion" data-prompt="Explique como você usa o SSD e a RAM.">▤ <span>Como funciona</span></button>
+              <button type="button" class="suggestion" data-prompt="/ensinar Olá => Olá!">✎ <span>Ensinar uma resposta</span></button>
+              <button type="button" class="suggestion" data-prompt="Como está a situação do Brasil hoje?">◉ <span>Notícias atuais do Brasil</span></button>
             </div>
           </div>
         </div>
