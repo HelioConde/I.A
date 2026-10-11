@@ -100,6 +100,15 @@ def is_local_action_answer(answer: str) -> bool:
         "Para ver o histórico de conversas",
         "Os diagnósticos locais ficam",
         "O Brain-SSD não treina os pesos",
+        "Esta instalação do Brain-SSD não tem uma integração",
+        "A pesquisa web está disponível pelo provedor",
+        "A pesquisa web está desativada nesta sessão",
+        "Uma fonte pode estar errada",
+        "Não posso afirmar como fato algo sobre você",
+        "Você disse nesta conversa que seu animal favorito",
+        "Não recebi confirmação de que os diagnósticos",
+        "Diagnósticos configurados, mas o arquivo",
+        "Arquivo de eventos encontrado",
         "Lembrança salva no SQLite local:",
         "Salvei na memória local:",
         "Últimas lembranças salvas explicitamente:",
@@ -342,7 +351,11 @@ def local_command(question: str, store: EpisodicMemory | None,
         )
     elif simple in (
         "o que voce aprendeu sozinho ate esse momento",
-        "o que voce aprendeu sozinho", "o que voce aprendeu ate agora",
+        "o que voce aprendeu sozinho", "o que voce aprendeu sozinho ate agora",
+        "o que voce aprendeu sozinha ate agora",
+        "o que voce aprendeu sozinha ate esse momento",
+        "o que voce aprendeu sozinha",
+        "o que voce aprendeu ate agora",
         "o que voce aprendeu ate esse momento",
     ):
         action = "learning_overview"
