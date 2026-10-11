@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from typing import Any
+from pathlib import Path
 
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.history import default_history_path
@@ -111,7 +112,9 @@ def is_local_action_answer(answer: str) -> bool:
 
 
 def local_command(question: str, store: EpisodicMemory | None,
-                  *, learned_store: Any = None, web_knowledge: Any = None) -> dict[str, Any] | None:
+                  *, learned_store: Any = None, web_knowledge: Any = None,
+                  web_provider: str | None = None,
+                  diagnostics_file: Path | None = None) -> dict[str, Any] | None:
     """Return a truthful app action; None means let the real Qwen answer."""
     simple = re.sub(r"[?.!]+\s*$", "", plain(question)).strip()
     greeting_text = simple
@@ -190,7 +193,10 @@ def local_command(question: str, store: EpisodicMemory | None,
             "consulta a essa base não significa navegação na internet. "
             "Não executo programas do PC nem acesso seus arquivos pessoais automaticamente."
         )
-    elif simple in ("quem criou brain-ssd", "qual e o nome do seu criador"):
+    elif simple in ("quem criou brain-ssd", "qual e o nome do seu criador") or (
+        re.search(r"\b(brain[- ]?ssd|seu projeto)\b", simple)
+        and re.search(r"\b(criou|criador|desenvolveu|desenvolvedor|autoria)\b", simple)
+    ):
         action = "project_attribution"
         answer = (
             "O responsável pelo projeto Brain-SSD é Hélio Conde "
@@ -220,7 +226,11 @@ def local_command(question: str, store: EpisodicMemory | None,
         "o que voce tem salvo na memoria", "quais informacoes voce tem na memoria",
         "quais informacoes voce possui na memoria", "o que voce lembra de mim",
         "o que voce tem na memoria",
-    ):
+    ) or bool(re.fullmatch(
+        r"(?:quais|que) informacoes voce (?:realmente )?"
+        r"(?:tem|possui|guardou|salvou) (?:salvas? )?"
+        r"(?:na|em) (?:sua )?memoria", simple
+    )):
         action = "memory_list"
         if store is None:
             answer = "A memória episódica está desativada nesta sessão; nenhuma nota foi lida."
@@ -258,14 +268,77 @@ def local_command(question: str, store: EpisodicMemory | None,
     elif simple in (
         "como acesso o log", "como acesso seu log", "onde vejo os logs",
         "onde fica o log", "como acesso os logs", "como vejo os logs",
+        "como consigo acessar seus logs", "como consigo acessar os seus logs",
+        "como acesso seus logs", "como esta seu log", "como esta o seu log",
+        "como estao seus logs", "como estao os seus logs",
     ):
         action = "diagnostics_access"
+        path = Path(diagnostics_file) if diagnostics_file is not None else default_diagnostics_dir() / "events.jsonl"
+        if diagnostics_file is None:
+            state = "Não recebi confirmação de que os diagnósticos estejam habilitados nesta sessão."
+        elif not path.is_file():
+            state = "Diagnósticos configurados, mas o arquivo de eventos ainda não foi encontrado."
+        else:
+            try:
+                size = path.stat().st_size
+                state = f"Arquivo de eventos encontrado ({size} bytes); isso não confirma que não existem erros."
+            except OSError:
+                state = "Arquivo configurado, mas não consegui verificar os metadados."
         answer = (
-            "Os diagnósticos locais ficam em "
-            f"{default_diagnostics_dir() / 'events.jsonl'} "
-            "quando a opção de diagnósticos está ativa. "
-            "Também é possível acompanhar mensagens de inicialização no "
-            "terminal do Brain-SSD. O log não contém o texto das perguntas."
+            f"{state} O caminho de diagnóstico é {path}. "
+            "Para analisar erros, examine os eventos ou consulte o terminal; "
+            "não vou afirmar que tudo está funcionando sem essa análise. "
+            "Os eventos estruturados não registram o texto das perguntas."
+        )
+    elif bool(re.fullmatch(
+        r"(?:voce |a luna |o brain[- ]?ssd )?(?:consegue |pode |tem como )?"
+        r"(?:acessar|ver|ler|consultar|alterar|mexer) "
+        r"(?:o |os |a )?(?:meu|minha|meus|minhas) (?:github|repositorios? do github|repositorios?)", simple
+    )) or simple in ("voce consegue acessar meu github", "voce tem acesso ao meu github"):
+        action = "github_access"
+        answer = (
+            "Esta instalação do Brain-SSD não tem uma integração autenticada com "
+            "sua conta do GitHub. Não consigo listar repositórios privados, "
+            "ler seus arquivos pessoais ou fazer alterações por conta própria. "
+            "A pesquisa web pública (quando autorizada) não concede acesso à "
+            "conta nem permissões de escrita. Para isso é necessário configurar "
+            "uma integração autenticada com permissões específicas."
+        )
+    elif simple in (
+        "voce tem acesso a internet", "voce consegue acessar a internet",
+        "voce acessa internet", "voce consegue pesquisar na internet",
+        "voce pode pesquisar na web", "voce consulta paginas da internet",
+    ):
+        action = "web_capabilities"
+        answer = (
+            f"A pesquisa web está disponível pelo provedor {web_provider}. "
+            "Ela é usada somente com sua autorização para a pergunta específica. "
+            "O Qwen gera respostas localmente; os resultados da internet são "
+            "fontes externas e podem conter erros."
+            if web_provider else
+            "A pesquisa web está desativada nesta sessão. "
+            "O Qwen continua respondendo localmente sem acessar sites."
+        )
+    elif ("pagina da internet" in simple or "fonte da internet" in simple) and (
+        "errada" in simple or "falsa" in simple or "incorreta" in simple
+    ) and ("como" in simple or "deve" in simple):
+        action = "source_reliability"
+        answer = (
+            "Uma fonte pode estar errada. Devo conferir a data e a origem, "
+            "comparar com outras fontes confiáveis quando possível e "
+            "deixar clara qualquer incerteza. Guardar um trecho no SSD não "
+            "garante que seja verdadeiro. Sem pesquisa autorizada não posso "
+            "afirmar que confirmei a informação na internet."
+        )
+    elif simple in (
+        "conte um fato sobre mim que voce nao sabe",
+        "diga um fato sobre mim que voce nao sabe",
+    ):
+        action = "unknown_user_fact"
+        answer = (
+            "Não posso afirmar como fato algo sobre você que desconheço. "
+            "Posso mencionar exemplos de informações que talvez eu não saiba, "
+            "mas isso não significa que sejam verdadeiras."
         )
     elif simple in (
         "o que voce aprendeu sozinho ate esse momento",
