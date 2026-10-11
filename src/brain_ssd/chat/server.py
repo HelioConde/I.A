@@ -701,6 +701,10 @@ class ChatEngine:
                         "sobre a situação do Brasil nesta pesquisa. "
                         "Tente novamente ou escolha outro provedor de busca; "
                         "não vou inventar um panorama político ou econômico."
+                        if needs_brazil_news(question) else
+                        "Não encontrei notas de atualização recentes e verificáveis "
+                        "sobre esse jogo nesta pesquisa. Tente outro provedor "
+                        "ou consulte as notas oficiais; não vou inventar patches."
                     )
                     if on_chunk:
                         on_chunk(message)
