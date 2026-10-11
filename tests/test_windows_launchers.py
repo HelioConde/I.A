@@ -25,7 +25,7 @@ class TestBatchLaunchers(unittest.TestCase):
 
     def test_web_launcher_requires_explicit_search_opt_in(self):
         text=(ROOT/"INICIAR-CHAT-WEB-WINDOWS.bat").read_text(encoding="utf-8")
-        self.assertIn("--web-search --web-provider wikipedia", text)
+        self.assertIn("--web-search --web-provider auto", text)
         self.assertIn("--episodic-memory", text)
 
     def test_prefer_supported_python_but_allow_installed_version(self):
