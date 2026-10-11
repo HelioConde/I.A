@@ -250,6 +250,35 @@ class TestWebEngine(unittest.TestCase):
         finally:
             engine.close()
 
+    def test_sse_fast_web_returns_sources_without_cpu_generation(self):
+        runtime = Runtime()
+        engine = ChatEngine(lambda: runtime, web_search_service=FakeWeb())
+        engine.start()
+        server = create_chat_server(engine, ROOT / "chat", port=0)
+        worker = threading.Thread(target=server.serve_forever, daemon=True)
+        worker.start()
+        base = f"http://127.0.0.1:{server.server_address[1]}"
+        try:
+            request = urllib.request.Request(
+                base + "/api/chat/stream", method="POST",
+                headers={"Content-Type":"application/json","Origin":base},
+                data=json.dumps({
+                    "message":"O que é astronomia?", "request_id":str(uuid.uuid4()),
+                    "web_search": True, "fast_web": True,
+                }).encode("utf-8"),
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                events = response.read().decode("utf-8")
+            self.assertIn('event: done', events)
+            self.assertIn('"local_action":"web_brief"', events)
+            self.assertIn("https://example.org/noticia", events)
+            self.assertEqual(runtime.core_backend.prompts, [])
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join(timeout=5)
+            engine.close()
+
     def test_sse_requires_explicit_flag_and_returns_sources(self):
         engine = ChatEngine(Runtime, web_search_service=FakeWeb())
         engine.start()
