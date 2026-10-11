@@ -213,6 +213,14 @@ async function refreshStatus() {
     setConnection(data.status, data.error, Boolean(data.inference_verified));
     $("modeInfo").textContent = data.profile ? ("Perfil: " + data.profile) : "Perfil: —";
     $("knowledgeInfo").textContent = data.knowledge_note || "Conhecimento SSD: verificando";
+    const webEnabled = data.web_search_enabled === true;
+    $("webSearchControl").hidden = !webEnabled;
+    $("webProviderInfo").hidden = !webEnabled;
+    $("webProviderInfo").textContent = webEnabled ? "(" + data.web_search_provider + ")" : "";
+    $("webPrivacyInfo").textContent = webEnabled
+      ? "Busca opcional: marque 'Pesquisar na web' para enviar SOMENTE aquela pergunta ao provedor " + data.web_search_provider + ". A IA continua local."
+      : "Busca web desligada. Nenhuma pergunta é enviada à internet.";
+    if (!webEnabled) $("webSearchToggle").checked = false;
     app.assistantName = data.assistant_name || "Brain-SSD";
     document.querySelectorAll(".message-label").forEach(label => {
       if (label.textContent !== "Problema na execução") label.textContent = app.assistantName;
@@ -298,6 +306,9 @@ function updateMetrics(data) {
 async function send() {
   const question = composer.value.trim();
   if (!app.ready || app.sending || !question) return;
+  const searchThisQuestion = !$("webSearchControl").hidden && $("webSearchToggle").checked;
+  // Consent applies only to this one search, never to the next message.
+  $("webSearchToggle").checked = false;
   app.sending = true;
   app.streamStarted = false;
   app.requestId = null;
@@ -325,7 +336,7 @@ async function send() {
       signal:app.abortController.signal,
       body:JSON.stringify({
         message:question, conversation_id:app.conversationId,
-        request_id:app.requestId
+        request_id:app.requestId, web_search:searchThisQuestion
       })
     });
     if (!response.ok) {
@@ -370,6 +381,48 @@ async function send() {
             void refreshEpisodicMemory();
             void refreshStatus();
           }
+        }
+        if (searchThisQuestion) {
+          const sourcePanel = document.createElement("div");
+          sourcePanel.className = "web-sources";
+          const heading = document.createElement("strong");
+          heading.textContent = "Fontes da pesquisa web";
+          sourcePanel.appendChild(heading);
+          const sources = Array.isArray(payload.web_sources) ? payload.web_sources.slice(0, 4) : [];
+          if (sources.length) {
+            const list = document.createElement("ul");
+            for (const source of sources) {
+              try {
+                const link = new URL(source.url);
+                if (link.protocol !== "https:") continue;
+                const li = document.createElement("li");
+                const anchor = document.createElement("a");
+                anchor.href = link.href;
+                anchor.target = "_blank";
+                anchor.rel = "noopener noreferrer";
+                anchor.textContent = String(source.title || link.hostname);
+                li.appendChild(anchor);
+                if (source.snippet) {
+                  const summary = document.createElement("p");
+                  summary.textContent = String(source.snippet);
+                  li.appendChild(summary);
+                }
+                list.appendChild(li);
+              } catch (_) { /* reject malformed provider URLs */ }
+            }
+            sourcePanel.appendChild(list);
+          } else {
+            const status = document.createElement("p");
+            status.textContent = payload.web_search_status === "unavailable"
+              ? "Pesquisa indisponível. Esta resposta não tem fontes web verificadas."
+              : payload.web_search_status === "context_full"
+                ? "Fontes encontradas, mas não couberam no contexto do modelo."
+                : payload.web_search_status === "no_results"
+                  ? "Nenhum resultado encontrado para esta pergunta."
+                  : "Nenhuma fonte web usada na resposta.";
+            sourcePanel.appendChild(status);
+          }
+          pending.querySelector(".message-body").appendChild(sourcePanel);
         }
         updateMetrics(payload);
         completed = true;
