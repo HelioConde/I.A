@@ -53,10 +53,10 @@ def strip_research_command(question: str) -> str:
 # Games with frequent patches require a genuinely current news/search provider.
 # The no-key 'auto' provider falls back to encyclopedia results outside Brazil;
 # it must not present unrelated Wikipedia biographies as "latest updates".
-_GAME_RE = re.compile(r"\\b(overwatch|valorant|league\\s+of\\s+legends|lol)\\b")
+_GAME_RE = re.compile(r"\b(overwatch|valorant|league\s+of\s+legends|lol)\b")
 _FRESH_RE = re.compile(
-    r"\\b(ultim[aos]*|atualizac[a-z]*|notici[a-z]*|recent[a-z]*|hoje|"
-    r"agora|patch|patches|novidade[s]?|mudanca[s]?|temporada)\\b"
+    r"\b(ultim[aos]*|atualizac[a-z]*|notici[a-z]*|recent[a-z]*|hoje|"
+    r"agora|patch|patches|novidade[s]?|mudanca[s]?|temporada)\b"
 )
 
 
@@ -79,5 +79,5 @@ def result_matches_game(question: str, title: str, snippet: str) -> bool:
     content = "".join(ch for ch in content if not unicodedata.combining(ch))
     name = target.group(1)
     if name in ("lol", "league of legends"):
-        return bool(re.search(r"\\b(?:league\\s+of\\s+legends|lol|cblol)\\b", content))
-    return bool(re.search(r"\\b" + re.escape(name) + r"\\b", content))
+        return bool(re.search(r"\b(?:league\s+of\s+legends|lol|cblol)\b", content))
+    return bool(re.search(r"\b" + re.escape(name) + r"\b", content))
