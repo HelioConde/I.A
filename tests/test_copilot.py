@@ -23,7 +23,7 @@ from brain_ssd.chat.web_search import WebSearchService
 class TestCopilot(unittest.TestCase):
     @unittest.skipUnless(os.name == "nt", "Drive root is Windows-specific")
     def test_drive_root_is_valid_when_explicitly_authorized(self):
-        drive = Path(os.environ.get("SystemDrive", "C:") + "\\\\.")
+        drive = Path(os.environ.get("SystemDrive", "C:") + "\\.")
         copilot = LocalCopilot([drive], screen=True)
         self.assertTrue(copilot.status()["files_enabled"])
         self.assertTrue(copilot.status()["screen_enabled"])
