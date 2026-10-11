@@ -1,0 +1,5 @@
+game,hunt,xp_per_hour,estimated_gems_per_hour,failure_probability,confidence,source
+world,Caca A ficticia,14000,0,0.04,0.7,demo
+world,Caca B ficticia,16000,0,0.3,0.6,demo
+io,Caca A ficticia,15000,0.1,0.1,0.65,demo
+io,Caca B ficticia,18000,0.05,0.25,0.5,demo
