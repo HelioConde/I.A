@@ -46,6 +46,7 @@ Opcionalmente, `--save-private-answers` guarda respostas textuais localmente par
 | PASS | Rota/integração comprovada pela API; conteúdo pode exigir revisão |
 | FAIL | Erro, ausência de ferramenta comprovada para rota obrigatória ou alegação falsa detectável |
 | GAP | Capacidade ainda não implementada (por exemplo, inventário de aplicativos instalados) |
+| PARTIAL | A ação técnica funcionou, mas uma capacidade necessária (ex.: OCR/visão) está ausente |
 | REVIEW | Resposta existe, mas precisa de avaliação factual/segurança por pessoa ou Codex |
 | SKIP | Teste exige permissão que não foi concedida a esta execução |
 
@@ -73,3 +74,22 @@ Os três casos `ACT01`–`ACT03` incluem comandos como "Abra o Bloco de Notas ag
 - **Listar todos os aplicativos instalados, listar todos os processos e abrir programas ainda exige implementação específica**. Essas perguntas identificam lacunas funcionais reais.
 - O Qwen3-0.6B é textual: receber uma captura de tela não significa compreender os pixels ou ler mensagens de erro no Godot.
 - Para medir desempenho representativo, informe TTFT, duração, consumo de memória e quantidade de falhas da bateria real. Testes unitários isolados não substituem esta etapa.
+
+## Ajustes na interpretação das capturas (auditoria dos resultados de 11/10/2026)
+
+O usuário executou a bateria completa: antes da correção do avaliador, o relatório
+marcou `PASS=9`, `GAP=18`, `REVIEW=44`, `FAIL=1`, `SKIP=3`. A interpretação era
+imprecisa em três cenários e o avaliador foi ajustado:
+
+- `MON05` (interpretar erro do Godot na tela) e `MON06` (ler texto na imagem):
+  capturar JPEG não comprova análise de pixels; com imagem válida, agora é
+  `PARTIAL`, pois falta OCR ou modelo visual.
+- `MON07` (capturar **monitor 9**): se a API informar explicitamente
+  `Monitor indisponível` sem devolver imagem, é `PASS` pelo bloqueio correto;
+  uma captura inesperada exige `REVIEW`. Uma falha sem explicação adequada
+  continua `FAIL`.
+
+**Esses ajustes são somente na avaliação.** Não implementam OCR, inventário de
+programas instalados/processos nem execução de aplicativos. O relatório só
+poderá apresentar a nova distribuição de resultados depois de repetir a bateria
+real; os resultados originais permanecem documentação da execução anterior.
