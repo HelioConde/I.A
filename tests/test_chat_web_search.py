@@ -78,7 +78,8 @@ class TestSearchProviders(unittest.TestCase):
         def fake_request(url, headers):
             if "prop=extracts" in url:
                 return {"query": {"pages": {
-                    "212": {"extract": "Uma estrela é composta por plasma. "
+                    "212": {"title": "Estrela", "index": 1,
+                            "extract": "Uma estrela é composta por plasma. "
                                           "A fusão nuclear ocorre no seu interior e libera energia."}
                 }}}
             return {"query": {"search": [
@@ -90,8 +91,8 @@ class TestSearchProviders(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertIn("fusão nuclear", results[0]["snippet"])
         self.assertIn("pt.wikipedia.org/wiki/Estrela", results[0]["url"])
-        self.assertEqual(request.call_count, 2)
-        self.assertIn("pageids=212", request.call_args.args[0])
+        self.assertEqual(request.call_count, 1)
+        self.assertIn("generator=search", request.call_args.args[0])
 
     def test_brave_key_stays_in_header_and_never_in_results(self):
         key = "TEST_FAKE_API_SECRET_DO_NOT_LOG"
