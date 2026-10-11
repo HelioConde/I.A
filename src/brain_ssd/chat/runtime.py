@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import re
+import os
 from pathlib import Path
 from typing import Any
 
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.backend import LocalLlamaCppBackend, resolve_llama_executable
 from brain_ssd.chat.startup_diagnostics import ChatStartupError
+from brain_ssd.chat.performance import windows_memory, choose_mode, recommended_threads, answer_token_limit
 from brain_ssd.local_runtime.core_backend import (
     PersistentCoreBackend, SubprocessPerQueryCore, resolve_server_executable,
 )
@@ -74,9 +76,14 @@ class LocalChatRuntime:
         self.root = root.resolve()
         self.profile = profile
         settings = PROFILES[profile]
-        self.core_mode = core_mode or settings["mode"]
-        if self.core_mode not in ("subprocess", "persistent"):
-            raise ValueError(f"Modo desconhecido: {self.core_mode}")
+        selected_mode = core_mode or settings["mode"]
+        if selected_mode not in ("subprocess", "persistent", "auto"):
+            raise ValueError(f"Modo desconhecido: {selected_mode}")
+        self.core_mode = selected_mode
+        self.auto_mode_reason = "manual_or_profile_default"
+        self.threads = int(settings["threads"])
+        self.context_size = int(settings["context_size"])
+        self.max_output_tokens = 256
         self.knowledge_budget = int(settings["knowledge_budget"])
         self.prompt_budget_bytes = int(settings["prompt_budget_bytes"])
         if model_file is not None and (
@@ -97,6 +104,22 @@ class LocalChatRuntime:
                     raise ChatStartupError("MODEL_INVALID")
         except OSError as exc:
             raise ChatStartupError("MODEL_UNREADABLE") from exc
+        model_bytes = self.model_path.stat().st_size
+        if selected_mode == "auto":
+            try:
+                resolve_chat_server(self.root)
+                server_available = True
+            except FileNotFoundError:
+                server_available = False
+            self.core_mode, self.auto_mode_reason = choose_mode(
+                self.profile, model_bytes, server_available, windows_memory()
+            )
+            self.threads = recommended_threads(self.profile, os.cpu_count())
+            # Lower the CPU prefill cost and Windows KV allocation for 4B.
+            if model_bytes >= 2 * 1024 ** 3 and self.profile != "economia":
+                self.context_size = min(self.context_size, 3072)
+                self.prompt_budget_bytes = min(self.prompt_budget_bytes, 5600)
+            self.max_output_tokens = answer_token_limit(model_bytes)
         self._completion_path: Path | None = None
         self._brain: LocalBrainSSD | None = None
         self._closed = False
@@ -112,7 +135,7 @@ class LocalChatRuntime:
                 raise ChatStartupError("SERVER_MISSING") from exc
             self.core_backend = PersistentCoreBackend(
                 executable, self.model_path,
-                threads=int(settings["threads"]), context_size=int(settings["context_size"]),
+                threads=self.threads, context_size=self.context_size,
             )
             try:
                 self._completion_path = resolve_llama_executable(self.root)
@@ -136,7 +159,7 @@ class LocalChatRuntime:
                 self._completion_path = executable
             self.core_backend = ChatSubprocessCore(
                 executable, self.model_path,
-                threads=int(settings["threads"]), context_size=int(settings["context_size"]),
+                threads=self.threads, context_size=self.context_size,
             )
 
     def status(self) -> dict[str, Any]:
@@ -148,7 +171,10 @@ class LocalChatRuntime:
             "interactive_runtime": ("official_cpu_distribution"
                 if self.core_backend.runtime_path.parent == (self.root / COMMUNITY_RUNTIME).resolve()
                 else "frozen_checkout"),
-            "threads": PROFILES[self.profile]["threads"],
+            "threads": self.threads,
+            "context_size": self.context_size,
+            "max_output_tokens": self.max_output_tokens,
+            "auto_mode_reason": self.auto_mode_reason,
             "prompt_budget_bytes": self.prompt_budget_bytes,
             "knowledge_cache": "per_query" if self.profile == "economia" else "session",
             "knowledge_available": available,
