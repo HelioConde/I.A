@@ -73,6 +73,24 @@ def dated_news():
 
 
 class TestWebKnowledgeStore(unittest.TestCase):
+    def test_broad_astronomy_question_prefers_topical_titles_over_side_history(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store = WebKnowledge(Path(folder) / "knowledge.sqlite3")
+            results = [
+                {"title": "Astronomia", "url": "https://example.org/astronomia",
+                 "snippet": "Astronomia é a ciência de estudar os corpos celestes, a física e o cosmos."},
+                {"title": "Estrela verde (astronomia)", "url": "https://example.org/verde",
+                 "snippet": "Uma estrela verde é uma percepção visual estudada dentro da astronomia."},
+                {"title": "Sidereus Nuncius", "url": "https://example.org/sidereus",
+                 "snippet": "Tratado histórico de Galileu mencionado na astronomia moderna."},
+            ]
+            self.assertEqual(store.save("Astronomia e estrelas", "wikipedia", results), 3)
+            recalled = store.retrieve("O que você aprendeu sobre astronomia?")
+            self.assertEqual(len(recalled), 2)
+            titles = [item["title"] for item in recalled]
+            self.assertIn("Astronomia", titles)
+            self.assertNotIn("Sidereus Nuncius", titles)
+
     def test_irrelevant_results_do_not_learn_query_words_as_facts(self):
         with tempfile.TemporaryDirectory() as tmp:
             store = WebKnowledge(Path(tmp) / "research.sqlite3")
