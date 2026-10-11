@@ -18,6 +18,7 @@ from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=tuple(PROFILES), default="economia")
+    parser.add_argument("--model-file", default=None, help="GGUF local na pasta models/")
     parser.add_argument("--diagnostics-dir", type=Path, default=None)
     parser.add_argument("--include-answer", action="store_true", help="Incluir texto pessoal no relatório local (não exportado no ZIP)")
     args = parser.parse_args()
@@ -26,7 +27,7 @@ def main() -> int:
         return 2
     diagnostics = DiagnosticLogger(args.diagnostics_dir or default_diagnostics_dir())
     diagnostics.emit("session.start", profile=args.profile, status="READY")
-    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile), diagnostics=diagnostics)
+    engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, model_file=args.model_file), diagnostics=diagnostics)
     engine.start()
     report: dict = {"platform": "Windows", "profile": args.profile, "status": "FAILED"}
     try:
