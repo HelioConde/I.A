@@ -512,7 +512,9 @@ class ChatEngine:
             if local_result is None:
                 local_result = knowledge_command(question, self.web_knowledge)
             if local_result is None:
-                local_result = local_command(question, self.episodic_store)
+                local_result = local_command(question, self.episodic_store,
+                                             learned_store=self.learned_store,
+                                             web_knowledge=self.web_knowledge)
             # No network calls here. Archive lookup reads public snippets from
             # disk, never personal history or private episodic memories.
             archived_sources = (
