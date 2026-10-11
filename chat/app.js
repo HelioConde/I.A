@@ -45,7 +45,13 @@ function readAssistantText(button, content) {
   button.setAttribute("aria-pressed", "true");
   utterance.onend = () => { if (reader.utterance === utterance) resetVoiceButton(); };
   utterance.onerror = () => { if (reader.utterance === utterance) resetVoiceButton(); };
-  window.speechSynthesis.speak(utterance);
+  try {
+    window.speechSynthesis.speak(utterance);
+  } catch (_) {
+    resetVoiceButton();
+    button.textContent = "Voz indisponível";
+    button.disabled = true;
+  }
 }
 
 
@@ -378,6 +384,7 @@ function updateMetrics(data) {
 async function send() {
   const question = composer.value.trim();
   if (!app.ready || app.sending || !question) return;
+  stopSpeaking();
   let searchThisQuestion = !$("webSearchControl").hidden && $("webSearchToggle").checked;
   // Only a clear user action authorizes this ONE query to leave the machine.
   // Current-affairs requests offer permission instead of silent web access.
