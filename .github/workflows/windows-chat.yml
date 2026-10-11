@@ -16,6 +16,7 @@ on:
       - "PREPARAR-CHAT-WINDOWS.bat"
       - "DIAGNOSTICAR-CHAT-WINDOWS.bat"
       - "INICIAR-CHAT-MEMORIA-WINDOWS.bat"
+      - "INICIAR-CHAT-WEB-WINDOWS.bat"
       - "tests/test_chat_history.py"
       - "tests/test_chat_doctor.py"
       - "tests/test_startup_diagnostics.py"
