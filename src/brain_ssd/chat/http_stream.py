@@ -67,7 +67,20 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
         else:
             try:
                 # Never stream arbitrary backend exception messages to the UI.
-                event("error", {"error": "Falha interna da geração local. Consulte o diagnóstico."})
+                if isinstance(exc, (RuntimeError, TimeoutError)):
+                    event("error", {
+                        "error": "O modelo local falhou ao gerar esta resposta. "
+                                 "Verifique o diagnóstico com: "
+                                 "py -3 tools/validate_chat_windows.py --profile economia. "
+                                 "Consulte os logs locais se o problema persistir.",
+                        "error_code": "MODEL_GENERATION_FAILED",
+                    })
+                else:
+                    event("error", {
+                        "error": "Falha interna no chat local. "
+                                 "Consulte o diagnóstico antes de tentar novamente.",
+                        "error_code": "LOCAL_CHAT_ERROR",
+                    })
             except OSError:
                 cancelled.set()
     finally:
