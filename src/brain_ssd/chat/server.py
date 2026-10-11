@@ -20,7 +20,7 @@ from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.local_actions import is_local_action_answer, local_command
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
-from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context
+from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
 from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research
 from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format_cached_context
@@ -359,7 +359,8 @@ class ChatEngine:
             on_chunk: Callable[[str], None] | None = None,
             cancel_event: threading.Event | None = None,
             request_id: str | None = None,
-            web_search: bool = False, remember_web: bool = False) -> dict[str, Any]:
+            web_search: bool = False, remember_web: bool = False,
+            fast_web: bool = False) -> dict[str, Any]:
         started = time.monotonic()
         started_cpu = time.process_time()
         trace_id = request_id or str(uuid.uuid4())
@@ -370,7 +371,8 @@ class ChatEngine:
         try:
             result = self._ask_inner(question, raw_history, on_chunk=on_chunk,
                                      cancel_event=cancel_event, request_id=trace_id,
-                                     web_search=web_search, remember_web=remember_web)
+                                     web_search=web_search, remember_web=remember_web,
+                                     fast_web=fast_web)
         except GenerationCancelled:
             if self.diagnostics:
                 self.diagnostics.emit("chat.cancelled", request_id=trace_id,
@@ -393,14 +395,18 @@ class ChatEngine:
     def _ask_inner(self, question: str, raw_history: Any, *,
                    on_chunk: Callable[[str], None] | None,
                    cancel_event: threading.Event | None,
-                   request_id: str, web_search: bool = False, remember_web: bool = False) -> dict[str, Any]:
+                   request_id: str, web_search: bool = False, remember_web: bool = False,
+                   fast_web: bool = False) -> dict[str, Any]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Digite uma mensagem.")
         question = question.strip()
         if len(question) > MAX_MESSAGE:
             raise ValueError(f"Limite de {MAX_MESSAGE} caracteres por mensagem.")
-        if type(web_search) is not bool or type(remember_web) is not bool:
+        if (type(web_search) is not bool or type(remember_web) is not bool
+                or type(fast_web) is not bool):
             raise ValueError("Sinalização de pesquisa web inválida.")
+        if fast_web and not web_search:
+            raise ValueError("Resposta rápida exige pesquisa web autorizada.")
         if remember_web and not web_search:
             raise ValueError("Para guardar conhecimento, autorize também uma pesquisa web.")
         if remember_web and self.web_knowledge is None:
@@ -580,15 +586,24 @@ class ChatEngine:
             # this particular message's explicit checkbox/JSON permission.
             web_sources: list[dict[str, str]] = []
             web_status = "not_requested"
+            web_search_ms = 0.0
+            web_cache_hit = False
             # Fresh sources have priority; archived snippets are added when
             # no new sources were requested. Cached evidence is always dated.
             web_context = format_cached_context(archived_sources) if not web_search else ""
             if web_search:
                 if cancel_event is not None and cancel_event.is_set():
                     raise GenerationCancelled()
+                lookup_started = time.monotonic()
                 try:
                     web_sources = self.web_search_service.search(question)
-                    web_status = "ok" if web_sources else "no_results"
+                    web_cache_hit = bool(
+                        getattr(self.web_search_service, "was_cached", lambda: False)()
+                    )
+                    web_status = (
+                        "cached" if web_sources and web_cache_hit
+                        else "ok" if web_sources else "no_results"
+                    )
                     if web_sources:
                         web_context = format_web_context(web_sources)
                 except WebSearchError:
@@ -597,6 +612,51 @@ class ChatEngine:
                         "A busca web solicitada não pôde retornar fontes verificáveis. "
                         "Não afirme que consultou páginas atuais ou encontrou fontes."
                     )
+                finally:
+                    web_search_ms = (time.monotonic() - lookup_started) * 1000
+                if cancel_event is not None and cancel_event.is_set():
+                    raise GenerationCancelled()
+                if fast_web:
+                    # Clearly label a source-only extractive reply, rather than
+                    # pretending a CPU model synthesized an instant answer.
+                    saved = 0
+                    save_status = "not_requested"
+                    if remember_web:
+                        save_status = "no_sources"
+                        if web_sources:
+                            try:
+                                saved = self.web_knowledge.save(
+                                    question, self.web_search_service.provider,
+                                    web_sources, current=needs_brazil_news(question),
+                                )
+                                save_status = "saved" if saved else "not_saved"
+                            except (sqlite3.Error, OSError, ValueError):
+                                save_status = "failed"
+                    answer = format_fast_web_answer(web_sources)
+                    if self.diagnostics:
+                        self.diagnostics.emit(
+                            "chat.local_action", request_id=request_id,
+                            action="web_brief", status="PASS",
+                        )
+                    if on_chunk:
+                        on_chunk(answer)
+                    return {
+                        "answer": answer, "mode": "local_command",
+                        "local_action": "web_brief",
+                        "web_search_status": web_status,
+                        "web_search_provider": self.web_search_service.provider,
+                        "web_sources": web_sources,
+                        "web_search_ms": web_search_ms,
+                        "web_cache_hit": web_cache_hit,
+                        "research_saved_sources": saved,
+                        "research_save_status": save_status,
+                        "metrics": {}, "active_pages": 0,
+                        "sources_from_ssd": 0,
+                        "episodic_memories_used": 0,
+                        "episodic_ambiguities_detected": 0,
+                        "episodic_ambiguities_withheld": False,
+                        "cognitive_shadow": None,
+                    }
                 if needs_brazil_news(question) and not web_sources:
                     # Do not let a small LLM invent current events when the
                     # authorized research produced no dated evidence.
@@ -798,6 +858,9 @@ class ChatEngine:
                 "model": getattr(getattr(self._runtime, "model_path", None), "name", MODEL_NAME),
                 "mode": "experimental_chat",
                 "web_search_status": web_status,
+                "web_search_ms": round(web_search_ms),
+                "web_cache_hit": web_cache_hit,
+                "inference_ms": round((time.monotonic() - infer_started) * 1000),
                 "web_search_provider": self.web_search_service.provider if web_search else None,
                 "web_sources": used_web_sources,
                 "research_saved_sources": stored,
