@@ -20,6 +20,8 @@ from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.local_actions import is_local_action_answer, local_command
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context
+from brain_ssd.chat.learning import LearnedResponses, learned_action
+from brain_ssd.chat.current_affairs import needs_brazil_news
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
@@ -223,13 +225,14 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None) -> None:
         self._runtime_factory = runtime_factory
         if memory_aliases and episodic_store is None:
             raise ValueError("A recuperação por sinônimos exige memória episódica explícita.")
         self.episodic_store = episodic_store
         self.memory_aliases = bool(memory_aliases)
         self.web_search_service = web_search_service
+        self.learned_store = learned_store
         self.cognitive_shadow = bool(cognitive_shadow)
         self.diagnostics = diagnostics
         self._runtime: Any | None = None
@@ -311,6 +314,7 @@ class ChatEngine:
             "assistant_name": (self.episodic_store.get_assistant_name() if self.episodic_store else None) or "Brain-SSD",
             "episodic_aliases_enabled": self.memory_aliases,
             "cognitive_shadow_enabled": self.cognitive_shadow,
+            "learning_enabled": self.learned_store is not None,
             "web_search_enabled": self.web_search_service is not None,
             "web_search_provider": self.web_search_service.provider if self.web_search_service else None,
         }
@@ -396,7 +400,42 @@ class ChatEngine:
         with self._lock:
             if cancel_event is not None and cancel_event.is_set():
                 raise GenerationCancelled()
-            local_result = local_command(question, self.episodic_store)
+            # Explicitly taught examples are checked before generic local
+            # greetings. They never intercept approved web research.
+            local_result = learned_action(question, self.learned_store,
+                                          bypass_match=web_search or needs_brazil_news(question))
+            if local_result is None:
+                local_result = local_command(question, self.episodic_store)
+            if local_result is None and needs_brazil_news(question):
+                if not web_search:
+                    explanation = (
+                        "Para avaliar a situação atual do Brasil preciso consultar "
+                        "notícias com data e fontes. "
+                        + ("Marque 'Pesquisar na web' e reenvie a pergunta; "
+                           "só essa mensagem será enviada ao provedor."
+                           if self.web_search_service else
+                           "Inicie o Brain-SSD com a opção de pesquisa web ativada.")
+                    )
+                    local_result = {
+                        "answer": explanation, "mode": "local_command",
+                        "local_action": "research_permission",
+                        "metrics": {}, "active_pages": 0, "sources_from_ssd": 0,
+                        "episodic_memories_used": 0,
+                        "episodic_ambiguities_detected": 0,
+                        "episodic_ambiguities_withheld": False,
+                        "cognitive_shadow": None,
+                    }
+                elif self.web_search_service.provider == "wikipedia":
+                    local_result = {
+                        "answer": "A Wikipédia não é um feed de notícias atuais. "
+                                  "Use o provedor 'auto' para consultar notícias recentes "
+                                  "da Agência Brasil, ou Brave Search com chave própria.",
+                        "mode": "local_command", "local_action": "research_permission",
+                        "metrics": {}, "active_pages": 0, "sources_from_ssd": 0,
+                        "episodic_memories_used": 0,
+                        "episodic_ambiguities_detected": 0,
+                        "episodic_ambiguities_withheld": False, "cognitive_shadow": None,
+                    }
             if local_result is not None:
                 # Explicit app commands are performed by Python/SQLite, not Qwen.
                 # Do not claim an inference occurred or mark it validated.
@@ -432,6 +471,28 @@ class ChatEngine:
                         "A busca web solicitada não pôde retornar fontes verificáveis. "
                         "Não afirme que consultou páginas atuais ou encontrou fontes."
                     )
+                if needs_brazil_news(question) and not web_sources:
+                    # Do not let a small LLM invent current events when the
+                    # authorized research produced no dated evidence.
+                    message = (
+                        "Não consegui obter notícias recentes e verificáveis "
+                        "sobre a situação do Brasil nesta pesquisa. "
+                        "Tente novamente ou escolha outro provedor de busca; "
+                        "não vou inventar um panorama político ou econômico."
+                    )
+                    if on_chunk:
+                        on_chunk(message)
+                    return {
+                        "answer": message, "mode": "local_command",
+                        "local_action": "research_unavailable",
+                        "web_search_status": web_status,
+                        "web_search_provider": self.web_search_service.provider,
+                        "web_sources": [], "metrics": {}, "active_pages": 0,
+                        "sources_from_ssd": 0, "episodic_memories_used": 0,
+                        "episodic_ambiguities_detected": 0,
+                        "episodic_ambiguities_withheld": False,
+                        "cognitive_shadow": None,
+                    }
             # Keep the frozen benchmark paths unchanged. This is an experimental
             # conversational adapter on top of the existing runtime and SSD retrieval.
             retrieval: dict[str, Any] | None = None
@@ -541,6 +602,13 @@ class ChatEngine:
             ]
             if web_sources and not used_web_sources:
                 web_status = "context_full"
+            if web_search and needs_brazil_news(question):
+                prompt += (
+                    "\n\nResuma somente as notícias com datas e links fornecidos. "
+                    "Diferencie manchetes de conclusões; elas são um retrato "
+                    "parcial, não uma avaliação completa do Brasil. Evite "
+                    "tom partidário e não invente indicadores econômicos."
+                ) if len(prompt.encode("utf-8")) + 350 < getattr(self._runtime, "prompt_budget_bytes", 3600) else ""
             generation = GenerationRequest(prompt=prompt, max_tokens=256, temperature=0.7)
             infer_started = time.monotonic()
             try:
