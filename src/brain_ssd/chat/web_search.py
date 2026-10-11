@@ -23,6 +23,7 @@ from brain_ssd.chat.current_affairs import needs_brazil_news
 
 
 MAX_BYTES = 256_000
+RSS_MAX_BYTES = 2 * 1024 * 1024  # Full-article feeds are larger than search JSON.
 MAX_QUERY = 280
 MAX_RESULTS = 4
 TIMEOUT_SECONDS = 7
@@ -131,8 +132,8 @@ class WebSearchService:
         })
         try:
             with build_opener(_NoRedirect()).open(request, timeout=TIMEOUT_SECONDS) as response:
-                raw = response.read(MAX_BYTES + 1)
-                if len(raw) > MAX_BYTES:
+                raw = response.read(RSS_MAX_BYTES + 1)
+                if len(raw) > RSS_MAX_BYTES:
                     raise WebSearchError("RSS excedeu limite de tamanho.")
                 return raw
         except (OSError, ValueError) as exc:
