@@ -59,10 +59,13 @@ def brain_ssd_self_context(question: str) -> str:
         )
     if re.search(r"\b(internet|web|sites|navegar|rede)\b", normalized):
         return (
-            "O Brain-SSD roda localmente. Não acessa sites, a internet, "
-            "e-mails ou serviços externos por conta própria. "
-            "Só usa os dados locais fornecidos ao aplicativo; "
-            "não afirme acesso externo que não existe."
+            "O Brain-SSD executa o modelo GGUF localmente na CPU. "
+            "Possui pesquisa web opcional (Wikipédia, Brave ou SearXNG) "
+            "configurada pelo usuário, com autorização por pergunta; "
+            "sem autorização, não consulta sites. "
+            "Não possui acesso autenticado ao GitHub do usuário nem aos "
+            "arquivos privados do PC. "
+            "Fontes externas devem ser verificadas e podem conter erros."
         )
     if any(phrase in normalized for phrase in (
         "consegue fazer", "pode fazer", "sabe fazer", "capacidades", "funcionalidades",
@@ -139,6 +142,9 @@ def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: s
         "Não substitua respostas por cumprimentos nem copie respostas anteriores.",
         "Não invente fatos pessoais, nomes de autores, fontes SSD, memórias "
         "ou acesso à internet. Se faltar informação, explique o limite.",
+        "Use informações explícitas do histórico recente para responder a "
+        "perguntas de acompanhamento. Não transforme suposições em fatos "
+        "nem negue um detalhe que o usuário acabou de informar.",
     ]
     self_context = brain_ssd_self_context(question)
     if self_context:
@@ -516,7 +522,11 @@ class ChatEngine:
             if local_result is None:
                 local_result = local_command(question, self.episodic_store,
                                              learned_store=self.learned_store,
-                                             web_knowledge=self.web_knowledge)
+                                             web_knowledge=self.web_knowledge,
+                                             web_provider=(self.web_search_service.provider
+                                                           if self.web_search_service else None),
+                                             diagnostics_file=(self.diagnostics.file
+                                                               if self.diagnostics else None))
             # No network calls here. Archive lookup reads public snippets from
             # disk, never personal history or private episodic memories.
             archived_sources = (
