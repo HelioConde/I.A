@@ -22,7 +22,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit, quote
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
-from brain_ssd.chat.current_affairs import needs_brazil_news, strip_research_command
+from brain_ssd.chat.current_affairs import needs_brazil_news, strip_research_command, current_game_request, result_matches_game
 
 
 MAX_BYTES = 256_000
@@ -341,6 +341,11 @@ class WebSearchService:
         seen = set()
         for title, url, snippet in raw:
             item = _safe_result(title, url, snippet)
+            # A wiki biography of a streamer is not a Valorant patch note.
+            if item and current_game_request(question) and not result_matches_game(
+                question, item["title"], item["snippet"]
+            ):
+                continue
             if item and item["url"] not in seen:
                 results.append(item)
                 seen.add(item["url"])
