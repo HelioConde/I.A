@@ -53,7 +53,7 @@ Se não receber notícias verificáveis (sem conexão, feed indisponível, infor
 
 ## Como iniciar
 
-Atualize o GitHub e abra `INICIAR-BRAIN-SSD.bat`. Escolha um modelo e responda **S** quando o menu perguntar se deseja habilitar a pesquisa opcional. O Qwen continua local. Cada envio que envolva web exige autorização da pergunta.
+Atualize o GitHub e abra `INICIAR-BRAIN-SSD.bat`. Escolha o modelo; memória, aprendizado local, diagnósticos e pesquisa web no provedor `auto` já estarão habilitados. O Qwen continua local. **Cada envio que envolver uma pesquisa externa ainda exige autorização da pergunta no navegador.**
 
 Também é possível executar no PowerShell:
 
