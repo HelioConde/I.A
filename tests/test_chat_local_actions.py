@@ -203,6 +203,98 @@ class TestExplicitLocalCommands(unittest.TestCase):
                 self.assertIsNone(local_command(message, notes), message)
             self.assertIsNone(notes.get_assistant_name())
 
+    def test_user_transcript_introspection_never_invents_capabilities_or_sources(self):
+        class ResearchSpy:
+            provider = "auto"
+            def __init__(self):
+                self.calls = []
+            def search(self, question):
+                self.calls.append(question)
+                return [{"title": "Unrelated result", "url": "https://example.org/",
+                         "snippet": "Este texto não responde à pergunta sobre acesso privado."}]
+        with tempfile.TemporaryDirectory() as folder:
+            notes = EpisodicMemory(Path(folder) / "memory.sqlite3")
+            notes.add("O seu usuario é um Gamer")
+            notes.remember_assistant_name("Luna")
+            service = ResearchSpy()
+            runtime = FakeRuntime()
+            diag = DiagnosticLogger(Path(folder) / "diagnostics")
+            engine = ChatEngine(lambda: runtime, episodic_store=notes,
+                                web_search_service=service, diagnostics=diag)
+            engine.start()
+            try:
+                creator = engine.ask(
+                    "Quem criou o Brain-SSD e quem desenvolveu o modelo Qwen?", []
+                )
+                self.assertEqual(creator["local_action"], "project_attribution")
+                self.assertIn("Hélio Conde", creator["answer"])
+                self.assertIn("equipe Qwen", creator["answer"])
+
+                memory = engine.ask(
+                    "Quais informações você realmente tem salvas na memória?", []
+                )
+                self.assertEqual(memory["local_action"], "memory_list")
+                self.assertIn("Gamer", memory["answer"])
+
+                status = engine.ask("Como está seu log?", [])
+                self.assertEqual(status["local_action"], "diagnostics_access")
+                self.assertIn("events.jsonl", status["answer"])
+                self.assertIn("não confirma", status["answer"])
+                self.assertEqual(engine.ask(
+                    "Como consigo acessar seus logs?", []
+                )["local_action"], "diagnostics_access")
+
+                github = engine.ask(
+                    "Você consegue acessar meu GitHub?", [],
+                    web_search=True, fast_web=True,
+                )
+                self.assertEqual(github["local_action"], "github_access")
+                self.assertIn("não tem uma integração autenticada", github["answer"])
+                self.assertNotIn("web_sources", github)
+                self.assertEqual(service.calls, [])
+
+                self.assertEqual(engine.ask(
+                    "O que você aprendeu sozinha até agora?", []
+                )["local_action"], "learning_overview")
+                reliability = engine.ask(
+                    "Se uma página da internet contiver uma informação errada, como você deve agir?", []
+                )
+                self.assertEqual(reliability["local_action"], "source_reliability")
+                self.assertIn("comparar com outras fontes", reliability["answer"])
+                unknown = engine.ask("Conte um fato sobre mim que você não sabe.", [])
+                self.assertEqual(unknown["local_action"], "unknown_user_fact")
+                self.assertIn("Não posso afirmar", unknown["answer"])
+                self.assertEqual(runtime.core_backend.prompts, [])
+            finally:
+                engine.close()
+
+    def test_current_chat_preference_followup_does_not_invent_or_save_motive(self):
+        with tempfile.TemporaryDirectory() as folder:
+            notes = EpisodicMemory(Path(folder) / "notes.sqlite3")
+            runtime = FakeRuntime()
+            engine = ChatEngine(lambda: runtime, episodic_store=notes)
+            engine.start()
+            try:
+                history = [
+                    {"role": "user", "content":
+                     "Meu animal favorito é o gato. Lembre disso apenas nesta conversa."},
+                    {"role": "assistant", "content":
+                     "Entendi, vou considerar isso apenas neste chat."},
+                    {"role": "user", "content": "Qual é meu animal favorito?"},
+                    {"role": "assistant", "content": "Você disse que é o gato."},
+                ]
+                result = engine.ask("Por que você acha que gosto desse animal?", history)
+                self.assertEqual(result["local_action"], "conversation_context")
+                self.assertIn("gato", result["answer"])
+                self.assertIn("não explicou por que", result["answer"])
+                self.assertEqual(runtime.core_backend.prompts, [])
+                self.assertEqual(notes.list(), [])
+                # With no preceding preference, defer to the actual model.
+                ordinary = engine.ask("Por que você acha que gosto desse animal?", [])
+                self.assertEqual(ordinary["answer"], "Resposta do modelo.")
+            finally:
+                engine.close()
+
     def test_explicit_name_command_when_memory_disabled_never_claims_success(self):
         response = local_command("Seu nome a partir de hoje é Luna", None)
         self.assertEqual(response["local_action"], "memory_save")
