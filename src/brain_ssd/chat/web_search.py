@@ -85,7 +85,7 @@ def _safe_result(title: object, url: object, snippet: object) -> dict[str, str] 
     safe_title = _plain(title, 140)
     if not safe_title:
         return None
-    return {"title": safe_title, "url": url, "snippet": _plain(snippet, 460)}
+    return {"title": safe_title, "url": url, "snippet": _plain(snippet, 900)}
 
 
 class WebSearchService:
@@ -192,6 +192,35 @@ class WebSearchService:
                 seen.add(item["url"])
         return unique[:MAX_RESULTS]
 
+    def _wikipedia_intro(self, pageids: list[int]) -> dict[int, str]:
+        """Read fuller encyclopedic extracts through the official fixed API.
+
+        No untrusted URLs are followed. A failed second request falls back to
+        the original search snippets, preserving normal offline error handling.
+        """
+        ids = [i for i in pageids[:MAX_RESULTS] if isinstance(i, int) and i > 0]
+        if not ids:
+            return {}
+        args = urlencode({
+            "action": "query", "prop": "extracts", "exintro": "1",
+            "explaintext": "1", "exchars": 1000, "pageids": "|".join(map(str, ids)),
+            "format": "json",
+        })
+        try:
+            data = self._request(
+                "https://pt.wikipedia.org/w/api.php?" + args,
+                {"Accept": "application/json"},
+            )
+            query = data.get("query") if isinstance(data.get("query"), dict) else {}
+            pages = query.get("pages") if isinstance(query.get("pages"), dict) else {}
+            return {
+                int(key): _plain(page.get("extract", ""), 900)
+                for key, page in pages.items()
+                if isinstance(page, dict) and str(key).isdigit()
+            }
+        except (WebSearchError, ValueError):
+            return {}
+
     def search(self, question: str) -> list[dict[str, str]]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Pergunta vazia.")
@@ -207,9 +236,16 @@ class WebSearchService:
             items = block.get("search", []) if isinstance(block, dict) else None
             if not isinstance(items, list):
                 raise WebSearchError("Resultados inválidos.")
-            raw = [(item.get("title"), "https://pt.wikipedia.org/wiki/" +
-                    quote(str(item.get("title", "")).replace(" ", "_")), item.get("snippet"))
-                   for item in items if isinstance(item, dict)]
+            identifiers = [item["pageid"] for item in items[:MAX_RESULTS]
+                           if isinstance(item, dict) and isinstance(item.get("pageid"), int)]
+            intros = self._wikipedia_intro(identifiers)
+            raw = [
+                (item.get("title"),
+                 "https://pt.wikipedia.org/wiki/" +
+                 quote(str(item.get("title", "")).replace(" ", "_")),
+                 intros.get(item.get("pageid")) or item.get("snippet"))
+                for item in items if isinstance(item, dict)
+            ]
         elif self.provider == "brave":
             endpoint = "https://api.search.brave.com/res/v1/web/search?"
             params = urlencode({"q": query, "count": MAX_RESULTS, "search_lang": "pt",
