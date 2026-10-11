@@ -233,6 +233,15 @@ def local_command(question: str, store: EpisodicMemory | None,
                     answer += "\nExibindo no máximo as 10 mais recentes; use o painel Memórias para consultar as demais."
             else:
                 answer = "Não há lembranças explícitas salvas no SQLite local."
+        if learned_store is not None or web_knowledge is not None:
+            examples = len(learned_store.list(limit=20)) if learned_store else 0
+            sources = web_knowledge.count() if web_knowledge else 0
+            answer += (
+                f"\nExemplos ensinados: {examples} entre os até 20 mais recentes "
+                f"(/aprendizados). Fontes pesquisadas: {sources} (/conhecimento). "
+                "O histórico de chats fica separado, na barra lateral Conversas. "
+                "Fontes públicas armazenadas não são necessariamente corretas."
+            )
     elif simple in (
         "como acesso seu historico", "como acesso o seu historico",
         "onde vejo meu historico", "como vejo as conversas anteriores",
