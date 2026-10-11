@@ -61,7 +61,7 @@ def main() -> int:
     learned_store = LearnedResponses(default_learning_path()) if args.episodic_memory else None
     research_store = WebKnowledge(default_research_path()) if (args.web_search or args.episodic_memory) else None
     engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode, model_file=args.model_file), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases, web_search_service=web_service,
-        learned_store=learned_store, web_knowledge=research_store,
+        learned_store=learned_store, web_knowledge=research_store, copilot=copilot,
         startup_reporter=lambda message: print("\n[Brain-SSD] " + message + "\n[Brain-SSD] Execute DIAGNOSTICAR-CHAT-WINDOWS.bat para verificar os requisitos.\n", file=sys.stderr, flush=True))
     history_store = ChatHistory(args.history_db or default_history_path())
     try:
