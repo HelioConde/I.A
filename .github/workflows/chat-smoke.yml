@@ -11,6 +11,7 @@ on:
       - "PREPARAR-CHAT-WINDOWS.bat"
       - "tests/test_chat_windows.py"
       - "tests/test_chat_local_actions.py"
+      - "tests/test_chat_web_search.py"
       - "tests/test_chat_history.py"
       - "tests/test_chat_doctor.py"
       - "tests/test_startup_diagnostics.py"
@@ -50,6 +51,7 @@ on:
       - "tools/run_chat.py"
       - "tests/test_chat_windows.py"
       - "tests/test_chat_local_actions.py"
+      - "tests/test_chat_web_search.py"
 jobs:
   chat-unit:
     runs-on: ubuntu-latest
@@ -66,6 +68,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_chat_windows.py" -v
           python -m unittest discover -s tests -p "test_chat_local_actions.py" -v
+          python -m unittest discover -s tests -p "test_chat_web_search.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v
           python -m unittest discover -s tests -p "test_chat_doctor.py" -v
           python -m unittest discover -s tests -p "test_install_windows_chat.py" -v
