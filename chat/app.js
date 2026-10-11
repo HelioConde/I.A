@@ -542,9 +542,11 @@ async function send() {
             sourcePanel.appendChild(list);
           } else {
             const status = document.createElement("p");
-            status.textContent = payload.web_search_status === "unavailable"
-              ? "Pesquisa indisponível. Esta resposta não tem fontes web verificadas."
-              : payload.web_search_status === "context_full"
+            status.textContent = payload.web_search_status === "provider_limited"
+              ? "O provedor automático não oferece notícias recentes verificadas desses jogos. Use Brave Search ou SearXNG para patches atuais."
+              : payload.web_search_status === "unavailable"
+                ? "Pesquisa indisponível. Esta resposta não tem fontes web verificadas."
+                : payload.web_search_status === "context_full"
                 ? "Fontes encontradas, mas não couberam no contexto do modelo."
                 : payload.web_search_status === "no_results"
                   ? "Nenhum resultado encontrado para esta pergunta."
