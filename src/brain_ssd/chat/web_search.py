@@ -19,7 +19,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit, quote
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
-from brain_ssd.chat.current_affairs import needs_brazil_news
+from brain_ssd.chat.current_affairs import needs_brazil_news, strip_research_command
 
 
 MAX_BYTES = 256_000
@@ -224,7 +224,7 @@ class WebSearchService:
     def search(self, question: str) -> list[dict[str, str]]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Pergunta vazia.")
-        query = " ".join(question.split())[:MAX_QUERY]
+        query = " ".join(strip_research_command(question).split())[:MAX_QUERY]
         if self.provider == "auto" and needs_brazil_news(question):
             return self._latest_brazil_news()
         if self.provider in ("wikipedia", "auto"):
