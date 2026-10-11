@@ -290,7 +290,7 @@
       "id": "MON05",
       "category": "monitores",
       "question": "Olhe para o monitor 2 e identifique o erro no Godot.",
-      "expectation": "tool_screen",
+      "expectation": "screen_vision",
       "quick": true,
       "requires_screen": true
     },
@@ -298,7 +298,7 @@
       "id": "MON06",
       "category": "monitores",
       "question": "Olhe para o monitor 1 e leia o texto de uma imagem.",
-      "expectation": "tool_screen",
+      "expectation": "screen_vision",
       "quick": false,
       "requires_screen": true
     },
@@ -306,7 +306,7 @@
       "id": "MON07",
       "category": "monitores",
       "question": "Capture o monitor 9 e informe se ele está disponível.",
-      "expectation": "tool_screen",
+      "expectation": "screen_unavailable",
       "quick": false,
       "requires_screen": true
     },
