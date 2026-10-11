@@ -272,23 +272,49 @@ class WebSearchService:
             return self._latest_brazil_news()
         if self.provider in ("wikipedia", "auto"):
             endpoint = "https://pt.wikipedia.org/w/api.php?"
-            params = urlencode({"action": "query", "list": "search", "srsearch": query,
-                                "srnamespace": 0, "srlimit": MAX_RESULTS, "format": "json"})
+            # One official MediaWiki request fetches both search hits and their
+            # introductory excerpts. Previously we made *two sequential*
+            # requests; this halves round trips on a responsive API.
+            params = urlencode({
+                "action": "query", "generator": "search", "gsrsearch": query,
+                "gsrnamespace": 0, "gsrlimit": MAX_RESULTS, "prop": "extracts",
+                "exintro": 1, "explaintext": 1, "exchars": 900, "format": "json",
+            })
             data = self._request(endpoint + params, {"Accept": "application/json"})
             block = data.get("query")
-            items = block.get("search", []) if isinstance(block, dict) else None
-            if not isinstance(items, list):
-                raise WebSearchError("Resultados inválidos.")
-            identifiers = [item["pageid"] for item in items[:MAX_RESULTS]
-                           if isinstance(item, dict) and isinstance(item.get("pageid"), int)]
-            intros = self._wikipedia_intro(identifiers)
-            raw = [
-                (item.get("title"),
-                 "https://pt.wikipedia.org/wiki/" +
-                 quote(str(item.get("title", "")).replace(" ", "_")),
-                 intros.get(item.get("pageid")) or item.get("snippet"))
-                for item in items if isinstance(item, dict)
-            ]
+            pages = block.get("pages") if isinstance(block, dict) else None
+            if isinstance(pages, dict):
+                ranked = sorted(
+                    (v for v in pages.values() if isinstance(v, dict)),
+                    key=lambda v: v.get("index", 9999),
+                )
+                raw = [
+                    (page.get("title"),
+                     "https://pt.wikipedia.org/wiki/" +
+                     quote(str(page.get("title", "")).replace(" ", "_")),
+                     page.get("extract", ""))
+                    for page in ranked
+                ]
+            else:
+                # Some installations do not support TextExtracts. Preserve
+                # compatibility, using a *single fallback* search request
+                # instead of the old extra page-extract request.
+                params = urlencode({
+                    "action": "query", "list": "search", "srsearch": query,
+                    "srnamespace": 0, "srlimit": MAX_RESULTS, "format": "json",
+                })
+                data = self._request(endpoint + params, {"Accept": "application/json"})
+                block = data.get("query")
+                hits = block.get("search") if isinstance(block, dict) else None
+                if not isinstance(hits, list):
+                    raise WebSearchError("Resultados inválidos.")
+                raw = [
+                    (item.get("title"),
+                     "https://pt.wikipedia.org/wiki/" +
+                     quote(str(item.get("title", "")).replace(" ", "_")),
+                     item.get("snippet"))
+                    for item in hits if isinstance(item, dict)
+                ]
         elif self.provider == "brave":
             endpoint = "https://api.search.brave.com/res/v1/web/search?"
             params = urlencode({"q": query, "count": MAX_RESULTS, "search_lang": "pt",
