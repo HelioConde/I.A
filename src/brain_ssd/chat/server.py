@@ -869,7 +869,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                 identifier = data.get("conversation_id")
                 if identifier is not None and self.server.history_store is not None:
                     saved_history = self.server.history_store.recent_context(identifier)
-                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False))
+                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False), remember_web=data.get("remember_web", False))
                     self.server.history_store.append_exchange(identifier, data["message"].strip(), result["answer"])
                     result["conversation_id"] = identifier
                 else:
