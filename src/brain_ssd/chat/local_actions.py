@@ -431,13 +431,15 @@ def conversation_followup(question: str, history: list[dict[str, str]]) -> dict[
     if not isinstance(question, str) or not isinstance(history, list):
         return None
     normalized = re.sub(r"[?.!]+$", "", plain(question)).strip()
-    if not re.fullmatch(
+    favorite_lookup = normalized in ("qual e meu animal favorito", "qual meu animal favorito")
+    why_lookup = bool(re.fullmatch(
         r"(?:por que |porque )?(?:voce |vc )?(?:acha |pensa )?"
         r"(?:que )?(?:eu )?gosto (?:desse|deste|de tal|daquele) animal"
         r"|(?:por que|porque) (?:voce )?acha que (?:eu )?gosto "
         r"(?:desse|deste|daquele) animal",
         normalized,
-    ):
+    ))
+    if not favorite_lookup and not why_lookup:
         return None
     for item in reversed(history):
         if not isinstance(item, dict) or item.get("role") != "user":
@@ -454,6 +456,8 @@ def conversation_followup(question: str, history: list[dict[str, str]]) -> dict[
         if fact:
             animal = fact.group(1)
             answer = (
+                f"Você disse nesta conversa que seu animal favorito é {animal}."
+                if favorite_lookup else
                 f"Você disse nesta conversa que seu animal favorito é {animal}, "
                 "mas não explicou por que gosta dele. Eu não tenho como saber "
                 "o motivo sem você contar; qualquer explicação seria hipótese."
