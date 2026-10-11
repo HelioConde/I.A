@@ -34,7 +34,7 @@ if errorlevel 1 (
   pause
   exit /b 3
 )
-title Brain-SSD - Chat com memoria
+title Brain-SSD - Chat completo com memoria e pesquisa
 echo.
 echo BRAIN-SSD - Experimento de memoria episodica
 echo Notas so sao salvas com seu pedido explicito: botao "Guardar uma lembranca"
@@ -45,8 +45,9 @@ echo [1/2] Verificando GGUF e llama.cpp. Sem carregar o modelo...
 %PYTHON_CMD% "tools\doctor_chat.py" --profile economia --probe
 if errorlevel 1 goto :auto_setup
 echo.
-echo [2/2] Iniciando chat com memoria opt-in...
-%PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow
+echo [2/2] Iniciando chat completo: memoria, aprendizado e pesquisa auto...
+echo A pesquisa somente ocorrera com sua autorizacao por pergunta.
+%PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto
 if errorlevel 1 goto :not_ready
 goto :end
 :auto_setup
