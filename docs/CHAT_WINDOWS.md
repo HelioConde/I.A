@@ -439,3 +439,50 @@ O aviso pode ser causado por script de terceiros sem interferir na conversa,
 mas só podemos confirmar o impacto se soubermos a URL de origem. O teste
 `test_chat_static_ui.py` verifica que a interface não usa execução dinâmica
 nem afrouxa a política CSP.
+
+
+## Consistência entre novas conversas: nome, memória e pesquisa
+
+Se uma versão antiga respondeu **"Meu nome agora é Luna"**, mas ao
+abrir outro chat voltou a **Brain-SSD**, isso significa que aquela
+resposta veio do GGUF e **não foi gravada na memória SQLite**.
+Não é prova de aprendizado. Na versão corrigida, a instrução explícita
+`O seu nome padrão agora é Luna` é reconhecida como comando local,
+gravada em `episodic-notes.sqlite3` e confirmada como
+**ação do aplicativo**. Atualize a pasta com `git pull --ff-only`
+e reinicie o `.bat`, depois diga novamente essa frase.
+
+Para conferir a persistência, pergunte:
+
+```text
+O seu nome padrão agora é Luna
+Qual é seu nome?
+Quem é Luna?
+/memorias
+```
+
+Depois inicie uma **nova conversa** e pergunte `Qual é seu nome?`.
+A resposta deverá continuar `Meu nome é Luna.`, sem consultar o Qwen
+para responder sobre a configuração do próprio aplicativo.
+
+Há três tipos de dados distintos: **histórico de chats** (barra
+lateral Conversas, arquivo `chat-history.sqlite3`),
+**memórias explícitas** (comando `/memorias` e arquivo
+`episodic-notes.sqlite3`) e **fontes públicas pesquisadas**
+(comando `/conhecimento` e arquivo `web-knowledge.sqlite3`).
+Os modelos GGUF não aprendem automaticamente por terem respondido algo.
+
+O comando `Como acesso seu histórico?` agora informa onde abrir
+o histórico. `Como acesso o log?` indica o arquivo de diagnósticos
+`events.jsonl` (que pode estar desativado). O aplicativo consulta
+essas configurações diretamente em Python/SQLite, em vez de deixar
+o Qwen inventar que não possui histórico.
+
+**Notícias e patches de jogos:** o provedor automático sem chave usa
+a Wikipédia para tópicos gerais. Ela não garante atualizações recentes
+de Overwatch, Valorant ou League of Legends. Nesses casos, a interface
+explica a limitação em vez de apresentar biografias ou páginas antigas
+como patch notes. Para buscar notícias em sites variados, configure
+Brave Search ou uma instância local SearXNG e autorize a consulta.
+Os resultados continuam sujeitos a erros e devem ser verificados
+nas fontes oficiais.
