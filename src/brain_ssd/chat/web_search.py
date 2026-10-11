@@ -254,6 +254,12 @@ class WebSearchService:
                 self._cache_state.hit = True
                 return [dict(item) for item in cached[1]]
         results = self._search_uncached(query, news=news)
+        if current_game_request(question):
+            results = [
+                item for item in results if result_matches_game(
+                    question, item["title"], item["snippet"]
+                )
+            ]
         if results:
             ttl = NEWS_CACHE_SECONDS if news else GENERAL_CACHE_SECONDS
             with self._cache_lock:
@@ -341,11 +347,6 @@ class WebSearchService:
         seen = set()
         for title, url, snippet in raw:
             item = _safe_result(title, url, snippet)
-            # A wiki biography of a streamer is not a Valorant patch note.
-            if item and current_game_request(question) and not result_matches_game(
-                question, item["title"], item["snippet"]
-            ):
-                continue
             if item and item["url"] not in seen:
                 results.append(item)
                 seen.add(item["url"])
