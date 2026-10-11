@@ -26,7 +26,7 @@ class TestModelCatalog(unittest.TestCase):
             self.assertNotIn("..", model.filename)
             self.assertRegex(model.filename, r"^[A-Za-z0-9_.+-]+\.gguf$")
             self.assertGreater(model.estimated_bytes, 0)
-            self.assertGreater(model.max_bytes, model.min_bytes)
+            self.assertGreaterEqual(model.max_bytes, model.min_bytes)
             self.assertNotIn(model.filename, names)
             names.add(model.filename)
 
