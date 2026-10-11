@@ -113,6 +113,13 @@ class TestPerformancePolicy(unittest.TestCase):
             reply=engine.ask("Explique o funcionamento dos modelos de linguagem.",[])
             self.assertEqual(reply["answer"],"Uma resposta curta.")
             self.assertEqual(runtime.core_backend.last.max_tokens,112)
+            engine.ask("Explique em detalhes a história da astronomia.", [], response_tokens=256)
+            self.assertEqual(runtime.core_backend.last.max_tokens,256)
+            engine.ask("Uma frase sobre estrelas.", [], response_tokens=96)
+            self.assertEqual(runtime.core_backend.last.max_tokens,96)
+            for invalid in (0, 32, 500, True, "256"):
+                with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                    engine.ask("Pergunta qualquer.", [], response_tokens=invalid)
         finally:
             engine.close()
 
