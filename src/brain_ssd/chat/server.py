@@ -433,6 +433,12 @@ class ChatEngine:
                         "A memória de pesquisa está desativada. "
                         "Inicie o Brain-SSD com memória de pesquisa habilitada."
                     )
+                elif not remember_web:
+                    answer = (
+                        "Para estudar e guardar fontes, marque também "
+                        "'Aprender com as fontes' nesta mensagem. "
+                        "Nenhuma pesquisa foi enviada nem memorizada."
+                    )
                 else:
                     if cancel_event is not None and cancel_event.is_set():
                         raise GenerationCancelled()
