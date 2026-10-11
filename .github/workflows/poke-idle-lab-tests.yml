@@ -9,11 +9,15 @@ on:
     paths:
       - 'experiments/poke_idle_lab/**'
       - '.github/workflows/poke-idle-lab-tests.yml'
+permissions:
+  contents: read
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -23,3 +27,21 @@ jobs:
           python -m unittest -v test_lab.py
           python lab.py exemplo_sintetico.csv --json
           python decision.py hunts_sinteticas.csv
+  companion-math-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout projeto original Companion (commit fixado)
+        uses: actions/checkout@v4
+        with:
+          repository: allmight-ai/poke-idle-companion
+          ref: 6baf92cc45cd44acbdddccd5659a86b9efdca4bd
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Testes offline do Companion (sem autenticação nos jogos)
+        working-directory: extension/tests
+        run: |
+          node teste.js
+          node breeding-teste.js
