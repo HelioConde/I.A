@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import sys
 import unittest
 
@@ -15,6 +15,10 @@ from brain_ssd.chat.performance import (
 )
 from brain_ssd.chat.runtime import LocalChatRuntime
 from brain_ssd.chat.server import ChatEngine
+from brain_ssd.chat.streaming import generate_streamed
+from brain_ssd.backend import GenerationRequest
+from brain_ssd.local_runtime.core_backend import PersistentCoreBackend
+import threading
 
 
 class TestPerformancePolicy(unittest.TestCase):
@@ -45,6 +49,46 @@ class TestPerformancePolicy(unittest.TestCase):
         for illegal in (0, 512, "100", True, 22.5):
             with self.subTest(illegal=illegal), self.assertRaises(ValueError):
                 answer_token_limit(int(2.5*GiB), illegal)
+
+    def test_auto_persistent_startup_failure_falls_back_before_any_output(self):
+        with TemporaryDirectory() as tmp:
+            core = PersistentCoreBackend(Path(tmp)/"server.exe", Path(tmp)/"fake.gguf")
+            fallback = Mock()
+            activate = Mock()
+            core._auto_fallback = fallback
+            core._auto_fallback_activate = activate
+            expected = {"return_code":0, "stdout":"recuperou com subprocesso", "metrics":{}}
+            with patch("brain_ssd.chat.streaming._persistent_stream",
+                       side_effect=RuntimeError("server unsupported")) as attempt:
+                with patch("brain_ssd.chat.streaming._subprocess_stream",
+                           return_value=expected) as cli:
+                    result = generate_streamed(
+                        core, GenerationRequest("test"), lambda _:None, threading.Event()
+                    )
+            self.assertEqual(result["answer"] if "answer" in result else result["stdout"],
+                             "recuperou com subprocesso")
+            attempt.assert_called_once()
+            cli.assert_called_once()
+            activate.assert_called_once()
+
+    def test_no_fallback_after_partial_answer_or_user_cancel(self):
+        with TemporaryDirectory() as tmp:
+            core = PersistentCoreBackend(Path(tmp)/"server.exe", Path(tmp)/"fake.gguf")
+            core._auto_fallback = Mock()
+            core._auto_fallback_activate = Mock()
+            output = []
+            def fail_after_start(_, request, callback, cancel):
+                callback("texto parcialmente enviado")
+                raise RuntimeError("stream interrupted")
+            with patch("brain_ssd.chat.streaming._persistent_stream", side_effect=fail_after_start):
+                with patch("brain_ssd.chat.streaming._subprocess_stream") as cli:
+                    with self.assertRaises(RuntimeError):
+                        generate_streamed(
+                            core, GenerationRequest("test"), output.append, threading.Event()
+                        )
+                    cli.assert_not_called()
+            self.assertEqual(output, ["texto parcialmente enviado"])
+            core._auto_fallback_activate.assert_not_called()
 
     def test_auto_without_llama_server_uses_tuned_subprocess_and_no_extra_ram(self):
         with TemporaryDirectory() as folder:
