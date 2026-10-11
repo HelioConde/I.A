@@ -35,6 +35,8 @@ if exist ".venv\Scripts\python.exe" (
 if not defined PYTHON_CMD goto :python_missing
 %PYTHON_CMD% --version
 if errorlevel 1 goto :python_missing
+%PYTHON_CMD% -c "import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)" >nul 2>nul
+if errorlevel 1 goto :python_missing
 
 :menu
 cls
