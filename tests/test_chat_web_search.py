@@ -141,6 +141,19 @@ class TestSearchProviders(unittest.TestCase):
         self.assertEqual(headers["X-Subscription-Token"], key)
         self.assertNotIn(key, str(results))
 
+    def test_current_game_search_rejects_unrelated_wikipedia_biographies(self):
+        service = WebSearchService("brave", brave_key="TEST_KEY")
+        with patch.object(service, "_request", return_value={"web": {"results": [
+            {"title": "Gaules", "url": "https://example.org/gaules",
+             "description": "Streamer de Counter-Strike e jogos de tiro competitivo."},
+            {"title": "Valorant patch 2026", "url": "https://example.org/valorant",
+             "description": "Valorant recebeu atualização com mudanças."},
+        ]}}):
+            result = service.search("Pesquise as últimas atualizações de Valorant")
+        self.assertEqual(len(result), 1)
+        self.assertIn("Valorant", result[0]["title"])
+        self.assertFalse(service.was_cached())
+
     def test_ssrf_safety_for_searxng_and_results(self):
         for value in ("https://internal.example:9000", "http://192.168.0.9:9000",
                       "http://localhost:9000/private", "http://bad@localhost:9000"):
