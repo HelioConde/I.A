@@ -90,7 +90,7 @@ test("does not start microphone or download anything on page load", () => {
   const h=harness();
   assert.equal(h.recognition.length,0);
   assert.equal(h.sent,0);
-  assert.equal(h.state(),"idle" in {} ? "idle" : undefined); // Initial HUD remains unchanged before click.
+  assert.equal(h.state(),undefined); // Initial HUD stays untouched until the user starts.
 });
 
 test("start uses on-device pt-BR and ending stops listening", () => {
@@ -141,7 +141,11 @@ test("voice turn submits once, hangup cancels active call-owned request", async 
 test("manual interruption during TTS cancels voice and resumes listening", async () => {
   const h=harness();
   h.click("startVoiceCall");
-  h.recognition[0].abort();
+  const rec=h.recognition[0];
+  h.final(rec,"Diga olá");
+  h.sending=true;
+  rec.onend();
+  h.sending=false;
   h.chat("done","Olá, tudo bem?");
   assert.equal(h.utterances.length,1);
   assert.equal(h.state(),"responding");
@@ -161,8 +165,8 @@ test("manual interruption during Qwen generation resumes after stopped event", a
   h.recognition[0].onend();
   h.click("interruptVoiceCall");
   assert.equal(h.cancellation,1);
-  h.sending=false; // app.js clears sending after its synchronous stopped notification.
-  h.chat("stopped");
+  h.chat("stopped"); // app.js publishes before clearing sending.
+  h.sending=false;
   await h.drain();
   assert.equal(h.state(),"listening");
   assert.equal(h.recognition.length,2);
@@ -177,7 +181,7 @@ test("mute prevents listening after TTS and no automatic microphone permission",
   h.utterances[0].onend();
   await h.drain();
   assert.equal(h.recognition.length,1);
-  assert.equal(h.state(),"responding"); // Remains in muted call without listening.
+  assert.equal(h.state(),"muted"); // No misleading responding status once TTS ends.
   h.click("muteVoiceCall");
   assert.equal(h.recognition.length,2);
   assert.equal(h.state(),"listening");
