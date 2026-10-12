@@ -370,6 +370,38 @@ class ChatEngine:
                 self._active_id = None
                 self._active_cancel = None
 
+    def generate_code_candidate(self, prompt: str) -> str:
+        """Invoke only the local CPU backend: no chat routes or external tools.
+
+        Untrusted code can contain sentences resembling tool commands.
+        Never route it through copilot_answer, web search or history lookup.
+        """
+        if not isinstance(prompt, str) or not 0 < len(prompt) <= MAX_MESSAGE:
+            raise ValueError("Contexto da proposta excede o limite.")
+        if self._state != "ready" or self._runtime is None:
+            raise RuntimeError("Modelo local não está pronto.")
+        with self._lock:
+            request = GenerationRequest(
+                prompt=prompt, max_tokens=256, temperature=0.15)
+            core = self._runtime.core_backend
+            try:
+                measured = core.generate(request)
+            except (OSError, RuntimeError, TimeoutError, ValueError):
+                fallback = getattr(core, "_auto_fallback", None)
+                if fallback is None:
+                    raise
+                core.close()
+                activate = getattr(core, "_auto_fallback_activate", None)
+                if activate is not None:
+                    activate()
+                measured = fallback.generate(request)
+            if measured.get("return_code") != 0:
+                raise RuntimeError("O modelo local falhou ao gerar a proposta.")
+            answer = clean_answer(str(measured.get("stdout", "")))
+            if not answer:
+                raise RuntimeError("O modelo local não retornou código.")
+            return answer
+
     def ask(self, question: str, raw_history: Any, *,
             on_chunk: Callable[[str], None] | None = None,
             cancel_event: threading.Event | None = None,
@@ -449,12 +481,7 @@ class ChatEngine:
                 try:
                     file_path, focus, instruction = patch_command.groups()
                     def generate_patch_text(prompt: str) -> str:
-                        generated = self.ask(
-                            prompt, [], web_search=False,
-                            remember_web=False, fast_web=False,
-                            response_tokens=256,
-                        )
-                        return str(generated.get("answer", ""))
+                        return self.generate_code_candidate(prompt)
                     draft = self.copilot.propose_model_patch(
                         file_path, instruction, generate_patch_text,
                         focus_line=int(focus) if focus else None,
@@ -1231,11 +1258,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                     # Web search, chat history and stored user conversations are
                     # never supplied to this local patch inference request.
                     def patch_inference(prompt: str) -> str:
-                        answer = self.server.engine.ask(
-                            prompt, [], web_search=False, remember_web=False,
-                            response_tokens=256,
-                        )
-                        return str(answer.get("answer", ""))
+                        return self.server.engine.generate_code_candidate(prompt)
                     result = copilot.propose_model_patch(
                         data.get("path"), data.get("instruction"), patch_inference,
                         focus_line=data.get("focus_line"),
