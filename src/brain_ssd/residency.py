@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ctypes
+import errno
 import mmap
 import os
 import time
@@ -8,8 +9,9 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 
-_LIBC = ctypes.CDLL(None, use_errno=True)
-_PAGE_SIZE = os.sysconf("SC_PAGE_SIZE")
+_POSIX_RESIDENCY = os.name == "posix"
+_LIBC = ctypes.CDLL(None, use_errno=True) if _POSIX_RESIDENCY else None
+_PAGE_SIZE = os.sysconf("SC_PAGE_SIZE") if _POSIX_RESIDENCY else mmap.ALLOCATIONGRANULARITY
 
 
 class _PyBuffer(ctypes.Structure):
@@ -23,13 +25,20 @@ class _PyBuffer(ctypes.Structure):
     ]
 
 
-_LIBC.PyObject_GetBuffer.argtypes = [ctypes.py_object, ctypes.POINTER(_PyBuffer), ctypes.c_int]
-_LIBC.PyObject_GetBuffer.restype = ctypes.c_int
-_LIBC.PyBuffer_Release.argtypes = [ctypes.POINTER(_PyBuffer)]
-_LIBC.mincore.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.POINTER(ctypes.c_ubyte)]
-_LIBC.mincore.restype = ctypes.c_int
-_LIBC.madvise.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]
-_LIBC.madvise.restype = ctypes.c_int
+if _LIBC is not None:
+    _LIBC.PyObject_GetBuffer.argtypes = [ctypes.py_object, ctypes.POINTER(_PyBuffer), ctypes.c_int]
+    _LIBC.PyObject_GetBuffer.restype = ctypes.c_int
+    _LIBC.PyBuffer_Release.argtypes = [ctypes.POINTER(_PyBuffer)]
+    _LIBC.mincore.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.POINTER(ctypes.c_ubyte)]
+    _LIBC.mincore.restype = ctypes.c_int
+    _LIBC.madvise.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]
+    _LIBC.madvise.restype = ctypes.c_int
+
+
+def _require_posix_residency() -> ctypes.CDLL:
+    if _LIBC is None:
+        raise OSError(errno.ENOTSUP, "A medição de residência de páginas requer POSIX.")
+    return _LIBC
 
 
 MADV_DONTNEED = getattr(mmap, "MADV_DONTNEED", 4)
@@ -49,13 +58,14 @@ class MappedRegion:
 
     @classmethod
     def borrow(cls, mapping: mmap.mmap, file_descriptor: int) -> "MappedRegion":
+        libc = _require_posix_residency()
         buffer = _PyBuffer()
-        if _LIBC.PyObject_GetBuffer(mapping, ctypes.byref(buffer), 0) != 0:
+        if libc.PyObject_GetBuffer(mapping, ctypes.byref(buffer), 0) != 0:
             raise BufferError("unable to borrow mmap address")
         return cls(mapping, int(buffer.buf), int(buffer.len), file_descriptor, buffer)
 
     def release(self) -> None:
-        _LIBC.PyBuffer_Release(ctypes.byref(self.buffer))
+        _require_posix_residency().PyBuffer_Release(ctypes.byref(self.buffer))
 
     def aligned(self, offset: int, length: int) -> tuple[int, int]:
         if offset < 0 or length <= 0 or offset + length > self.length:
@@ -71,10 +81,11 @@ def _raise_errno(operation: str) -> None:
 
 
 def resident_vector(region: MappedRegion, offset: int, length: int) -> tuple[bool, ...]:
+    libc = _require_posix_residency()
     start, aligned_length = region.aligned(offset, length)
     count = (aligned_length + _PAGE_SIZE - 1) // _PAGE_SIZE
     vector = (ctypes.c_ubyte * count)()
-    if _LIBC.mincore(ctypes.c_void_p(region.address + start), aligned_length, vector) != 0:
+    if libc.mincore(ctypes.c_void_p(region.address + start), aligned_length, vector) != 0:
         _raise_errno("mincore")
     return tuple(bool(value & 1) for value in vector)
 
@@ -163,7 +174,7 @@ class AdvisoryResidencyController(KernelOnlyResidencyController):
             else:
                 advice = {"madv_cold": MADV_COLD, "madv_dontneed": MADV_DONTNEED,
                           "madv_pageout": MADV_PAGEOUT}[self.mode]
-                if _LIBC.madvise(ctypes.c_void_p(self.region.address + offset), length, advice) != 0:
+                if _require_posix_residency().madvise(ctypes.c_void_p(self.region.address + offset), length, advice) != 0:
                     _raise_errno(self.mode)
             return True
         except (OSError, AttributeError):

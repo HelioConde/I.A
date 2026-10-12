@@ -29,6 +29,7 @@ EVENTS = frozenset({
     "session.start", "session.stop", "runtime.ready", "runtime.error",
     "chat.start", "retrieval.done", "memory.recall", "chat.prompt",
     "inference.done", "inference.error", "chat.complete", "chat.cancelled",
+    "inference.truncated",
     "chat.error", "chat.local_action", "test.start", "test.result", "test.error",
 })
 NUMERIC = frozenset({

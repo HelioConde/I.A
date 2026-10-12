@@ -29,6 +29,8 @@ from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PRO
 from brain_ssd.chat.streaming import GenerationCancelled, generate_streamed
 from brain_ssd.chat.completion_quality import classify_completion, select_output_budget
 from brain_ssd.chat.http_stream import serve_stream
+from brain_ssd.chat.copilot import LocalCopilot, CopilotPermissionError
+from brain_ssd.chat.copilot_queries import copilot_answer
 from brain_ssd.backend import GenerationRequest
 from brain_ssd.local_runtime.pipeline import clean_answer
 
@@ -61,11 +63,12 @@ def brain_ssd_self_context(question: str) -> str:
     if re.search(r"\b(internet|web|sites|navegar|rede)\b", normalized):
         return (
             "O Brain-SSD executa o modelo GGUF localmente na CPU. "
-            "Possui pesquisa web opcional (Wikipédia, Brave ou SearXNG) "
+            "Possui pesquisa web opcional (Wikipédia, Google via Serper, Brave ou SearXNG) "
             "configurada pelo usuário, com autorização por pergunta; "
             "sem autorização, não consulta sites. "
-            "Não possui acesso autenticado ao GitHub do usuário nem aos "
-            "arquivos privados do PC. "
+            "Não possui acesso autenticado ao GitHub do usuário. "
+            "A leitura de arquivos do PC e de capturas está disponível somente "
+            "se autorizada no iniciador do Copiloto. "
             "Fontes externas devem ser verificadas e podem conter erros."
         )
     if any(phrase in normalized for phrase in (
@@ -241,13 +244,14 @@ def bounded_chat_prompt(
 class ChatEngine:
     """Serialize access to the native runtime while the web server serves UI requests."""
 
-    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None, web_knowledge: WebKnowledge | None = None) -> None:
+    def __init__(self, runtime_factory: Callable[[], Any], episodic_store: EpisodicMemory | None = None, *, cognitive_shadow: bool = False, diagnostics: DiagnosticLogger | None = None, memory_aliases: bool = False, startup_reporter: Callable[[str], None] | None = None, web_search_service: WebSearchService | None = None, learned_store: LearnedResponses | None = None, web_knowledge: WebKnowledge | None = None, copilot: LocalCopilot | None = None) -> None:
         self._runtime_factory = runtime_factory
         if memory_aliases and episodic_store is None:
             raise ValueError("A recuperação por sinônimos exige memória episódica explícita.")
         self.episodic_store = episodic_store
         self.memory_aliases = bool(memory_aliases)
         self.web_search_service = web_search_service
+        self.copilot = copilot
         self.learned_store = learned_store
         self.web_knowledge = web_knowledge
         self.cognitive_shadow = bool(cognitive_shadow)
@@ -334,6 +338,7 @@ class ChatEngine:
             "learning_enabled": self.learned_store is not None,
             "research_memory_enabled": self.web_knowledge is not None,
             "research_memory_sources": self.web_knowledge.count() if self.web_knowledge else 0,
+            "copilot_enabled": self.copilot is not None and self.copilot.status()["enabled"],
             "web_search_enabled": self.web_search_service is not None,
             "web_search_provider": self.web_search_service.provider if self.web_search_service else None,
         }
@@ -364,6 +369,38 @@ class ChatEngine:
             if self._active_id == request_id:
                 self._active_id = None
                 self._active_cancel = None
+
+    def generate_code_candidate(self, prompt: str) -> str:
+        """Invoke only the local CPU backend: no chat routes or external tools.
+
+        Untrusted code can contain sentences resembling tool commands.
+        Never route it through copilot_answer, web search or history lookup.
+        """
+        if not isinstance(prompt, str) or not 0 < len(prompt) <= MAX_MESSAGE:
+            raise ValueError("Contexto da proposta excede o limite.")
+        if self._state != "ready" or self._runtime is None:
+            raise RuntimeError("Modelo local não está pronto.")
+        with self._lock:
+            request = GenerationRequest(
+                prompt=prompt, max_tokens=256, temperature=0.15)
+            core = self._runtime.core_backend
+            try:
+                measured = core.generate(request)
+            except (OSError, RuntimeError, TimeoutError, ValueError):
+                fallback = getattr(core, "_auto_fallback", None)
+                if fallback is None:
+                    raise
+                core.close()
+                activate = getattr(core, "_auto_fallback_activate", None)
+                if activate is not None:
+                    activate()
+                measured = fallback.generate(request)
+            if measured.get("return_code") != 0:
+                raise RuntimeError("O modelo local falhou ao gerar a proposta.")
+            answer = clean_answer(str(measured.get("stdout", "")))
+            if not answer:
+                raise RuntimeError("O modelo local não retornou código.")
+            return answer
 
     def ask(self, question: str, raw_history: Any, *,
             on_chunk: Callable[[str], None] | None = None,
@@ -425,6 +462,67 @@ class ChatEngine:
             raise ValueError("Memória de pesquisas desativada nesta sessão.")
         if web_search and self.web_search_service is None:
             raise ValueError("Pesquisa web desativada nesta sessão.")
+        # Explicit chat request for a local-model patch. This is an inference,
+        # never a write. The nested generation receives a bounded authorized
+        # code sample, no conversation history and no web permission. CodeEditor
+        # creates a separate one-use token for the human confirmation button.
+        patch_command = re.fullmatch(
+            r'/sugerir-correcao\s+"([^"\r\n]+)"(?:\s+@(\d{1,6}))?\s*::\s*(.+)',
+            question, re.I | re.S,
+        )
+        if patch_command:
+            if self.copilot is None or not self.copilot.edit_enabled:
+                local = {
+                    "answer": "Edição de código desativada. Autorize uma pasta e a "
+                              "edição no iniciador do Copiloto.",
+                    "mode": "local_command", "local_action": "copilot_patch_disabled",
+                }
+            else:
+                try:
+                    file_path, focus, instruction = patch_command.groups()
+                    def generate_patch_text(prompt: str) -> str:
+                        return self.generate_code_candidate(prompt)
+                    draft = self.copilot.propose_model_patch(
+                        file_path, instruction, generate_patch_text,
+                        focus_line=int(focus) if focus else None,
+                    )
+                    local = {
+                        "answer": "Proposta da IA local (NÃO aplicada):\n" +
+                                  draft["diff"] +
+                                  "\nMotivo alegado pela IA: " + draft["reason"] +
+                                  "\nVerificação: " + draft["validation"] +
+                                  "\nConfirme no botão desta mensagem somente "
+                                  "após revisar o diff.",
+                        "mode": "local_command",
+                        "local_action": "copilot_code_edit_proposal",
+                        "copilot_edit_token": draft["token"],
+                        "copilot_edit_path": draft["path"],
+                    }
+                except (CopilotPermissionError, ValueError, RuntimeError, OSError):
+                    local = {
+                        "answer": "Não foi possível gerar uma proposta segura. "
+                                  "Confira o arquivo, o modelo local e a permissão. "
+                                  "Nenhuma mudança foi aplicada.",
+                        "mode": "local_command",
+                        "local_action": "copilot_patch_unavailable",
+                    }
+            if on_chunk is not None:
+                on_chunk(local["answer"])
+            return local
+
+        # Explicit PC/screen intents have verified local-tool answers even if
+        # llama.cpp is loading or temporarily failing. Never send screenshots
+        # or machine window titles into the language model or web provider.
+        local_pc = copilot_answer(question, self.copilot)
+        if local_pc is not None:
+            if cancel_event is not None and cancel_event.is_set():
+                raise GenerationCancelled()
+            if on_chunk is not None:
+                on_chunk(local_pc["answer"])
+            if self.diagnostics:
+                self.diagnostics.emit("chat.local_action", request_id=request_id,
+                                      action=local_pc["local_action"], status="PASS")
+            return local_pc
         if self._state != "ready" or self._runtime is None:
             raise RuntimeError(self._error or "O modelo local ainda não está pronto.")
         history = normalize_history(raw_history)
@@ -562,14 +660,15 @@ class ChatEngine:
                 # biographical entries to the model as current game news.
                 limited = (
                     web_search and self.web_search_service is not None
-                    and self.web_search_service.provider in ("auto", "wikipedia")
+                    and not bool(getattr(self.web_search_service, "supports_general_web",
+                                         lambda: self.web_search_service.provider in ("brave", "searxng", "google"))())
                 )
                 if not web_search or limited:
                     message = (
                         "O provedor automático usa Wikipédia para esse jogo e "
                         "não confirma patches nem notícias recentes. Para "
                         "atualizações atuais de Overwatch, Valorant ou League "
-                        "of Legends, configure Brave Search (com chave) ou "
+                        "of Legends, configure Google via Serper, Brave Search (com chave) ou "
                         "uma instância local SearXNG; depois autorize a pesquisa."
                         if limited else
                         "Para responder com atualizações recentes de jogos, "
@@ -982,7 +1081,7 @@ class ChatHttpServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, address: tuple[str, int], engine: ChatEngine, static_dir: Path, history_store: ChatHistory | None = None, episodic_store: EpisodicMemory | None = None):
+    def __init__(self, address: tuple[str, int], engine: ChatEngine, static_dir: Path, history_store: ChatHistory | None = None, episodic_store: EpisodicMemory | None = None, copilot: LocalCopilot | None = None):
         if address[0] != "127.0.0.1":
             raise ValueError("O chat deve usar apenas 127.0.0.1.")
         super().__init__(address, ChatHandler)
@@ -990,6 +1089,7 @@ class ChatHttpServer(ThreadingHTTPServer):
         self.static_dir = static_dir
         self.history_store = history_store
         self.episodic_store = episodic_store
+        self.copilot = copilot
 
     def handle_error(self, request: Any, client_address: tuple[str, int]) -> None:
         # A browser can close a connection during a request.
@@ -1028,6 +1128,10 @@ class ChatHandler(BaseHTTPRequestHandler):
             self._json({"error": "Host não permitido."}, HTTPStatus.FORBIDDEN)
             return
         path = urlsplit(self.path).path
+        if path == "/api/copilot/status":
+            copilot = self.server.copilot
+            self._json(copilot.status() if copilot else {"enabled": False, "files_enabled": False, "screen_enabled": False, "roots": []})
+            return
         if path in ("/api/health", "/api/status"):
             self._json(self.server.engine.status())
             return
@@ -1087,7 +1191,7 @@ class ChatHandler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         memory_mutation = (path.startswith("/api/memories/") and
                            (path.endswith("/edit") or path.endswith("/restore")))
-        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel", "/api/memories") and not memory_mutation:
+        if path not in ("/api/chat", "/api/conversations", "/api/chat/stream", "/api/chat/cancel", "/api/memories", "/api/copilot") and not memory_mutation:
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
             return
         if (path == "/api/memories" or memory_mutation) and self.server.episodic_store is None:
@@ -1110,7 +1214,75 @@ class ChatHandler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(size))
             if not isinstance(data, dict):
                 raise ValueError("JSON inválido.")
-            if path == "/api/memories":
+            if path == "/api/copilot":
+                copilot = self.server.copilot
+                if copilot is None:
+                    self._json({"error": "Copiloto local não ativado."}, HTTPStatus.FORBIDDEN)
+                    return
+                action = data.get("action")
+                if action == "list":
+                    result = copilot.list_directory(data.get("path"))
+                elif action == "read":
+                    result = copilot.read_file(data.get("path"))
+                elif action == "image":
+                    result = copilot.preview_image(data.get("path"))
+                elif action == "system":
+                    result = copilot.system_info()
+                elif action == "apps":
+                    result = copilot.installed_apps(data.get("search"))
+                elif action == "processes":
+                    result = copilot.running_apps(data.get("search"))
+                elif action == "agent_plan":
+                    result = copilot.plan_investigation(
+                        data.get("task"),
+                        project=data.get("project"),
+                        error=data.get("error"),
+                        path=data.get("path"),
+                    )
+                elif action == "agent_execute":
+                    result = copilot.run_investigation(data.get("token"))
+                elif action == "project_scan":
+                    result = copilot.inspect_godot_project(data.get("path"))
+                elif action == "godot_error":
+                    result = copilot.diagnose_godot_error(
+                        data.get("path"), data.get("error"))
+                elif action == "propose_godot_validation":
+                    result = copilot.propose_godot_validation(
+                        data.get("path"), data.get("script"))
+                elif action == "confirm_godot_validation":
+                    result = copilot.confirm_godot_validation(data.get("token"))
+                elif action == "review_code":
+                    result = copilot.review_code(data.get("path"))
+                elif action == "draft_model_patch":
+                    # No automatic execution: inference only produces JSON data.
+                    # Web search, chat history and stored user conversations are
+                    # never supplied to this local patch inference request.
+                    def patch_inference(prompt: str) -> str:
+                        return self.server.engine.generate_code_candidate(prompt)
+                    result = copilot.propose_model_patch(
+                        data.get("path"), data.get("instruction"), patch_inference,
+                        focus_line=data.get("focus_line"),
+                    )
+                elif action == "propose_code_edit":
+                    result = copilot.propose_code_edit(
+                        data.get("path"), data.get("before"), data.get("after"))
+                elif action == "apply_code_edit":
+                    result = copilot.apply_code_edit(data.get("token"))
+                elif action == "verify_code_edit":
+                    result = copilot.verify_code_edit(data.get("edit_id"))
+                elif action == "propose_code_undo":
+                    result = copilot.propose_code_undo(data.get("edit_id"))
+                elif action == "confirm_code_undo":
+                    result = copilot.confirm_code_undo(data.get("token"))
+                elif action == "launch":
+                    result = copilot.confirm_launch(data.get("token"))
+                elif action == "screen":
+                    result = copilot.capture_screen(data.get("monitor", 1))
+                elif action == "screen_ocr":
+                    result = copilot.read_screen_text(data.get("monitor", 1))
+                else:
+                    raise CopilotPermissionError("Ação local não permitida.")
+            elif path == "/api/memories":
                 result = {"memory": self.server.episodic_store.add(data.get("content"))}
             elif memory_mutation:
                 endpoint = "edit" if path.endswith("/edit") else "restore"
@@ -1186,5 +1358,6 @@ def create_chat_server(
     engine: ChatEngine, static_dir: Path, port: int = 8766,
     history_store: ChatHistory | None = None,
     episodic_store: EpisodicMemory | None = None,
+    copilot: LocalCopilot | None = None,
 ) -> ChatHttpServer:
-    return ChatHttpServer(("127.0.0.1", port), engine, static_dir, history_store, episodic_store)
+    return ChatHttpServer(("127.0.0.1", port), engine, static_dir, history_store, episodic_store, copilot)

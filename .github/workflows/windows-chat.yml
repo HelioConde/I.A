@@ -1,6 +1,31 @@
 name: Brain-SSD Windows Chat Build
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "INICIAR-COPILOTO-WINDOWS.bat"
+      - "tests/test_windows_launchers.py"
+      - "tests/test_copilot.py"
+      - "tests/test_copilot_queries.py"
+      - "tests/test_copilot_question_battery.py"
+      - "tests/test_jarvis_apps.py"
+      - "tests/test_copilot_code_edits.py"
+      - "tests/test_godot_diagnostics.py"
+      - "tests/test_godot_validation.py"
+      - "tests/test_agent_core.py"
+      - "tests/test_model_patch_draft.py"
+      - "src/brain_ssd/chat/model_patch_draft.py"
+      - "src/brain_ssd/chat/agent_core.py"
+      - "src/brain_ssd/chat/godot_validation.py"
+      - "src/brain_ssd/chat/godot_diagnostics.py"
+      - "src/brain_ssd/chat/code_edits.py"
+      - "src/brain_ssd/chat/windows_apps.py"
+      - "INICIAR-COPILOTO-WINDOWS.bat"
+      - "tests/fixtures/copilot_question_battery.json"
+      - "tools/run_copilot_question_battery.py"
+      - ".github/workflows/windows-chat.yml"
+      - "src/brain_ssd/chat/copilot.py"
+      - "tools/run_chat.py"
   push:
     branches: [main]
     paths:
@@ -61,6 +86,11 @@ on:
       - "tests/test_chat_history.py"
       - "launcher/**"
       - "tools/build_windows_launcher.ps1"
+concurrency:
+  # PR and branch pushes share a group; keep only the newest test run.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   windows-chat:
     runs-on: windows-latest
@@ -105,6 +135,15 @@ jobs:
           python -m unittest discover -s tests -p "test_compare_diagnostics.py" -v
           python -m unittest discover -s tests -p "test_chat_static_ui.py" -v
           python -m unittest discover -s tests -p "test_windows_launchers.py" -v
+          python -m unittest discover -s tests -p "test_copilot.py" -v
+          python -m unittest discover -s tests -p "test_copilot_queries.py" -v
+          python -m unittest discover -s tests -p "test_copilot_question_battery.py" -v
+          python -m unittest discover -s tests -p "test_jarvis_apps.py" -v
+          python -m unittest discover -s tests -p "test_copilot_code_edits.py" -v
+          python -m unittest discover -s tests -p "test_godot_diagnostics.py" -v
+          python -m unittest discover -s tests -p "test_godot_validation.py" -v
+          python -m unittest discover -s tests -p "test_agent_core.py" -v
+          python -m unittest discover -s tests -p "test_model_patch_draft.py" -v
       - name: Assert runtime unit tests independently
         shell: pwsh
         run: python -m unittest discover -s tests -p "test_chat_runtime.py" -v

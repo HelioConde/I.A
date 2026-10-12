@@ -48,6 +48,7 @@
         </div>
         <div class="top-right">
           <span class="privacy-pill"><span class="tiny-lock">◆</span> Local e privado</span>
+          <button class="icon-btn copilot-open" id="openCopilot" type="button" aria-label="Abrir copiloto local" aria-expanded="false" title="Arquivos, computador e tela">▣</button>
           <button class="icon-btn info-btn" id="showDetails" type="button" aria-label="Mostrar detalhes técnicos" aria-expanded="false">ⓘ</button>
         </div>
       </header>
@@ -93,6 +94,10 @@
                 <input type="checkbox" id="webFastToggle" checked>
                 <span>Resposta rápida</span>
               </label>
+              <label class="web-optin" id="autoVoiceControl" title="Falar as respostas usando somente voz local informada pelo navegador; o microfone fica desligado">
+                <input type="checkbox" id="autoVoiceToggle" disabled>
+                <span>Voz automática local</span>
+              </label>
               <label class="response-size-control" for="responseSize" title="Respostas longas levam mais tempo na CPU">
                 <span>Resposta</span>
                 <select id="responseSize" aria-label="Tamanho da resposta">
@@ -104,7 +109,7 @@
               </label>
               <span class="web-provider-info" id="webProviderInfo" hidden></span>
             </div>
-            <div class="composer-actions"><button class="stop-button" id="stopButton" type="button" aria-label="Interromper resposta" title="Interromper resposta" hidden>■ Parar</button><button class="send-button" id="sendButton" aria-label="Enviar mensagem" type="submit" disabled>↑</button></div>
+            <div class="composer-actions"><button type="button" id="localMicButton" class="voice-message" disabled title="Fala local não disponível">🎤 Falar (local)</button><button class="stop-button" id="stopButton" type="button" aria-label="Interromper resposta" title="Interromper resposta" hidden>■ Parar</button><button class="send-button" id="sendButton" aria-label="Enviar mensagem" type="submit" disabled>↑</button></div>
           </div>
         </form>
         <p class="disclaimer">Projeto experimental. Respostas podem conter erros. RAM e latência dependem do computador.</p>
@@ -113,6 +118,128 @@
   </div>
 
   <div class="backdrop" id="backdrop" hidden></div>
+  <aside class="copilot-panel" id="copilotPanel" aria-label="Copiloto local" hidden>
+    <div class="copilot-head"><h2>Brain-SSD · Assistente Windows</h2><button class="icon-btn" id="closeCopilot" type="button" aria-label="Fechar copiloto">×</button></div>
+    <p id="copilotStatus" role="status">Verificando permissões locais...</p>
+    <p class="copilot-muted">Cada recurso depende da permissão escolhida ao iniciar. Consultas são locais; abrir um aplicativo exige confirmação separada na conversa.</p>
+    <div id="copilotRoots" class="copilot-roots"></div>
+    <section class="copilot-block">
+      <h3>Arquivos e pastas</h3>
+      <label for="copilotPath">Caminho completo dentro das pastas autorizadas</label>
+      <input id="copilotPath" placeholder="C:\\Projetos\\meu-jogo" spellcheck="false">
+      <div class="copilot-actions">
+        <button type="button" id="copilotList">Listar pasta</button>
+        <button type="button" id="copilotRead">Ler texto</button>
+        <button type="button" id="copilotImage">Ver imagem</button>
+      </div>
+      <button type="button" id="copilotSystem">Informações do computador</button>
+      <div class="copilot-actions">
+        <button type="button" id="copilotReviewCode">Inspecionar código</button>
+        <button type="button" id="copilotExplainCode">Recomendações no chat</button>
+      </div>
+      <details class="copilot-edit-workflow">
+        <summary>IA local: gerar proposta de correção</summary>
+        <p class="copilot-muted">A IA recebe só um trecho do arquivo autorizado e uma descrição curta. Não executa o código nem grava nada sem sua confirmação. Qwen 0.6B pode falhar ao produzir JSON válido.</p>
+        <label for="copilotPatchInstruction">O que corrigir?</label>
+        <textarea id="copilotPatchInstruction" rows="3" maxlength="380" placeholder="Ex.: corrija o acesso a variável nula na função _ready()" spellcheck="false"></textarea>
+        <label for="copilotPatchLine">Linha do erro (opcional)</label>
+        <input id="copilotPatchLine" type="number" min="1" max="100000" placeholder="Ex.: 42">
+        <button type="button" id="copilotDraftPatch">Gerar proposta com IA local</button>
+        <p class="copilot-muted">Se uma proposta válida for gerada, confira o diff no editor abaixo. Não há execução automática nem garantia de correção.</p>
+      </details>
+      <details class="copilot-edit-workflow">
+        <summary>Editar código com prévia e backup</summary>
+        <p class="copilot-muted">Selecione um arquivo acima. Informe o trecho exato e a substituição; nenhuma alteração ocorre antes da sua confirmação.</p>
+        <label for="copilotEditBefore">Trecho original (deve aparecer exatamente uma vez)</label>
+        <textarea id="copilotEditBefore" rows="4" maxlength="8000" spellcheck="false"></textarea>
+        <label for="copilotEditAfter">Substituir por</label>
+        <textarea id="copilotEditAfter" rows="4" maxlength="8000" spellcheck="false"></textarea>
+        <button type="button" id="copilotProposeEdit">Visualizar alteração</button>
+        <pre class="copilot-edit-diff" id="copilotEditDiff" hidden></pre>
+        <div class="copilot-actions">
+          <button type="button" id="copilotConfirmEdit" hidden>Confirmar edição no disco</button>
+          <button type="button" id="copilotCancelEdit" hidden>Cancelar edição</button>
+        </div>
+        <div class="copilot-actions">
+          <button type="button" id="copilotVerifyEdit" hidden>Verificar última alteração</button>
+          <button type="button" id="copilotPrepareUndo" hidden>Preparar desfazer</button>
+        </div>
+        <pre id="copilotUndoDiff" class="copilot-edit-diff" hidden></pre>
+        <div class="copilot-actions">
+          <button type="button" id="copilotConfirmUndo" hidden>Confirmar desfazer</button>
+          <button type="button" id="copilotCancelUndo" hidden>Cancelar desfazer</button>
+        </div>
+        <p class="copilot-muted">Desfazer exige nova aprovação, só vale para a última edição nesta sessão e é bloqueado caso o arquivo tenha sido modificado depois.</p>
+      </details>
+    </section>
+    <section class="copilot-block">
+      <h3>Agent Core — investigação em etapas</h3>
+      <p class="copilot-muted">Planejamento local e rastreável. O agente ainda não edita arquivos nem executa programas; essas ações exigem controles separados.</p>
+      <label for="copilotAgentTask">Tipo de investigação</label>
+      <select id="copilotAgentTask">
+        <option value="godot_diagnosis">Investigar erro do Godot</option>
+        <option value="godot_overview">Revisar estrutura do projeto Godot</option>
+        <option value="code_review">Revisar arquivo de código selecionado</option>
+        <option value="pc_report">Diagnosticar informações do computador</option>
+      </select>
+      <p class="copilot-muted">Para Godot, informe projeto e mensagem na seção abaixo. Para código, selecione o arquivo acima.</p>
+      <button type="button" id="copilotAgentPlan">Preparar plano</button>
+      <pre id="copilotAgentPreview" class="copilot-edit-diff" hidden></pre>
+      <div class="copilot-actions">
+        <button type="button" id="copilotAgentRun" hidden>Investigar (somente leitura)</button>
+        <button type="button" id="copilotAgentCancel" hidden>Descartar plano</button>
+        <button type="button" id="copilotAgentToEditor" hidden>Selecionar arquivo encontrado no editor</button>
+      </div>
+    </section>
+    <section class="copilot-block">
+      <h3>Diagnóstico de projeto Godot</h3>
+      <p class="copilot-muted">Verifica estrutura, scripts e cenas dentro de um projeto autorizado. Não executa Godot e não altera arquivos.</p>
+      <label for="copilotProjectPath">Pasta que contém project.godot</label>
+      <input id="copilotProjectPath" placeholder="C:\\Projetos\\MeuJogo" spellcheck="false">
+      <button type="button" id="copilotScanProject">Inspecionar projeto</button>
+      <label for="copilotGodotError">Mensagem de erro copiada do Godot</label>
+      <textarea id="copilotGodotError" rows="4" maxlength="4000" placeholder="SCRIPT ERROR ... res://scripts/player.gd:42"></textarea>
+      <button type="button" id="copilotDiagnoseGodot">Encontrar arquivo e linha do erro</button>
+      <details class="copilot-edit-workflow">
+        <summary>Validar script com Godot instalado (execução aprovada)</summary>
+        <p class="copilot-muted">Godot pode carregar extensões ou modificar caches durante a inicialização. Execute somente projetos confiáveis. O teste usa --headless --recovery-mode --check-only com tempo máximo de 30 segundos.</p>
+        <label for="copilotGodotScript">Caminho relativo ao projeto (res://script.gd)</label>
+        <input id="copilotGodotScript" placeholder="res://scripts/player.gd" maxlength="260" spellcheck="false">
+        <button type="button" id="copilotProposeGodotTest">Preparar verificação</button>
+        <pre id="copilotGodotTestPreview" class="copilot-edit-diff" hidden></pre>
+        <div class="copilot-actions">
+          <button type="button" id="copilotConfirmGodotTest" hidden>Confirmar execução de Godot</button>
+          <button type="button" id="copilotCancelGodotTest" hidden>Cancelar</button>
+        </div>
+      </details>
+    </section>
+    <section class="copilot-block">
+      <h3>Aplicativos do Windows</h3>
+      <p class="copilot-muted">Consulta somente nomes, versões registradas e processos (nome/PID). Aplicativos portáteis podem não aparecer.</p>
+      <label for="copilotAppSearch">Filtrar aplicativo (opcional)</label>
+      <input id="copilotAppSearch" placeholder="Godot, Steam, Chrome..." maxlength="100" spellcheck="false">
+      <div class="copilot-actions">
+        <button type="button" id="copilotInstalled">Instalados</button>
+        <button type="button" id="copilotProcesses">Em execução</button>
+      </div>
+      <p class="copilot-muted">Bloco de Notas e Calculadora podem ser propostos pelo chat, se autorizados no iniciador. Nunca são abertos automaticamente.</p>
+    </section>
+    <section class="copilot-block">
+      <h3>Tela</h3>
+      <p class="copilot-muted">A tela só é capturada ao clicar. A atualização contínua fica ativa apenas enquanto esta janela está aberta e o controle estiver marcado.</p>
+      <label for="copilotMonitor">Monitor (0 = todos)</label>
+      <input id="copilotMonitor" type="number" min="0" max="16" value="1">
+      <div class="copilot-actions">
+        <button type="button" id="copilotCapture">Capturar agora</button>
+        <button type="button" id="copilotOCR">Ler texto (OCR local)</button>
+        <label class="copilot-live"><input type="checkbox" id="copilotLive"> Atualizar a cada 3 s</label>
+      </div>
+    </section>
+    <p class="copilot-feedback" id="copilotFeedback" role="status" aria-live="polite"></p>
+    <div id="copilotResult" class="copilot-result" aria-label="Resultado da leitura local"></div>
+    <button type="button" id="copilotUseChat" hidden>Usar texto no chat</button>
+    <p class="copilot-muted">Captura é prévia; OCR local opcional reconhece texto mas não entende imagens. Nunca envie senhas ou dados sensíveis ao chat.</p>
+  </aside>
   <aside class="details-panel" id="detailsPanel" aria-label="Métricas técnicas" hidden>
     <div class="details-head"><h2>Diagnóstico local</h2><button class="icon-btn" id="closeDetails" type="button" aria-label="Fechar detalhes">×</button></div>
     <p>Dados da última resposta (quando disponíveis). Estes valores não representam validação física do SSD.</p>

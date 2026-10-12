@@ -17,6 +17,7 @@ from brain_ssd.chat.episodic import EpisodicMemory, default_episodic_path
 from brain_ssd.chat.diagnostics import DiagnosticLogger, default_diagnostics_dir, machine_metadata
 from brain_ssd.chat.runtime import LocalChatRuntime, PROFILES
 from brain_ssd.chat.web_search import WebSearchService, PROVIDERS
+from brain_ssd.chat.copilot import LocalCopilot
 from brain_ssd.chat.learning import LearnedResponses, default_learning_path
 from brain_ssd.chat.web_knowledge import WebKnowledge, default_research_path
 
@@ -35,7 +36,13 @@ def main() -> int:
     parser.add_argument("--episodic-db", type=Path, default=None)
     parser.add_argument("--history-db", type=Path, default=None, help="Banco SQLite das conversas (local)")
     parser.add_argument("--web-search", action="store_true", help="Permite buscar na internet por mensagem, sempre com autorização na interface")
-    parser.add_argument("--web-provider", choices=PROVIDERS, default="auto", help="auto (Wikipédia + notícias Brasil), brave (API key), wikipedia ou searxng")
+    parser.add_argument("--web-provider", choices=PROVIDERS, default="auto", help="auto (Google com SERPER_API_KEY, senão Wikipédia), google (Serper), brave, wikipedia ou searxng")
+    parser.add_argument("--copilot-root", type=Path, action="append", default=[], help="Autoriza SOMENTE leitura de arquivos sob esta pasta; repita para outras pastas")
+    parser.add_argument("--copilot-screen", action="store_true", help="Habilita capturas locais solicitadas explicitamente na interface; nunca inicia monitoramento sozinho")
+    parser.add_argument("--copilot-apps", action="store_true", help="Permite consultar aplicativos registrados e processos locais (nomes/PID)")
+    parser.add_argument("--copilot-launch", action="store_true", help="Permite preparar abertura de Bloco de Notas e Calculadora; requer confirmação por clique")
+    parser.add_argument("--copilot-edit", action="store_true", help="Permite editar código em pastas autorizadas somente após prévia e confirmação")
+    parser.add_argument("--copilot-godot-bin", type=Path, default=None, help="Executável Godot .exe escolhido na inicialização; validação somente com confirmação individual")
     parser.add_argument("--core-mode", choices=("subprocess", "persistent", "auto"), default=None, help="auto escolhe modo persistente apenas com RAM livre suficiente")
     args = parser.parse_args()
     if args.memory_aliases and not args.episodic_memory:
@@ -44,6 +51,10 @@ def main() -> int:
         web_service = WebSearchService(args.web_provider) if args.web_search else None
     except ValueError as exc:
         parser.error(str(exc))
+    try:
+        copilot = LocalCopilot(args.copilot_root, screen=args.copilot_screen, apps=args.copilot_apps, launch=args.copilot_launch, edit=args.copilot_edit, godot_binary=args.copilot_godot_bin) if (args.copilot_root or args.copilot_screen or args.copilot_apps or args.copilot_launch or args.copilot_edit or args.copilot_godot_bin) else None
+    except (ValueError, OSError) as exc:
+        parser.error("Pasta autorizada ou executável Godot inválido/inacessível.")
     diagnostics = None if args.no_diagnostics else DiagnosticLogger(args.diagnostics_dir or default_diagnostics_dir())
     if diagnostics:
         diagnostics.emit("session.start", **machine_metadata(), profile=args.profile,
@@ -54,11 +65,11 @@ def main() -> int:
     learned_store = LearnedResponses(default_learning_path()) if args.episodic_memory else None
     research_store = WebKnowledge(default_research_path()) if (args.web_search or args.episodic_memory) else None
     engine = ChatEngine(lambda: LocalChatRuntime(ROOT, profile=args.profile, core_mode=args.core_mode, model_file=args.model_file), episodic_store=episodic_store, cognitive_shadow=args.cognitive_shadow, diagnostics=diagnostics, memory_aliases=args.memory_aliases, web_search_service=web_service,
-        learned_store=learned_store, web_knowledge=research_store,
+        learned_store=learned_store, web_knowledge=research_store, copilot=copilot,
         startup_reporter=lambda message: print("\n[Brain-SSD] " + message + "\n[Brain-SSD] Execute DIAGNOSTICAR-CHAT-WINDOWS.bat para verificar os requisitos.\n", file=sys.stderr, flush=True))
     history_store = ChatHistory(args.history_db or default_history_path())
     try:
-        server = create_chat_server(engine, ROOT / "chat", port=args.port, history_store=history_store, episodic_store=episodic_store)
+        server = create_chat_server(engine, ROOT / "chat", port=args.port, history_store=history_store, episodic_store=episodic_store, copilot=copilot)
     except OSError as exc:
         print(f"Não foi possível abrir a porta {args.port}: {exc}", file=sys.stderr)
         return 1
@@ -72,6 +83,7 @@ def main() -> int:
         f"{web_service.provider} habilitada (uso autorizado por mensagem)"
         if web_service else "desativada; nenhuma busca externa automática"
     ))
+    print("Copiloto Windows: " + (str(copilot.status()) if copilot else "desativado; use --copilot-root e/ou --copilot-screen"))
     print(f"Histórico local privado: {history_store.path}")
     print(f"Memórias episódicas: {episodic_store.path if episodic_store else 'desativadas (opt-in --episodic-memory)'}")
     print(f"Aprendizado por correções: {learned_store.path if learned_store else 'desativado (use --episodic-memory)'}")

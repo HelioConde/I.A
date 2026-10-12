@@ -22,6 +22,24 @@ on:
       - "src/brain_ssd/chat/performance.py"
       - "tests/test_chat_local_actions.py"
       - "tests/test_chat_web_search.py"
+      - "tests/test_copilot.py"
+      - "tests/test_copilot_queries.py"
+      - "tests/test_copilot_question_battery.py"
+      - "tests/test_jarvis_apps.py"
+      - "tests/test_copilot_code_edits.py"
+      - "tests/test_godot_diagnostics.py"
+      - "tests/test_godot_validation.py"
+      - "tests/test_agent_core.py"
+      - "tests/test_model_patch_draft.py"
+      - "src/brain_ssd/chat/model_patch_draft.py"
+      - "src/brain_ssd/chat/agent_core.py"
+      - "src/brain_ssd/chat/godot_validation.py"
+      - "src/brain_ssd/chat/godot_diagnostics.py"
+      - "src/brain_ssd/chat/code_edits.py"
+      - "src/brain_ssd/chat/windows_apps.py"
+      - "INICIAR-COPILOTO-WINDOWS.bat"
+      - "tests/fixtures/copilot_question_battery.json"
+      - "tools/run_copilot_question_battery.py"
       - "tests/test_web_knowledge.py"
       - "tests/test_chat_learning_news.py"
       - "tests/test_chat_history.py"
@@ -72,8 +90,14 @@ on:
       - "src/brain_ssd/chat/performance.py"
       - "tests/test_chat_local_actions.py"
       - "tests/test_chat_web_search.py"
+      - "tests/test_copilot.py"
       - "tests/test_web_knowledge.py"
       - "tests/test_chat_learning_news.py"
+concurrency:
+  # PR and branch pushes share a group; keep only the newest test run.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   chat-unit:
     runs-on: ubuntu-latest
@@ -95,6 +119,15 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_performance.py" -v
           python -m unittest discover -s tests -p "test_chat_local_actions.py" -v
           python -m unittest discover -s tests -p "test_chat_web_search.py" -v
+          python -m unittest discover -s tests -p "test_copilot.py" -v
+          python -m unittest discover -s tests -p "test_copilot_queries.py" -v
+          python -m unittest discover -s tests -p "test_copilot_question_battery.py" -v
+          python -m unittest discover -s tests -p "test_jarvis_apps.py" -v
+          python -m unittest discover -s tests -p "test_copilot_code_edits.py" -v
+          python -m unittest discover -s tests -p "test_godot_diagnostics.py" -v
+          python -m unittest discover -s tests -p "test_godot_validation.py" -v
+          python -m unittest discover -s tests -p "test_agent_core.py" -v
+          python -m unittest discover -s tests -p "test_model_patch_draft.py" -v
           python -m unittest discover -s tests -p "test_web_knowledge.py" -v
           python -m unittest discover -s tests -p "test_chat_learning_news.py" -v
           python -m unittest discover -s tests -p "test_chat_history.py" -v

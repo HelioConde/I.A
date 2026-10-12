@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 import sqlite3
 import unicodedata
+from contextlib import contextmanager
 from pathlib import Path
 import os
 from typing import Any
@@ -74,7 +75,7 @@ class LearnedResponses:
     def __init__(self, path: Path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        with self._connection() as db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS learned_responses (
                     normalized TEXT PRIMARY KEY,
@@ -89,9 +90,27 @@ class LearnedResponses:
         db.row_factory = sqlite3.Row
         return db
 
+    @contextmanager
+    def _connection(self):
+        """Commit/roll back and close every SQLite handle on Windows.
+
+        ``sqlite3.Connection`` used as a context manager commits but does not
+        close.  Keeping its handle open prevents TemporaryDirectory cleanup on
+        Windows and can lock a learned-response database between sessions.
+        """
+        db = self._connect()
+        try:
+            yield db
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
+
     def teach(self, trigger: str, reply: str) -> dict[str, str]:
         trigger, normalized, reply = _validated(trigger, reply)
-        with self._connect() as db:
+        with self._connection() as db:
             db.execute("BEGIN IMMEDIATE")
             count = db.execute("SELECT COUNT(*) FROM learned_responses").fetchone()[0]
             old = db.execute(
@@ -112,7 +131,7 @@ class LearnedResponses:
         normalized = normalize_trigger(question)
         if not normalized or len(normalized) > MAX_TRIGGER:
             return None
-        with self._connect() as db:
+        with self._connection() as db:
             row = db.execute(
                 "SELECT reply FROM learned_responses WHERE normalized=?", (normalized,)
             ).fetchone()
@@ -120,7 +139,7 @@ class LearnedResponses:
 
     def list(self, limit: int = 10) -> list[dict[str, str]]:
         limit = min(max(int(limit), 1), 20)
-        with self._connect() as db:
+        with self._connection() as db:
             rows = db.execute(
                 "SELECT trigger, reply FROM learned_responses "
                 "ORDER BY updated_at DESC, rowid DESC LIMIT ?", (limit,)
@@ -131,7 +150,7 @@ class LearnedResponses:
         normalized = normalize_trigger(trigger)
         if not normalized:
             raise ValueError("Informe a frase ensinada.")
-        with self._connect() as db:
+        with self._connection() as db:
             changed = db.execute(
                 "DELETE FROM learned_responses WHERE normalized=?", (normalized,)
             ).rowcount

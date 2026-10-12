@@ -33,7 +33,7 @@ TIMEOUT_SECONDS = 5
 NEWS_CACHE_SECONDS = 75
 GENERAL_CACHE_SECONDS = 300
 MAX_CACHE_ENTRIES = 24
-PROVIDERS = ("wikipedia", "brave", "searxng", "auto")
+PROVIDERS = ("wikipedia", "google", "brave", "searxng", "auto")
 
 # Official Agencia Brasil RSS endpoints advertised at /feed/. No arbitrary fetch.
 NEWS_FEEDS = (
@@ -96,7 +96,7 @@ def _safe_result(title: object, url: object, snippet: object) -> dict[str, str] 
 
 class WebSearchService:
     def __init__(self, provider: str = "wikipedia", *, brave_key: str | None = None,
-                 searxng_url: str | None = None):
+                 searxng_url: str | None = None, serper_key: str | None = None):
         if provider not in PROVIDERS:
             raise ValueError("Provedor de pesquisa inválido.")
         self.provider = provider
@@ -105,6 +105,9 @@ class WebSearchService:
         self._cache_state = threading.local()
         self._brave_key = brave_key if brave_key is not None else os.environ.get("BRAVE_SEARCH_API_KEY", "")
         self._searxng = searxng_url if searxng_url is not None else os.environ.get("BRAINSSD_SEARXNG_URL", "")
+        self._serper_key = serper_key if serper_key is not None else os.environ.get("SERPER_API_KEY", "")
+        if provider == "google" and not self._serper_key:
+            raise ValueError("SERPER_API_KEY não configurada (Google via Serper).")
         if provider == "brave" and not self._brave_key:
             raise ValueError("BRAVE_SEARCH_API_KEY não configurada.")
         if provider == "searxng":
@@ -130,6 +133,39 @@ class WebSearchService:
             return data
         except (OSError, ValueError, UnicodeError, json.JSONDecodeError) as exc:
             raise WebSearchError("O provedor web está indisponível.") from exc
+
+    def _request_google(self, query: str) -> dict:
+        """Obtain Google-indexed search results via the Serper API, not HTML scraping.
+
+        This is a third-party provider. The explicitly authorized query and
+        the API key leave the computer; never forward local context or memory.
+        """
+        payload = json.dumps({"q": query, "gl": "br", "hl": "pt-br",
+                              "num": MAX_RESULTS}).encode("utf-8")
+        request = Request("https://google.serper.dev/search", data=payload,
+                          headers={"User-Agent": "BrainSSD-LocalWebSearch/0.1",
+                                   "Content-Type": "application/json",
+                                   "Accept": "application/json",
+                                   "X-API-KEY": self._serper_key},
+                          method="POST")
+        try:
+            with build_opener(_NoRedirect()).open(request, timeout=TIMEOUT_SECONDS) as reply:
+                if "json" not in reply.headers.get("Content-Type", ""):
+                    raise WebSearchError("Resposta Google inválida.")
+                raw = reply.read(MAX_BYTES + 1)
+                if len(raw) > MAX_BYTES:
+                    raise WebSearchError("Resultados excederam limite.")
+            data = json.loads(raw.decode("utf-8"))
+            if not isinstance(data, dict):
+                raise ValueError("JSON inválido")
+            return data
+        except (OSError, ValueError, UnicodeError, json.JSONDecodeError) as exc:
+            raise WebSearchError("Pesquisa Google indisponível.") from exc
+
+    def supports_general_web(self) -> bool:
+        return self.provider in ("google", "brave", "searxng") or (
+            self.provider == "auto" and bool(self._serper_key)
+        )
 
     def _request_feed(self, url: str) -> bytes:
         """Fetch one fixed RSS endpoint only; never arbitrary links or redirects."""
@@ -276,7 +312,14 @@ class WebSearchService:
     def _search_uncached(self, query: str, *, news: bool) -> list[dict[str, str]]:
         if news:
             return self._latest_brazil_news()
-        if self.provider in ("wikipedia", "auto"):
+        if self.provider == "google" or (self.provider == "auto" and self._serper_key):
+            data = self._request_google(query)
+            items = data.get("organic")
+            if not isinstance(items, list):
+                raise WebSearchError("Resultados Google inválidos.")
+            raw = [(item.get("title"), item.get("link"), item.get("snippet", ""))
+                   for item in items if isinstance(item, dict)]
+        elif self.provider in ("wikipedia", "auto"):
             endpoint = "https://pt.wikipedia.org/w/api.php?"
             # One official MediaWiki request fetches both search hits and their
             # introductory excerpts. Previously we made *two sequential*
