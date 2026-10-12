@@ -153,6 +153,24 @@
       </details>
     </section>
     <section class="copilot-block">
+      <h3>Agent Core — investigação em etapas</h3>
+      <p class="copilot-muted">Planejamento local e rastreável. O agente ainda não edita arquivos nem executa programas; essas ações exigem controles separados.</p>
+      <label for="copilotAgentTask">Tipo de investigação</label>
+      <select id="copilotAgentTask">
+        <option value="godot_diagnosis">Investigar erro do Godot</option>
+        <option value="godot_overview">Revisar estrutura do projeto Godot</option>
+        <option value="code_review">Revisar arquivo de código selecionado</option>
+        <option value="pc_report">Diagnosticar informações do computador</option>
+      </select>
+      <p class="copilot-muted">Para Godot, informe projeto e mensagem na seção abaixo. Para código, selecione o arquivo acima.</p>
+      <button type="button" id="copilotAgentPlan">Preparar plano</button>
+      <pre id="copilotAgentPreview" class="copilot-edit-diff" hidden></pre>
+      <div class="copilot-actions">
+        <button type="button" id="copilotAgentRun" hidden>Investigar (somente leitura)</button>
+        <button type="button" id="copilotAgentCancel" hidden>Descartar plano</button>
+      </div>
+    </section>
+    <section class="copilot-block">
       <h3>Diagnóstico de projeto Godot</h3>
       <p class="copilot-muted">Verifica estrutura, scripts e cenas dentro de um projeto autorizado. Não executa Godot e não altera arquivos.</p>
       <label for="copilotProjectPath">Pasta que contém project.godot</label>
