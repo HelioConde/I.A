@@ -136,7 +136,7 @@
     try { window.speechSynthesis.speak(utterance); } catch (_) { utterance.onerror(); }
   }
   function interrupt() {
-    const pendingVoiceTurn = state.expectingAnswer;
+    const pendingVoiceTurn = state.expectingAnswer && Boolean(window.appVoiceSending?.());
     stopSpeech();
     stopRecognition();
     state.expectingAnswer = false;
@@ -150,7 +150,7 @@
     }
   }
   function endCall() {
-    const pendingVoiceTurn = state.expectingAnswer;
+    const pendingVoiceTurn = state.expectingAnswer && Boolean(window.appVoiceSending?.());
     state.active = false;
     state.muted = false;
     state.expectingAnswer = false;
