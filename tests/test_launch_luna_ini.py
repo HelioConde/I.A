@@ -195,9 +195,9 @@ class LunaIniTests(unittest.TestCase):
         self.assertEqual(self.ini.read_bytes(), original)
 
     def test_model_cli_switch_only_updates_local_ini_and_does_not_boot_model(self):
-        with patch("launch_luna.select_local_model", return_value="Qwen3-4B-Q4_K_M.gguf") as select, \\
-             patch("launch_luna.subprocess.run") as doctor, \\
-             patch("launch_luna.subprocess.call") as start, \\
+        with patch("launch_luna.select_local_model", return_value="Qwen3-4B-Q4_K_M.gguf") as select, \
+             patch("launch_luna.subprocess.run") as doctor, \
+             patch("launch_luna.subprocess.call") as start, \
              patch("builtins.print"):
             self.assertEqual(main(["--config", str(self.ini), "--select-model", "4b"]), 0)
         select.assert_called_once_with(self.ini.resolve(), "4b")
