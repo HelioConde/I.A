@@ -55,12 +55,13 @@ class PinnedNativeBuildTests(unittest.TestCase):
                     inspect(target, DEFAULT_REVISION)
 
     def test_no_windows_native_build_outside_windows(self):
+        if sys.platform == "win32":
+            self.skipTest("Windows deliberately permits native build with explicit flags.")
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "source"
-            with patch("prepare_native_llama_windows.os.name", "posix"):
-                with patch("builtins.print"):
-                    self.assertEqual(main(["--fetch", "--build",
-                                           "--source-dir", str(target)]), 2)
+            with patch("builtins.print"):
+                self.assertEqual(main(["--fetch", "--build",
+                                       "--source-dir", str(target)]), 2)
             self.assertFalse(target.exists())
 
 
