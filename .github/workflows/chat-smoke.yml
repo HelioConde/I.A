@@ -25,6 +25,10 @@ on:
       - "tests/test_copilot.py"
       - "tests/test_copilot_queries.py"
       - "tests/test_luna_real_world_regression.py"
+      - "tests/test_luna_session_facts.py"
+      - "src/brain_ssd/chat/session_facts.py"
+      - "src/brain_ssd/chat/http_stream.py"
+      - "src/brain_ssd/chat/history.py"
       - "tests/test_luna_hud_trust_followups.py"
       - "chat/luna-hud.css"
       - "src/brain_ssd/chat/local_actions.py"
@@ -137,6 +141,7 @@ jobs:
           python -m unittest discover -s tests -p "test_copilot.py" -v
           python -m unittest discover -s tests -p "test_copilot_queries.py" -v
           python -m unittest discover -s tests -p "test_luna_real_world_regression.py" -v
+          python -m unittest discover -s tests -p "test_luna_session_facts.py" -v
           python -m unittest discover -s tests -p "test_luna_hud_trust_followups.py" -v
           python -m unittest discover -s tests -p "test_copilot_question_battery.py" -v
           python -m unittest discover -s tests -p "test_jarvis_apps.py" -v
