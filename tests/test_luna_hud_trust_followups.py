@@ -93,6 +93,11 @@ class LunaHudTrustFollowupTests(unittest.TestCase):
             "live_weather")
         self.assertIsNone(
             time_sensitive_local_intent("Explique o clima tropical no Brasil."))
+        self.assertIsNone(
+            time_sensitive_local_intent("O que é previsão do tempo?"))
+        self.assertEqual(
+            time_sensitive_local_intent("Qual a previsão do tempo em Brasília?"),
+            "live_weather")
         engine = ChatEngine(lambda: None)
         try:
             answer = engine.ask("Qual vai ser o clima em Brasília hoje", [])
