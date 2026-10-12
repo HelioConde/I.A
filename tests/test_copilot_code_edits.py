@@ -12,6 +12,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.copilot import CopilotPermissionError, LocalCopilot
+from brain_ssd.chat.copilot_queries import copilot_answer
 
 
 class CodeEditingTests(unittest.TestCase):
@@ -23,6 +24,20 @@ class CodeEditingTests(unittest.TestCase):
         self.fixture = self.root / "hero.gd"
         self.fixture.write_text("extends Node\nvar speed = 10\n", encoding="utf-8")
         self.copilot = LocalCopilot([self.root], edit=True)
+
+    def test_chat_code_review_and_proposal_are_real(self):
+        response = copilot_answer("/revisar " + str(self.fixture), self.copilot)
+        self.assertEqual(response["local_action"], "copilot_code_review")
+        self.assertIn("Linhas: 2", response["answer"])
+        question = ('/trocar "' + str(self.fixture) +
+                    '" "speed = 10" => "speed = 12"')
+        change = copilot_answer(question, self.copilot)
+        self.assertEqual(change["local_action"], "copilot_code_edit_proposal")
+        self.assertIn("+var speed = 12", change["answer"])
+        self.assertEqual(self.fixture.read_text(), "extends Node\nvar speed = 10\n")
+        with patch("brain_ssd.chat.code_edits._backup_dir", return_value=self.backups):
+            self.copilot.apply_code_edit(change["copilot_edit_token"])
+        self.assertIn("speed = 12", self.fixture.read_text())
 
     def test_code_review_is_grounded_without_execution(self):
         result = self.copilot.review_code(str(self.fixture))
