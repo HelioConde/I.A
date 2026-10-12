@@ -93,6 +93,21 @@ pesos densos requeridos, além de comparar logits/tokens contra o baseline.
 Até isso existir, `llama.cpp` convencional permanece o único runtime de
 inferência suportado.
 
+## V3 — baseline Qwen reproduzível
+
+`tools\bench_qwen_runtime.py` mede uma pergunta curta pelo runtime convencional
+Windows e grava TTFT, tokens/s quando o runtime os expõe, working set, memória
+privada, CPU e transferências lógicas do processo. O texto da resposta não é
+gravado. O segundo braço do JSON recebe `not_implemented`; ele não simula uma
+comparação nem declara igualdade de logits/tokens.
+
+```bat
+py -3 tools\bench_qwen_runtime.py --profile economia --output results\weight_lab\qwen-baseline.json
+```
+
+O estado frio/quente do cache do SO é desconhecido neste benchmark. VRAM e
+leitura física de SSD permanecem não medidas no baseline CPU Windows.
+
 ## Estratégias, dados e limites
 
 | Modo | Leitura/caching |
