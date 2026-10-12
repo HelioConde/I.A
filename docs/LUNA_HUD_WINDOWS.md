@@ -198,7 +198,8 @@ do computador ou do histórico salvo:
 - **Data de hoje:** obtida pelo relógio/fuso local do processo Windows, nunca inferida do prompt nem da internet.
 - **Modelo utilizado:** nome exposto pelo runtime ativo (por exemplo `Qwen3-0.6B-Q8_0.gguf`), separado do nome da interface (Luna) e do projeto (Brain-SSD).
 - **Estado de conversa:** responde como assistente de software, sem simular emoções humanas.
-- **Primeira pergunta da conversa:** recuperada diretamente da primeira mensagem `user` no SQLite daquela conversa, independentemente da janela curta do Qwen.
+- **Primeira pergunta da conversa:** recuperada da primeira pergunta identificável do usuário no SQLite, pulando cumprimentos iniciais. Aceita perguntas sem `?` quando reconhecidas pela abertura interrogativa, comum na transcrição por voz. Se não for possível identificá-la, explica a limitação.
+- **Primeira mensagem da conversa:** recuperada literalmente do SQLite, incluindo um cumprimento inicial como `Olá, bom dia!`.
 - **Últimas cinco mensagens:** extrato rotulado das mensagens efetivamente fornecidas pelo histórico recente, sem inventar turnos inexistentes.
 - **Capacidade de memória:** distingue histórico local SQLite de lembranças episódicas salvas explicitamente.
 - **Informações de hoje sem assunto:** pede que o usuário escolha notícias, previsão do tempo ou tarefas.
