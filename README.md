@@ -10,6 +10,21 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Experimento Luna: Qwen3-4B Q8_0 vs Qwen3-0.6B Q8_0
+
+A Luna pode testar **um modelo Qwen maior, sem remover o atual**.
+O script `tools/test_luna_models.py` lista modelos instalados sem acessar a
+Internet; o download oficial de ~4,28 GB só ocorre com `--download`,
+seguido de verificação SHA-256. A comparação sequencial `--compare`
+executa ambos em CPU e grava respostas e métricas localmente,
+sem alegar que 4B será mais rápido ou melhor em todos os casos.
+Para ativar o 4B na Luna, escolha `model_file = Qwen3-4B-Q8_0.gguf`
+no seu `LUNA.ini` e reinicie. O modelo atual permanece como padrão.
+
+[Guia completo do experimento](docs/LUNA_QWEN_MODEL_AB.md)
+
+---
+
 ## Luna HUD — nova interface experimental
 
 A interface web do chat ganhou o visual **Luna**, inspirado em uma central de
