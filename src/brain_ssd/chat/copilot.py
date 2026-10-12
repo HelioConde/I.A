@@ -60,6 +60,7 @@ class LocalCopilot:
         self.launch_enabled = bool(launch)
         self.edit_enabled = bool(edit) and bool(allowed)
         self._editor = None
+        self._editor_lock = threading.Lock()
         self._agent = None
         self._agent_lock = threading.Lock()
         self._godot_validator = None
@@ -224,10 +225,13 @@ class LocalCopilot:
         return self._godot_inspector().diagnose(user_path, error_text)
 
     def _code_editor(self):
-        if self._editor is None:
-            from brain_ssd.chat.code_edits import CodeEditor
-            self._editor = CodeEditor(self)
-        return self._editor
+        # HTTP server uses worker threads. Never create separate editor
+        # instances that could invalidate each other's edit/undo tokens.
+        with self._editor_lock:
+            if self._editor is None:
+                from brain_ssd.chat.code_edits import CodeEditor
+                self._editor = CodeEditor(self)
+            return self._editor
 
     def review_code(self, user_path: str) -> dict:
         return self._code_editor().recommend(user_path)
