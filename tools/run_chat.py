@@ -40,11 +40,14 @@ def main() -> int:
     parser.add_argument("--copilot-root", type=Path, action="append", default=[], help="Autoriza SOMENTE leitura de arquivos sob esta pasta; repita para outras pastas")
     parser.add_argument("--copilot-screen", action="store_true", help="Habilita capturas locais solicitadas explicitamente na interface; nunca inicia monitoramento sozinho")
     parser.add_argument("--copilot-apps", action="store_true", help="Permite consultar aplicativos registrados e processos locais (nomes/PID)")
-    parser.add_argument("--copilot-launch", action="store_true", help="Permite preparar abertura de Bloco de Notas e Calculadora; requer confirmação por clique")
+    parser.add_argument("--copilot-launch", action="store_true", help="Habilita abertura de aplicativos, com confirmação por padrão")
+    parser.add_argument("--copilot-launch-direct", action="store_true", help="Permite abrir aplicativos registrados do menu Iniciar sem clique, somente para ordens explícitas; requer --copilot-apps e --copilot-launch")
     parser.add_argument("--copilot-edit", action="store_true", help="Permite editar código em pastas autorizadas somente após prévia e confirmação")
     parser.add_argument("--copilot-godot-bin", type=Path, default=None, help="Executável Godot .exe escolhido na inicialização; validação somente com confirmação individual")
     parser.add_argument("--core-mode", choices=("subprocess", "persistent", "auto"), default=None, help="auto escolhe modo persistente apenas com RAM livre suficiente")
     args = parser.parse_args()
+    if args.copilot_launch_direct and (not args.copilot_apps or not args.copilot_launch):
+        parser.error("--copilot-launch-direct exige --copilot-apps e --copilot-launch")
     if args.memory_aliases and not args.episodic_memory:
         parser.error("--memory-aliases requer --episodic-memory.")
     try:
@@ -52,7 +55,7 @@ def main() -> int:
     except ValueError as exc:
         parser.error(str(exc))
     try:
-        copilot = LocalCopilot(args.copilot_root, screen=args.copilot_screen, apps=args.copilot_apps, launch=args.copilot_launch, edit=args.copilot_edit, godot_binary=args.copilot_godot_bin) if (args.copilot_root or args.copilot_screen or args.copilot_apps or args.copilot_launch or args.copilot_edit or args.copilot_godot_bin) else None
+        copilot = LocalCopilot(args.copilot_root, screen=args.copilot_screen, apps=args.copilot_apps, launch=args.copilot_launch, launch_without_confirmation=args.copilot_launch_direct, edit=args.copilot_edit, godot_binary=args.copilot_godot_bin) if (args.copilot_root or args.copilot_screen or args.copilot_apps or args.copilot_launch or args.copilot_edit or args.copilot_godot_bin) else None
     except (ValueError, OSError) as exc:
         parser.error("Pasta autorizada ou executável Godot inválido/inacessível.")
     diagnostics = None if args.no_diagnostics else DiagnosticLogger(args.diagnostics_dir or default_diagnostics_dir())
