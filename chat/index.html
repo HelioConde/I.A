@@ -138,6 +138,16 @@
         <button type="button" id="copilotExplainCode">Recomendações no chat</button>
       </div>
       <details class="copilot-edit-workflow">
+        <summary>IA local: gerar proposta de correção</summary>
+        <p class="copilot-muted">A IA recebe só um trecho do arquivo autorizado e uma descrição curta. Não executa o código nem grava nada sem sua confirmação. Qwen 0.6B pode falhar ao produzir JSON válido.</p>
+        <label for="copilotPatchInstruction">O que corrigir?</label>
+        <textarea id="copilotPatchInstruction" rows="3" maxlength="380" placeholder="Ex.: corrija o acesso a variável nula na função _ready()" spellcheck="false"></textarea>
+        <label for="copilotPatchLine">Linha do erro (opcional)</label>
+        <input id="copilotPatchLine" type="number" min="1" max="100000" placeholder="Ex.: 42">
+        <button type="button" id="copilotDraftPatch">Gerar proposta com IA local</button>
+        <p class="copilot-muted">Se uma proposta válida for gerada, confira o diff no editor abaixo. Não há execução automática nem garantia de correção.</p>
+      </details>
+      <details class="copilot-edit-workflow">
         <summary>Editar código com prévia e backup</summary>
         <p class="copilot-muted">Selecione um arquivo acima. Informe o trecho exato e a substituição; nenhuma alteração ocorre antes da sua confirmação.</p>
         <label for="copilotEditBefore">Trecho original (deve aparecer exatamente uma vez)</label>
