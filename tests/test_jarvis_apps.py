@@ -123,6 +123,58 @@ class TestJarvisTools(unittest.TestCase):
                     assistant.confirm_launch(token)
                 launcher.assert_not_called()
 
+    def test_direct_launch_is_explicit_opt_in_and_works_for_voice_text(self):
+        assistant = LocalCopilot(apps=True, launch=True, launch_without_confirmation=True)
+        self.assertTrue(assistant.status()["launch_without_confirmation"])
+        with patch("brain_ssd.chat.windows_apps.run_start_app",
+                   return_value={"label": "Calculadora", "status": "requested",
+                                 "started_pid": 9001}) as launcher:
+            reply = copilot_answer("Abra a calculadora", assistant)
+            self.assertEqual(reply["local_action"], "copilot_launch_direct_requested")
+            self.assertIn("Solicitei ao Windows", reply["answer"])
+            launcher.assert_called_once_with("calculadora")
+            second = copilot_answer("abrir steam", assistant)
+            self.assertEqual(second["local_action"], "copilot_launch_direct_requested")
+            self.assertEqual(launcher.call_args.args, ("steam",))
+
+    def test_direct_launch_never_runs_on_question_or_file_request(self):
+        assistant = LocalCopilot(apps=True, launch=True, launch_without_confirmation=True)
+        with patch("brain_ssd.chat.windows_apps.run_start_app") as launcher:
+            question = copilot_answer("Você consegue abrir a Calculadora?", assistant)
+            self.assertEqual(question["local_action"], "copilot_launch_info")
+            result = copilot_answer("Você consegue abrir uma imagem em Downloads?", assistant)
+            self.assertNotEqual(result["local_action"] if result else None,
+                                "copilot_launch_direct_requested")
+            result = copilot_answer("Abra o arquivo config.ini", assistant)
+            self.assertNotEqual(result["local_action"] if result else None,
+                                "copilot_launch_direct_requested")
+            launcher.assert_not_called()
+
+    def test_direct_mode_requires_both_inventory_and_launch(self):
+        disabled = LocalCopilot(apps=False, launch=True,
+                                launch_without_confirmation=True)
+        self.assertFalse(disabled.launch_without_confirmation)
+        with self.assertRaises(CopilotPermissionError):
+            disabled.launch_by_name("Steam")
+        disabled = LocalCopilot(apps=True, launch=False,
+                                launch_without_confirmation=True)
+        self.assertFalse(disabled.launch_without_confirmation)
+
+    def test_start_menu_catalog_is_paginated_and_grounded(self):
+        items = [{"name": "Aplicativo " + str(i).zfill(3), "app_id": "app." + str(i)}
+                 for i in range(82)]
+        assistant = LocalCopilot(apps=True)
+        with patch("brain_ssd.chat.windows_apps.start_menu_apps",
+                   return_value={"items": items, "total_matches": len(items)}) as catalog:
+            first = copilot_answer("liste todos os programas instalados", assistant)
+            self.assertEqual(first["local_action"], "copilot_start_apps_catalog")
+            self.assertIn("Aplicativo 000", first["answer"])
+            self.assertNotIn("Aplicativo 070", first["answer"])
+            second = copilot_answer("liste aplicativos instalados pagina 3", assistant)
+            self.assertEqual(second["local_action"], "copilot_start_apps_catalog")
+            self.assertIn("Aplicativo 070", second["answer"])
+            catalog.assert_called_with(None)
+
     def test_unrelated_query_remains_regular_chat(self):
         assistant = LocalCopilot(apps=True, launch=True)
         self.assertIsNone(copilot_answer("Como funciona a CPU?", assistant))
