@@ -25,3 +25,7 @@ brain-ssd-diagnostics-*.zip
 
 # Personal persistent Luna permissions and paths; template is versioned.
 /LUNA.ini
+
+# Luna A/B reports contain local model outputs; never commit.
+results/model_comparison/
+models/*.download-incomplete
