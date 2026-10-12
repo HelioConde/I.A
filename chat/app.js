@@ -2,6 +2,72 @@
 const $ = id => document.getElementById(id);
 const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false, assistantName:"Brain-SSD" };
 const composer = $("messageInput");
+const nativeSpeech = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micState = {recognizer:null, active:false, available:false};
+async function checkLocalMic() {
+  const button = $("localMicButton");
+  // Explicit local processing support is required; never fall back to
+  // network-backed speech services without a separate consent design.
+  if (!nativeSpeech || !("processLocally" in nativeSpeech.prototype) ||
+      typeof nativeSpeech.available !== "function") {
+    button.disabled = true;
+    button.title = "Reconhecimento de fala no dispositivo não disponível neste navegador.";
+    return;
+  }
+  try {
+    const availability = await nativeSpeech.available({
+      langs:["pt-BR"], processLocally:true
+    });
+    micState.available = availability === "available";
+  } catch (_) {
+    micState.available = false;
+  }
+  button.disabled = !micState.available;
+  button.title = micState.available
+    ? "Clique para ativar o microfone só nesta frase, processada localmente."
+    : "Pacote pt-BR local não instalado ou não suportado. Microfone desligado.";
+}
+function stopLocalMic() {
+  if (micState.recognizer) {
+    try { micState.recognizer.abort(); } catch (_) {}
+  }
+  micState.recognizer = null;
+  micState.active = false;
+  $("localMicButton").textContent = "🎤 Falar (local)";
+}
+$("localMicButton").addEventListener("click", () => {
+  if (micState.active) { stopLocalMic(); return; }
+  if (!micState.available || !nativeSpeech || app.sending) return;
+  const recognition = new nativeSpeech();
+  recognition.lang = "pt-BR";
+  recognition.processLocally = true;
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  const original = composer.value;
+  micState.recognizer = recognition;
+  micState.active = true;
+  $("localMicButton").textContent = "■ Parar microfone";
+  recognition.onresult = event => {
+    if (micState.recognizer !== recognition) return;
+    const transcript = Array.from(event.results)
+      .map(result => result[0]?.transcript || "").join(" ").trim();
+    composer.value = (original ? original + " " : "") + transcript;
+    fitComposer();
+  };
+  recognition.onerror = event => {
+    if (micState.recognizer === recognition) {
+      $("localMicButton").title = "Microfone: " + (event.error || "falha");
+      stopLocalMic();
+    }
+  };
+  recognition.onend = () => {
+    if (micState.recognizer === recognition) stopLocalMic();
+  };
+  try { recognition.start(); }
+  catch (_) { stopLocalMic(); }
+});
+void checkLocalMic();
+
 const log = $("messages");
 // Spoken answers use the browser Web Speech API. Speech starts only on click;
 // it may use installed OS voices or a browser-provided voice service.
@@ -415,6 +481,7 @@ function updateMetrics(data) {
   $("detailWorking").textContent = shadow ? shadow.working_memory_bytes + " B · " + shadow.working_topics.length + " tópicos" : "desativado";
 }
 async function send() {
+  if (micState.active) stopLocalMic();
   const question = composer.value.trim();
   if (!app.ready || app.sending || !question) return;
   stopSpeaking();
@@ -826,6 +893,7 @@ async function stopGeneration() {
   }
 }
 function resetChat() {
+  stopLocalMic();
   stopSpeaking();
   if (app.sending) return;
   app.messages = [];
