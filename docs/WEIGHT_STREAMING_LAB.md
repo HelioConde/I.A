@@ -86,6 +86,12 @@ provar o roteamento e os tensores compartilhados; nomes duplicados ou ausentes
 são rejeitados. O módulo não implementa `generate`, não altera o Chat e não
 faz fallback silencioso.
 
+`weight_cache.py` fornece a primitiva LRU de janelas exatas de tensor para
+essa investigação. O orçamento é limitado a 256 MiB, janelas maiores retornam
+corretamente mas não são retidas, e a cache nunca lê além do range validado
+pelo GGUF. Ela não faz prefetch, não interpreta blocos quantizados e não é
+conectada ao runtime de inferência.
+
 O bloqueio técnico é objetivo: `llama.cpp` atual possui o carregador GGUF e
 as dependências de cada matmul internamente. Streaming real exige um contrato
 nativo que mantenha embeddings, normalizações, projeções, KV cache e todos os
