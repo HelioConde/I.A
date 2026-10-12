@@ -115,9 +115,9 @@
 
   <div class="backdrop" id="backdrop" hidden></div>
   <aside class="copilot-panel" id="copilotPanel" aria-label="Copiloto local" hidden>
-    <div class="copilot-head"><h2>Copiloto Windows</h2><button class="icon-btn" id="closeCopilot" type="button" aria-label="Fechar copiloto">×</button></div>
+    <div class="copilot-head"><h2>Brain-SSD · Assistente Windows</h2><button class="icon-btn" id="closeCopilot" type="button" aria-label="Fechar copiloto">×</button></div>
     <p id="copilotStatus" role="status">Verificando permissões locais...</p>
-    <p class="copilot-muted">Apenas leitura. As pastas e a captura precisam ser habilitadas ao iniciar o programa. Nenhum acesso é contínuo sem você ativar.</p>
+    <p class="copilot-muted">Cada recurso depende da permissão escolhida ao iniciar. Consultas são locais; abrir um aplicativo exige confirmação separada na conversa.</p>
     <div id="copilotRoots" class="copilot-roots"></div>
     <section class="copilot-block">
       <h3>Arquivos e pastas</h3>
@@ -129,6 +129,17 @@
         <button type="button" id="copilotImage">Ver imagem</button>
       </div>
       <button type="button" id="copilotSystem">Informações do computador</button>
+    </section>
+    <section class="copilot-block">
+      <h3>Aplicativos do Windows</h3>
+      <p class="copilot-muted">Consulta somente nomes, versões registradas e processos (nome/PID). Aplicativos portáteis podem não aparecer.</p>
+      <label for="copilotAppSearch">Filtrar aplicativo (opcional)</label>
+      <input id="copilotAppSearch" placeholder="Godot, Steam, Chrome..." maxlength="100" spellcheck="false">
+      <div class="copilot-actions">
+        <button type="button" id="copilotInstalled">Instalados</button>
+        <button type="button" id="copilotProcesses">Em execução</button>
+      </div>
+      <p class="copilot-muted">Bloco de Notas e Calculadora podem ser propostos pelo chat, se autorizados no iniciador. Nunca são abertos automaticamente.</p>
     </section>
     <section class="copilot-block">
       <h3>Tela</h3>
