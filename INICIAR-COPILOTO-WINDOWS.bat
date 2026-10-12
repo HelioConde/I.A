@@ -65,8 +65,23 @@ set "COPILOT_EDIT="
 if not defined COPILOT_ROOT goto :start
 echo Edicao apenas de codigo em pasta autorizada, com diff e backup.
 choice /c SN /n /m "Permitir editar CODIGO apos confirmacao manual de cada mudanca? [S/N] "
-if errorlevel 2 goto :start
+if errorlevel 2 goto :ask_godot
 set "COPILOT_EDIT=--copilot-edit"
+:ask_godot
+set "COPILOT_GODOT_ARG="
+echo.
+echo OPCIONAL: Godot --check-only pode inicializar extensoes e gravar cache no projeto.
+echo Use apenas projeto confiavel. Cada verificacao exige novo clique de confirmacao.
+choice /c SN /n /m "Permitir validacao Godot --check-only APOS aprovacao individual? [S/N] "
+if errorlevel 2 goto :start
+set "COPILOT_GODOT_BINARY="
+set /p "COPILOT_GODOT_BINARY=Informe o caminho COMPLETO do executavel Godot .exe: "
+if not defined COPILOT_GODOT_BINARY goto :start
+if not exist "%COPILOT_GODOT_BINARY%" (
+  echo Godot nao encontrado. Validacao desabilitada.
+  goto :start
+)
+set "COPILOT_GODOT_ARG=--copilot-godot-bin "%COPILOT_GODOT_BINARY%""
 :start
 echo.
 echo Verificando requisitos do modelo...
@@ -81,9 +96,9 @@ if errorlevel 1 (
 echo.
 echo Iniciando chat e copiloto local. A pesquisa web continua opt-in.
 if defined COPILOT_ROOT (
-  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto --copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT%
+  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto --copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT% %COPILOT_GODOT_ARG%
 ) else (
-  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT%
+  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT% %COPILOT_GODOT_ARG%
 )
 if errorlevel 1 (
   echo.
