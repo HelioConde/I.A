@@ -182,7 +182,18 @@ class TestStaticUI(unittest.TestCase):
         self.assertIn('window.stopVoiceCallGeneration', call_js)
         self.assertIn('window.speechSynthesis.cancel()', call_js)
         self.assertIn('Turnos alternados', self.html)
-        self.assertNotIn('getUserMedia', call_js)
+        self.assertIn('id="retryVoiceCall"', self.html)
+        self.assertIn('id="testVoiceCallMic"', self.html)
+        self.assertIn('id="testVoiceCallTts"', self.html)
+        self.assertIn('if (reason === "no-speech")', call_js)
+        self.assertIn('scheduleListeningRetry()', call_js)
+        self.assertIn('byId("testVoiceCallMic").addEventListener("click"', call_js)
+        self.assertIn('byId("testVoiceCallTts").addEventListener("click"', call_js)
+        # The temporary mic-level diagnostic has an explicit click, requests
+        # no video, and releases every track. It never stores raw audio.
+        self.assertIn('navigator.mediaDevices.getUserMedia({audio:true, video:false})', call_js)
+        self.assertIn('stream?.getTracks().forEach(track => track.stop())', call_js)
+        self.assertIn('if (!window.lunaVoiceCallActive && autoVoice.enabled', self.js)
         self.assertNotIn('fetch(', call_js)
 
 
