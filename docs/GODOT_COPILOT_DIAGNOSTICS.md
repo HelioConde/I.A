@@ -31,3 +31,55 @@ Os testes usam projetos temporários e não precisam executar Godot. A associaç
 ## Próximas fases
 
 Selecionar contexto do projeto por sessão, planejar patches com a IA e provas de origem, verificar a alteração com testes seguros executados sob autorização, e permitir ação reversível com botão de parada. A inferência Qwen 0.6B continua limitada e não equivale a um agente autônomo validado.
+
+## Verificação real de GDScript (opt-in, com confirmação)
+
+Esta etapa adiciona um validador de sintaxe com o executável Godot do
+próprio usuário. O Godot é iniciado **somente após** um pedido explícito
+e um segundo clique de confirmação. A execução termina em até 30 segundos.
+Não há execução arbitrária de comandos PowerShell, shell ou scripts externos.
+
+Ao iniciar `INICIAR-COPILOTO-WINDOWS.bat`, autorize uma pasta de projeto
+e, quando perguntado, forneça o **caminho completo** do executável Godot
+(exemplo: `C:\Ferramentas\Godot_v4.6.1-stable_win64.exe`).
+O Brain-SSD não instala nem escolhe esse executável sozinho.
+
+Depois acesse o painel **Diagnóstico de projeto Godot**, digite
+`res://scripts/player.gd` e pressione **Preparar verificação**.
+Revise o binário, o projeto e o aviso. Apenas o botão
+**Confirmar execução de Godot**, mais a confirmação do navegador,
+inicia o processo.
+
+Também há um comando textual:
+
+```text
+/validar-godot "C:\Users\helio\Documents\MeuJogo" :: res://scripts/player.gd
+```
+
+O comando por si só **não executa** o Godot; ele retorna uma proposta
+que pode ser confirmada no chat.
+
+O sistema usa os argumentos fixos `--headless --recovery-mode --path
+<projeto> --script res://arquivo.gd --check-only`, conforme a documentação
+de linha de comando do Godot:
+https://docs.godotengine.org/pt-br/4.x/tutorials/editor/command_line_tutorial.html
+
+**Aviso de segurança:** modo headless e `--check-only` não criam uma
+sandbox de sistema; Godot pode carregar plugins/extensões ou criar caches
+na pasta do projeto. Use essa função apenas para projetos locais confiáveis.
+O motor, o manifesto e o script precisam continuar sem alterações entre
+a proposta e a confirmação. Os pedidos expiram em 90 segundos e são
+usados uma única vez.
+
+Os resultados indicam `PASS` (processo retornou exit code 0),
+`FAIL` (exit code diferente de 0) ou `TIMEOUT` (30 segundos).
+Mesmo PASS não significa que o jogo foi executado, que os testes de
+gameplay passaram ou que o bug visual foi resolvido.
+
+Para regressão sem abrir Godot:
+```bat
+py -3 -m unittest discover -s tests -p "test_godot_validation.py" -v
+```
+
+Os testes de regressão interceptam `subprocess.run`, criam um projeto
+temporário e não iniciam o executável real.
