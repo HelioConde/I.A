@@ -709,6 +709,57 @@ async function send() {
           });
         }
 
+        if (payload.local_action === "copilot_agent_plan" &&
+            typeof payload.copilot_agent_token === "string") {
+          const controls = document.createElement("div");
+          controls.className = "copilot-confirm-actions";
+          const run = document.createElement("button");
+          run.type = "button";
+          run.textContent = "Investigar agora (somente leitura)";
+          const dismiss = document.createElement("button");
+          dismiss.type = "button";
+          dismiss.className = "copilot-cancel";
+          dismiss.textContent = "Descartar plano";
+          const note = document.createElement("p");
+          note.setAttribute("role", "status");
+          controls.append(run, dismiss, note);
+          pending.querySelector(".message-body").appendChild(controls);
+          const token = payload.copilot_agent_token;
+          dismiss.addEventListener("click", () => {
+            run.disabled = true;
+            dismiss.disabled = true;
+            note.textContent = "Plano descartado. Nada foi executado.";
+          });
+          run.addEventListener("click", async () => {
+            if (run.disabled) return;
+            run.disabled = true;
+            dismiss.disabled = true;
+            note.textContent = "Consultando fontes locais autorizadas...";
+            try {
+              const report = await requestJson("/api/copilot", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({action:"agent_execute", token})
+              });
+              const output = document.createElement("pre");
+              output.className = "copilot-edit-diff";
+              output.textContent = (
+                "Status: " + report.status + "\n" +
+                report.evidence.map(e => e.step + " — " + e.source +
+                  "\n" + JSON.stringify(e.facts, null, 2)).join("\n\n") +
+                "\n\nSugestões a conferir:\n" +
+                (report.suggestions || []).map(x => "• " + x).join("\n") +
+                "\n\n" + report.next_step + "\n" + report.notice
+              ).slice(0, 16000);
+              controls.append(output);
+              note.textContent = report.status === "completed"
+                ? "Investigação concluída. Nenhum código foi modificado."
+                : "Investigação parcial. Verifique as informações faltantes.";
+            } catch (error) {
+              note.textContent = "Investigação não concluída: " + error.message;
+            }
+          });
+        }
+
         if (payload.local_action === "copilot_godot_validation_proposal" &&
             typeof payload.copilot_godot_validation_token === "string") {
           const token = payload.copilot_godot_validation_token;
