@@ -13,6 +13,8 @@ on:
       - "tests/test_godot_diagnostics.py"
       - "tests/test_godot_validation.py"
       - "tests/test_agent_core.py"
+      - "tests/test_model_patch_draft.py"
+      - "src/brain_ssd/chat/model_patch_draft.py"
       - "src/brain_ssd/chat/agent_core.py"
       - "src/brain_ssd/chat/godot_validation.py"
       - "src/brain_ssd/chat/godot_diagnostics.py"
@@ -141,6 +143,7 @@ jobs:
           python -m unittest discover -s tests -p "test_godot_diagnostics.py" -v
           python -m unittest discover -s tests -p "test_godot_validation.py" -v
           python -m unittest discover -s tests -p "test_agent_core.py" -v
+          python -m unittest discover -s tests -p "test_model_patch_draft.py" -v
       - name: Assert runtime unit tests independently
         shell: pwsh
         run: python -m unittest discover -s tests -p "test_chat_runtime.py" -v
