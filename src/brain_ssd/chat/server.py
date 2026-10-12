@@ -378,68 +378,6 @@ class ChatEngine:
         """
         if not isinstance(prompt, str) or not 0 < len(prompt) <= MAX_MESSAGE:
             raise ValueError("Contexto da proposta excede o limite.")
-        # Google is available only with the configured Serper API key.
-        # A question about Google search is not proof a query was sent.
-        normalized = unicodedata.normalize("NFKD", question.casefold())
-        normalized = "".join(c for c in normalized if not unicodedata.combining(c))
-        google_intent = bool(re.search(r"\bgoogle\b", normalized)
-                             and re.search(r"\b(?:pesquis|busc|consult|utiliz)", normalized))
-        google_search_request = google_intent and bool(
-            re.search(r"\b(?:utilizar|use|utilize|faca|pesquise|busque|pesquisar|consulte)\b", normalized)
-            and re.search(r"\b(?:sobre|noticias|noticia|de|do|da)\b", normalized)
-        )
-        if google_intent:
-            google_enabled = bool(self.web_search_service and
-                                  self.web_search_service.provider in ("google", "auto") and
-                                  getattr(self.web_search_service, "_serper_key", ""))
-            if not google_search_request or not web_search or not google_enabled:
-                if not google_enabled:
-                    message = (
-                        "Não tenho busca Google configurada nesta sessão. "
-                        "O provedor automático sem SERPER_API_KEY usa Wikipédia "
-                        "(não o Google). Configure o Serper para buscas Google reais. "
-                        "Nenhuma pesquisa Google foi realizada."
-                    )
-                elif not web_search:
-                    message = (
-                        "Busca Google via Serper disponível, mas você não autorizou "
-                        "pesquisa para esta mensagem. Marque 'Pesquisar na web' "
-                        "e reenvie o pedido. Não consultei o Google."
-                    )
-                else:
-                    message = (
-                        "O Google via Serper está configurado, mas nenhuma busca foi "
-                        "realizada por esta pergunta de capacidade. Para pesquisar, "
-                        "peça 'Pesquise no Google sobre ASSUNTO'."
-                    )
-                local = {"answer": message, "mode": "local_command",
-                         "local_action": "google_search_capability",
-                         "web_search_status": "not_requested",
-                         "metrics": {}, "active_pages": 0,
-                         "sources_from_ssd": 0,
-                         "episodic_memories_used": 0,
-                         "episodic_ambiguities_detected": 0,
-                         "episodic_ambiguities_withheld": False,
-                         "cognitive_shadow": None}
-                if on_chunk is not None:
-                    on_chunk(local["answer"])
-                return local
-        if (needs_recent_public_sources(question) and not needs_brazil_news(question)
-                and not current_game_request(question) and not web_search):
-            local = {
-                "answer": (
-                    "Para responder sobre notícias recentes preciso de fontes atuais "
-                    "com datas. Marque 'Pesquisar na web' e reenvie. "
-                    "Não fiz consulta externa e não vou inventar acontecimentos."
-                ), "mode": "local_command", "local_action": "recent_news_permission",
-                "web_search_status": "not_requested", "metrics": {}, "active_pages": 0,
-                "sources_from_ssd": 0, "episodic_memories_used": 0,
-                "episodic_ambiguities_detected": 0,
-                "episodic_ambiguities_withheld": False, "cognitive_shadow": None
-            }
-            if on_chunk is not None:
-                on_chunk(local["answer"])
-            return local
         if self._state != "ready" or self._runtime is None:
             raise RuntimeError("Modelo local não está pronto.")
         with self._lock:
@@ -585,6 +523,68 @@ class ChatEngine:
                 self.diagnostics.emit("chat.local_action", request_id=request_id,
                                       action=local_pc["local_action"], status="PASS")
             return local_pc
+        # Google is available only with the configured Serper API key.
+        # A question about Google search is not proof a query was sent.
+        normalized = unicodedata.normalize("NFKD", question.casefold())
+        normalized = "".join(c for c in normalized if not unicodedata.combining(c))
+        google_intent = bool(re.search(r"\bgoogle\b", normalized)
+                             and re.search(r"\b(?:pesquis|busc|consult|utiliz)", normalized))
+        google_search_request = google_intent and bool(
+            re.search(r"\b(?:utilizar|use|utilize|faca|pesquise|busque|pesquisar|consulte)\b", normalized)
+            and re.search(r"\b(?:sobre|noticias|noticia|de|do|da)\b", normalized)
+        )
+        if google_intent:
+            google_enabled = bool(self.web_search_service and
+                                  self.web_search_service.provider in ("google", "auto") and
+                                  getattr(self.web_search_service, "_serper_key", ""))
+            if not google_search_request or not web_search or not google_enabled:
+                if not google_enabled:
+                    message = (
+                        "Não tenho busca Google configurada nesta sessão. "
+                        "O provedor automático sem SERPER_API_KEY usa Wikipédia "
+                        "(não o Google). Configure o Serper para buscas Google reais. "
+                        "Nenhuma pesquisa Google foi realizada."
+                    )
+                elif not web_search:
+                    message = (
+                        "Busca Google via Serper disponível, mas você não autorizou "
+                        "pesquisa para esta mensagem. Marque 'Pesquisar na web' "
+                        "e reenvie o pedido. Não consultei o Google."
+                    )
+                else:
+                    message = (
+                        "O Google via Serper está configurado, mas nenhuma busca foi "
+                        "realizada por esta pergunta de capacidade. Para pesquisar, "
+                        "peça 'Pesquise no Google sobre ASSUNTO'."
+                    )
+                local = {"answer": message, "mode": "local_command",
+                         "local_action": "google_search_capability",
+                         "web_search_status": "not_requested",
+                         "metrics": {}, "active_pages": 0,
+                         "sources_from_ssd": 0,
+                         "episodic_memories_used": 0,
+                         "episodic_ambiguities_detected": 0,
+                         "episodic_ambiguities_withheld": False,
+                         "cognitive_shadow": None}
+                if on_chunk is not None:
+                    on_chunk(local["answer"])
+                return local
+        if (needs_recent_public_sources(question) and not needs_brazil_news(question)
+                and not current_game_request(question) and not web_search):
+            local = {
+                "answer": (
+                    "Para responder sobre notícias recentes preciso de fontes atuais "
+                    "com datas. Marque 'Pesquisar na web' e reenvie. "
+                    "Não fiz consulta externa e não vou inventar acontecimentos."
+                ), "mode": "local_command", "local_action": "recent_news_permission",
+                "web_search_status": "not_requested", "metrics": {}, "active_pages": 0,
+                "sources_from_ssd": 0, "episodic_memories_used": 0,
+                "episodic_ambiguities_detected": 0,
+                "episodic_ambiguities_withheld": False, "cognitive_shadow": None
+            }
+            if on_chunk is not None:
+                on_chunk(local["answer"])
+            return local
         if self._state != "ready" or self._runtime is None:
             raise RuntimeError(self._error or "O modelo local ainda não está pronto.")
         history = normalize_history(raw_history)
