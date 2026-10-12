@@ -169,3 +169,117 @@ def run_approved_app(app_id: str) -> dict[str, Any]:
                              cwd=str(system_dir), shell=False)
     return {"app_id": app_id, "label": label, "started_pid": child.pid,
             "status": "requested", "notice": "Processo iniciado; abertura da janela não verificada."}
+
+
+# Registered Start Menu entries are launchable apps; Uninstall entries are not.
+def _normalized_app_name(value: str) -> str:
+    import unicodedata
+    name = unicodedata.normalize("NFKD", value.casefold())
+    return " ".join("".join(c for c in name if not unicodedata.combining(c)).split())
+
+
+_DENIED_LAUNCH_NAMES = frozenset({
+    "powershell", "windows powershell", "powershell ise", "pwsh",
+    "prompt de comando", "command prompt", "cmd", "windows terminal",
+    "terminal", "regedit", "editor do registro", "registry editor",
+    "task scheduler", "agendador de tarefas", "gerenciamento do computador",
+    "computer management", "windows security", "seguranca do windows",
+    "gerenciador de tarefas", "task manager", "control panel",
+    "painel de controle", "windows tools", "ferramentas do windows",
+    "executar", "run", "diskpart", "explorer", "explorador de arquivos",
+    "file explorer", "command processor", "editor de politica de grupo",
+})
+
+
+def start_menu_apps(name: str | None = None) -> dict[str, Any]:
+    """Return real launchable Start Menu app registrations, not paths or scripts."""
+    if os.name != "nt":
+        raise OSError("Menu Iniciar disponível somente no Windows.")
+    ps = _system_dir() / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+    if not ps.is_file():
+        raise OSError("PowerShell do Windows indisponível para consulta.")
+    # This script is constant; app names are filtered in Python, never in shell.
+    command = ("Get-StartApps | Select-Object Name,AppID | "
+               "ConvertTo-Json -Compress -Depth 3")
+    completed = subprocess.run(
+        [str(ps), "-NoLogo", "-NoProfile", "-NonInteractive",
+         "-ExecutionPolicy", "Restricted", "-Command", command],
+        capture_output=True, timeout=18, check=False,
+    )
+    if completed.returncode:
+        raise OSError("Consulta do menu Iniciar falhou.")
+    import json
+    try:
+        data = completed.stdout.decode("utf-8-sig", errors="replace").strip()
+        raw = json.loads(data) if data else []
+    except ValueError:
+        raise OSError("Catálogo do menu Iniciar inválido.") from None
+    if isinstance(raw, dict):
+        raw = [raw]
+    if not isinstance(raw, list):
+        raise OSError("Catálogo do menu Iniciar inválido.")
+    import re
+    rows, seen = [], set()
+    for item in raw[:_MAX_SCANNED]:
+        if not isinstance(item, dict):
+            continue
+        label, app_id = item.get("Name"), item.get("AppID")
+        if not isinstance(label, str) or not isinstance(app_id, str):
+            continue
+        label, app_id = label.strip(), app_id.strip()
+        if not label or len(label) > 180 or not 4 <= len(app_id) <= 300:
+            continue
+        if not re.fullmatch(r"[A-Za-z0-9._{}!\\-]+", app_id):
+            continue
+        identity = (label.casefold(), app_id)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        rows.append({"name": label, "app_id": app_id})
+    result = _filter(rows, name, limit=600)
+    result["source"] = "Windows Get-StartApps (Menu Iniciar)"
+    result["notice"] = (
+        "Somente aplicativos registrados no menu Iniciar; portáteis ou sem "
+        "atalho podem estar ausentes. Não equivale a todos os executáveis no disco."
+    )
+    return result
+
+
+def run_start_app(app_name: str) -> dict[str, Any]:
+    """Run one uniquely identified Start app, never an arbitrary user command."""
+    if os.name != "nt":
+        raise OSError("Abertura direta disponível somente no Windows.")
+    if not isinstance(app_name, str) or not 2 <= len(app_name.strip()) <= 100:
+        raise ValueError("Nome de aplicativo inválido.")
+    if any(x in app_name for x in ("/", chr(92), ":", "|", "&", ";", "$", chr(96), "\n", "\r")):
+        raise ValueError("Comandos e caminhos não são nomes de aplicativos.")
+    query = _normalized_app_name(app_name)
+    if query in _DENIED_LAUNCH_NAMES:
+        raise ValueError("Aplicativo administrativo ou interpretador de comandos bloqueado.")
+    inventory = start_menu_apps()
+    rows = inventory["items"]
+    exact = [entry for entry in rows if _normalized_app_name(entry["name"]) == query]
+    if not exact and len(query) >= 4:
+        exact = [entry for entry in rows if query in _normalized_app_name(entry["name"])]
+    if not exact:
+        raise ValueError("Aplicativo não localizado no menu Iniciar.")
+    if len(exact) != 1:
+        raise ValueError("Nome ambíguo; informe o nome completo do aplicativo.")
+    item = exact[0]
+    if _normalized_app_name(item["name"]) in _DENIED_LAUNCH_NAMES:
+        raise ValueError("Aplicativo administrativo ou interpretador de comandos bloqueado.")
+    import re
+    app_id = item["app_id"]
+    if not isinstance(app_id, str) or not re.fullmatch(r"[A-Za-z0-9._{}!\\-]+", app_id):
+        raise ValueError("Identificador de aplicativo inválido.")
+    explorer = _system_dir().parent / "explorer.exe"
+    if not explorer.is_file():
+        raise OSError("Windows Explorer indisponível.")
+    child = subprocess.Popen(
+        [str(explorer), "shell:AppsFolder" + chr(92) + app_id],
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL, cwd=str(explorer.parent), shell=False,
+    )
+    return {"label": item["name"], "app_id": app_id,
+            "started_pid": child.pid, "status": "requested",
+            "notice": "Solicitação enviada ao Explorer; janela não verificada."}
