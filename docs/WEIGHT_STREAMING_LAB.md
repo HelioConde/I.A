@@ -76,6 +76,23 @@ Na validação local, o Qwen autorizado foi lido como GGUF v3 com 310 tensores;
 165.306.368 bytes físicos. Uma janela de 64 bytes foi verificada. Isso não é
 execução de tensor, logits ou inferência por streaming.
 
+## V2 — contrato de pré-flight, ainda sem inferência
+
+`weight_streaming_runtime.py` é um contrato deliberadamente conservador para
+uma futura integração nativa: em modelos densos, **todos** os tensores são
+marcados obrigatórios. Nenhum nome é usado para adivinhar especialistas MoE.
+Uma integração específica pode declarar nomes de experts somente depois de
+provar o roteamento e os tensores compartilhados; nomes duplicados ou ausentes
+são rejeitados. O módulo não implementa `generate`, não altera o Chat e não
+faz fallback silencioso.
+
+O bloqueio técnico é objetivo: `llama.cpp` atual possui o carregador GGUF e
+as dependências de cada matmul internamente. Streaming real exige um contrato
+nativo que mantenha embeddings, normalizações, projeções, KV cache e todos os
+pesos densos requeridos, além de comparar logits/tokens contra o baseline.
+Até isso existir, `llama.cpp` convencional permanece o único runtime de
+inferência suportado.
+
 ## Estratégias, dados e limites
 
 | Modo | Leitura/caching |

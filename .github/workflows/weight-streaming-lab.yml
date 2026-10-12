@@ -6,10 +6,12 @@ on:
     paths:
       - "src/brain_ssd/weight_streaming_lab.py"
       - "src/brain_ssd/gguf_inspector.py"
+      - "src/brain_ssd/weight_streaming_runtime.py"
       - "tools/bench_weight_streaming.py"
       - "tools/inspect_gguf.py"
       - "tests/test_weight_streaming_lab.py"
       - "tests/test_gguf_inspector.py"
+      - "tests/test_weight_streaming_runtime.py"
       - "docs/WEIGHT_STREAMING_LAB.md"
       - ".github/workflows/weight-streaming-lab.yml"
 jobs:
@@ -29,5 +31,6 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_weight_streaming_lab.py" -v
           python -m unittest discover -s tests -p "test_gguf_inspector.py" -v
+          python -m unittest discover -s tests -p "test_weight_streaming_runtime.py" -v
       - name: Verify matrix checksums on a synthetic 1 MiB window
         run: python tools/bench_weight_streaming.py --matrix --fixture-mib 1 --page-kib 128 --pages 8 --budget-mib 1 --turns 5 --pattern moe
