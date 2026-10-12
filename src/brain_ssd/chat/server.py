@@ -1152,6 +1152,13 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result = copilot.installed_apps(data.get("search"))
                 elif action == "processes":
                     result = copilot.running_apps(data.get("search"))
+                elif action == "review_code":
+                    result = copilot.review_code(data.get("path"))
+                elif action == "propose_code_edit":
+                    result = copilot.propose_code_edit(
+                        data.get("path"), data.get("before"), data.get("after"))
+                elif action == "apply_code_edit":
+                    result = copilot.apply_code_edit(data.get("token"))
                 elif action == "launch":
                     result = copilot.confirm_launch(data.get("token"))
                 elif action == "screen":
