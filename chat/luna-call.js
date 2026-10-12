@@ -5,7 +5,7 @@
   const byId = id => document.getElementById(id);
   const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
   const state = {active:false, muted:false, recognition:null, finalText:"", interimText:"", silenceTimer:null,
-    speaking:false, expectingAnswer:false, utterance:null, turn:0};
+    speaking:false, expectingAnswer:false, utterance:null, turn:0, recognitionFailed:false, emptyRestarts:0};
   const silenceMs = 1000;
   const status = {
     idle:["Pronta para iniciar.","Clique para iniciar; o navegador pedirá o microfone somente então."],
@@ -74,7 +74,7 @@
     stopRecognition(); state.finalText = ""; state.interimText = ""; setTranscript();
     const recognition = new Speech(); recognition.lang = "pt-BR"; recognition.processLocally = true;
     recognition.continuous = true; recognition.interimResults = true;
-    state.recognition = recognition; setState("listening"); buttons();
+    state.recognition = recognition; state.recognitionFailed = false; setState("listening"); buttons();
     recognition.onspeechstart = () => {
       if (state.recognition !== recognition) return;
       clearSilence(); // User resumed speaking before the silence threshold.
@@ -100,7 +100,7 @@
     };
     recognition.onerror = event => {
       if (state.recognition !== recognition) return;
-      state.recognition = null;
+      state.recognition = null; state.recognitionFailed = true;
       const reason = event.error || "desconhecido";
       if (reason === "aborted" && !state.active) return;
       setState("error", reason === "not-allowed" || reason === "service-not-allowed"
@@ -111,7 +111,13 @@
       if (state.recognition !== recognition) return;
       state.recognition = null; clearSilence();
       const text = state.finalText.trim(); state.interimText = ""; setTranscript();
-      if (text) void submitTurn(text); else if (state.active && !state.muted) beginListening();
+      if (state.recognitionFailed) return;
+      if (text) { state.emptyRestarts = 0; void submitTurn(text); }
+      else if (state.active && !state.muted) {
+        state.emptyRestarts += 1;
+        if (state.emptyRestarts > 3) setState("error", "O microfone encerrou repetidamente sem fala. Encerre e reinicie a ligação; verifique a permissão e o pacote pt-BR.");
+        else setTimeout(() => { if (state.active && !state.muted && !state.recognition && !state.recognitionFailed) beginListening(); }, 350);
+      }
     };
     try { recognition.start(); } catch (_) { state.recognition = null; setState("error", "O navegador não iniciou o microfone local."); buttons(); }
   }
@@ -167,9 +173,9 @@
       setState("error", "Aguarde o término da resposta atual antes de iniciar outra ligação.");
       return;
     }
-    if (!supportsLocalRecognition()) { setState("error", "Reconhecimento local pt-BR indisponível. Use Verificar/Instalar pt-BR offline antes de iniciar."); return; }
+    if (!supportsLocalRecognition()) { setState("error", "Reconhecimento local pt-BR indisponível. Use Verificar/Instalar pt-BR offline antes de iniciar. Chrome/Edge podem não oferecer esse recurso."); return; }
     if (!localVoice()) { setState("error", "Não há voz portuguesa local instalada neste navegador."); return; }
-    state.active = true; state.muted = false; window.lunaVoiceCallActive = true; setState("initializing"); buttons(); beginListening();
+    state.active = true; state.muted = false; state.emptyRestarts = 0; state.recognitionFailed = false; window.lunaVoiceCallActive = true; setState("initializing"); buttons(); beginListening();
   }
   byId("openVoiceCall").addEventListener("click", () => { byId("voiceCallPanel").hidden = false; });
   byId("closeVoiceCall").addEventListener("click", () => { endCall(); byId("voiceCallPanel").hidden = true; });
