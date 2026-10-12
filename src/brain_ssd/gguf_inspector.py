@@ -185,6 +185,13 @@ class GGUFInspector:
             tensor = TensorInfo(name, shape, type_id, type_name, offset, physical)
             self._by_name[name] = tensor
             tensors.append(tensor)
+        # Distinct tensor entries must not alias the same serialized bytes.
+        # Future loaders cannot safely assign cache ownership otherwise.
+        previous_end = 0
+        for tensor in sorted(tensors, key=lambda item: item.offset):
+            if tensor.offset < previous_end:
+                raise GGUFError("GGUF tensor byte ranges overlap.")
+            previous_end = tensor.offset + tensor.size_bytes
         self.tensors = tuple(tensors)
 
     def tensor(self, name: str) -> TensorInfo:

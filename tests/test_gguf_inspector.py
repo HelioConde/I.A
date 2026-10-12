@@ -58,6 +58,10 @@ class GGUFInspectorTests(unittest.TestCase):
         _fixture(unaligned, second_offset=1)
         with self.assertRaises(GGUFError):
             GGUFInspector(unaligned)
+        overlapping = Path(self.tmp.name) / "overlapping.gguf"
+        _fixture(overlapping, second_offset=0)
+        with self.assertRaises(GGUFError):
+            GGUFInspector(overlapping)
         inspected = GGUFInspector(self.path)
         with self.assertRaises(ValueError):
             inspected.read_tensor_window("first", offset=17)
