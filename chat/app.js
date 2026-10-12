@@ -977,6 +977,7 @@ async function copilotStatus() {
       .forEach(id => { $(id).disabled = !state.files_enabled; });
     $("copilotSystem").disabled = !state.enabled;
     $("copilotCapture").disabled = !state.screen_enabled;
+    $("copilotOCR").disabled = !state.screen_enabled;
     $("copilotLive").disabled = !state.screen_enabled;
     $("copilotInstalled").disabled = !state.apps_enabled;
     $("copilotProcesses").disabled = !state.apps_enabled;
