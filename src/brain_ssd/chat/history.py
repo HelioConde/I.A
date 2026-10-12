@@ -118,6 +118,18 @@ class ChatHistory:
             ).fetchall()
         return [{"role": row["role"], "content": row["content"]} for row in rows]
 
+    def first_user_question(self, conversation_id: Any) -> str | None:
+        """Return the real earliest user message, not the truncated recent context."""
+        identifier = self._valid_id(conversation_id)
+        if self.get(identifier) is None:
+            raise ValueError("Conversa não encontrada.")
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT content FROM messages WHERE conversation_id=? "
+                "AND role='user' ORDER BY id ASC LIMIT 1", (identifier,),
+            ).fetchone()
+        return str(row["content"]) if row is not None else None
+
     def recent_context(self, conversation_id: Any, limit: int = 8) -> list[dict[str, str]]:
         return [
             {"role": item["role"], "content": item["content"][:700]}
