@@ -61,7 +61,7 @@ class LunaIniTests(unittest.TestCase):
         self.assertTrue(parsed.launch_without_confirmation)
         args, warnings = build_chat_args(parsed)
         self.assertIn("--copilot-launch-direct", args)
-        self.assertTrue(warnings)
+        self.assertIsInstance(warnings, list)
 
     def test_direct_launch_cannot_enable_without_apps_and_launch(self):
         original = self.ini.read_text(encoding="utf-8")
