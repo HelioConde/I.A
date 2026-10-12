@@ -150,6 +150,16 @@
           <button type="button" id="copilotConfirmEdit" hidden>Confirmar edição no disco</button>
           <button type="button" id="copilotCancelEdit" hidden>Cancelar edição</button>
         </div>
+        <div class="copilot-actions">
+          <button type="button" id="copilotVerifyEdit" hidden>Verificar última alteração</button>
+          <button type="button" id="copilotPrepareUndo" hidden>Preparar desfazer</button>
+        </div>
+        <pre id="copilotUndoDiff" class="copilot-edit-diff" hidden></pre>
+        <div class="copilot-actions">
+          <button type="button" id="copilotConfirmUndo" hidden>Confirmar desfazer</button>
+          <button type="button" id="copilotCancelUndo" hidden>Cancelar desfazer</button>
+        </div>
+        <p class="copilot-muted">Desfazer exige nova aprovação, só vale para a última edição nesta sessão e é bloqueado caso o arquivo tenha sido modificado depois.</p>
       </details>
     </section>
     <section class="copilot-block">
