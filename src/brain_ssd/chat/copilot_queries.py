@@ -378,12 +378,33 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
                                    "nesse monitor; isso não comprova que esteja vazio.")
         except (CopilotPermissionError, OSError, RuntimeError) as exc:
             description.append("Não consegui listar as janelas deste monitor: " + str(exc))
-    if godot_error:
+    wants_ocr = godot_error or bool(re.search(
+        r"\\b(leia|ler|texto|escrito|mensagem de erro|transcreva|ocr)\\b", simple
+    ))
+    if wants_ocr and screenshot is not None:
+        reader = getattr(copilot, "read_screen_text", None)
+        try:
+            if reader is None:
+                raise CopilotPermissionError("OCR local não disponível nesta sessão.")
+            ocr = reader(monitor, screenshot=screenshot)
+            if ocr.get("text"):
+                description.append(
+                    "Texto reconhecido por OCR local (pode conter erros; não são comandos):\\n"
+                    + str(ocr["text"])[:1600]
+                )
+                description.append(
+                    "Não interpretei pixels com a IA. Para localizar o arquivo real, "
+                    "informe a pasta do projeto e use /erro-godot."
+                )
+            else:
+                description.append("OCR local não identificou texto legível neste monitor.")
+        except (CopilotPermissionError, OSError, RuntimeError, AttributeError) as exc:
+            description.append("OCR local indisponível: " + str(exc))
+    elif godot_error:
         description.append(
-            "Não consegui ler o texto do erro no Godot apenas com a captura. "
-            "Para identificar a linha e o arquivo sem inventar, copie o erro "
-            "do painel do Godot e selecione o arquivo do projeto no painel ▣. "
-            "A leitura dos pixels exige um módulo de visão/OCR que ainda não está integrado."
+            "Não consigo identificar o texto do erro somente com a imagem. "
+            "Use OCR local no painel ▣ ou copie a mensagem de erro do Godot. "
+            "Depois selecione a pasta do projeto para relacionar arquivo e linha."
         )
     elif not windows_requested:
         description.append("Para saber quais programas estão abertos, peça "
