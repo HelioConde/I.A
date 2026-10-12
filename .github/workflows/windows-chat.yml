@@ -9,6 +9,8 @@ on:
       - "tests/test_copilot_queries.py"
       - "tests/test_copilot_question_battery.py"
       - "tests/test_jarvis_apps.py"
+      - "tests/test_copilot_code_edits.py"
+      - "src/brain_ssd/chat/code_edits.py"
       - "src/brain_ssd/chat/windows_apps.py"
       - "INICIAR-COPILOTO-WINDOWS.bat"
       - "tests/fixtures/copilot_question_battery.json"
@@ -124,6 +126,7 @@ jobs:
           python -m unittest discover -s tests -p "test_copilot_queries.py" -v
           python -m unittest discover -s tests -p "test_copilot_question_battery.py" -v
           python -m unittest discover -s tests -p "test_jarvis_apps.py" -v
+          python -m unittest discover -s tests -p "test_copilot_code_edits.py" -v
       - name: Assert runtime unit tests independently
         shell: pwsh
         run: python -m unittest discover -s tests -p "test_chat_runtime.py" -v
