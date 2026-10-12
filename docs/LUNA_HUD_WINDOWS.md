@@ -153,3 +153,38 @@ py -3 -m unittest discover -s tests -p 'test_luna_real_world_regression.py' -v
 py -3 -m unittest discover -s tests -p 'test_copilot_queries.py' -v
 py -3 -m unittest discover -s tests -p 'test_chat_web_search.py' -v
 ```
+
+## Ajustes a partir dos screenshots: painel e respostas da Luna
+
+- O painel direito estava comprimindo cada cartão (`flex-shrink: 1`) e
+  ocultando textos como `Respondendo`, permissões e ações rápidas.
+  Os cartões agora mantêm a altura do conteúdo e o painel rola
+  verticalmente; a barra esquerda também pode rolar sem perder conteúdo.
+- Perguntas sobre **as abas abertas** (inclusive `quais as minhas abas`
+  e o acompanhamento `mas isso são programas, não abas`) recebem uma
+  resposta honesta: os processos `chrome.exe` de `tasklist.exe` não são
+  URLs nem nomes das abas do navegador.
+- Se a transcrição de voz disser apenas `verifique o que está aberto
+  no Google Chrome`, sem especificar abas ou processos, a Luna pede
+  esclarecimento antes de executar o inventário de processos.
+- Perguntas se consegue ver `o que está aberto no meu computador`
+  descrevem as permissões/capacidades, sem alegar que já inspecionou a máquina.
+- `Olá bom dia`/`Olá, bom dia` agora têm respostas locais de saudação;
+  não recuperam páginas Wikipédia sobre a palavra `oi`.
+- `Quais as informações de hoje?` pergunta qual assunto foi pretendido.
+- `Qual vai ser o clima em Brasília hoje?` informa que ainda não há
+  serviço de previsão meteorológica ao vivo integrado. Nem a caixa
+  `Pesquisar na web` autoriza fabricar uma previsão.
+
+Teste offline de regressão:
+
+```powershell
+py -3 -m unittest discover -s tests -p "test_luna_hud_trust_followups.py" -v
+py -3 -m unittest discover -s tests -p "test_luna_real_world_regression.py" -v
+py -3 -m unittest discover -s tests -p "test_chat_learning_news.py" -v
+```
+
+**Limitações ainda existentes:** a Luna não enumera abas do Chrome/Edge
+sem uma integração de navegador com autorização explícita; não há
+API meteorológica configurada nem OCR/vídeo inferido automaticamente.
+Não foi realizada validação visual/screenshot no Windows nesta alteração.
