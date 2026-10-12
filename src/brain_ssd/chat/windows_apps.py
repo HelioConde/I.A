@@ -254,11 +254,18 @@ def run_start_app(app_name: str) -> dict[str, Any]:
     if any(x in app_name for x in ("/", chr(92), ":", "|", "&", ";", "$", chr(96), "\n", "\r")):
         raise ValueError("Comandos e caminhos não são nomes de aplicativos.")
     query = _normalized_app_name(app_name)
+    aliases = {
+        "notepad": ("notepad", "bloco de notas"),
+        "bloco de notas": ("bloco de notas", "notepad"),
+        "calculator": ("calculator", "calculadora"),
+        "calculadora": ("calculadora", "calculator"),
+    }
+    candidates = aliases.get(query, (query,))
     if query in _DENIED_LAUNCH_NAMES:
         raise ValueError("Aplicativo administrativo ou interpretador de comandos bloqueado.")
     inventory = start_menu_apps()
     rows = inventory["items"]
-    exact = [entry for entry in rows if _normalized_app_name(entry["name"]) == query]
+    exact = [entry for entry in rows if _normalized_app_name(entry["name"]) in candidates]
     if not exact and len(query) >= 4:
         exact = [entry for entry in rows if query in _normalized_app_name(entry["name"])]
     if not exact:
