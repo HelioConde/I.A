@@ -100,6 +100,7 @@ class WindowPager:
         if offset + (pages - 1) * page_bytes >= size:
             raise ValueError("Weight window extends beyond the file.")
         self.source = path
+        self._source_size = size
         self.offset = offset
         self.page_bytes = page_bytes
         self.pages = pages
@@ -126,7 +127,7 @@ class WindowPager:
         if self.mode == "full_window":
             # Load ONLY the selected window, never the whole model implicitly.
             size = min(self.pages * self.page_bytes,
-                       self.source.stat().st_size - self.offset)
+                       self._source_size - self.offset)
             if size > MAX_BUDGET_BYTES:
                 raise ValueError("Full-window baseline exceeds 256 MiB safety ceiling.")
             self._fd.seek(self.offset)
@@ -147,7 +148,7 @@ class WindowPager:
 
     def _read(self, page_id: int) -> bytes:
         start = self.offset + page_id * self.page_bytes
-        remaining = self.source.stat().st_size - start
+        remaining = self._source_size - start
         size = min(self.page_bytes, remaining)
         if size <= 0:
             raise IndexError("Page outside source.")
@@ -192,7 +193,7 @@ class WindowPager:
 
     def _size(self, page_id: int) -> int:
         return min(self.page_bytes,
-                   self.source.stat().st_size - (self.offset + page_id * self.page_bytes))
+                   self._source_size - (self.offset + page_id * self.page_bytes))
 
     def access(self, page_id: int) -> int:
         """Return CRC32 to force touching every requested byte on all strategies."""
