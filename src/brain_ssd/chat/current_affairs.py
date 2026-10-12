@@ -41,6 +41,26 @@ def needs_recent_public_sources(question: str) -> bool:
                               r"ultimas?|recentes?|hoje|agora|atual)\b", lower))
 
 
+
+def time_sensitive_local_intent(question: str) -> str | None:
+    """Identify vague daily and live-weather requests before offline Qwen."""
+    if not isinstance(question, str):
+        return None
+    text = unicodedata.normalize("NFKD", question.casefold())
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    text = re.sub(r"\s+", " ", text).strip(" ?!.")
+    if re.fullmatch(
+        r"(?:quais? (?:sao )?(?:as )?informacoes de hoje|o que tem de novo hoje|"
+        r"me atualize sobre hoje|me de as informacoes de hoje|"
+        r"quais? as novidades de hoje)", text
+    ):
+        return "ambiguous_today"
+    if (re.search(r"\b(?:clima|previsao(?: do tempo)?|tempo)\b", text)
+            and re.search(r"\b(?:hoje|amanha|agora|esta semana|essa semana|vai ser|vai estar|
+                               r"previsao|esta fazendo|estara)\b", text)):
+        return "live_weather"
+    return None
+
 def explicit_web_research(question: str) -> bool:
     """Only an explicit command can request browser consent for general topics."""
     if not isinstance(question, str):
