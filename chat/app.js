@@ -526,6 +526,51 @@ async function send() {
           imageNote.textContent = "Imagem capturada localmente; a IA de texto não consegue interpretar seu conteúdo.";
           pending.querySelector(".message-body").appendChild(imageNote);
         }
+        if (payload.local_action === "copilot_launch_proposal" &&
+            typeof payload.copilot_launch_token === "string" &&
+            ["notepad","calculator"].includes(payload.copilot_launch_app)) {
+          // No execution during LLM generation. This explicit click is the only
+          // event allowed to consume the single-use server token.
+          const token = payload.copilot_launch_token;
+          const label = payload.copilot_launch_label || payload.copilot_launch_app;
+          const controls = document.createElement("div");
+          controls.className = "copilot-confirm-actions";
+          const confirm = document.createElement("button");
+          confirm.type = "button";
+          confirm.textContent = "Confirmar abertura: " + label;
+          const cancel = document.createElement("button");
+          cancel.type = "button";
+          cancel.textContent = "Não abrir";
+          cancel.className = "copilot-cancel";
+          const result = document.createElement("p");
+          result.setAttribute("role", "status");
+          controls.append(confirm, cancel, result);
+          pending.querySelector(".message-body").appendChild(controls);
+          cancel.addEventListener("click", () => {
+            confirm.disabled = true;
+            cancel.disabled = true;
+            result.textContent = "Pedido cancelado. Nenhum programa foi iniciado.";
+          });
+          confirm.addEventListener("click", async () => {
+            if (confirm.disabled || !window.confirm("Deseja iniciar " + label +
+                " neste computador? Esta ação foi proposta pelo assistente.")) return;
+            confirm.disabled = true;
+            cancel.disabled = true;
+            result.textContent = "Solicitando abertura ao Windows...";
+            try {
+              const launched = await requestJson("/api/copilot", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({action:"launch", token})
+              });
+              result.textContent = "Pedido enviado ao Windows para iniciar " +
+                launched.label + " (PID " + launched.started_pid +
+                "). Confira se a janela abriu corretamente.";
+            } catch (error) {
+              result.textContent = "Não foi possível abrir: " + error.message;
+            }
+          });
+        }
+
         app.messages.push({role:"assistant", content:payload.answer});
         if (payload.local_action) {
           const actionNote = document.createElement("p");
@@ -772,9 +817,11 @@ async function copilotStatus() {
     const state = await requestJson("/api/copilot/status", {cache:"no-store"});
     copilotState.enabled = !!state.enabled;
     $("copilotStatus").textContent = state.enabled
-      ? "Recursos habilitados: " + (state.files_enabled ? "arquivos " : "") +
-        (state.screen_enabled ? "tela" : "") + "."
-      : "Desativado. Inicie com --copilot-root e/ou --copilot-screen.";
+      ? "Permissões ativas: " + (state.files_enabled ? "arquivos · " : "") +
+        (state.screen_enabled ? "tela · " : "") +
+        (state.apps_enabled ? "aplicativos · " : "") +
+        (state.launch_enabled ? "abertura confirmada" : "sem abertura automática")
+      : "Desativado. Escolha as permissões no iniciador do Copiloto.";
     $("copilotRoots").textContent = state.roots && state.roots.length
       ? "Pastas autorizadas: " + state.roots.join(" · ") : "Nenhuma pasta autorizada.";
     ["copilotList", "copilotRead", "copilotImage"]
@@ -782,6 +829,8 @@ async function copilotStatus() {
     $("copilotSystem").disabled = !state.enabled;
     $("copilotCapture").disabled = !state.screen_enabled;
     $("copilotLive").disabled = !state.screen_enabled;
+    $("copilotInstalled").disabled = !state.apps_enabled;
+    $("copilotProcesses").disabled = !state.apps_enabled;
   } catch (_) {
     $("copilotStatus").textContent = "Não foi possível verificar as permissões locais.";
   }
@@ -804,6 +853,7 @@ async function copilotCall(action) {
   const data = {action};
   if (["list","read","image"].includes(action)) data.path = $("copilotPath").value.trim();
   if (action === "screen") data.monitor = Number($("copilotMonitor").value);
+  if (["apps", "processes"].includes(action)) data.search = $("copilotAppSearch").value.trim() || null;
   feedback.textContent = "Consultando recurso local...";
   $("copilotUseChat").hidden = true;
   try {
@@ -820,6 +870,25 @@ async function copilotCall(action) {
       img.className = "copilot-preview";
       result.append(img);
       feedback.textContent = "Captura local pronta. O modelo de texto não interpreta os pixels.";
+    } else if (action === "apps" || action === "processes") {
+      const title = document.createElement("p");
+      title.textContent = (action === "apps" ? "Aplicativos registrados: " : "Processos ativos: ") +
+        response.total_matches + (response.truncated ? " (mostrando até 30)" : "");
+      result.append(title);
+      for (const item of response.items || []) {
+        const line = document.createElement("p");
+        line.className = "copilot-inventory-item";
+        line.textContent = action === "apps"
+          ? item.name + (item.version ? " · versão " + item.version : "")
+          : item.name + " · PID " + item.pid;
+        result.append(line);
+      }
+      copilotState.text = (response.items || []).map(item =>
+        action === "apps"
+          ? item.name + (item.version ? " · " + item.version : "")
+          : item.name + " (PID " + item.pid + ")").join("\n");
+      $("copilotUseChat").hidden = !copilotState.text;
+      feedback.textContent = "Consulta local concluída; esta lista pode ser parcial.";
     } else if (action === "list") {
       const head = document.createElement("p");
       head.textContent = "Pasta: " + response.path;
@@ -862,6 +931,8 @@ $("copilotList").addEventListener("click", () => copilotCall("list"));
 $("copilotRead").addEventListener("click", () => copilotCall("read"));
 $("copilotImage").addEventListener("click", () => copilotCall("image"));
 $("copilotSystem").addEventListener("click", () => copilotCall("system"));
+$("copilotInstalled").addEventListener("click", () => copilotCall("apps"));
+$("copilotProcesses").addEventListener("click", () => copilotCall("processes"));
 $("copilotCapture").addEventListener("click", () => copilotCall("screen"));
 $("copilotLive").addEventListener("change", () => {
   if (!$("copilotLive").checked) { stopCopilotLive(); return; }
