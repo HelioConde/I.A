@@ -224,3 +224,61 @@ py -3 -m unittest discover -s tests -p 'test_chat_history.py' -v
 ```
 
 Reinicie a Luna para atualizar o servidor Python, inclusive no modo ligação.
+
+## Abertura de aplicativos por texto ou voz sem clique (opt-in)
+
+Por solicitação explícita do usuário, o iniciador oferece a opção:
+
+```ini
+[copilot]
+apps = true
+launch = true
+launch_without_confirmation = true
+```
+
+**Atenção:** configurar somente `launch = true` NÃO ativa abertura sem clique.
+É necessário definir `launch_without_confirmation = true` no arquivo pessoal
+`LUNA.ini`, pois configurações antigas não são sobrescritas pelo Git.
+
+Para ativar uma única vez preservando as demais configurações:
+
+```powershell
+Set-Location "C:\Users\helio\Documents\I.A"
+git pull --ff-only origin feat/ssd-weight-streaming-lab
+py -3 .\tools\launch_luna.py --enable-direct-launch
+py -3 .\tools\launch_luna.py --check
+.\INICIAR-COPILOTO-WINDOWS.bat
+```
+
+Após reiniciar, o HUD exibe `Abrir programas: Direto (INI)`.
+A frase **Abra a Calculadora** ou **Abra o Steam** é tratada por uma
+ferramenta local (não por resposta inventada do Qwen). Assim, transcrições
+de chamadas de voz podem abrir aplicativos registrados sem outro clique.
+A transcrição precisa ter a forma de uma ordem explícita e sem ambiguidade.
+
+A consulta **Liste todos os programas instalados** mostra aplicativos do
+menu Iniciar em páginas de 35. Para continuar: **Liste aplicativos instalados
+página 2**. O registro Uninstall e o menu Iniciar são fontes diferentes;
+aplicativos portáteis, sem registro ou sem atalho podem ficar ausentes.
+Não se promete listar todos os executáveis do disco.
+
+**Restrições:** não interpreta nomes como comandos, não usa `shell=True`,
+não aceita caminhos arbitrários, não permite abrir terminal/PowerShell/cmd
+ou alguns utilitários administrativos, nem tenta instalar software.
+Somente um aplicativo identificado de modo único pelo Windows poderá
+ser iniciado. A resposta significa que o pedido foi encaminhado ao Windows,
+não que a janela foi visualmente confirmada.
+
+A permissão pode ser desligada novamente com
+`launch_without_confirmation = false` no LUNA.ini.
+Em conversa por voz, erros de reconhecimento podem produzir palavras
+inesperadas; use microfone bem configurado e mantenha essa permissão
+desativada quando houver outras pessoas falando perto do computador.
+
+Validação técnica sem realmente abrir programas:
+
+```powershell
+py -3 -m unittest discover -s tests -p "test_windows_start_apps.py" -v
+py -3 -m unittest discover -s tests -p "test_jarvis_apps.py" -v
+py -3 -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
+```
