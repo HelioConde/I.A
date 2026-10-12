@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from launch_luna import (  # noqa: E402
-    EXAMPLE, build_chat_args, enable_direct_launch, ensure_config, main, read_config, resolve_godot,
+    EXAMPLE, MODEL_PRESETS, build_chat_args, enable_direct_launch, ensure_config, main, read_config, resolve_godot, select_local_model,
 )
 
 
@@ -167,6 +167,42 @@ class LunaIniTests(unittest.TestCase):
         self.assertIn("--model-file", chat_args)
         self.assertEqual(chat_args[chat_args.index("--model-file") + 1],
                          "Qwen3-4B-Q8_0.gguf")
+
+    def test_choose_qwen4b_persists_model_without_changing_permissions(self):
+        models = self.temp / "models"
+        models.mkdir()
+        (models / MODEL_PRESETS["4b"][0]).write_bytes(b"fixture: not a GGUF")
+        before = read_config(self.ini)
+        original = self.ini.read_text(encoding="utf-8")
+        filename = select_local_model(self.ini, "4b", root=self.temp)
+        after = read_config(self.ini)
+        self.assertEqual(filename, "Qwen3-4B-Q4_K_M.gguf")
+        self.assertEqual(after.model_file, filename)
+        self.assertEqual(after.profile, "equilibrado")
+        self.assertEqual(after.roots, before.roots)
+        self.assertEqual(after.screen, before.screen)
+        self.assertEqual(after.apps, before.apps)
+        self.assertEqual(after.launch, before.launch)
+        self.assertEqual(after.edit, before.edit)
+        self.assertEqual(after.web_search, before.web_search)
+        self.assertIn("godot_path = " + before.godot_path, self.ini.read_text(encoding="utf-8"))
+        self.assertEqual(len(original.splitlines()), len(self.ini.read_text(encoding="utf-8").splitlines()))
+
+    def test_missing_model_does_not_change_ini(self):
+        original = self.ini.read_bytes()
+        with self.assertRaisesRegex(ValueError, "não instalado"):
+            select_local_model(self.ini, "4b", root=self.temp)
+        self.assertEqual(self.ini.read_bytes(), original)
+
+    def test_model_cli_switch_only_updates_local_ini_and_does_not_boot_model(self):
+        with patch("launch_luna.select_local_model", return_value="Qwen3-4B-Q4_K_M.gguf") as select, \\
+             patch("launch_luna.subprocess.run") as doctor, \\
+             patch("launch_luna.subprocess.call") as start, \\
+             patch("builtins.print"):
+            self.assertEqual(main(["--config", str(self.ini), "--select-model", "4b"]), 0)
+        select.assert_called_once_with(self.ini.resolve(), "4b")
+        doctor.assert_not_called()
+        start.assert_not_called()
 
     def test_windows_batch_no_longer_prompts_and_uses_ini_launcher(self):
         batch = (ROOT / "INICIAR-COPILOTO-WINDOWS.bat").read_text(encoding="utf-8")
