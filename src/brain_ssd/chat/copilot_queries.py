@@ -285,7 +285,8 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
         )
     if re.search(r"\b(?:crie|criar|cria|grave|salve|escreva|gerar|gere)\b", simple) and re.search(
         r"\b(?:arquivo|texto|txt|documento)\b", simple
-    ) and (re.search(r"\b(?:c:/|c:|disco|pasta|diretorio|arquivo|salve|grave|crie o texto|criar um texto)\b", simple)
+    ) and (bool(re.search(r"[a-z]:[/\\\\]", simple))
+           or bool(re.search(r"\b(?:disco|pasta|diretorio|arquivo|salve|grave)\b", simple))
            or "crie o texto" in simple):
         return _result(
             "Posso redigir o conteúdo aqui, mas esta versão do chat não grava arquivos "
@@ -295,7 +296,7 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "do Copiloto para arquivos de código autorizados.",
             "copilot_text_write_unsupported",
         )
-    if re.search(r"\b(?:imagem|imagens|fotos?|png|jpg|jpeg|webp)\b", simple) and re.search(
+    if re.search(r"\b(?:imagem|imagen|imagens|fotos?|png|jpg|jpeg|webp)\b", simple) and re.search(
         r"\b(?:downloads?|baixados?)\b", simple
     ) and re.search(r"\b(?:localize|localizar|ache|encontre|mostre|mostrar|liste|listar|primeir[ao])\b", simple):
         if copilot is None or not copilot.status().get("files_enabled"):
