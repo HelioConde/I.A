@@ -7,6 +7,7 @@ const log = $("messages");
 // it may use installed OS voices or a browser-provided voice service.
 const voiceSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 const reader = {button:null, utterance:null};
+const autoVoice = {enabled:false};
 function resetVoiceButton() {
   if (reader.button) {
     reader.button.textContent = "🔊 Ouvir resposta";
@@ -21,7 +22,7 @@ function stopSpeaking() {
   window.speechSynthesis.cancel();
   resetVoiceButton();
 }
-function readAssistantText(button, content) {
+function readAssistantText(button, content, {localOnly=false} = {}) {
   if (!voiceSupported) return;
   if (reader.button === button) {
     stopSpeaking();
@@ -35,9 +36,12 @@ function readAssistantText(button, content) {
   utterance.rate = 1.02;
   const voices = window.speechSynthesis.getVoices();
   const localPtBR = voices.find(voice => voice.lang.toLowerCase() === "pt-br" && voice.localService);
+  const localPt = voices.find(voice => voice.lang.toLowerCase().startsWith("pt") && voice.localService);
   const ptBR = voices.find(voice => voice.lang.toLowerCase() === "pt-br");
   const pt = voices.find(voice => voice.lang.toLowerCase().startsWith("pt"));
-  if (localPtBR || ptBR || pt) utterance.voice = localPtBR || ptBR || pt;
+  if (localOnly && !(localPtBR || localPt)) return;
+  if (localPtBR || localPt || ptBR || pt)
+    utterance.voice = localPtBR || localPt || (localOnly ? null : ptBR || pt);
   reader.button = button;
   reader.utterance = utterance;
   button.textContent = "■ Parar áudio";
@@ -53,6 +57,29 @@ function readAssistantText(button, content) {
     button.disabled = true;
   }
 }
+
+function updateLocalVoiceAvailability() {
+  const control = $("autoVoiceToggle");
+  const hasLocal = voiceSupported && window.speechSynthesis.getVoices().some(
+    voice => voice.localService && voice.lang.toLowerCase().startsWith("pt")
+  );
+  control.disabled = !hasLocal;
+  $("autoVoiceControl").title = hasLocal
+    ? "Falar respostas automaticamente com voz instalada no sistema (microfone desligado)"
+    : "Sem voz portuguesa local disponível neste navegador; nenhuma voz remota será usada automaticamente";
+  if (!hasLocal) {
+    control.checked = false;
+    autoVoice.enabled = false;
+  }
+}
+$("autoVoiceToggle").addEventListener("change", () => {
+  autoVoice.enabled = !$("autoVoiceToggle").disabled && $("autoVoiceToggle").checked;
+  if (!autoVoice.enabled) stopSpeaking();
+});
+if (voiceSupported) {
+  window.speechSynthesis.addEventListener("voiceschanged", updateLocalVoiceAvailability);
+}
+updateLocalVoiceAvailability();
 
 
 async function requestJson(path, options = {}) {
@@ -481,6 +508,9 @@ async function send() {
         output.textContent = payload.answer;
         const speak = pending.querySelector(".voice-message");
         if (speak && voiceSupported) speak.disabled = !payload.answer?.trim();
+        if (autoVoice.enabled && voiceSupported && speak && payload.answer?.trim()) {
+          readAssistantText(speak, payload.answer, {localOnly:true});
+        }
         if (payload.needs_continuation && payload.mode === "experimental_chat") {
           const note = document.createElement("div");
           note.className = "generation-incomplete";
