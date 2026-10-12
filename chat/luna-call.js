@@ -116,7 +116,7 @@
     try { recognition.start(); } catch (_) { state.recognition = null; setState("error", "O navegador não iniciou o microfone local."); buttons(); }
   }
   async function submitTurn(text) {
-    if (!state.active || state.expectingAnswer || window.appVoiceSending?.()) return;
+    if (!state.active || state.muted || state.expectingAnswer || window.appVoiceSending?.()) return;
     state.expectingAnswer = true; state.turn += 1; setState("thinking"); buttons();
     const input = byId("messageInput"); input.value = text; input.dispatchEvent(new Event("input", {bubbles:true}));
     try { await window.sendVoiceCallTranscript(); } catch (_) { setState("error", "A solicitação ao Qwen local não pôde ser iniciada."); }
@@ -175,9 +175,9 @@
   byId("closeVoiceCall").addEventListener("click", () => { endCall(); byId("voiceCallPanel").hidden = true; });
   byId("startVoiceCall").addEventListener("click", startCall);
   byId("endVoiceCall").addEventListener("click", endCall);
-  byId("muteVoiceCall").addEventListener("click", () => { state.muted = !state.muted; if (state.muted) { stopRecognition(); setState("muted"); } else beginListening(); buttons(); });
+  byId("muteVoiceCall").addEventListener("click", () => { if (!state.active) return; state.muted = !state.muted; if (state.muted) { stopRecognition(); setState("muted"); } else beginListening(); buttons(); });
   byId("interruptVoiceCall").addEventListener("click", interrupt);
-  window.addEventListener("luna:chat", event => { const data = event.detail || {}; if (!state.active) return; if (data.kind === "done") { byId("voiceCallAnswer").textContent = data.answer || "Resposta vazia."; speakAnswer(data.answer); } else if (data.kind === "stopped") {
+  window.addEventListener("luna:chat", event => { const data = event.detail || {}; if (!state.active) return; if (!state.expectingAnswer) return; if (data.kind === "done") { byId("voiceCallAnswer").textContent = data.answer || "Resposta vazia."; speakAnswer(data.answer); } else if (data.kind === "stopped") {
       state.expectingAnswer = false;
       setState("interrupted");
       buttons();
