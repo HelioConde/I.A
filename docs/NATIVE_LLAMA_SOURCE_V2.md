@@ -73,3 +73,32 @@ py -3 -m unittest discover -s tests -p "test_prepare_native_llama_windows.py" -v
 
 **Este módulo é infraestrutura para investigação de código-fonte e compilação,
 não é uma implementação de inferência com streaming.**
+
+## Baseline do processo nativo compilado
+
+`tools/bench_native_llama_windows.py` inicia o `llama-cli.exe` que foi
+produzido na árvore isolada e mede o processo que realmente executa o Qwen.
+Ele usa contadores Windows de working set, memória privada, pico, page faults,
+CPU e I/O do processo. I/O é **lógico do processo**, não uma medida física do
+SSD: o Windows pode responder a um page fault pelo cache de arquivos.
+
+Exemplo (o caminho do fonte permanece fora do repositório):
+
+```bat
+py -3 tools\bench_native_llama_windows.py ^
+  --cli "%LOCALAPPDATA%\BrainSSD\native-llama-source\972b5fcc1967\build-brainssd-cpu\bin\Release\llama-cli.exe" ^
+  --model models\Qwen3-0.6B-Q8_0.gguf ^
+  --context-size 512 ^
+  --comparison-load-mode none ^
+  --output results\weight_lab\native-llama-mmap-vs-none.json
+```
+
+O modo `mmap` existente no upstream executa a inferência real por páginas
+sob demanda do SO, mas não é o `Brain-SSD Native Weight Loader`. Em particular,
+nesta revisão `llama_mmap::unmap_fragment()` não descarrega fragmentos no
+Windows. O runner registra logits e TTFT como indisponíveis porque a interface
+de linha de comando não expõe callback de logits nem de primeiro token; não
+estima esses valores.
+
+O tamanho de contexto é fixado e registrado; deixar o padrão do modelo pode
+alocar vários gigabytes para KV cache e invalidar uma comparação de pesos.
