@@ -390,6 +390,7 @@ class ChatEngine:
         )
         if google_intent:
             google_enabled = bool(self.web_search_service and
+                                  self.web_search_service.provider in ("google", "auto") and
                                   getattr(self.web_search_service, "_serper_key", ""))
             if not google_search_request or not web_search or not google_enabled:
                 if not google_enabled:
