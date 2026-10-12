@@ -1005,6 +1005,16 @@ setInterval(refreshStatus, 3000);
 const copilotState = {timer:null, busy:false, text:"", enabled:false};
 const codeEdit = {token:null, path:null};
 const godotTest = {token:null, project:null, script:null};
+const agentPlan = {token:null, task:null};
+function clearAgentPlan() {
+  agentPlan.token = null;
+  agentPlan.task = null;
+  $("copilotAgentPreview").hidden = true;
+  $("copilotAgentPreview").textContent = "";
+  $("copilotAgentRun").hidden = true;
+  $("copilotAgentCancel").hidden = true;
+}
+
 function resetGodotTest() {
   godotTest.token = null;
   godotTest.project = null;
@@ -1048,6 +1058,7 @@ async function copilotStatus() {
     $("copilotScanProject").disabled = !state.files_enabled;
     $("copilotDiagnoseGodot").disabled = !state.files_enabled;
     $("copilotProposeGodotTest").disabled = !state.godot_validate_enabled;
+    $("copilotAgentPlan").disabled = !state.agent_enabled;
     $("copilotExplainCode").disabled = !state.files_enabled;
     $("copilotProposeEdit").disabled = !state.edit_enabled;
   } catch (_) {
@@ -1061,6 +1072,7 @@ function stopCopilotLive() {
 }
 function closeCopilot() {
   stopCopilotLive();
+  clearAgentPlan();
   resetCodeEditPreview();
   resetGodotTest();
   $("copilotPanel").hidden = true;
@@ -1257,6 +1269,79 @@ $("copilotConfirmGodotTest").addEventListener("click", async () => {
 $("copilotCancelGodotTest").addEventListener("click", () => {
   resetGodotTest();
   $("copilotFeedback").textContent = "Proposta descartada. Nenhum teste foi executado.";
+});
+
+$("copilotAgentPlan").addEventListener("click", async () => {
+  if (copilotState.busy || $("copilotPanel").hidden) return;
+  clearAgentPlan();
+  copilotState.busy = true;
+  try {
+    const task = $("copilotAgentTask").value;
+    const plan = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        action:"agent_plan",
+        task,
+        project:$("copilotProjectPath").value.trim(),
+        error:$("copilotGodotError").value.trim(),
+        path:$("copilotPath").value.trim()
+      })
+    });
+    agentPlan.token = plan.token;
+    agentPlan.task = plan.task;
+    $("copilotAgentPreview").textContent = "Tarefa: " + plan.task +
+      "\nEscopo: " + JSON.stringify(plan.scope) +
+      "\n\n" + plan.steps.map(step =>
+        step.number + ". " + step.title + " [" + step.tool + "]").join("\n") +
+      "\n\nRisco: " + plan.risk +
+      "\n" + plan.notice + "\nPrazo: " + plan.expires_seconds + "s";
+    $("copilotAgentPreview").hidden = false;
+    $("copilotAgentRun").hidden = false;
+    $("copilotAgentCancel").hidden = false;
+    $("copilotFeedback").textContent = "Plano preparado. Ainda não foi executada nenhuma ferramenta.";
+  } catch (error) {
+    $("copilotFeedback").textContent = error.message || "Falha ao criar plano.";
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotAgentRun").addEventListener("click", async () => {
+  if (!agentPlan.token || copilotState.busy) return;
+  const token = agentPlan.token;
+  clearAgentPlan();
+  copilotState.busy = true;
+  $("copilotFeedback").textContent = "Consultando ferramentas locais permitidas...";
+  try {
+    const result = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"agent_execute", token})
+    });
+    const text = "Investigação: " + result.task +
+      "\nStatus: " + result.status +
+      "\n\nEVIDÊNCIAS DO SISTEMA\n" +
+      result.evidence.map(e =>
+        e.step + " (" + e.source + ")\n" +
+        JSON.stringify(e.facts, null, 2)).join("\n\n") +
+      "\n\nRECOMENDAÇÕES (a verificar)\n" +
+      (result.suggestions || []).map(x => "• " + x).join("\n") +
+      "\n\n" + result.next_step + "\n" + result.notice;
+    const pre = document.createElement("pre");
+    pre.textContent = text.slice(0, 24000);
+    $("copilotResult").replaceChildren(pre);
+    copilotState.text = text.slice(0, 1400);
+    $("copilotUseChat").hidden = !copilotState.text;
+    $("copilotFeedback").textContent = result.status === "completed"
+      ? "Consulta concluída; nenhuma alteração realizada."
+      : "Consulta parcial: confira as limitações e informações faltantes.";
+  } catch (error) {
+    $("copilotFeedback").textContent = error.message || "Investigação não concluída.";
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotAgentCancel").addEventListener("click", () => {
+  clearAgentPlan();
+  $("copilotFeedback").textContent = "Plano descartado; nenhuma ferramenta foi executada.";
 });
 $("copilotScanProject").addEventListener("click", () => copilotCall("project_scan"));
 $("copilotDiagnoseGodot").addEventListener("click", () => copilotCall("godot_error"));
