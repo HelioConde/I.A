@@ -262,7 +262,11 @@ def run_start_app(app_name: str) -> dict[str, Any]:
         "calculadora": ("calculadora", "calculator"),
     }
     candidates = aliases.get(query, (query,))
-    if query in _DENIED_LAUNCH_NAMES:
+    if query in _DENIED_LAUNCH_NAMES or any(
+        marker in query for marker in ("powershell", "terminal", "prompt de comando",
+                                      "command prompt", "regedit", "registry editor",
+                                      "agendador de tarefas", "task scheduler")
+    ):
         raise ValueError("Aplicativo administrativo ou interpretador de comandos bloqueado.")
     inventory = start_menu_apps()
     rows = inventory["items"]
