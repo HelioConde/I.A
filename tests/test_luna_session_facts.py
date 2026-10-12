@@ -107,6 +107,18 @@ class SessionFactsTests(unittest.TestCase):
         self.assertIn("SQLite", reply["answer"])
         self.assertIn("diferente das lembranças episódicas", reply["answer"])
 
+    def test_ambiguous_daily_information_asks_which_topic(self):
+        from brain_ssd.chat.current_affairs import time_sensitive_local_intent
+        text = "Quais informações de hoje você consegue me fornecer?"
+        self.assertEqual(time_sensitive_local_intent(text), "ambiguous_today")
+        engine = ChatEngine(lambda: None)
+        try:
+            reply = engine.ask(text, [])
+            self.assertEqual(reply["local_action"], "today_topic_clarification")
+            self.assertIn("Diga o assunto", reply["answer"])
+        finally:
+            engine.close()
+
     def test_do_not_intercept_unrelated_model_or_weather_questions(self):
         for question in (
             "Como quantizar um modelo Qwen?",
