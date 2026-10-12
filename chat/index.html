@@ -153,6 +153,16 @@
       </details>
     </section>
     <section class="copilot-block">
+      <h3>Diagnóstico de projeto Godot</h3>
+      <p class="copilot-muted">Verifica estrutura, scripts e cenas dentro de um projeto autorizado. Não executa Godot e não altera arquivos.</p>
+      <label for="copilotProjectPath">Pasta que contém project.godot</label>
+      <input id="copilotProjectPath" placeholder="C:\\Projetos\\MeuJogo" spellcheck="false">
+      <button type="button" id="copilotScanProject">Inspecionar projeto</button>
+      <label for="copilotGodotError">Mensagem de erro copiada do Godot</label>
+      <textarea id="copilotGodotError" rows="4" maxlength="4000" placeholder="SCRIPT ERROR ... res://scripts/player.gd:42"></textarea>
+      <button type="button" id="copilotDiagnoseGodot">Encontrar arquivo e linha do erro</button>
+    </section>
+    <section class="copilot-block">
       <h3>Aplicativos do Windows</h3>
       <p class="copilot-muted">Consulta somente nomes, versões registradas e processos (nome/PID). Aplicativos portáteis podem não aparecer.</p>
       <label for="copilotAppSearch">Filtrar aplicativo (opcional)</label>
