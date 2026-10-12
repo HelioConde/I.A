@@ -67,15 +67,31 @@ def _rss_bytes() -> int | None:
     return None
 
 
-def _io_bytes() -> int | None:
-    """OS-reported physical process read bytes when available, else unknown."""
+def _io_bytes() -> tuple[int | None, str]:
+    """Return process read accounting without overstating physical SSD I/O."""
+    if os.name == "nt":
+        try:
+            import ctypes
+            class IO_COUNTERS(ctypes.Structure):
+                _fields_ = [(name, ctypes.c_size_t) for name in (
+                    "ReadOperationCount", "WriteOperationCount", "OtherOperationCount",
+                    "ReadTransferCount", "WriteTransferCount", "OtherTransferCount")]
+            counters = IO_COUNTERS()
+            ok = ctypes.windll.kernel32.GetProcessIoCounters(
+                ctypes.windll.kernel32.GetCurrentProcess(), ctypes.byref(counters),
+            )
+            if ok:
+                return int(counters.ReadTransferCount), "windows_process_io_logical"
+        except (AttributeError, OSError):
+            pass
+        return None, "unavailable"
     try:
         for line in Path("/proc/self/io").read_text().splitlines():
             if line.startswith("read_bytes:"):
-                return int(line.split()[1])
+                return int(line.split()[1]), "linux_proc_storage_read"
     except (OSError, ValueError, IndexError):
         pass
-    return None
+    return None, "unavailable"
 
 
 class WindowPager:
@@ -240,7 +256,7 @@ def measure(source: Path, *, mode: str, pattern: str, page_bytes: int,
     """Single process/single strategy; no model inference and no OS cache reset."""
     trace = make_trace(pages, turns, pattern, seed)
     rss_before = _rss_bytes()
-    io_before = _io_bytes()
+    io_before, io_kind = _io_bytes()
     cpu_before = time.process_time()
     start = time.perf_counter()
     checksum = 0
@@ -260,7 +276,7 @@ def measure(source: Path, *, mode: str, pattern: str, page_bytes: int,
             rss_peak = max(rss_peak or 0, rss)
     wall = time.perf_counter() - start
     cpu = time.process_time() - cpu_before
-    io_after = _io_bytes()
+    io_after, _ = _io_bytes()
     return {
         "schema": 1, "type": "weight_window_io_only",
         "status": "measured", "mode": mode, "pattern": pattern,
@@ -272,16 +288,18 @@ def measure(source: Path, *, mode: str, pattern: str, page_bytes: int,
         "elapsed_seconds": round(wall, 6), "cpu_seconds": round(cpu, 6),
         "accesses_per_second": round(len(trace) / wall, 2) if wall else None,
         "rss_at_start_bytes": rss_before, "rss_peak_observed_bytes": rss_peak,
-        "os_physical_read_bytes_delta": (
+        "os_process_read_bytes_delta": (
             None if io_before is None or io_after is None
             else max(0, io_after - io_before)),
+        "os_process_read_counter_kind": io_kind,
         "checksum_sink": f"{checksum:08x}",
         "cache": stats,
         "notice": (
             "Benchmark de I/O sintético, NÃO inferência de Qwen: não mede "
             "tokens/s, qualidade do modelo, VRAM ou roteamento MoE real. "
             "bytes_requested_from_file são chamadas lógicas de leitura; "
-            "o cache de páginas do SO pode evitar leituras físicas. "
+            "os_process_read_bytes_delta é estritamente lógico no Windows. "
+            "O cache de páginas do SO pode evitar leituras físicas. "
             "rss_peak_observed é amostrado, não um limite rígido. "
             "O limite budget_bytes vale apenas para cache Python explícito."
         ),

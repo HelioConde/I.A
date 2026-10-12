@@ -4,7 +4,7 @@
 
 Esta etapa inaugura a branch `feat/ssd-weight-streaming-lab`. O código
 mede leitura de janelas de bytes do SSD e estratégias de cache local.
-**Não executa camadas/tensores, não interpreta GGUF, não altera pesos,
+**Não executa camadas/tensores, não altera pesos,
 não faz inferência, não mede tokens/s nem produz um runtime MoE real.**
 
 A motivação é conseguir **preservar modelos grandes** e reduzir a
@@ -59,6 +59,23 @@ especialistas, camadas ativas ou representativos da arquitetura Qwen.
 O modelo original não é gravado e a saída não inclui pesos ou caminho
 do arquivo. Sem `--source`, usa fixture sintético.
 
+## V1 — diretório GGUF somente leitura
+
+`tools\inspect_gguf.py` interpreta GGUF v2/v3 sem carregar o modelo inteiro
+nem chamar `llama.cpp`. Ele valida magic, versão, metadados, alinhamento,
+nome/rank/shape, tipo GGML suportado, offsets e limites antes de retornar
+qualquer byte. Calcula layouts F32/F16 e blocos Q4/Q5/Q8/K comuns.
+
+```bat
+py -3 tools\inspect_gguf.py models\Qwen3-0.6B-Q8_0.gguf --tensor token_embd.weight --window-bytes 64
+py -3 -m unittest discover -s tests -p "test_gguf_inspector.py" -v
+```
+
+Na validação local, o Qwen autorizado foi lido como GGUF v3 com 310 tensores;
+`token_embd.weight` foi localizado como Q8_0, shape 1024×151936 e
+165.306.368 bytes físicos. Uma janela de 64 bytes foi verificada. Isso não é
+execução de tensor, logits ou inferência por streaming.
+
 ## Estratégias, dados e limites
 
 | Modo | Leitura/caching |
@@ -87,9 +104,10 @@ dados, não a precisão de inferência neural.
 Métricas: tempo total, CPU, acessos/s (não tokens/s), quantidade de
 chamadas lógicas de leitura, hits, misses, prefetch, expulsões,
 ocupação de cache Python, RSS amostrado (quando disponível) e
-`/proc/self/io` no Linux. Leitura física do sistema pode ser
-desconhecida no Windows. **Não interpretar bytes_requested_from_file
-como leitura física do SSD**: o SO mantém page cache.
+`/proc/self/io` no Linux e contador de I/O do processo no Windows. O contador
+Windows é lógico e nenhum dos dois deve ser confundido automaticamente com
+leitura física do SSD. **Não interpretar bytes_requested_from_file como
+leitura física do SSD**: o SO mantém page cache.
 
 ### Segurança
 
