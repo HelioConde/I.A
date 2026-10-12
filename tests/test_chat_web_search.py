@@ -259,7 +259,9 @@ class TestWebEngine(unittest.TestCase):
             result = engine.ask("Últimas novidades sobre Marte?", [], web_search=True)
             self.assertEqual(result["web_search_status"], "unavailable")
             self.assertEqual(result["web_sources"], [])
-            self.assertIn("não pôde retornar fontes", engine._runtime.core_backend.prompts[0])
+            self.assertEqual(result["local_action"], "research_unavailable")
+            self.assertIn("Não consegui obter notícias recentes", result["answer"])
+            self.assertEqual(engine._runtime.core_backend.prompts, [])
         finally:
             engine.close()
 
