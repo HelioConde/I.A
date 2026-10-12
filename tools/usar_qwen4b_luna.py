@@ -129,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     action.add_argument("--activate", action="store_true", help="Ativar o 4B oficial ja instalado")
     action.add_argument("--restore-06b", action="store_true", help="Voltar para Qwen3 0.6B, sem apagar nenhum GGUF")
     action.add_argument("--status", action="store_true", help="Verificar arquivos locais sem baixar nada")
-    parser.add_argument("--config", type=Path, default=INI)
+    parser.add_argument("--config", type=Path, default=INI,
                         help="INI local alternativo para testes (padrao: LUNA.ini)")
     args = parser.parse_args(argv)
     try:
