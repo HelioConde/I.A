@@ -200,8 +200,8 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
     Paths and image files are checked using the existing authorized-root gates.
     """
     simple = _plain(question)
-    if re.search(r"\\b(?:abas?|guias?)\\b", simple) and re.search(
-        r"\\b(?:navegador|chrome|edge|browser|abert[ao]s?|estou|tenho|minhas|meus)\\b", simple
+    if re.search(r"\b(?:abas?|guias?)\\b", simple) and re.search(
+        r"\b(?:navegador|chrome|edge|browser|abert[ao]s?|estou|tenho|minhas|meus)\\b", simple
     ):
         return _result(
             "Ainda não consigo enumerar as abas abertas do Chrome ou Edge. "
@@ -210,8 +210,8 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "ou peça uma captura explícita do monitor; o Qwen atual não interpreta pixels.",
             "copilot_browser_tabs_unsupported",
         )
-    if re.search(r"\\b(?:funcoes|funcionalidades|capacidades|recursos)\\b", simple) and re.search(
-        r"\\b(?:meu pc|meu computador|no pc|no computador|voce consegue|voce pode)\\b", simple
+    if re.search(r"\b(?:funcoes|funcionalidades|capacidades|recursos)\\b", simple) and re.search(
+        r"\b(?:meu pc|meu computador|no pc|no computador|voce consegue|voce pode)\\b", simple
     ):
         if copilot is None:
             return _result(
@@ -221,19 +221,19 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             )
         features = copilot.status()
         return _result(
-            "Funções verificadas nesta sessão da Luna:\\n"
-            + "• Leitura de pastas e arquivos: " + ("autorizada" if features.get("files_enabled") else "desativada") + "\\n"
-            + "• Captura de tela solicitada: " + ("autorizada" if features.get("screen_enabled") else "desativada") + "\\n"
-            + "• Inventário de aplicativos: " + ("autorizado" if features.get("apps_enabled") else "desativado") + "\\n"
-            + "• Abertura de Bloco de Notas/Calculadora: " + ("com confirmação" if features.get("launch_enabled") else "desativada") + "\\n"
-            + "• Edição de CÓDIGO: " + ("diff, backup e confirmação" if features.get("edit_enabled") else "desativada") + "\\n"
+            "Funções verificadas nesta sessão da Luna:\n"
+            + "• Leitura de pastas e arquivos: " + ("autorizada" if features.get("files_enabled") else "desativada") + "\n"
+            + "• Captura de tela solicitada: " + ("autorizada" if features.get("screen_enabled") else "desativada") + "\n"
+            + "• Inventário de aplicativos: " + ("autorizado" if features.get("apps_enabled") else "desativado") + "\n"
+            + "• Abertura de Bloco de Notas/Calculadora: " + ("com confirmação" if features.get("launch_enabled") else "desativada") + "\n"
+            + "• Edição de CÓDIGO: " + ("diff, backup e confirmação" if features.get("edit_enabled") else "desativada") + "\n"
             + "Não navego nas abas do navegador, não interpreto imagens com este Qwen "
             "e não crio arquivos de texto arbitrários nesta versão. "
             "Autorizar uma raiz não concede automaticamente permissão de escrita.",
             "copilot_capabilities",
         )
-    if re.search(r"\\b(?:pastas|diretorios)\\b", simple) and re.search(
-        r"\\b(?:principais|raiz|meu pc|meu computador|do pc|disco|unidade c)\\b", simple
+    if re.search(r"\b(?:pastas|diretorios)\\b", simple) and re.search(
+        r"\b(?:principais|raiz|meu pc|meu computador|do pc|disco|unidade c)\\b", simple
     ):
         if copilot is None or not copilot.status().get("files_enabled"):
             return _result("Não há uma pasta autorizada para listar. "
@@ -256,9 +256,9 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             lines.append("Nenhuma subpasta visível foi encontrada nos limites desta consulta.")
         if directory.get("truncated"):
             lines.append("A consulta é limitada; outras pastas podem não aparecer.")
-        return _result("\\n".join(lines), "copilot_folders")
-    if re.search(r"\\b(?:jogos?)\\b", simple) and re.search(
-        r"\\b(?:instalado|instalados|instalada|instaladas|tenho no|tenho instal)\\b", simple
+        return _result("\n".join(lines), "copilot_folders")
+    if re.search(r"\b(?:jogos?)\\b", simple) and re.search(
+        r"\b(?:instalado|instalados|instalada|instaladas|tenho no|tenho instal)\\b", simple
     ):
         return _result(
             "O inventário do Windows lista aplicativos registrados, mas não classifica "
@@ -267,7 +267,7 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "específico ou listar aplicativos registrados sem essa classificação.",
             "copilot_games_registry_limited",
         )
-    if re.search(r"\\b(?:voce consegue|consegue|pode|sabe)\\b.*\\b(?:ver|visualizar|enxergar)\\b.*\\b(?:monitor|tela|imagem|imagens)\\b", simple):
+    if re.search(r"\b(?:voce consegue|consegue|pode|sabe)\\b.*\\b(?:ver|visualizar|enxergar)\\b.*\\b(?:monitor|tela|imagem|imagens)\\b", simple):
         return _result(
             "Posso capturar um monitor explicitamente solicitado, quando autorizado, "
             "e exibir a captura no chat. Mas o Qwen instalado é apenas texto: "
@@ -276,16 +276,16 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "Para texto visível, peça OCR local, que pode errar.",
             "copilot_vision_limitation",
         )
-    if re.search(r"\\b(?:voce consegue|consegue|pode|sabe)\\b.*\\b(?:visualizar|analisar|interpretar)\\b.*\\b(?:imagem|imagens|foto|fotos)\\b", simple):
+    if re.search(r"\b(?:voce consegue|consegue|pode|sabe)\\b.*\\b(?:visualizar|analisar|interpretar)\\b.*\\b(?:imagem|imagens|foto|fotos)\\b", simple):
         return _result(
             "Consigo exibir uma prévia de imagem autorizada, mas este Qwen é somente texto "
             "e não a compreende visualmente. Para texto legível de telas, posso tentar OCR "
             "sob solicitação. Não analisei nenhuma imagem nesta resposta.",
             "copilot_image_limitation",
         )
-    if re.search(r"\\b(?:crie|criar|cria|grave|salve|escreva|gerar|gere)\\b", simple) and re.search(
-        r"\\b(?:arquivo|texto|txt|documento)\\b", simple
-    ) and (re.search(r"\\b(?:c:/|c:|disco|pasta|diretorio|arquivo|salve|grave|crie o texto|criar um texto)\\b", simple)
+    if re.search(r"\b(?:crie|criar|cria|grave|salve|escreva|gerar|gere)\\b", simple) and re.search(
+        r"\b(?:arquivo|texto|txt|documento)\\b", simple
+    ) and (re.search(r"\b(?:c:/|c:|disco|pasta|diretorio|arquivo|salve|grave|crie o texto|criar um texto)\\b", simple)
            or "crie o texto" in simple):
         return _result(
             "Posso redigir o conteúdo aqui, mas esta versão do chat não grava arquivos "
@@ -295,9 +295,9 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "do Copiloto para arquivos de código autorizados.",
             "copilot_text_write_unsupported",
         )
-    if re.search(r"\\b(?:imagem|imagens|fotos?|png|jpg|jpeg|webp)\\b", simple) and re.search(
-        r"\\b(?:downloads?|baixados?)\\b", simple
-    ) and re.search(r"\\b(?:localize|localizar|ache|encontre|mostre|mostrar|liste|listar|primeir[ao])\\b", simple):
+    if re.search(r"\b(?:imagem|imagens|fotos?|png|jpg|jpeg|webp)\\b", simple) and re.search(
+        r"\b(?:downloads?|baixados?)\\b", simple
+    ) and re.search(r"\b(?:localize|localizar|ache|encontre|mostre|mostrar|liste|listar|primeir[ao])\\b", simple):
         if copilot is None or not copilot.status().get("files_enabled"):
             return _result("Downloads não está autorizado. Não pesquisei nem localizei imagens.",
                            "copilot_downloads_disabled")
@@ -322,7 +322,7 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
                 "A busca é limitada a 100 entradas e pode não incluir todos os arquivos.",
                 "copilot_downloads_empty",
             )
-        if re.search(r"\\b(?:mostre|mostrar|exiba|primeir[ao])\\b", simple):
+        if re.search(r"\b(?:mostre|mostrar|exiba|primeir[ao])\\b", simple):
             try:
                 preview = copilot.preview_image(str(downloads / image_names[0]))
                 return _result(
@@ -337,9 +337,9 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
                     "copilot_image_preview_unavailable",
                 )
         return _result(
-            "Imagens encontradas nos primeiros registros da pasta Downloads:\\n" +
-            "\\n".join("• " + name for name in image_names[:12]) +
-            ("\\nListagem parcial: limite de entradas atingido." if directory.get("truncated") else ""),
+            "Imagens encontradas nos primeiros registros da pasta Downloads:\n" +
+            "\n".join("• " + name for name in image_names[:12]) +
+            ("\nListagem parcial: limite de entradas atingido." if directory.get("truncated") else ""),
             "copilot_downloads_list",
         )
     return None
