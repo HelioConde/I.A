@@ -952,6 +952,17 @@ setInterval(refreshStatus, 3000);
 /* Copiloto local: leitura opt-in, nenhuma captura persistida ou enviada à web. */
 const copilotState = {timer:null, busy:false, text:"", enabled:false};
 const codeEdit = {token:null, path:null};
+const godotTest = {token:null, project:null, script:null};
+function resetGodotTest() {
+  godotTest.token = null;
+  godotTest.project = null;
+  godotTest.script = null;
+  $("copilotGodotTestPreview").hidden = true;
+  $("copilotGodotTestPreview").textContent = "";
+  $("copilotConfirmGodotTest").hidden = true;
+  $("copilotCancelGodotTest").hidden = true;
+}
+
 function resetCodeEditPreview() {
   codeEdit.token = null;
   codeEdit.path = null;
@@ -984,6 +995,7 @@ async function copilotStatus() {
     $("copilotReviewCode").disabled = !state.files_enabled;
     $("copilotScanProject").disabled = !state.files_enabled;
     $("copilotDiagnoseGodot").disabled = !state.files_enabled;
+    $("copilotProposeGodotTest").disabled = !state.godot_validate_enabled;
     $("copilotExplainCode").disabled = !state.files_enabled;
     $("copilotProposeEdit").disabled = !state.edit_enabled;
   } catch (_) {
@@ -998,6 +1010,7 @@ function stopCopilotLive() {
 function closeCopilot() {
   stopCopilotLive();
   resetCodeEditPreview();
+  resetGodotTest();
   $("copilotPanel").hidden = true;
   $("openCopilot").setAttribute("aria-expanded", "false");
 }
@@ -1120,6 +1133,79 @@ $("copilotRead").addEventListener("click", () => copilotCall("read"));
 $("copilotImage").addEventListener("click", () => copilotCall("image"));
 $("copilotSystem").addEventListener("click", () => copilotCall("system"));
 $("copilotReviewCode").addEventListener("click", () => copilotCall("review_code"));
+
+$("copilotProposeGodotTest").addEventListener("click", async () => {
+  if (copilotState.busy) return;
+  resetGodotTest();
+  copilotState.busy = true;
+  try {
+    const proposal = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        action:"propose_godot_validation",
+        path:$("copilotProjectPath").value.trim(),
+        script:$("copilotGodotScript").value.trim()
+      })
+    });
+    godotTest.token = proposal.token;
+    godotTest.project = proposal.project;
+    godotTest.script = proposal.script;
+    $("copilotGodotTestPreview").textContent =
+      "Binário: " + proposal.binary + "\nProjeto: " + proposal.project +
+      "\nScript: " + proposal.script +
+      "\nArgumentos fixos: " + proposal.command_flags.join(" ") +
+      "\nLimite: " + proposal.timeout_seconds + "s" +
+      "\n\nATENÇÃO: " + proposal.warning;
+    $("copilotGodotTestPreview").hidden = false;
+    $("copilotConfirmGodotTest").hidden = false;
+    $("copilotCancelGodotTest").hidden = false;
+    $("copilotFeedback").textContent =
+      "Apenas proposta preparada; Godot NÃO foi executado. Revise os riscos e confirme.";
+  } catch (error) {
+    $("copilotFeedback").textContent = error.message || "Verificação indisponível.";
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotConfirmGodotTest").addEventListener("click", async () => {
+  if (!godotTest.token || copilotState.busy) return;
+  const pending = {...godotTest};
+  resetGodotTest();
+  if (!window.confirm(
+    "Autoriza executar o Godot configurado em modo headless no projeto " +
+    pending.project + " para verificar " + pending.script +
+    "?\nA inicialização PODE executar extensões/scripts e modificar caches. " +
+    "Não é um sandbox. Continue apenas se confiar neste projeto.")) return;
+  copilotState.busy = true;
+  $("copilotFeedback").textContent = "Executando verificação aprovada de Godot...";
+  try {
+    const report = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"confirm_godot_validation", token:pending.token})
+    });
+    $("copilotResult").replaceChildren();
+    const pre = document.createElement("pre");
+    pre.textContent = "Estado: " + report.status +
+      "\nCódigo de saída: " + report.exit_code +
+      "\nDuração: " + report.duration_seconds + "s" +
+      "\nScript: " + report.script +
+      "\n\n" + report.output + "\n\n" + report.notice;
+    $("copilotResult").append(pre);
+    copilotState.text = pre.textContent.slice(0, 1400);
+    $("copilotUseChat").hidden = !copilotState.text;
+    $("copilotFeedback").textContent = report.status === "PASS"
+      ? "Godot retornou código zero em --check-only; o jogo inteiro NÃO foi testado."
+      : "Godot reportou falha/tempo limite. Revise a saída antes de alterar código.";
+  } catch (error) {
+    $("copilotFeedback").textContent = "Validação não realizada: " + error.message;
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotCancelGodotTest").addEventListener("click", () => {
+  resetGodotTest();
+  $("copilotFeedback").textContent = "Proposta descartada. Nenhum teste foi executado.";
+});
 $("copilotScanProject").addEventListener("click", () => copilotCall("project_scan"));
 $("copilotDiagnoseGodot").addEventListener("click", () => copilotCall("godot_error"));
 $("copilotExplainCode").addEventListener("click", async () => {
