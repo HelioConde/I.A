@@ -25,6 +25,7 @@ da marca e do personagem fictício.
 | Reconhecimento de fala por microfone | Parcial (pressionar para falar) | Só em navegadores com reconhecimento pt-BR local; sem escuta contínua |
 | Localizar erro Godot e analisar projeto | Implementado parcialmente | OCR opcional, referência res://, ainda sem validação em execução ou correção autônoma |
 | Validar sintaxe de script Godot | Implementado (opt-in + confirmação) | Executa Godot headless --check-only no projeto confiável, não equivale a testar gameplay |
+| Agent Core — investigações em etapas | Primeira versão implementada | Plano revisável e leitura real de Godot/código/PC; não gera patches ou executa tarefas arbitrárias |
 
 ### Inicialização segura
 
@@ -138,6 +139,19 @@ Documentação Windows usada para a arquitetura: registros de desinstalação
 e App Paths, APIs de processos e orientações de ShellExecute no Microsoft
 Learn. Evitar `Win32_Product`, cujo uso pode disparar verificações e
 reparações de pacotes MSI.
+
+### Agent Core v1
+
+O fluxo de investigação em etapas está no arquivo
+`src/brain_ssd/chat/agent_core.py`, com controle no painel Copiloto e
+comandos `/investigar-godot`, `/investigar-projeto`,
+`/investigar-codigo` e `/investigar-pc`. O sistema separa plano,
+confirmação da leitura, execução de ferramentas e relatório com
+fontes. Ele **não** aplica alterações nem executa comandos gerados por IA.
+
+Consulte `docs/AGENT_CORE.md` para instruções. A próxima etapa é
+integrar geração de patches a partir das evidências com testes e rollback,
+sem eliminar a confirmação humana.
 
 ### Estado do ciclo de programação
 
