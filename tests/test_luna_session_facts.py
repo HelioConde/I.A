@@ -60,12 +60,15 @@ class SessionFactsTests(unittest.TestCase):
             row = db.create()
             identity = row["id"]
             for i in range(18):
-                first = "Olá, bom dia!" if i == 0 else "Pergunta " + str(i)
+                first = ("Olá, bom dia!" if i == 0 else
+                         "Como você está hoje, Luna?" if i == 1 else
+                         "Pergunta " + str(i))
                 db.append_exchange(identity, first, "Resposta " + str(i))
             # A small inference window cannot expose the original first question.
             history = db.recent_context(identity)
             self.assertNotIn("Olá, bom dia!", [x["content"] for x in history])
-            self.assertEqual(db.first_user_question(identity), "Olá, bom dia!")
+            self.assertEqual(db.first_user_message(identity), "Olá, bom dia!")
+            self.assertEqual(db.first_user_question(identity), "Como você está hoje, Luna?")
             engine = ChatEngine(lambda: None)
             try:
                 result = engine.ask(
@@ -73,9 +76,33 @@ class SessionFactsTests(unittest.TestCase):
                     history, first_question=db.first_user_question(identity),
                 )
                 self.assertEqual(result["local_action"], "local_first_question")
-                self.assertIn("Olá, bom dia!", result["answer"])
+                self.assertIn("Como você está hoje, Luna?", result["answer"])
+                self.assertNotIn("Olá, bom dia!", result["answer"])
             finally:
                 engine.close()
+
+    def test_first_message_includes_greeting_even_if_not_question(self):
+        self.assertTrue(is_first_question_intent(
+            "Qual foi a primeira mensagem que enviei nesta conversa?"))
+        with tempfile.TemporaryDirectory() as tmp:
+            db = ChatHistory(Path(tmp) / "history.sqlite3")
+            cid = db.create()["id"]
+            db.append_exchange(cid, "Olá, bom dia!", "Bom dia!")
+            db.append_exchange(cid, "Como você está, Luna?", "Tudo pronto!")
+            reply = self.ask_local(
+                "Qual foi a primeira mensagem que enviei nesta conversa?",
+                first_question=db.first_user_message(cid),
+            )
+            self.assertIn("primeira mensagem", reply["answer"])
+            self.assertIn("Olá, bom dia!", reply["answer"])
+
+    def test_voice_transcription_without_question_mark(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = ChatHistory(Path(tmp) / "history.sqlite3")
+            cid = db.create()["id"]
+            db.append_exchange(cid, "ola bom dia", "Bom dia")
+            db.append_exchange(cid, "como voce esta hoje luna", "Pronta")
+            self.assertEqual(db.first_user_question(cid), "como voce esta hoje luna")
 
     def test_missing_first_question_never_invents_it(self):
         reply = self.ask_local("Qual foi a primeira pergunta que fiz nesta conversa?",
