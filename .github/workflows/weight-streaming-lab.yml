@@ -1,0 +1,27 @@
+name: Brain-SSD Weight Streaming Lab
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/ssd-weight-streaming-lab]
+    paths:
+      - "src/brain_ssd/weight_streaming_lab.py"
+      - "tools/bench_weight_streaming.py"
+      - "tests/test_weight_streaming_lab.py"
+      - ".github/workflows/weight-streaming-lab.yml"
+jobs:
+  weight-lab:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run paging and safety tests
+        run: python -m unittest discover -s tests -p "test_weight_streaming_lab.py" -v
+      - name: Verify matrix checksums on a synthetic 1 MiB window
+        run: python tools/bench_weight_streaming.py --matrix --fixture-mib 1 --page-kib 128 --pages 8 --budget-mib 1 --turns 5 --pattern moe
