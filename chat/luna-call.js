@@ -6,7 +6,7 @@
   const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
   const state = {active:false, muted:false, recognition:null, finalText:"", interimText:"", silenceTimer:null,
     speaking:false, expectingAnswer:false, utterance:null, turn:0, recognitionFailed:false, emptyRestarts:0,
-    restartTimer:null, testInProgress:false};
+    restartTimer:null, testInProgress:false, sessionEpoch:0};
   const silenceMs = 1000;
   const status = {
     idle:["Pronta para iniciar.","Clique para iniciar; o navegador pedirá o microfone somente então."],
@@ -198,6 +198,7 @@
   }
   function endCall() {
     const pendingVoiceTurn = state.expectingAnswer && Boolean(window.appVoiceSending?.());
+    state.sessionEpoch += 1;
     state.active = false;
     state.muted = false;
     state.expectingAnswer = false;
@@ -218,6 +219,7 @@
     }
     if (!supportsLocalRecognition()) { setState("error", "Reconhecimento local pt-BR indisponível. Use Verificar/Instalar pt-BR offline antes de iniciar. Chrome/Edge podem não oferecer esse recurso."); return; }
     if (!localVoice()) { setState("error", "Não há voz portuguesa local instalada neste navegador."); return; }
+    state.sessionEpoch += 1;
     state.active = true; state.muted = false; state.emptyRestarts = 0; state.recognitionFailed = false; window.lunaVoiceCallActive = true; setState("initializing"); buttons(); beginListening();
   }
   byId("retryVoiceCall").addEventListener("click", () => {
@@ -233,15 +235,19 @@
       return;
     }
     state.testInProgress = true;
+    const checkSession = state.sessionEpoch;
     clearRestart(); stopRecognition(); buttons();
     let stream = null, audio = null;
     try {
       setState("initializing", "Testando entrada do microfone por 3 segundos. Fale perto do microfone; nenhum áudio será gravado ou enviado.");
       // Microphone permission is requested ONLY by clicking "Testar microfone".
       stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
+      if (state.sessionEpoch !== checkSession) return;
       const AudioContextType = window.AudioContext || window.webkitAudioContext;
       if (!AudioContextType) throw new Error("audio-context-unavailable");
       audio = new AudioContextType();
+      if (audio.state === "suspended") await audio.resume();
+      if (state.sessionEpoch !== checkSession) return;
       const source = audio.createMediaStreamSource(stream);
       const analyser = audio.createAnalyser();
       analyser.fftSize = 1024;
@@ -249,19 +255,20 @@
       const samples = new Uint8Array(analyser.fftSize);
       let peak = 0;
       const deadline = Date.now() + 3000;
-      while (Date.now() < deadline && state.testInProgress) {
+      while (Date.now() < deadline && state.testInProgress && state.sessionEpoch === checkSession) {
         analyser.getByteTimeDomainData(samples);
         let power = 0;
         for (const sample of samples) power += ((sample - 128) / 128) ** 2;
         peak = Math.max(peak, Math.sqrt(power / samples.length));
         await new Promise(resolve => setTimeout(resolve, 70));
       }
-      setState(peak > 0.014 ? "listening" : "error",
+      if (state.sessionEpoch !== checkSession) return;
+      setState(peak > 0.014 ? (state.active ? "interrupted" : "idle") : "error",
         peak > 0.014
           ? "O microfone recebeu sinal de áudio. O teste não garante que o reconhecimento de fala pt-BR esteja funcionando."
           : "O microfone abriu, mas não houve sinal de voz suficiente. Verifique a entrada padrão do Windows, nível do microfone e permissões.");
     } catch (error) {
-      setState("error", error?.name === "NotAllowedError"
+      if (state.sessionEpoch === checkSession) setState("error", error?.name === "NotAllowedError"
         ? "Permissão do microfone negada pelo navegador. Autorize o endereço local e teste novamente."
         : "Não foi possível testar o microfone: " + (error?.name || "dispositivo indisponível") + ".");
     } finally {
