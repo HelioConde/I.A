@@ -282,3 +282,31 @@ py -3 -m unittest discover -s tests -p "test_windows_start_apps.py" -v
 py -3 -m unittest discover -s tests -p "test_jarvis_apps.py" -v
 py -3 -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
 ```
+
+## Trocar o modelo da Luna em um comando
+
+Sem editar manualmente o INI e sem baixar modelos:
+
+```powershell
+Set-Location "C:\Users\helio\Documents\I.A"
+py -3 .\tools\launch_luna.py --select-model 4b
+py -3 .\tools\launch_luna.py --check
+.\INICIAR-COPILOTO-WINDOWS.bat
+```
+
+O comando seleciona `Qwen3-4B-Q4_K_M.gguf` e muda o perfil para
+`equilibrado` em `LUNA.ini`, mantendo intactas todas as permissões.
+O modelo **precisa estar em `models/`**. Se estiver ausente,
+o programa avisa para executar `INICIAR-BRAIN-SSD.bat` e escolher a opção `3`.
+O comando não instala nada e não reinicia a sessão aberta; encerre
+o servidor anterior antes de iniciar o novo.
+
+Para retornar ao anterior: `py -3 .\tools\launch_luna.py --select-model 0.6b`.
+A opção `1.7b` seleciona o Qwen3 1.7B se estiver instalado.
+
+### Sobre consultas meteorológicas
+
+O modelo de linguagem não dispõe de dados ao vivo. Na versão atual,
+o backend intercepta perguntas sobre clima e informa que **ainda não existe
+um provedor de meteorologia integrado**; pesquisar via Wikipédia não é uma
+fonte confiável de temperatura atual. O novo modelo não altera isso.
