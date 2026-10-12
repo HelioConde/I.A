@@ -161,6 +161,18 @@
       <label for="copilotGodotError">Mensagem de erro copiada do Godot</label>
       <textarea id="copilotGodotError" rows="4" maxlength="4000" placeholder="SCRIPT ERROR ... res://scripts/player.gd:42"></textarea>
       <button type="button" id="copilotDiagnoseGodot">Encontrar arquivo e linha do erro</button>
+      <details class="copilot-edit-workflow">
+        <summary>Validar script com Godot instalado (execução aprovada)</summary>
+        <p class="copilot-muted">Godot pode carregar extensões ou modificar caches durante a inicialização. Execute somente projetos confiáveis. O teste usa --headless --recovery-mode --check-only com tempo máximo de 30 segundos.</p>
+        <label for="copilotGodotScript">Caminho relativo ao projeto (res://script.gd)</label>
+        <input id="copilotGodotScript" placeholder="res://scripts/player.gd" maxlength="260" spellcheck="false">
+        <button type="button" id="copilotProposeGodotTest">Preparar verificação</button>
+        <pre id="copilotGodotTestPreview" class="copilot-edit-diff" hidden></pre>
+        <div class="copilot-actions">
+          <button type="button" id="copilotConfirmGodotTest" hidden>Confirmar execução de Godot</button>
+          <button type="button" id="copilotCancelGodotTest" hidden>Cancelar</button>
+        </div>
+      </details>
     </section>
     <section class="copilot-block">
       <h3>Aplicativos do Windows</h3>
