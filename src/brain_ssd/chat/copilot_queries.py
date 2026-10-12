@@ -18,7 +18,8 @@ def _plain(text: str) -> str:
     return " ".join(normalized.split())
 
 
-def _result(answer: str, action: str, image_data_url: str | None = None) -> dict[str, Any]:
+def _result(answer: str, action: str, image_data_url: str | None = None,
+            extra: dict[str, Any] | None = None) -> dict[str, Any]:
     out: dict[str, Any] = {
         "answer": answer,
         "mode": "local_command",
@@ -35,6 +36,8 @@ def _result(answer: str, action: str, image_data_url: str | None = None) -> dict
     }
     if image_data_url is not None:
         out["copilot_image_data_url"] = image_data_url
+    if extra:
+        out.update(extra)
     return out
 
 
@@ -68,6 +71,127 @@ def _is_window_request(text: str) -> bool:
                           r"identifique os programas|liste os programas)\b", text))
 
 
+_APP_NAMES = {
+    "godot": "godot", "visual studio code": "visual studio code", "vs code": "code",
+    "vscode": "code", "chrome": "chrome", "steam": "steam",
+    "python": "python", "bloco de notas": "notepad", "notepad": "notepad",
+    "calculadora": "calc", "calculator": "calc",
+}
+
+
+def _app_name(text: str) -> str | None:
+    for alias in sorted(_APP_NAMES, key=len, reverse=True):
+        if re.search(r"(?<![a-z0-9])" + re.escape(alias) + r"(?![a-z0-9])", text):
+            return _APP_NAMES[alias]
+    return None
+
+
+def _inventory_intent(text: str) -> str | None:
+    if re.search(r"\b(instalad[oa]s?|instalacao|versao instalada)\b", text):
+        return "installed"
+    if (re.search(r"\b(programas?|aplicativos?|apps?|processos?|godot|chrome|steam|code|python)\b", text)
+            and re.search(r"\b(abert[oa]s?|rodando|executando|execucao|ativos?|segundo plano|"
+                          r"consumindo|consome|em primeiro plano|travados?)\b", text)):
+        return "running"
+    return None
+
+
+def _app_reply(question: str, copilot: LocalCopilot, intent: str) -> dict[str, Any]:
+    query = _app_name(question)
+    if not copilot.apps_enabled:
+        return _result(
+            "A consulta de aplicativos do Windows não foi autorizada nesta sessão. "
+            "Reinicie o iniciador do Copiloto e escolha autorizar o inventário, sem conceder acesso a arquivos.",
+            "copilot_apps_disabled",
+        )
+    try:
+        data = copilot.installed_apps(query) if intent == "installed" else copilot.running_apps(query)
+    except (CopilotPermissionError, OSError):
+        return _result("A consulta do Windows falhou; nenhum programa foi confirmado.",
+                       "copilot_apps_unavailable")
+    rows = data.get("items", [])
+    limit_type = "instalados registrados" if intent == "installed" else "processos ativos"
+    intro = (f"Consulta local de {limit_type}, fonte: {data.get('source', 'Windows')}.")
+    if query:
+        intro += f" Filtro: {query}."
+    if rows:
+        if intent == "installed":
+            detail = [
+                "• " + r["name"] + (" — versão " + r["version"] if r.get("version") else "")
+                for r in rows[:20]
+            ]
+        else:
+            detail = ["• " + r["name"] + " (PID " + str(r["pid"]) + ")" for r in rows[:20]]
+    else:
+        detail = ["Nenhum registro correspondente foi encontrado; isso não prova que não está instalado ou executando."]
+    if data.get("truncated"):
+        detail.append("Resultados limitados aos primeiros registros; refine o nome.")
+    if intent == "installed":
+        detail.append("Aplicativos portáteis e instalações sem registro podem não aparecer. "
+                      "Não foi verificado o caminho do executável.")
+    else:
+        detail.append("Esta lista não representa janelas visíveis e não mede CPU ou RAM em tempo real.")
+    if intent == "running" and re.search(r"\b(cpu|ram|memoria|mais|travado|travados|sem responder)\b", question):
+        action = "copilot_running_apps_limited"
+    else:
+        action = "copilot_installed_apps" if intent == "installed" else "copilot_running_apps"
+    return _result("\n".join([intro, *detail]), action)
+
+
+def _launch_intent(question: str) -> tuple[str | None, bool, bool]:
+    wants = bool(re.search(r"\b(abra|abre|abrir|inicie|iniciar|inicia|execute|executar)\b", question))
+    if not wants:
+        return None, False, False
+    app = None
+    if re.search(r"\b(bloco de notas|notepad)\b", question):
+        app = "notepad"
+    elif re.search(r"\b(calculadora|calculator)\b", question):
+        app = "calculator"
+    question_only = bool(re.search(r"\b(consegue|pode|poderia|sabe)\b", question))
+    imperative = bool(re.match(r"^(?:por favor,?\s+)?(?:abra|abre|inicie|inicia|execute)\b", question))
+    return app, question_only, imperative
+
+
+def _launch_reply(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
+    app, question_only, imperative = _launch_intent(question)
+    if app is None and not (question_only or imperative):
+        return None
+    if app is None:
+        return _result(
+            "Esta versão não abre o aplicativo solicitado. A abertura segura está limitada "
+            "a Bloco de Notas e Calculadora, com autorização da sessão e confirmação por clique.",
+            "copilot_launch_unsupported",
+        )
+    if copilot is None or not copilot.launch_enabled:
+        return _result(
+            "Posso preparar a abertura de Bloco de Notas ou Calculadora, mas o controle "
+            "de aplicativos está desativado. Reinicie o Copiloto e autorize esta função; "
+            "nada foi aberto.",
+            "copilot_launch_disabled",
+        )
+    if question_only or not imperative:
+        return _result(
+            "Posso preparar a abertura do aplicativo, mas nunca executá-la só porque "
+            "a IA respondeu. Diga 'Abra o Bloco de Notas' ou 'Abra a Calculadora' "
+            "e confirme no botão da conversa.",
+            "copilot_launch_info",
+        )
+    try:
+        offer = copilot.offer_launch(app)
+    except (CopilotPermissionError, OSError):
+        return _result("Não foi possível preparar a abertura. Nenhuma aplicação foi iniciada.",
+                       "copilot_launch_unavailable")
+    return _result(
+        "Pedido de abertura de " + offer["label"] + " preparado. "
+        "Nenhuma aplicação foi iniciada. Clique em 'Confirmar abertura' nesta "
+        "mensagem para executar apenas este pedido. O pedido expira em 90 segundos.",
+        "copilot_launch_proposal",
+        extra={"copilot_launch_token": offer["token"],
+               "copilot_launch_app": offer["app_id"],
+               "copilot_launch_label": offer["label"]},
+    )
+
+
 def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
     """Return a truthful local result only for clearly selected Copilot intents."""
     if not isinstance(question, str):
@@ -75,7 +199,10 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
     simple = _plain(question)
     system = _is_system_question(simple)
     screen, monitor = _screen_request(simple)
-    if not system and not screen:
+    inventory = _inventory_intent(simple)
+    if not system and not screen and inventory is None:
+        return _launch_reply(simple, copilot)
+    if not system and not screen and inventory is None:
         return None
     if copilot is None or not copilot.status()["enabled"]:
         return _result(
@@ -84,6 +211,8 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
             "Eu não devo afirmar que vi arquivos, tela ou hardware sem permissão.",
             "copilot_disabled",
         )
+    if inventory is not None and not screen:
+        return _app_reply(simple, copilot, inventory)
     if system:
         try:
             info = copilot.system_info()
