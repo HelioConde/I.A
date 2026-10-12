@@ -1075,6 +1075,7 @@ function showCodeEditRecovery() {
 
 const godotTest = {token:null, project:null, script:null};
 const agentPlan = {token:null, task:null};
+const agentEvidence = {path:null};
 function clearAgentPlan() {
   agentPlan.token = null;
   agentPlan.task = null;
@@ -1128,6 +1129,7 @@ async function copilotStatus() {
     $("copilotDiagnoseGodot").disabled = !state.files_enabled;
     $("copilotProposeGodotTest").disabled = !state.godot_validate_enabled;
     $("copilotAgentPlan").disabled = !state.agent_enabled;
+    $("copilotAgentToEditor").disabled = !state.edit_enabled;
     $("copilotExplainCode").disabled = !state.files_enabled;
     $("copilotProposeEdit").disabled = !state.edit_enabled;
   } catch (_) {
@@ -1344,6 +1346,8 @@ $("copilotCancelGodotTest").addEventListener("click", () => {
 $("copilotAgentPlan").addEventListener("click", async () => {
   if (copilotState.busy || $("copilotPanel").hidden) return;
   clearAgentPlan();
+  agentEvidence.path = null;
+  $("copilotAgentToEditor").hidden = true;
   copilotState.busy = true;
   try {
     const task = $("copilotAgentTask").value;
@@ -1398,6 +1402,11 @@ $("copilotAgentRun").addEventListener("click", async () => {
     const pre = document.createElement("pre");
     pre.textContent = text.slice(0, 24000);
     $("copilotResult").replaceChildren(pre);
+    const diagnosis = (result.evidence || []).find(e => e.step === "godot_error_inspector");
+    const review = (result.evidence || []).find(e => e.step === "code_inspector");
+    const matchedFile = diagnosis?.facts?.matches?.[0]?.path || review?.facts?.path || null;
+    agentEvidence.path = typeof matchedFile === "string" ? matchedFile : null;
+    $("copilotAgentToEditor").hidden = !agentEvidence.path;
     copilotState.text = text.slice(0, 1400);
     $("copilotUseChat").hidden = !copilotState.text;
     $("copilotFeedback").textContent = result.status === "completed"
@@ -1408,6 +1417,15 @@ $("copilotAgentRun").addEventListener("click", async () => {
   } finally {
     copilotState.busy = false;
   }
+});
+$("copilotAgentToEditor").addEventListener("click", () => {
+  if (!agentEvidence.path || copilotState.busy) return;
+  $("copilotPath").value = agentEvidence.path;
+  const editorSection = $("copilotProposeEdit").closest("details");
+  if (editorSection) editorSection.open = true;
+  $("copilotFeedback").textContent =
+    "Arquivo encontrado selecionado. Informe o trecho exato e a substituição; nada será alterado sem diff e aprovação.";
+  $("copilotEditBefore").focus();
 });
 $("copilotAgentCancel").addEventListener("click", () => {
   clearAgentPlan();
