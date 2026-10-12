@@ -1163,6 +1163,8 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result = copilot.confirm_launch(data.get("token"))
                 elif action == "screen":
                     result = copilot.capture_screen(data.get("monitor", 1))
+                elif action == "screen_ocr":
+                    result = copilot.read_screen_text(data.get("monitor", 1))
                 else:
                     raise CopilotPermissionError("Ação local não permitida.")
             elif path == "/api/memories":
