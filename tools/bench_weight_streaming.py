@@ -100,7 +100,10 @@ def _matrix(options: argparse.Namespace, source: Path) -> dict:
                 raise RuntimeError(
                     "A subprocess benchmark failed for " + mode + ": " +
                     result.stderr[-500:])
-            runs.append(json.loads(destination.read_text(encoding="utf-8")))
+            case = json.loads(destination.read_text(encoding="utf-8"))
+            if options.source is None:
+                case["input"]["kind"] = "temporary_fixture"
+            runs.append(case)
     sinks = {case["checksum_sink"] for case in runs}
     return {
         "schema": 1,
