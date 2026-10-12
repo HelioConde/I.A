@@ -7,7 +7,7 @@ A IA pode gerar **uma proposta de substituição** de código baseada em trecho 
 1. Inicie INICIAR-COPILOTO-WINDOWS.bat e autorize uma pasta de projeto e a permissão de edição de código.
 2. No painel Copiloto, selecione um arquivo .gd, .py, .json ou outro formato permitido pelo editor.
 3. Abra **IA local: gerar proposta de correção**. Escreva o problema em até 380 caracteres e indique uma linha de foco, se souber.
-4. Clique **Gerar proposta com IA local**. O Brain-SSD envia ao Qwen local até 900 caracteres de código do arquivo autorizado, sem ativar pesquisa web ou anexar histórico de chat.
+4. Clique **Gerar proposta com IA local**. O Brain-SSD envia ao Qwen local até 900 caracteres de código do arquivo autorizado por uma rota isolada, sem ativar pesquisa web, histórico ou ferramentas de controle do PC.
 5. O modelo deve devolver um JSON estrito contendo trechos before, after e reason. O backend rejeita candidatos inválidos, trechos que não correspondam exatamente ao arquivo e propostas ambíguas.
 6. Para Python, a proposta deve passar por ast.parse; para JSON, pelo parser JSON. Para GDScript, CSS e demais formatos o editor **não afirma ter validado a sintaxe**.
 7. Se a proposta passar nesses filtros, o editor mostra o diff. Nenhuma alteração ocorre até clicar **Confirmar edição no disco** e aprovar a confirmação.
@@ -31,8 +31,7 @@ mostra o diff e um botão **Aplicar diff e criar backup**. A geração por
 si só não modifica o projeto. Qualquer erro do modelo é reportado
 como indisponibilidade da proposta, sem inventar que corrigiu o arquivo.
 
-A geração usa a instância do ChatEngine local, explicitamente com
-`web_search=False` e histórico vazio. Não requer conexão externa.
+A geração usa o backend do modelo local por uma rota dedicada do ChatEngine, **sem consultar comandos de Copiloto, pesquisa web, memória ou histórico**. Nenhuma API externa é necessária.
 
 ## Segurança e limitações
 
