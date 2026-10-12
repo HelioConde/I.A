@@ -149,6 +149,37 @@ class TestModelPatchDraft(unittest.TestCase):
             str(self.source), "Corrigir", model, focus_line=2)
         self.assertIn("return a + 0", model.call_args.args[0])
 
+    def test_chat_patch_command_prepares_without_applying(self):
+        engine = ChatEngine(lambda: None, copilot=self.copilot)
+        question = (
+            '/sugerir-correcao "' + str(self.source) +
+            '" @2 :: Simplifique o return da função'
+        )
+        chunks = []
+        with patch.object(engine, "ask", return_value={"answer": self.answer}) as llm:
+            result = ChatEngine.ask(engine, question, [], on_chunk=chunks.append)
+        self.assertEqual(result["local_action"], "copilot_code_edit_proposal")
+        self.assertIn("-    return a + 0", result["answer"])
+        self.assertTrue(result["copilot_edit_token"])
+        self.assertEqual(chunks, [result["answer"]])
+        self.assertIn("return a + 0", self.source.read_text())
+        self.assertEqual(llm.call_args.kwargs["web_search"], False)
+        self.assertEqual(llm.call_args.kwargs["remember_web"], False)
+        self.assertEqual(llm.call_args.kwargs["response_tokens"], 256)
+        with patch("brain_ssd.chat.code_edits._backup_dir", return_value=self.backups):
+            applied = self.copilot.apply_code_edit(result["copilot_edit_token"])
+        self.assertEqual(applied["status"], "applied")
+
+    def test_chat_command_refuses_when_edit_is_not_authorized(self):
+        read_only = LocalCopilot([self.root])
+        engine = ChatEngine(lambda: None, copilot=read_only)
+        command = '/sugerir-correcao "' + str(self.source) + '" :: Simplifique'
+        with patch.object(engine, "ask") as model:
+            reply = ChatEngine.ask(engine, command, [])
+            model.assert_not_called()
+        self.assertEqual(reply["local_action"], "copilot_patch_disabled")
+        self.assertIn("return a + 0", self.source.read_text())
+
     def test_local_api_does_not_apply_until_explicit_confirmation(self):
         engine = ChatEngine(lambda: None, copilot=self.copilot)
         server = create_chat_server(
