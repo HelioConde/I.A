@@ -196,6 +196,57 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
     """Return a truthful local result only for clearly selected Copilot intents."""
     if not isinstance(question, str):
         return None
+    # Agent Core only prepares deterministic read-only workflows here.
+    investigate_godot = re.fullmatch(
+        r'/investigar-godot\s+"([^"\r\n]+)"\s*::\s*(.+)',
+        question.strip(), re.I | re.S)
+    investigate_project = re.fullmatch(
+        r'/investigar-projeto\s+"([^"\r\n]+)"\s*',
+        question.strip(), re.I)
+    investigate_code = re.fullmatch(
+        r'/investigar-codigo\s+"([^"\r\n]+)"\s*',
+        question.strip(), re.I)
+    investigate_pc = question.strip().casefold() == "/investigar-pc"
+    if (investigate_godot or investigate_project or investigate_code
+            or investigate_pc):
+        if copilot is None:
+            return _result(
+                "O Agent Core local não está ativo. Inicie o Copiloto Windows.",
+                "copilot_disabled",
+            )
+        try:
+            if investigate_godot:
+                plan = copilot.plan_investigation(
+                    "godot_diagnosis", project=investigate_godot.group(1),
+                    error=investigate_godot.group(2))
+            elif investigate_project:
+                plan = copilot.plan_investigation(
+                    "godot_overview", project=investigate_project.group(1))
+            elif investigate_code:
+                plan = copilot.plan_investigation(
+                    "code_review", path=investigate_code.group(1))
+            else:
+                plan = copilot.plan_investigation("pc_report")
+        except (CopilotPermissionError, OSError, ValueError):
+            return _result(
+                "Não foi possível preparar a investigação. Confira a pasta "
+                "autorizada, o arquivo e as informações fornecidas.",
+                "copilot_agent_unavailable",
+            )
+        steps = "\n".join(
+            str(step["number"]) + ". " + step["title"] +
+            " [" + step["tool"] + "]" for step in plan["steps"]
+        )
+        return _result(
+            "Plano de investigação local (nenhuma ferramenta executada):\n" +
+            steps + "\n" + plan["risk"] +
+            "\nClique em 'Investigar agora' para consultar os dados reais. "
+            "A autorização expira em 90 segundos.",
+            "copilot_agent_plan",
+            extra={"copilot_agent_token": plan["token"],
+                   "copilot_agent_task": plan["task"]},
+        )
+
     validation_command = re.fullmatch(
         r'/validar-godot\s+"([^"\r\n]+)"\s*::\s*(res://[^\s\r\n]+\.gd)\s*',
         question.strip(), re.I)
