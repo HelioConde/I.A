@@ -150,7 +150,7 @@ class LunaIniTests(unittest.TestCase):
     def test_selected_model_is_checked_by_preflight_before_start(self):
         body = self.ini.read_text(encoding="utf-8")
         self.ini.write_text(
-            body.replace("model_file =", "model_file = Qwen3-4B-Q8_0.gguf"),
+            body.replace("model_file =", "model_file = Qwen3-4B-Q4_K_M.gguf"),
             encoding="utf-8",
         )
         from unittest.mock import MagicMock
@@ -163,10 +163,10 @@ class LunaIniTests(unittest.TestCase):
         chat_args = chat.call_args.args[0]
         self.assertIn("--model-file", doctor_args)
         self.assertEqual(doctor_args[doctor_args.index("--model-file") + 1],
-                         "Qwen3-4B-Q8_0.gguf")
+                         "Qwen3-4B-Q4_K_M.gguf")
         self.assertIn("--model-file", chat_args)
         self.assertEqual(chat_args[chat_args.index("--model-file") + 1],
-                         "Qwen3-4B-Q8_0.gguf")
+                         "Qwen3-4B-Q4_K_M.gguf")
 
     def test_choose_qwen4b_persists_model_without_changing_permissions(self):
         models = self.temp / "models"
