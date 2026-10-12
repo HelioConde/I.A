@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from pathlib import Path
 from typing import Any
 
 from brain_ssd.chat.copilot import CopilotPermissionError, LocalCopilot
@@ -192,6 +193,158 @@ def _launch_reply(question: str, copilot: LocalCopilot | None) -> dict[str, Any]
     )
 
 
+def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
+    """Resolve desktop capability claims before loose hardware/LLM routing.
+
+    Only explicitly requested reads happen; other questions explain limitations.
+    Paths and image files are checked using the existing authorized-root gates.
+    """
+    simple = _plain(question)
+    if re.search(r"\\b(?:abas?|guias?)\\b", simple) and re.search(
+        r"\\b(?:navegador|chrome|edge|browser|abert[ao]s?|estou|tenho|minhas|meus)\\b", simple
+    ):
+        return _result(
+            "Ainda não consigo enumerar as abas abertas do Chrome ou Edge. "
+            "A consulta de processos do Windows não identifica as URLs das abas. "
+            "Não acessei o navegador. Para mostrar uma aba, copie o endereço "
+            "ou peça uma captura explícita do monitor; o Qwen atual não interpreta pixels.",
+            "copilot_browser_tabs_unsupported",
+        )
+    if re.search(r"\\b(?:funcoes|funcionalidades|capacidades|recursos)\\b", simple) and re.search(
+        r"\\b(?:meu pc|meu computador|no pc|no computador|voce consegue|voce pode)\\b", simple
+    ):
+        if copilot is None:
+            return _result(
+                "O Copiloto não está ativo. Posso conversar com o Qwen local, "
+                "mas não tenho acesso automático ao PC; inicie o Copiloto para habilitar ferramentas.",
+                "copilot_capabilities_disabled",
+            )
+        features = copilot.status()
+        return _result(
+            "Funções verificadas nesta sessão da Luna:\\n"
+            + "• Leitura de pastas e arquivos: " + ("autorizada" if features.get("files_enabled") else "desativada") + "\\n"
+            + "• Captura de tela solicitada: " + ("autorizada" if features.get("screen_enabled") else "desativada") + "\\n"
+            + "• Inventário de aplicativos: " + ("autorizado" if features.get("apps_enabled") else "desativado") + "\\n"
+            + "• Abertura de Bloco de Notas/Calculadora: " + ("com confirmação" if features.get("launch_enabled") else "desativada") + "\\n"
+            + "• Edição de CÓDIGO: " + ("diff, backup e confirmação" if features.get("edit_enabled") else "desativada") + "\\n"
+            + "Não navego nas abas do navegador, não interpreto imagens com este Qwen "
+            "e não crio arquivos de texto arbitrários nesta versão. "
+            "Autorizar uma raiz não concede automaticamente permissão de escrita.",
+            "copilot_capabilities",
+        )
+    if re.search(r"\\b(?:pastas|diretorios)\\b", simple) and re.search(
+        r"\\b(?:principais|raiz|meu pc|meu computador|do pc|disco|unidade c)\\b", simple
+    ):
+        if copilot is None or not copilot.status().get("files_enabled"):
+            return _result("Não há uma pasta autorizada para listar. "
+                           "Configure a raiz no LUNA.ini; não vou inventar diretórios.",
+                           "copilot_folders_disabled")
+        root = next(iter(getattr(copilot, "roots", ())), None)
+        if root is None:
+            return _result("Não existe raiz autorizada para consultar.",
+                           "copilot_folders_disabled")
+        try:
+            directory = copilot.list_directory(str(root))
+        except (CopilotPermissionError, OSError, ValueError):
+            return _result("Não foi possível listar a pasta autorizada.",
+                           "copilot_folders_unavailable")
+        names = [item["name"] for item in directory.get("entries", [])
+                 if item.get("type") == "folder"][:25]
+        lines = ["Pastas conferidas agora em " + str(directory["path"]) + ":"]
+        lines.extend("• " + item for item in names)
+        if not names:
+            lines.append("Nenhuma subpasta visível foi encontrada nos limites desta consulta.")
+        if directory.get("truncated"):
+            lines.append("A consulta é limitada; outras pastas podem não aparecer.")
+        return _result("\\n".join(lines), "copilot_folders")
+    if re.search(r"\\b(?:jogos?)\\b", simple) and re.search(
+        r"\\b(?:instalado|instalados|instalada|instaladas|tenho no|tenho instal)\\b", simple
+    ):
+        return _result(
+            "O inventário do Windows lista aplicativos registrados, mas não classifica "
+            "com segurança quais são jogos. Não posso apresentar essa lista como "
+            "uma lista completa de jogos instalados. Posso consultar um título "
+            "específico ou listar aplicativos registrados sem essa classificação.",
+            "copilot_games_registry_limited",
+        )
+    if re.search(r"\\b(?:voce consegue|consegue|pode|sabe)\\b.*\\b(?:ver|visualizar|enxergar)\\b.*\\b(?:monitor|tela|imagem|imagens)\\b", simple):
+        return _result(
+            "Posso capturar um monitor explicitamente solicitado, quando autorizado, "
+            "e exibir a captura no chat. Mas o Qwen instalado é apenas texto: "
+            "não interpreta pixels nem consegue dizer o que aparece na imagem. "
+            "Para uma captura, diga 'Mostre o monitor 1' ou 'Mostre o monitor 2'. "
+            "Para texto visível, peça OCR local, que pode errar.",
+            "copilot_vision_limitation",
+        )
+    if re.search(r"\\b(?:voce consegue|consegue|pode|sabe)\\b.*\\b(?:visualizar|analisar|interpretar)\\b.*\\b(?:imagem|imagens|foto|fotos)\\b", simple):
+        return _result(
+            "Consigo exibir uma prévia de imagem autorizada, mas este Qwen é somente texto "
+            "e não a compreende visualmente. Para texto legível de telas, posso tentar OCR "
+            "sob solicitação. Não analisei nenhuma imagem nesta resposta.",
+            "copilot_image_limitation",
+        )
+    if re.search(r"\\b(?:crie|criar|cria|grave|salve|escreva|gerar|gere)\\b", simple) and re.search(
+        r"\\b(?:arquivo|texto|txt|documento)\\b", simple
+    ) and (re.search(r"\\b(?:c:/|c:|disco|pasta|diretorio|arquivo|salve|grave|crie o texto|criar um texto)\\b", simple)
+           or "crie o texto" in simple):
+        return _result(
+            "Posso redigir o conteúdo aqui, mas esta versão do chat não grava arquivos "
+            ".txt automaticamente. A permissão atual de edição cobre apenas CÓDIGO "
+            "com diff e confirmação. Nenhum arquivo foi criado. "
+            "Copie o texto para o Bloco de Notas ou use o editor de código "
+            "do Copiloto para arquivos de código autorizados.",
+            "copilot_text_write_unsupported",
+        )
+    if re.search(r"\\b(?:imagem|imagens|fotos?|png|jpg|jpeg|webp)\\b", simple) and re.search(
+        r"\\b(?:downloads?|baixados?)\\b", simple
+    ) and re.search(r"\\b(?:localize|localizar|ache|encontre|mostre|mostrar|liste|listar|primeir[ao])\\b", simple):
+        if copilot is None or not copilot.status().get("files_enabled"):
+            return _result("Downloads não está autorizado. Não pesquisei nem localizei imagens.",
+                           "copilot_downloads_disabled")
+        downloads = Path.home() / "Downloads"
+        try:
+            directory = copilot.list_directory(str(downloads))
+        except (CopilotPermissionError, ValueError, OSError):
+            return _result(
+                "Não consegui abrir a pasta Downloads padrão dentro das raízes autorizadas. "
+                "Nenhuma imagem foi localizada. Verifique a pasta no Copiloto.",
+                "copilot_downloads_unavailable",
+            )
+        image_names = sorted(
+            (item["name"] for item in directory.get("entries", [])
+             if item.get("type") == "file"
+             and Path(item["name"]).suffix.casefold() in {".jpg", ".jpeg", ".png", ".webp", ".bmp"}),
+            key=str.casefold,
+        )
+        if not image_names:
+            return _result(
+                "Não identifiquei imagens nos primeiros registros autorizados de Downloads. "
+                "A busca é limitada a 100 entradas e pode não incluir todos os arquivos.",
+                "copilot_downloads_empty",
+            )
+        if re.search(r"\\b(?:mostre|mostrar|exiba|primeir[ao])\\b", simple):
+            try:
+                preview = copilot.preview_image(str(downloads / image_names[0]))
+                return _result(
+                    "Primeira imagem por ordem alfabética nos registros consultados: "
+                    + image_names[0] + ". Exibindo prévia (sem interpretação visual pelo Qwen).",
+                    "copilot_image_preview", image_data_url=preview["image_data_url"],
+                )
+            except (CopilotPermissionError, OSError, ValueError):
+                return _result(
+                    "Encontrei o arquivo " + image_names[0] +
+                    ", mas não consegui gerar a prévia. Nenhuma imagem foi interpretada.",
+                    "copilot_image_preview_unavailable",
+                )
+        return _result(
+            "Imagens encontradas nos primeiros registros da pasta Downloads:\\n" +
+            "\\n".join("• " + name for name in image_names[:12]) +
+            ("\\nListagem parcial: limite de entradas atingido." if directory.get("truncated") else ""),
+            "copilot_downloads_list",
+        )
+    return None
+
+
 def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
     """Return a truthful local result only for clearly selected Copilot intents."""
     if not isinstance(question, str):
@@ -354,6 +507,9 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
             )
         except (CopilotPermissionError, OSError) as exc:
             return _result(str(exc), "copilot_code_unavailable")
+    direct = _grounded_desktop_question(question, copilot)
+    if direct is not None:
+        return direct
     simple = _plain(question)
     if simple in (
         "/recomendar pc", "/recomendar computador",
