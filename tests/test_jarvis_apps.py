@@ -5,6 +5,7 @@ Unit tests use mock app listings and NEVER open a real Windows program.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import threading
 import time
@@ -30,6 +31,19 @@ PROCESSES = {"items": [{"name": "godot.exe", "pid": 31415}],
 
 
 class TestJarvisTools(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Inventário físico exige Windows")
+    def test_windows_read_only_inventory_is_callable(self):
+        assistant = LocalCopilot(apps=True)
+        registered = assistant.installed_apps()
+        running = assistant.running_apps()
+        self.assertIsInstance(registered["items"], list)
+        self.assertIn("source", registered)
+        self.assertIsInstance(running["items"], list)
+        self.assertIn("source", running)
+        self.assertTrue(all("name" in item and "pid" in item
+                            for item in running["items"]))
+        # Do not print the user's private app or process names in CI.
+
     def test_registry_results_are_from_tool_not_llm(self):
         assistant = LocalCopilot(apps=True)
         with patch("brain_ssd.chat.windows_apps.installed_apps", return_value=APPS) as lookup:
