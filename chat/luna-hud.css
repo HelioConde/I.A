@@ -170,3 +170,25 @@ html,body { background:#060d17; }
 .luna-hud-card {padding:12px 14px;}
 .luna-rail-end {font-size:10px;}
 @media(max-width:900px) {.luna-rail {overscroll-behavior:contain;}}
+/* v1.2: flex items in a column shrink by default; that clipped real data. */
+/* Keep card content accessible and scroll the rail, not each card. */
+.luna-rail {
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  align-content:flex-start;
+  padding-bottom:22px;
+}
+.luna-rail-head,.luna-rail-end,.luna-hud-card {
+  flex:0 0 auto;
+}
+.luna-hud-card {min-height:max-content;}
+.luna-activity-list {max-height:none;overflow:visible;}
+/* On shorter laptop displays both sidebars must remain scrollable. */
+.sidebar {min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.sidebar .conversation-list {flex:0 0 auto;max-height:26vh;min-height:42px;}
+.sidebar .sidebar-panel {flex:0 0 auto;}
+@media (max-height:770px) {
+  .luna-rail {gap:9px;padding-top:12px;}
+  .luna-status-core {width:72px;height:72px;}
+}
