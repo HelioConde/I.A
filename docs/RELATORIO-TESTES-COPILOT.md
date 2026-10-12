@@ -1,3 +1,32 @@
+## Evolução J.A.R.V.I.S. — funções adicionadas após a bateria de 75 perguntas
+
+Os relatórios anteriores apresentaram **18 GAPs** relacionados a
+aplicativos instalados e processos ativos. A branch recebeu implementações
+locais para consulta do registro Uninstall (HKCU/HKLM, visualizações
+32 e 64 bits), leitura de processos por nome/PID e filtro por nome.
+Essas ferramentas são **opt-in** e as respostas agora diferenciam registros
+confirmados de informações ausentes.
+
+Adicionalmente há propostas de abertura do Bloco de Notas e Calculadora
+por comandos em linguagem natural, com token aleatório, confirmação
+humana no frontend, validade de 90 segundos e proteção de uso único.
+**O Qwen nunca executa o programa durante a geração de resposta.**
+Foi adicionado modo opcional de leitura automática de respostas
+com voz portuguesa marcada como `localService` pelo navegador,
+sem ativar microfone.
+
+A regressão automatizada das permissões, da rota do chat e da confirmação
+foi incorporada em `tests/test_jarvis_apps.py`. O teste real de
+inventário roda no Windows CI e não publica os nomes encontrados.
+
+**Limites do novo estado:** a bateria das 75 perguntas não foi repetida
+na sessão física do usuário após instalar essas alterações.
+Não se deve converter automaticamente os 18 GAPs anteriores em PASS
+antes dessa nova execução. Abertura efetiva de janelas no desktop,
+reconhecimento de voz e OCR ainda não foram verificados/implementados.
+
+Arquitetura e fases seguintes: `docs/JARVIS_ROADMAP_WINDOWS.md`.
+
 # Relatório de testes — Brain-SSD Copilot Windows
 
 ## Atualização V2 — 2026-10-11
