@@ -228,6 +228,39 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
         except (CopilotPermissionError, OSError) as exc:
             return _result(str(exc), "copilot_code_unavailable")
     simple = _plain(question)
+    if simple in (
+        "/recomendar pc", "/recomendar computador",
+        "o que voce recomenda para meu computador",
+        "faca recomendacoes para meu computador",
+        "recomende melhorias para meu pc",
+    ):
+        if copilot is None or not copilot.status()["enabled"]:
+            return _result("Ative o Copiloto Windows para recomendações verificadas.",
+                           "copilot_disabled")
+        try:
+            info = copilot.system_info()
+        except (CopilotPermissionError, OSError):
+            return _result("Não consegui verificar hardware; não vou inventar recomendações.",
+                           "copilot_recommend_unavailable")
+        recommendations = []
+        ram = info.get("ram_total_gib")
+        if isinstance(ram, (float, int)) and ram < 8:
+            recommendations.append("RAM abaixo de 8 GiB: mantenha poucos aplicativos pesados abertos ao usar o modelo local.")
+        else:
+            recommendations.append("Para reduzir latência na CPU, use o perfil economia e respostas curtas quando for suficiente.")
+        for disk in info.get("disks", []):
+            total, free = disk.get("total_gib"), disk.get("free_gib")
+            if (isinstance(total, (float, int)) and isinstance(free, (float, int))
+                    and total > 0 and free / total < 0.10):
+                recommendations.append(
+                    "Armazenamento da raiz autorizada " + str(disk.get("root", "")) +
+                    " com menos de 10% livre. Revise manualmente arquivos grandes antes de excluir."
+                )
+        recommendations.append("Para depurar Godot, abra um projeto autorizado no painel ▣ e faça uma inspeção de código ou OCR local da tela.")
+        recommendations.append("Não foram verificadas temperatura, GPU, integridade de SSD nem gargalos de aplicativos.")
+        return _result("Recomendações baseadas no hardware consultado agora:\n" +
+                       "\n".join("• " + item for item in recommendations),
+                       "copilot_recommendations")
     system = _is_system_question(simple)
     screen, monitor = _screen_request(simple)
     inventory = _inventory_intent(simple)
