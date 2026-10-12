@@ -683,12 +683,15 @@ async function send() {
         }
         // The screenshot is an ephemeral image returned only for this
         // explicit question. It is NOT inserted into conversation history.
-        if (payload.local_action === "copilot_screen" &&
+        if ((payload.local_action === "copilot_screen" ||
+             payload.local_action === "copilot_image_preview") &&
             typeof payload.copilot_image_data_url === "string" &&
             /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(payload.copilot_image_data_url)) {
           const image = document.createElement("img");
           image.className = "message-screen-preview";
-          image.alt = "Captura local solicitada pelo usuário (sem análise visual pelo modelo)";
+          image.alt = payload.local_action === "copilot_image_preview"
+            ? "Prévia local de imagem autorizada, sem interpretação pelo modelo"
+            : "Captura local solicitada pelo usuário (sem análise visual pelo modelo)";
           image.src = payload.copilot_image_data_url;
           pending.querySelector(".message-body").appendChild(image);
           const imageNote = document.createElement("p");
