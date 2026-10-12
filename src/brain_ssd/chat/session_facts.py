@@ -18,7 +18,8 @@ _MONTHS = ("janeiro", "fevereiro", "março", "abril", "maio", "junho",
 
 def _text(value: str) -> str:
     lowered = unicodedata.normalize("NFKD", value.casefold())
-    return re.sub(r"\s+", " ", "".join(c for c in lowered if not unicodedata.combining(c))).strip(" ?!.")
+    normalized = "".join(c for c in lowered if not unicodedata.combining(c))
+    return re.sub(r"\s+", " ", re.sub(r"[,;:]+", " ", normalized)).strip(" ?!.")
 
 
 def is_first_question_intent(question: str) -> bool:
