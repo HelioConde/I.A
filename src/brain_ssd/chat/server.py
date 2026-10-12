@@ -1152,6 +1152,15 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result = copilot.installed_apps(data.get("search"))
                 elif action == "processes":
                     result = copilot.running_apps(data.get("search"))
+                elif action == "agent_plan":
+                    result = copilot.plan_investigation(
+                        data.get("task"),
+                        project=data.get("project"),
+                        error=data.get("error"),
+                        path=data.get("path"),
+                    )
+                elif action == "agent_execute":
+                    result = copilot.run_investigation(data.get("token"))
                 elif action == "project_scan":
                     result = copilot.inspect_godot_project(data.get("path"))
                 elif action == "godot_error":
