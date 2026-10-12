@@ -200,6 +200,18 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
     Paths and image files are checked using the existing authorized-root gates.
     """
     simple = _plain(question)
+    # Distinguish what could be checked from an observation actually made.
+    if (re.search(r"\b(?:consegue|pode|sabe)\b.*\b(?:ver|visualizar|identificar)\b", simple)
+            and re.search(r"\b(?:aberto|abertos|aberta|abertas|rodando|executando)\b", simple)
+            and re.search(r"\b(?:meu pc|meu computador|no meu pc|no meu computador)\b", simple)):
+        return _result(
+            "Posso consultar títulos de janelas visíveis do Windows, se a "
+            "permissão de tela estiver ativa, ou nomes de processos se a "
+            "permissão de aplicativos estiver ativa. Mas NÃO vejo o conteúdo "
+            "das abas do navegador. Ainda não verifiquei janelas ou processos "
+            "nesta resposta. Para listar as janelas, peça 'Liste as janelas abertas'.",
+            "copilot_windows_capability",
+        )
     # A user asking about their OWN tabs must not fall through to Qwen or
     # be answered from tasklist.exe. Browser processes != open tab URLs.
     personal_tabs = bool(
