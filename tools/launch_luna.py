@@ -223,9 +223,12 @@ def enable_direct_launch(path: Path) -> None:
     rows = path.read_text(encoding="utf-8-sig").splitlines(keepends=True)
     inside = False
     replaced = False
+    insertion = len(rows)
     for index, line in enumerate(rows):
         stripped = line.strip().casefold()
         if stripped.startswith("[") and stripped.endswith("]"):
+            if inside and insertion == len(rows):
+                insertion = index
             inside = stripped == "[copilot]"
             continue
         if inside and line.split("=", 1)[0].strip().casefold() == "launch_without_confirmation":
@@ -234,7 +237,7 @@ def enable_direct_launch(path: Path) -> None:
             replaced = True
             break
     if not replaced:
-        rows.append("\nlaunch_without_confirmation = true\n")
+        rows.insert(insertion, "launch_without_confirmation = true\n")
     path.write_text("".join(rows), encoding="utf-8")
     if not read_config(path).launch_without_confirmation:
         raise ValueError("A permissão não foi persistida corretamente.")
