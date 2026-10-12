@@ -1211,7 +1211,7 @@ async function copilotStatus() {
       ? "Permissões ativas: " + (state.files_enabled ? "arquivos · " : "") +
         (state.screen_enabled ? "tela · " : "") +
         (state.apps_enabled ? "aplicativos · " : "") +
-        (state.launch_enabled ? "abertura confirmada" : "sem abertura automática")
+        (state.launch_without_confirmation ? "abertura direta autorizada" : state.launch_enabled ? "abertura confirmada" : "sem abertura de aplicativos")
       : "Desativado. Escolha as permissões no iniciador do Copiloto.";
     window.dispatchEvent(new CustomEvent("luna:permission", {detail:{
       files_enabled:Boolean(state.files_enabled), screen_enabled:Boolean(state.screen_enabled)
