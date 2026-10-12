@@ -101,3 +101,25 @@ py -3 -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
 
 Depois execute `.\INICIAR-COPILOTO-WINDOWS.bat` normalmente.
 Se aparecer erro de INI, ajuste a opção indicada. Não há leitura de `%VAR%`, shell ou execução de comandos a partir dos valores do INI.
+
+## Microfone: reconhecimento de fala local
+
+O botão `Falar (local)` só é habilitado quando o navegador confirma
+reconhecimento **no dispositivo** para `pt-BR` via Web Speech API.
+Permissões do Copiloto em `LUNA.ini` (`screen`, `apps`, `launch`) não
+habilitam o microfone do navegador.
+
+Se não houver pacote, a interface informa a causa e apresenta `Instalar pt-BR offline`
+**apenas quando** o próprio navegador declarar o pacote como `downloadable`.
+O clique pede confirmação explícita: a instalação pode baixar componentes
+pela internet, porém as transcrições posteriores continuam configuradas
+com `processLocally = true`. Não há fallback automático para speech-to-text remoto.
+
+Se o navegador declarar `unavailable` ou não implementar esta API
+experimental, a fala permanece indisponível. O botão `Verificar novamente`
+permite reavaliar após uma atualização ou mudança de permissão.
+Confira o microfone nas permissões do site `http://127.0.0.1:8766`
+(a porta pode variar com a configuração).
+
+Alternativa futura: integrar um motor speech-to-text local próprio, independente
+do suporte de idioma no navegador, com instalação e permissões explícitas.
