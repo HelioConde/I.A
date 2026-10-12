@@ -5,6 +5,7 @@ browser, Downloads, model, disk writes or the public Internet.
 """
 from __future__ import annotations
 
+import inspect
 import sys
 import tempfile
 import unittest
@@ -164,6 +165,42 @@ class TestPastConversationRegression(unittest.TestCase):
             result = engine.ask("pesquise para mim sobre notícias recentes de Jair Bolsonaro", [])
             self.assertEqual(result["local_action"], "recent_news_permission")
             self.assertIn("Não fiz consulta externa", result["answer"])
+            self.assertFalse(engine.status()["inference_verified"])
+        finally:
+            engine.close()
+
+    def test_news_and_google_guards_are_in_chat_not_code_generation(self):
+        # The 12/10 regression came from inserting these routes in the
+        # code-patch generator instead of ChatEngine._ask_inner.
+        chat_source = inspect.getsource(ChatEngine._ask_inner)
+        code_source = inspect.getsource(ChatEngine.generate_code_candidate)
+        self.assertIn("google_intent", chat_source)
+        self.assertIn("needs_recent_public_sources(question)", chat_source)
+        self.assertLess(chat_source.index("google_intent"),
+                        chat_source.index('if self._state != "ready"'))
+        self.assertNotIn("google_intent", code_source)
+        self.assertNotIn("needs_recent_public_sources", code_source)
+        self.assertNotIn("on_chunk", code_source)
+
+    def test_denied_web_queries_stream_without_starting_qwen(self):
+        class MockWeb:
+            provider = "auto"
+            _serper_key = ""
+            def search(self, question):
+                raise AssertionError("No network needed for denied request")
+        engine = ChatEngine(lambda: None, web_search_service=MockWeb())
+        try:
+            for text, allowed, expected in (
+                ("utilizar as pesquisas do google sobre noticias jair bolsonaro",
+                 True, "google_search_capability"),
+                ("pesquise para mim sobre notícias recentes de Jair Bolsonaro",
+                 False, "recent_news_permission"),
+            ):
+                chunks = []
+                with self.subTest(question=text):
+                    result = engine.ask(text, [], on_chunk=chunks.append, web_search=allowed)
+                    self.assertEqual(result["local_action"], expected)
+                    self.assertEqual("".join(chunks), result["answer"])
             self.assertFalse(engine.status()["inference_verified"])
         finally:
             engine.close()
