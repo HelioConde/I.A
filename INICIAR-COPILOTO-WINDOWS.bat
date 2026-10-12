@@ -58,8 +58,15 @@ set "COPILOT_APPS=--copilot-apps"
 set "COPILOT_LAUNCH="
 echo Abrir programas exige outro clique de confirmacao no chat.
 choice /c SN /n /m "Permitir ABERTURA confirmada do Bloco de Notas e Calculadora? [S/N] "
-if errorlevel 2 goto :start
+if errorlevel 2 goto :ask_edit
 set "COPILOT_LAUNCH=--copilot-launch"
+:ask_edit
+set "COPILOT_EDIT="
+if not defined COPILOT_ROOT goto :start
+echo Edicao apenas de codigo em pasta autorizada, com diff e backup.
+choice /c SN /n /m "Permitir editar CODIGO apos confirmacao manual de cada mudanca? [S/N] "
+if errorlevel 2 goto :start
+set "COPILOT_EDIT=--copilot-edit"
 :start
 echo.
 echo Verificando requisitos do modelo...
@@ -74,9 +81,9 @@ if errorlevel 1 (
 echo.
 echo Iniciando chat e copiloto local. A pesquisa web continua opt-in.
 if defined COPILOT_ROOT (
-  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto --copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH%
+  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto --copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT%
 ) else (
-  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH%
+  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT%
 )
 if errorlevel 1 (
   echo.
