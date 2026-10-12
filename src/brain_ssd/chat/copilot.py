@@ -236,6 +236,12 @@ class LocalCopilot:
     def review_code(self, user_path: str) -> dict:
         return self._code_editor().recommend(user_path)
 
+    def propose_model_patch(self, path: str, instruction: str,
+                            generate_local, *, focus_line=None) -> dict:
+        from brain_ssd.chat.model_patch_draft import ModelPatchDraft
+        return ModelPatchDraft(self).propose(
+            path, instruction, generate_local, focus_line=focus_line)
+
     def propose_code_edit(self, user_path: str, before: str, after: str) -> dict:
         return self._code_editor().propose(user_path, before, after)
 
