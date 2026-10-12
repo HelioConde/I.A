@@ -22,7 +22,7 @@ from brain_ssd.chat.local_actions import is_local_action_answer, local_command, 
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
-from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, current_game_request, needs_recent_public_sources
+from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, current_game_request, needs_recent_public_sources, time_sensitive_local_intent
 from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format_cached_context
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
@@ -523,6 +523,37 @@ class ChatEngine:
                 self.diagnostics.emit("chat.local_action", request_id=request_id,
                                       action=local_pc["local_action"], status="PASS")
             return local_pc
+        # A local model cannot know live weather or what "today" refers to.
+        # Resolve these BEFORE checking model readiness or retrieving stale sources.
+        temporal_intent = time_sensitive_local_intent(question)
+        if temporal_intent:
+            if temporal_intent == "ambiguous_today":
+                message = ("Você quer informações de hoje sobre notícias, previsão do "
+                           "tempo ou suas tarefas? Diga o assunto; não consultei "
+                           "fontes atuais nesta mensagem.")
+                action = "today_topic_clarification"
+            else:
+                message = (
+                    "Não tenho uma previsão meteorológica ao vivo verificada. "
+                    "Mesmo com pesquisa web autorizada, a Luna ainda não possui "
+                    "um serviço meteorológico específico integrado. "
+                    "Não consultei o tempo em Brasília nem em outra cidade; "
+                    "não vou inventar temperatura ou chuva."
+                    if web_search else
+                    "Para saber o clima de hoje preciso consultar uma fonte "
+                    "meteorológica atual. Ainda não há um provedor de previsão "
+                    "integrado à Luna; marcar Pesquisar na web, por si só, "
+                    "não garante esse dado. Não consultei a previsão."
+                )
+                action = "weather_provider_unavailable"
+            local = {"answer": message, "mode": "local_command",
+                     "local_action": action, "web_search_status": "not_requested",
+                     "metrics": {}, "active_pages": 0, "sources_from_ssd": 0,
+                     "episodic_memories_used": 0, "episodic_ambiguities_detected": 0,
+                     "episodic_ambiguities_withheld": False, "cognitive_shadow": None}
+            if on_chunk is not None:
+                on_chunk(message)
+            return local
         # Google is available only with the configured Serper API key.
         # A question about Google search is not proof a query was sent.
         normalized = unicodedata.normalize("NFKD", question.casefold())
