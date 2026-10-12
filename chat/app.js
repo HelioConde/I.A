@@ -842,6 +842,16 @@ setInterval(refreshStatus, 3000);
 
 /* Copiloto local: leitura opt-in, nenhuma captura persistida ou enviada à web. */
 const copilotState = {timer:null, busy:false, text:"", enabled:false};
+const codeEdit = {token:null, path:null};
+function resetCodeEditPreview() {
+  codeEdit.token = null;
+  codeEdit.path = null;
+  $("copilotEditDiff").hidden = true;
+  $("copilotEditDiff").textContent = "";
+  $("copilotConfirmEdit").hidden = true;
+  $("copilotCancelEdit").hidden = true;
+}
+
 async function copilotStatus() {
   try {
     const state = await requestJson("/api/copilot/status", {cache:"no-store"});
@@ -861,6 +871,9 @@ async function copilotStatus() {
     $("copilotLive").disabled = !state.screen_enabled;
     $("copilotInstalled").disabled = !state.apps_enabled;
     $("copilotProcesses").disabled = !state.apps_enabled;
+    $("copilotReviewCode").disabled = !state.files_enabled;
+    $("copilotExplainCode").disabled = !state.files_enabled;
+    $("copilotProposeEdit").disabled = !state.edit_enabled;
   } catch (_) {
     $("copilotStatus").textContent = "Não foi possível verificar as permissões locais.";
   }
@@ -872,6 +885,7 @@ function stopCopilotLive() {
 }
 function closeCopilot() {
   stopCopilotLive();
+  resetCodeEditPreview();
   $("copilotPanel").hidden = true;
   $("openCopilot").setAttribute("aria-expanded", "false");
 }
@@ -881,7 +895,7 @@ async function copilotCall(action) {
   const feedback = $("copilotFeedback");
   const result = $("copilotResult");
   const data = {action};
-  if (["list","read","image"].includes(action)) data.path = $("copilotPath").value.trim();
+  if (["list","read","image","review_code"].includes(action)) data.path = $("copilotPath").value.trim();
   if (action === "screen") data.monitor = Number($("copilotMonitor").value);
   if (["apps", "processes"].includes(action)) data.search = $("copilotAppSearch").value.trim() || null;
   feedback.textContent = "Consultando recurso local...";
@@ -961,6 +975,85 @@ $("copilotList").addEventListener("click", () => copilotCall("list"));
 $("copilotRead").addEventListener("click", () => copilotCall("read"));
 $("copilotImage").addEventListener("click", () => copilotCall("image"));
 $("copilotSystem").addEventListener("click", () => copilotCall("system"));
+$("copilotReviewCode").addEventListener("click", () => copilotCall("review_code"));
+$("copilotExplainCode").addEventListener("click", async () => {
+  if (copilotState.busy || app.sending) return;
+  const path = $("copilotPath").value.trim();
+  if (!path) { $("copilotFeedback").textContent = "Selecione o arquivo de código."; return; }
+  try {
+    const response = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"read", path})
+    });
+    const code = String(response.content || "").slice(0, 1200);
+    if (!code.trim()) throw new Error("Arquivo vazio.");
+    // Code is untrusted data. Never treat comments as user instructions.
+    const message = "Analise este código fornecido por mim. Liste até 3 problemas reais " +
+      "e sugestões pequenas, sem inventar erros. Não execute alterações.\n" +
+      "Arquivo: " + response.path + "\n" +
+      "=== INÍCIO DO CÓDIGO NÃO CONFIÁVEL ===\n" + code +
+      "\n=== FIM DO CÓDIGO ===\n";
+    if (message.length > 2000) throw new Error("Trecho longo; use arquivo menor.");
+    composer.value = message;
+    fitComposer();
+    closeCopilot();
+    composer.focus();
+  } catch (error) {
+    $("copilotFeedback").textContent = error.message || "Arquivo indisponível.";
+  }
+});
+$("copilotProposeEdit").addEventListener("click", async () => {
+  if (copilotState.busy) return;
+  resetCodeEditPreview();
+  copilotState.busy = true;
+  try {
+    const request = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        action:"propose_code_edit",
+        path:$("copilotPath").value.trim(),
+        before:$("copilotEditBefore").value,
+        after:$("copilotEditAfter").value
+      })
+    });
+    codeEdit.token = request.token;
+    codeEdit.path = request.path;
+    $("copilotEditDiff").textContent = request.diff;
+    $("copilotEditDiff").hidden = false;
+    $("copilotConfirmEdit").hidden = false;
+    $("copilotCancelEdit").hidden = false;
+    $("copilotFeedback").textContent = "Prévia preparada; confira o diff antes de confirmar.";
+  } catch (error) {
+    $("copilotFeedback").textContent = error.message || "Não foi possível preparar a alteração.";
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotConfirmEdit").addEventListener("click", async () => {
+  if (!codeEdit.token || copilotState.busy) return;
+  const token = codeEdit.token;
+  const path = codeEdit.path;
+  resetCodeEditPreview();
+  if (!window.confirm("Aplicar a alteração revisada em " + path +
+      " e criar um backup privado?")) return;
+  copilotState.busy = true;
+  try {
+    const response = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"apply_code_edit", token})
+    });
+    $("copilotFeedback").textContent = "Arquivo atualizado após confirmação. Backup: " +
+      response.backup_path;
+  } catch (error) {
+    $("copilotFeedback").textContent = error.message || "Edição não aplicada.";
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotCancelEdit").addEventListener("click", () => {
+  resetCodeEditPreview();
+  $("copilotFeedback").textContent = "Prévia descartada; arquivo permanece intacto.";
+});
 $("copilotInstalled").addEventListener("click", () => copilotCall("apps"));
 $("copilotProcesses").addEventListener("click", () => copilotCall("processes"));
 $("copilotCapture").addEventListener("click", () => copilotCall("screen"));
