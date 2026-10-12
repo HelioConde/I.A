@@ -1,9 +1,9 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title Brain-SSD - Copiloto Windows experimental
-if not exist "tools\run_chat.py" (
-  echo ERRO: execute este arquivo na raiz do projeto I.A.
+title Luna - Brain-SSD Windows
+if not exist "tools\launch_luna.py" (
+  echo ERRO: iniciador da Luna nao encontrado nesta pasta.
   pause
   exit /b 2
 )
@@ -24,86 +24,25 @@ if errorlevel 1 (
   exit /b 3
 )
 echo.
-echo O COPILOTO NAO abre arquivos nem grava a tela automaticamente.
-echo Primeiro, escolha quais permissoes dar nesta sessao.
+echo =====================================================
+echo LUNA / BRAIN-SSD  -  Configuracao persistente INI
+echo =====================================================
+echo As preferencias sao lidas de LUNA.ini na raiz do projeto.
+echo Na primeira execucao, o arquivo e criado automaticamente.
+echo Para alterar permissoes ou pastas, edite o LUNA.ini.
+echo Captura, edicao e execucao ainda exigem confirmacao na interface.
 echo.
-set "COPILOT_ROOT="
-choice /c SN /n /m "Autorizar leitura de UMA pasta e suas subpastas? [S/N] "
-if errorlevel 2 goto :ask_screen
-set "COPILOT_ROOT=%USERPROFILE%\Documents"
-echo Pasta padrao: %COPILOT_ROOT%
-set /p "COPILOT_ROOT=Digite outra pasta autorizada (Enter = Documents): "
-if not defined COPILOT_ROOT set "COPILOT_ROOT=%USERPROFILE%\Documents"
-if not exist "%COPILOT_ROOT%\" (
-  echo Pasta inexistente. Nenhuma pasta foi autorizada.
-  set "COPILOT_ROOT="
-)
-set "COPILOT_ROOT_ARG=%COPILOT_ROOT%"
-if defined COPILOT_ROOT (
-  rem O Windows interpreta "C:\\" como argumento com aspa escapada.
-  rem Acrescente ponto apenas no argumento de caminhos que terminam em barra.
-  if "%COPILOT_ROOT:~-1%"=="\" set "COPILOT_ROOT_ARG=%COPILOT_ROOT%."
-)
-:ask_screen
-set "COPILOT_SCREEN="
-choice /c SN /n /m "Permitir capturas da tela SOMENTE quando solicitadas na interface? [S/N] "
-if errorlevel 2 goto :ask_apps
-set "COPILOT_SCREEN=--copilot-screen"
-:ask_apps
-set "COPILOT_APPS="
-choice /c SN /n /m "Permitir consultar nomes dos programas instalados e processos ativos? [S/N] "
-if errorlevel 2 goto :ask_launch
-set "COPILOT_APPS=--copilot-apps"
-:ask_launch
-set "COPILOT_LAUNCH="
-echo Abrir programas exige outro clique de confirmacao no chat.
-choice /c SN /n /m "Permitir ABERTURA confirmada do Bloco de Notas e Calculadora? [S/N] "
-if errorlevel 2 goto :ask_edit
-set "COPILOT_LAUNCH=--copilot-launch"
-:ask_edit
-set "COPILOT_EDIT="
-if not defined COPILOT_ROOT goto :start
-echo Edicao apenas de codigo em pasta autorizada, com diff e backup.
-choice /c SN /n /m "Permitir editar CODIGO apos confirmacao manual de cada mudanca? [S/N] "
-if errorlevel 2 goto :ask_godot
-set "COPILOT_EDIT=--copilot-edit"
-:ask_godot
-set "COPILOT_GODOT_ARG="
-echo.
-echo OPCIONAL: Godot --check-only pode inicializar extensoes e gravar cache no projeto.
-echo Use apenas projeto confiavel. Cada verificacao exige novo clique de confirmacao.
-choice /c SN /n /m "Permitir validacao Godot --check-only APOS aprovacao individual? [S/N] "
-if errorlevel 2 goto :start
-set "COPILOT_GODOT_BINARY="
-set /p "COPILOT_GODOT_BINARY=Informe o caminho COMPLETO do executavel Godot .exe: "
-if not defined COPILOT_GODOT_BINARY goto :start
-if not exist "%COPILOT_GODOT_BINARY%" (
-  echo Godot nao encontrado. Validacao desabilitada.
-  goto :start
-)
-set "COPILOT_GODOT_ARG=--copilot-godot-bin "%COPILOT_GODOT_BINARY%""
-:start
-echo.
-echo Verificando requisitos do modelo...
-%PYTHON_CMD% "tools\doctor_chat.py" --profile economia --probe
-if errorlevel 1 (
+%PYTHON_CMD% "tools\launch_luna.py" --run
+set "LUNA_EXIT=%ERRORLEVEL%"
+if "%LUNA_EXIT%"=="3" (
   echo.
-  echo Modelo ou runtime ausente. Prepare pelo instalador principal.
-  echo Depois execute novamente INICIAR-COPILOTO-WINDOWS.bat.
+  echo Modelo ou runtime ausente. Abrindo instalador principal...
   call "%~dp0INICIAR-BRAIN-SSD.bat"
-  goto :end
 )
-echo.
-echo Iniciando chat e copiloto local. A pesquisa web continua opt-in.
-if defined COPILOT_ROOT (
-  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto --copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT% %COPILOT_GODOT_ARG%
-) else (
-  %PYTHON_CMD% "tools\run_chat.py" --profile economia --episodic-memory --cognitive-shadow --web-search --web-provider auto %COPILOT_SCREEN% %COPILOT_APPS% %COPILOT_LAUNCH% %COPILOT_EDIT% %COPILOT_GODOT_ARG%
-)
-if errorlevel 1 (
+if not "%LUNA_EXIT%"=="0" (
   echo.
-  echo Copiloto nao iniciou; consulte os erros anteriores.
+  echo Luna nao iniciou ou foi encerrada com erro %LUNA_EXIT%.
+  echo Configure o arquivo LUNA.ini e execute novamente.
   pause
 )
-:end
 endlocal
