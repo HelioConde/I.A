@@ -70,8 +70,24 @@ class TestCopilotQuestionRouter(unittest.TestCase):
             "Olhe para meu monitor 2, identifique o erro no Godot, "
             "encontre o arquivo relacionado e me explique a correção.", fake)
         self.assertEqual(fake.captured, [2])
-        self.assertIn("Não consegui ler o texto do erro", r["answer"])
+        self.assertIn("OCR local indisponível", r["answer"])
         self.assertIn("OCR", r["answer"])
+
+    def test_screen_godot_uses_requested_ocr_when_available(self):
+        fake = FakeCopilot()
+        frames = []
+        def ocr(monitor, *, screenshot):
+            frames.append((monitor, screenshot))
+            return {"text": "SCRIPT ERROR: res://scripts/player.gd:42",
+                    "language": "eng"}
+        fake.read_screen_text = ocr
+        result = copilot_answer(
+            "Olhe para o meu monitor 2 e identifique o erro no Godot", fake)
+        self.assertEqual(fake.captured, [2])
+        self.assertEqual(len(frames), 1)
+        self.assertEqual(frames[0][0], 2)
+        self.assertIn("res://scripts/player.gd:42", result["answer"])
+        self.assertIn("OCR local", result["answer"])
 
     def test_no_screen_permission(self):
         fake = FakeCopilot()
