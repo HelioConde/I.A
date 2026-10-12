@@ -1,5 +1,58 @@
 # Luna — comparação local Qwen3-0.6B vs Qwen3-4B (Q8_0)
 
+## Instalar, selecionar e iniciar o Qwen3-4B com um comando
+
+Existe agora um iniciador Windows que une download, verificação SHA-256,
+preflight do CPU runtime, atualização localizada do `LUNA.ini` e abertura da Luna.
+
+Feche qualquer sessão anterior da Luna e execute **no PowerShell**:
+
+```powershell
+Set-Location "C:\Users\helio\Documents\I.A"
+git pull --ff-only origin feat/ssd-weight-streaming-lab
+.\INSTALAR-QWEN4B-LUNA.bat
+```
+
+Na primeira execução, baixa o GGUF oficial Q8_0 (~4,28 GB) por HTTPS,
+exigindo ao menos 6 GiB livres no SSD. Se o arquivo já estiver presente,
+confere sua assinatura e SHA-256; **não sobrescreve arquivos existentes**.
+O download só começa após executar explicitamente o comando. Se o download
+ou a verificação falhar, não altera o `LUNA.ini`. O modelo 0.6B permanece disponível.
+
+Após download, o comando confirma que o runtime CPU está instalado antes
+de ativar `model_file = Qwen3-4B-Q8_0.gguf`, `profile = equilibrado`,
+`core_mode = auto`, preservando todas as outras permissões e caminhos
+do `LUNA.ini`. Isso **não** comprova ainda a qualidade/velocidade da
+inferência real do Qwen3-4B; esse teste acontece quando a Luna iniciar.
+
+Também é possível executar as etapas separadamente:
+
+```powershell
+py -3 .\tools\usar_qwen4b_luna.py --status
+py -3 .\tools\usar_qwen4b_luna.py --install-activate
+.\INICIAR-COPILOTO-WINDOWS.bat
+```
+
+Para reverter para o Qwen3-0.6B **sem apagar os pesos do 4B**:
+
+```powershell
+py -3 .\tools\usar_qwen4b_luna.py --restore-06b
+.\INICIAR-COPILOTO-WINDOWS.bat
+```
+
+Teste offline das alterações do INI (não baixa o modelo):
+
+```powershell
+py -3 -m unittest discover -s tests -p "test_usar_qwen4b_luna.py" -v
+```
+
+**Importante sobre voz:** o Qwen3-4B é o **modelo de texto** que responde
+às perguntas. Ele não contém motor de reconhecimento de microfone nem
+gerador de áudio. O modo ligação existente ainda usa STT local via navegador
+e TTS local do navegador; mudar Qwen pode aumentar a demora entre
+pergunta e resposta em computadores com CPU limitada.
+
+---
 ## Objetivo
 
 Testar um Qwen maior na mesma instalação Windows, sem desinstalar, diminuir a
