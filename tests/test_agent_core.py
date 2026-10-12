@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from brain_ssd.chat.copilot import CopilotPermissionError, LocalCopilot
+from brain_ssd.chat.copilot_queries import copilot_answer
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 
 
@@ -40,6 +41,25 @@ class AgentCoreTests(unittest.TestCase):
         )
         self.copilot = LocalCopilot([self.project])
         self.before = self.script.read_bytes()
+
+    def test_chat_plans_but_never_executes_automatically(self):
+        question = ('/investigar-godot "' + str(self.project) +
+                    '" :: Invalid access at res://scripts/player.gd:4')
+        with patch.object(self.copilot, "inspect_godot_project") as inspector:
+            proposal = copilot_answer(question, self.copilot)
+            inspector.assert_not_called()
+        self.assertEqual(proposal["local_action"], "copilot_agent_plan")
+        self.assertNotIn("completada", proposal["answer"].lower())
+        self.assertGreater(len(proposal["copilot_agent_token"]), 20)
+        result = self.copilot.run_investigation(proposal["copilot_agent_token"])
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(self.script.read_bytes(), self.before)
+
+    def test_explicit_pc_command_remains_read_only(self):
+        with patch.object(self.copilot, "system_info") as inspector:
+            proposal = copilot_answer("/investigar-pc", self.copilot)
+            self.assertEqual(proposal["local_action"], "copilot_agent_plan")
+            inspector.assert_not_called()
 
     def test_plan_does_not_read_project_or_run_tools(self):
         with patch.object(self.copilot, "inspect_godot_project") as inspector:
