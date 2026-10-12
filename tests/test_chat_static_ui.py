@@ -129,6 +129,25 @@ class TestStaticUI(unittest.TestCase):
         self.assertNotIn("getDisplayMedia", hud_js)
         self.assertNotIn("eval(", hud_js)
 
+    def test_local_microphone_setup_never_autostarts_or_falls_back_to_cloud(self):
+        for identifier in ("localMicButton", "localMicSetup", "localMicStatus",
+                           "installLocalSpeech", "retryLocalSpeech"):
+            self.assertIn('id="' + identifier + '"', self.html)
+        self.assertIn('processLocally:true', self.js)
+        self.assertIn('recognition.processLocally = true', self.js)
+        self.assertIn('nativeSpeech.available(localMicLanguage)', self.js)
+        self.assertIn('nativeSpeech.install(localMicLanguage)', self.js)
+        self.assertIn('micState.availability !== "downloadable"', self.js)
+        self.assertIn('window.confirm("Instalar o pacote pt-BR', self.js)
+        self.assertIn('addEventListener("click", async () => {', self.js)
+        self.assertNotIn('recognition.processLocally = false', self.js)
+        # Installation needs an explicit click; no automatic download on page load.
+        boot = self.js.split('void checkLocalMic();', 1)[0]
+        self.assertEqual(boot.count('nativeSpeech.install(localMicLanguage)'), 1)
+        self.assertIn('aria-live="polite"', self.html)
+        hud_style = (ROOT / "chat" / "luna-hud.css").read_text(encoding="utf-8")
+        self.assertIn('.luna-mic-setup[hidden]', hud_style)
+
     def test_static_assets_are_local_and_no_inline_handlers(self):
         self.assertEqual(self.inventory.scripts,["/app.js", "/luna-hud.js"])
         self.assertEqual(self.inventory.styles,["/styles.css", "/luna-hud.css"])
