@@ -51,6 +51,8 @@ on:
       - "INICIAR-COPILOTO-WINDOWS.bat"
       - "LUNA.exemplo.ini"
       - "tools/launch_luna.py"
+      - "tools/test_luna_models.py"
+      - "tests/test_luna_model_comparison.py"
       - "tests/test_launch_luna_ini.py"
       - "tests/fixtures/copilot_question_battery.json"
       - "tools/run_copilot_question_battery.py"
@@ -170,6 +172,7 @@ jobs:
           python -m unittest discover -s tests -p "test_chat_static_ui.py" -v
           python -m unittest discover -s tests -p "test_windows_launchers.py" -v
           python -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
+          python -m unittest discover -s tests -p "test_luna_model_comparison.py" -v
       - name: Synthetic episodic negative controls (not a human memory benchmark)
         run: |
           python tools/bench_episodic_memory.py
