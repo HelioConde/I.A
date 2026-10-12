@@ -282,7 +282,7 @@ class TestHttpUI(unittest.TestCase):
     def test_serves_visual_chat_and_status(self):
         with urllib.request.urlopen(self.url + "/", timeout=3) as response:
             html = response.read().decode("utf-8")
-        self.assertIn("Como posso ajudar?", html)
+        self.assertIn("Olá, eu sou a", html)
         with urllib.request.urlopen(self.url + "/api/status", timeout=3) as response:
             data = json.loads(response.read())
         self.assertTrue(data["local"])
