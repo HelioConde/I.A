@@ -156,3 +156,17 @@ html,body { background:#060d17; }
 .luna-mic-action:hover:not(:disabled),.luna-mic-action:focus-visible{border-color:#68dafa;background:#11485f}
 .luna-mic-action:disabled{opacity:.5;cursor:wait}
 .luna-mic-action[hidden]{display:none!important}
+
+/* Luna HUD v1.1: improve legibility at 1366–1920px and vertical overflow. */
+.luna-rail {overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#36718d transparent;gap:10px;}
+.luna-rail-head,.luna-card-label {font-size:11px;letter-spacing:.09em;}
+.luna-facts div {font-size:12px;line-height:1.45;}
+.luna-facts dd {max-width:61%;}
+.luna-rail-note {font-size:11px;line-height:1.48;}
+.luna-quick {font-size:12px;min-height:39px;}
+.luna-activity-list {font-size:11px;line-height:1.45;}
+.luna-status-core {width:80px;height:80px;margin:10px auto 6px;}
+.luna-status-core span {font-size:49px;}
+.luna-hud-card {padding:12px 14px;}
+.luna-rail-end {font-size:10px;}
+@media(max-width:900px) {.luna-rail {overscroll-behavior:contain;}}
