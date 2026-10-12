@@ -147,3 +147,12 @@ html,body { background:#060d17; }
 @media(max-width:800px){.luna-rail{top:69px}.sidebar{width:min(285px,85vw)}}
 @media(max-width:520px){.topbar{padding:0 10px}.luna-rail-toggle{padding:7px;font-size:10px}.luna-top-signature{display:none}.luna-orb-scene{height:174px}.luna-orb{width:105px;height:105px}.luna-orb span{font-size:56px}.luna-orb-scene::before{inset:4px 65px}.luna-orb-scene::after{inset:20px 78px}.luna-orbit-left,.luna-orbit-right{display:none}.welcome p{margin-bottom:12px}.welcome h1{font-size:29px}}
 @media(prefers-reduced-motion:reduce){.luna-orb,.luna-orb-scene::before,.luna-orb-scene::after,.luna-status-core{animation:none!important}}
+
+/* Explicit on-device microphone setup: never switches to cloud STT. */
+.luna-mic-setup{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:7px;margin:6px 3px 0;padding:8px 10px;border:1px solid rgba(84,221,255,.24);background:rgba(12,36,53,.74);border-radius:8px}
+.luna-mic-setup[hidden]{display:none!important}
+.luna-mic-status{flex:1 1 185px;min-width:0;color:#b7d8e8;font-size:11px;line-height:1.45}
+.luna-mic-action{flex:0 0 auto;border:1px solid #327b99;background:#0b3148;border-radius:6px;color:#c2edff;font-size:10px;padding:7px 9px;cursor:pointer}
+.luna-mic-action:hover:not(:disabled),.luna-mic-action:focus-visible{border-color:#68dafa;background:#11485f}
+.luna-mic-action:disabled{opacity:.5;cursor:wait}
+.luna-mic-action[hidden]{display:none!important}
