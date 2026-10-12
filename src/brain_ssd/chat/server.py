@@ -1178,6 +1178,12 @@ class ChatHandler(BaseHTTPRequestHandler):
                         data.get("path"), data.get("before"), data.get("after"))
                 elif action == "apply_code_edit":
                     result = copilot.apply_code_edit(data.get("token"))
+                elif action == "verify_code_edit":
+                    result = copilot.verify_code_edit(data.get("edit_id"))
+                elif action == "propose_code_undo":
+                    result = copilot.propose_code_undo(data.get("edit_id"))
+                elif action == "confirm_code_undo":
+                    result = copilot.confirm_code_undo(data.get("token"))
                 elif action == "launch":
                     result = copilot.confirm_launch(data.get("token"))
                 elif action == "screen":
