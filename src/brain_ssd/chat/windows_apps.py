@@ -6,15 +6,26 @@ Installed-app discovery is incomplete by design: registry registration is option
 from __future__ import annotations
 
 import csv
+import ctypes
 import io
 import os
-import re
 import subprocess
 from pathlib import Path
 from typing import Any
 
 _MAX_SCANNED = 6000
 _MAX_ITEMS = 30
+
+
+def _system_dir() -> Path:
+    """Use the Windows API instead of trusting mutable SystemRoot/PATH values."""
+    if os.name != "nt":
+        raise OSError("Sistema Windows necessário.")
+    buffer = ctypes.create_unicode_buffer(32768)
+    length = ctypes.windll.kernel32.GetSystemDirectoryW(buffer, len(buffer))
+    if not length or length >= len(buffer):
+        raise OSError("Não foi possível localizar System32.")
+    return Path(buffer.value)
 
 
 def _filter(items: list[dict[str, Any]], name: str | None, limit: int = _MAX_ITEMS) -> dict[str, Any]:
@@ -40,7 +51,7 @@ def installed_apps(name: str | None = None) -> dict[str, Any]:
     def get(key: Any, value: str) -> str:
         try:
             val, _ = winreg.QueryValueEx(key, value)
-            return val.strip() if isinstance(val, str) else ""
+            return val.strip() if isinstance(val, str) else str(val) if isinstance(val, int) else ""
         except OSError:
             return ""
 
@@ -105,7 +116,7 @@ def running_apps(name: str | None = None) -> dict[str, Any]:
                 continue
     if method == "tasklist.exe":
         # Fixed binary, no user-controlled args and never shell=True.
-        tasklist = Path(os.environ.get("SystemRoot", r"C:\Windows")) / "System32" / "tasklist.exe"
+        tasklist = _system_dir() / "tasklist.exe"
         if not tasklist.is_file():
             raise OSError("tasklist.exe não encontrado.")
         completed = subprocess.run([str(tasklist), "/FO", "CSV", "/NH"],
@@ -148,13 +159,13 @@ def run_approved_app(app_id: str) -> dict[str, Any]:
     if target is None:
         raise ValueError("Aplicativo não autorizado.")
     label, exe = target
-    windows = Path(os.environ.get("SystemRoot", r"C:\Windows"))
-    full_path = windows / "System32" / exe
+    system_dir = _system_dir()
+    full_path = system_dir / exe
     if not full_path.is_file():
         raise OSError("Aplicativo não encontrado no Windows.")
     # No execution of arbitrary paths, documents, arguments, or commands.
     child = subprocess.Popen([str(full_path)], stdin=subprocess.DEVNULL,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                             cwd=str(windows / "System32"), shell=False)
+                             cwd=str(system_dir), shell=False)
     return {"app_id": app_id, "label": label, "started_pid": child.pid,
             "status": "requested", "notice": "Processo iniciado; abertura da janela não verificada."}
