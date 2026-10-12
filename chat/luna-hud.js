@@ -133,6 +133,7 @@
     if (info.error) {
       element("lunaRailFiles").textContent = "Indisponível";
       element("lunaRailScreen").textContent = "Indisponível";
+      element("lunaRailLaunch").textContent = "Indisponível";
     }
   });
 
