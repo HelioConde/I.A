@@ -17,11 +17,13 @@ da marca e do personagem fictício.
 | Nome/versão de aplicativos instalados | Implementado (opt-in) | Registro do Windows omite portáteis/MSIX |
 | Nomes/PIDs de processos ativos | Implementado (opt-in) | Não equivale a janelas nem diagnostica travamento |
 | Janelas por monitor | Implementado com permissão de captura | EnumWindows vê títulos; não lê pixels |
-| Captura dos monitores | Implementado com permissão | Sem OCR ou visão |
+| Captura dos monitores | Implementado com permissão | Captura JPEG, sem compreensão visual pelo Qwen |
 | Abrir Bloco de Notas / Calculadora | Implementado (opt-in + confirmação por botão) | Duas aplicações fixas, sem argumentos; abertura da janela não comprovada pelo backend |
 | Falar respostas automaticamente | Implementado (opt-in na interface) | Somente voz pt-BR/pt marcada como `localService` pelo navegador |
-| Reconhecimento de fala por microfone | Não implementado | Não há captura de áudio em segundo plano |
-| Corrigir Godot diretamente pela tela | Não implementado | Falta OCR/visão e plano seguro de ações |
+| Editar arquivos de código autorizados | Implementado (opt-in + diff/backup) | Substituição textual exata, confirmada manualmente; não é refatoração autônoma |
+| Extrair texto da tela com OCR | Parcial | Tesseract e dependências locais opcionais; OCR pode errar |
+| Reconhecimento de fala por microfone | Parcial (pressionar para falar) | Só em navegadores com reconhecimento pt-BR local; sem escuta contínua |
+| Localizar erro Godot e analisar projeto | Implementado parcialmente | OCR opcional, referência res://, ainda sem validação em execução ou correção autônoma |
 
 ### Inicialização segura
 
@@ -66,6 +68,18 @@ relata.
 
 Não há escuta contínua, palavra de ativação ou transmissão de áudio do
 microfone pelo Brain-SSD nesta etapa.
+
+
+### Entrega da etapa Godot
+
+A inspeção de projetos e o diagnóstico vinculado a texto de erros estão em
+`src/brain_ssd/chat/godot_diagnostics.py`, acessíveis pelo painel Copiloto e
+pelos comandos `/projeto` e `/erro-godot`. A ferramenta não executa o
+jogo nem afirma que encontrou a causa apenas por identificar arquivo/linha.
+
+Use `docs/GODOT_COPILOT_DIAGNOSTICS.md` para testar e compreender limites.
+A próxima prioridade é um ciclo de agente com **plano revisável, edição
+confirmada e verificação de execução**, não uma automação irrestrita.
 
 ## Próximas etapas — ordem recomendada
 
