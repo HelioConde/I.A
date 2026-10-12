@@ -47,7 +47,7 @@ class LunaIniTests(unittest.TestCase):
 
     def test_boolean_flags_can_all_be_disabled_without_extra_permissions(self):
         text = self.ini.read_text(encoding="utf-8")
-        for key in ("screen", "apps", "launch", "edit", "godot_validate"):
+        for key in ("screen", "apps", "launch", "launch_without_confirmation", "edit", "godot_validate"):
             text = text.replace(key + " = true", key + " = false")
         self.ini.write_text(text, encoding="utf-8")
         conf = read_config(self.ini)
