@@ -87,11 +87,9 @@
     };
     recognition.onresult = event => {
       if (state.recognition !== recognition) return;
-      if (state.silenceTimer) {
-        // A new transcript update after a pause is evidence of resumed speech.
-        clearSilence();
-        setState("speech");
-      }
+      // Final transcript results may arrive AFTER onspeechend; do not clear
+      // the silence timer here or continuous recognition could never finish.
+      // Only a new onspeechstart event proves speech has resumed.
       let finalPart = "", interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const part = event.results[i][0]?.transcript || "";
