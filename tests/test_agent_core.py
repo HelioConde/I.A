@@ -134,6 +134,8 @@ class AgentCoreTests(unittest.TestCase):
                 "godot_overview", project=str(self.project)
             )
         with self.assertRaises(CopilotPermissionError):
+            LocalCopilot().plan_investigation("pc_report")
+        with self.assertRaises(CopilotPermissionError):
             self.copilot.plan_investigation("run_shell", path=str(self.script))
         with self.assertRaises(CopilotPermissionError):
             self.copilot.plan_investigation(
