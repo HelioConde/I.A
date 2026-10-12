@@ -15,6 +15,25 @@ A IA pode gerar **uma proposta de substituição** de código baseada em trecho 
 
 No Agent Core, ao diagnosticar um erro Godot e localizar um arquivo, o botão **Selecionar arquivo encontrado no editor** preenche o caminho, a linha de foco (se existir) e ajuda a abrir a seção de proposta. Esse botão não executa IA, testes ou mudanças: é uma transferência de contexto.
 
+## Pedir a proposta diretamente no chat
+
+Além do painel, use um comando explícito. O caminho precisa apontar para
+arquivo dentro de uma pasta autorizada:
+
+```text
+/sugerir-correcao "C:\\Users\\helio\\Documents\\Slime-Harvest\\scripts\\player.gd" @42 :: Corrija o acesso a variável nula na linha citada
+```
+
+O número depois de `@` é a linha de foco **opcional**. O chat coleta um
+trecho real próximo dessa linha e pede ao Qwen uma única substituição em
+formato JSON. Caso consiga gerar uma proposta coerente com o arquivo,
+mostra o diff e um botão **Aplicar diff e criar backup**. A geração por
+si só não modifica o projeto. Qualquer erro do modelo é reportado
+como indisponibilidade da proposta, sem inventar que corrigiu o arquivo.
+
+A geração usa a instância do ChatEngine local, explicitamente com
+`web_search=False` e histórico vazio. Não requer conexão externa.
+
 ## Segurança e limitações
 
 - Somente o modelo local é usado nessa ação; o request para geração define pesquisa web e memória de pesquisa como desabilitadas. A ferramenta não envia arquivos para provedores externos.
