@@ -45,7 +45,7 @@ class CopilotPermissionError(ValueError):
 
 class LocalCopilot:
     def __init__(self, roots: Iterable[Path] = (), *, screen: bool = False,
-                 apps: bool = False, launch: bool = False, edit: bool = False,
+                 apps: bool = False, launch: bool = False, launch_without_confirmation: bool = False, edit: bool = False,
                  godot_binary: Path | None = None):
         allowed = []
         for path in roots:
@@ -58,6 +58,7 @@ class LocalCopilot:
         self.screen_enabled = bool(screen)
         self.apps_enabled = bool(apps)
         self.launch_enabled = bool(launch)
+        self.launch_without_confirmation = bool(launch_without_confirmation) and self.launch_enabled and self.apps_enabled
         self.edit_enabled = bool(edit) and bool(allowed)
         self._editor = None
         self._editor_lock = threading.Lock()
@@ -82,6 +83,7 @@ class LocalCopilot:
             "screen_enabled": self.screen_enabled,
             "apps_enabled": self.apps_enabled,
             "launch_enabled": self.launch_enabled,
+            "launch_without_confirmation": self.launch_without_confirmation,
             "edit_enabled": self.edit_enabled,
             "agent_enabled": True,  # bounded, read-only with separate plan/run steps
             "godot_validate_enabled": self._godot_validator is not None,
@@ -278,6 +280,31 @@ class LocalCopilot:
             return running_apps(search)
         except OSError:
             raise CopilotPermissionError("Não foi possível consultar processos ativos.") from None
+
+    def start_menu_apps(self, search: str | None = None) -> dict:
+        if not self.apps_enabled:
+            raise CopilotPermissionError("Inventário de aplicativos não autorizado.")
+        if search is not None and (not isinstance(search, str) or len(search) > 100):
+            raise CopilotPermissionError("Filtro de aplicativos inválido.")
+        from brain_ssd.chat.windows_apps import start_menu_apps
+        try:
+            return start_menu_apps(search)
+        except (OSError, ValueError):
+            raise CopilotPermissionError("Não foi possível consultar o menu Iniciar.") from None
+
+    def launch_by_name(self, app_name: str) -> dict:
+        """One explicit imperative may open an installed application if INI opts in."""
+        if not self.launch_without_confirmation:
+            raise CopilotPermissionError(
+                "Abertura direta não autorizada; configure launch_without_confirmation = true."
+            )
+        if not isinstance(app_name, str) or len(app_name) > 100:
+            raise CopilotPermissionError("Nome de aplicativo inválido.")
+        from brain_ssd.chat.windows_apps import run_start_app
+        try:
+            return run_start_app(app_name)
+        except (OSError, ValueError) as exc:
+            raise CopilotPermissionError(str(exc)) from None
 
     def offer_launch(self, app_id: str) -> dict:
         """Prepare one short-lived, single-use proposal. Never execute here."""
