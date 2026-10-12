@@ -1006,7 +1006,7 @@ async function copilotCall(action) {
   const result = $("copilotResult");
   const data = {action};
   if (["list","read","image","review_code"].includes(action)) data.path = $("copilotPath").value.trim();
-  if (action === "screen") data.monitor = Number($("copilotMonitor").value);
+  if (action === "screen" || action === "screen_ocr") data.monitor = Number($("copilotMonitor").value);
   if (["apps", "processes"].includes(action)) data.search = $("copilotAppSearch").value.trim() || null;
   feedback.textContent = "Consultando recurso local...";
   $("copilotUseChat").hidden = true;
