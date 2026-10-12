@@ -355,6 +355,50 @@ class LocalCopilot:
                 "ram_total_gib": memory_gib, "disks": disks,
                 "python": platform.python_version()}
 
+    def read_screen_text(self, monitor: int = 1) -> dict:
+        """Optional local OCR only after a specific screen request.
+
+        OCR output is returned to the browser, never automatically passed
+        to the model, web search or SQLite conversation history.
+        """
+        if not self.screen_enabled:
+            raise CopilotPermissionError("OCR exige autorização de captura de tela.")
+        try:
+            import pytesseract  # optional local Tesseract installation
+            from PIL import Image
+        except ImportError:
+            raise CopilotPermissionError(
+                "OCR local não disponível. Instale pytesseract e Tesseract OCR no Windows."
+            ) from None
+        screenshot = self.capture_screen(monitor)
+        try:
+            encoded = screenshot["image_data_url"].split(",", 1)[1]
+            with Image.open(io.BytesIO(base64.b64decode(encoded))) as image:
+                languages = set(pytesseract.get_languages(config=""))
+                wanted = "por+eng" if {"por", "eng"} <= languages else (
+                    "por" if "por" in languages else "eng" if "eng" in languages else None
+                )
+                if wanted is None:
+                    raise CopilotPermissionError(
+                        "Tesseract OCR não tem dados de idioma português ou inglês."
+                    )
+                extracted = pytesseract.image_to_string(
+                    image, lang=wanted, config="--psm 11", timeout=20
+                )
+        except CopilotPermissionError:
+            raise
+        except Exception:
+            raise CopilotPermissionError(
+                "OCR falhou. Confira a instalação local do Tesseract e o pacote de idioma."
+            ) from None
+        cleaned = extracted.replace("\x00", "").strip()[:4000]
+        return {
+            "monitor": monitor, "text": cleaned,
+            "language": wanted, "vision_enabled": False,
+            "notice": "OCR local é imperfeito e não compreende a imagem. "
+                      "O texto não foi salvo nem enviado ao modelo.",
+        }
+
     def capture_screen(self, monitor: object = 1) -> dict:
         if not self.screen_enabled:
             raise CopilotPermissionError("Captura desativada; use --copilot-screen.")
