@@ -25,6 +25,22 @@ def needs_brazil_news(question: str) -> bool:
     ))
 
 
+def needs_recent_public_sources(question: str) -> bool:
+    """Broad recent-news intent; never mistake encyclopedia for live reporting."""
+    if not isinstance(question, str):
+        return False
+    lower = unicodedata.normalize("NFKD", question.casefold())
+    lower = "".join(c for c in lower if not unicodedata.combining(c))
+    lower = re.sub(r"\s+", " ", lower).strip()
+    if re.search(r"\b(?:historia|historico|conceito|o que significa)\b", lower):
+        return False
+    if needs_brazil_news(question):
+        return True
+    return bool(re.search(r"\b(?:noticias?|noticiario|novidades|atualizacoes)\b", lower)
+                and re.search(r"\b(?:pesquise|pesquisar|busque|busca|procure|sobre|de |do |da |"
+                              r"ultimas?|recentes?|hoje|agora|atual)\b", lower))
+
+
 def explicit_web_research(question: str) -> bool:
     """Only an explicit command can request browser consent for general topics."""
     if not isinstance(question, str):
