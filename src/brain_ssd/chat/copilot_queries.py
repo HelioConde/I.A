@@ -209,7 +209,7 @@ def _launch_reply(question: str, copilot: LocalCopilot | None) -> dict[str, Any]
             "Para abrir esse aplicativo sem clique, configure "
             "launch_without_confirmation = true no LUNA.ini. "
             "No modo de confirmação, somente Bloco de Notas e Calculadora estão disponíveis.",
-            "copilot_launch_direct_disabled",
+            "copilot_launch_unsupported",
         )
     try:
         offer = copilot.offer_launch(app_id)
