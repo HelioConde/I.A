@@ -1,0 +1,149 @@
+/* LUNA HUD v1 — visual layer only. Original chat logic remains in app.js. */
+:root {
+  --luna-cyan:#54ddff;
+  --luna-blue:#2d95cb;
+  --luna-glass:rgba(11,25,40,.8);
+  --luna-line:rgba(78,185,223,.24);
+  --luna-text:#e7f8ff;
+  --luna-muted:#8eafc0;
+}
+html,body { background:#060d17; }
+.app-shell { background:#060d17; }
+.sidebar {
+  background:linear-gradient(180deg,#07111f,#0b1523 74%,#080f1a);
+  border-right:1px solid var(--luna-line);
+  position:relative;
+}
+.sidebar::after { content:"";position:absolute;right:0;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(84,221,255,.45),transparent);pointer-events:none; }
+.brand-icon {
+  color:var(--luna-cyan);
+  border:1px solid rgba(78,200,241,.65);
+  background:radial-gradient(circle at 50% 45%,rgba(52,180,230,.25),transparent 70%);
+  box-shadow:0 0 20px rgba(52,186,247,.16),inset 0 0 14px rgba(50,190,240,.11);
+  border-radius:11px;
+}
+.side-brand strong,.luna-wordmark {color:var(--luna-text);letter-spacing:.18em;font-weight:800}
+.side-brand small { color:#5b91ab;letter-spacing:.11em; }
+.new-chat {background:#0c2336;border-color:rgba(74,187,224,.32);color:#daf6ff}
+.new-chat:hover {background:#10374c;border-color:#4ec9f3}
+.current-chat,.conversation-row.active {background:#122838}
+.sidebar-panel,.episodic-panel {background:#0c1b2c;border-color:var(--luna-line)}
+.sidebar-panel .micro-title,.side-section {color:#6faac5}
+.side-footer {color:#60859a}
+.workspace {
+  background:
+    linear-gradient(90deg,rgba(84,221,255,.025) 1px,transparent 1px),
+    linear-gradient(rgba(84,221,255,.025) 1px,transparent 1px),
+    radial-gradient(ellipse 75% 65% at 45% 33%,#10243a 0%,#071120 54%,#080d18 100%);
+  background-size:48px 48px,48px 48px,auto;
+}
+.topbar {background:rgba(7,17,29,.88);border-bottom:1px solid var(--luna-line);padding:0 26px;height:70px}
+.top-heading {font-size:17px}
+.luna-top-signature {font-size:10px;color:#5f9cb9;letter-spacing:.12em;font-weight:650}
+.top-subtitle {color:#819eaf}
+.top-right {gap:9px}
+.privacy-pill {border-color:rgba(79,198,180,.37);color:#90eac8;background:rgba(25,92,80,.14)}
+.luna-rail-toggle {border:1px solid var(--luna-line);background:#0e2537;color:#b6edff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:750;letter-spacing:.05em;white-space:nowrap}
+.luna-rail-toggle:hover,.luna-rail-toggle:focus-visible {background:#17394d;border-color:#51b8e1}
+.icon-btn:hover {background:#14364d}
+.connection-banner {background:#0e2630;border-color:#194a5f;color:#d4ba82}
+.connection-banner.ready {background:#0e322c;border-color:#245b52}
+.luna-layout {flex:1;min-height:0;display:flex;overflow:hidden}
+.luna-center {min-width:0;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.luna-center .conversation {scrollbar-color:#37657b transparent}
+.messages {width:min(100%,840px);gap:28px}
+.welcome {padding:4vh 0 3vh;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.luna-orb-scene {width:min(300px,65vw);height:246px;position:relative;display:grid;place-items:center;margin:0 auto 6px}
+.luna-orb-scene::before,.luna-orb-scene::after {
+  content:"";position:absolute;border-radius:50%;inset:12px 40px;
+  border:1px solid rgba(76,204,248,.18);pointer-events:none;
+}
+.luna-orb-scene::before {animation:luna-ring 20s linear infinite;border-top-color:#4ddcff;border-right-style:dashed}
+.luna-orb-scene::after {inset:33px 61px;border-style:dashed;border-bottom-color:#43ceff;animation:luna-ring 30s linear reverse infinite}
+.luna-orb {
+  width:134px;height:134px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle,#113d5f 4%,#0b2035 45%,#061526 75%);
+  border:1px solid rgba(77,215,255,.8);
+  box-shadow:0 0 0 9px rgba(54,166,204,.07),0 0 54px rgba(36,195,244,.22),inset 0 0 30px rgba(59,191,240,.17);
+  position:relative;z-index:1;
+  animation:luna-core-breathe 4.5s ease-in-out infinite;
+}
+.luna-orb span {font-size:70px;font-weight:300;color:#8eeeff;text-shadow:0 0 26px #3bccf5}
+.luna-orb::before,.luna-orb::after {content:"";position:absolute;inset:-12px;border-radius:50%;border:1px solid transparent;border-left-color:#51c7ef;border-right-color:rgba(87,209,247,.35)}
+.luna-orb::after {inset:-25px;border-style:dashed;opacity:.38;transform:rotate(40deg)}
+.luna-orbit-left,.luna-orbit-right {position:absolute;top:50%;font-size:9px;letter-spacing:.17em;color:#588aaa}
+.luna-orbit-left {left:0}.luna-orbit-right {right:0}
+.luna-kicker {font-size:10px;letter-spacing:.27em;color:#57b5d6;font-weight:800;margin:7px auto 15px}
+.welcome h1 {color:#f0fbff;letter-spacing:-.055em;font-size:clamp(29px,3.2vw,43px)}
+.welcome h1 em {color:#60ddff;font-style:normal;text-shadow:0 0 22px #2bd2ef3b}
+.welcome p {margin:12px auto 22px;max-width:505px;color:#9ab4c2;font-size:13px}
+.welcome .luna-welcome-state {font-size:11px;color:#65d4f2;letter-spacing:.05em;margin:2px auto 25px}
+.luna-welcome-state::before {content:"";display:inline-block;margin-right:8px;width:6px;height:6px;border-radius:50%;background:#65d4f2;box-shadow:0 0 8px #65d4f2}
+.suggestions {max-width:700px}
+.suggestion {background:rgba(11,35,54,.8);border-color:var(--luna-line);color:#c1dfea}
+.suggestion:hover {background:#183a50;border-color:#46c6e9}
+.composer-section {background:linear-gradient(0deg,#07101d 80%,rgba(7,16,29,0));padding-bottom:14px}
+.composer {background:rgba(12,30,46,.96);border:1px solid rgba(87,195,230,.32);box-shadow:0 10px 40px rgba(0,0,0,.28);border-radius:15px}
+.composer:focus-within {border-color:#53d8fa;box-shadow:0 0 0 2px rgba(77,216,250,.09)}
+.cpu-badge {background:rgba(47,163,191,.14);border:1px solid var(--luna-line);color:#8feaff}
+.send-button {background:#51d9f4;color:#052032}
+.send-button:hover:enabled {background:#adf5ff}
+.message .avatar {border-color:#276080;background:#0d334a;color:#8eeeff;border-radius:50%}
+.message .message-label {color:#61c9e6}
+.message.user .message-content {background:#183149;border-color:#2c5973}
+.luna-rail {
+  width:308px;flex-shrink:0;min-height:0;padding:20px 16px;
+  overflow-y:auto;scrollbar-color:#295b76 transparent;
+  background:linear-gradient(180deg,rgba(7,21,34,.98),rgba(6,15,26,.98));
+  border-left:1px solid var(--luna-line);display:flex;flex-direction:column;gap:12px;
+}
+.luna-rail[hidden] {display:none!important}
+.luna-layout.rail-collapsed .luna-rail {display:none}
+.luna-rail-head,.luna-card-label,.luna-card-footer,.luna-rail-end {display:flex;justify-content:space-between;gap:9px;align-items:center}
+.luna-rail-head {font-size:10px;letter-spacing:.12em;color:#78aeca;font-weight:800;margin-bottom:4px}
+.luna-rail-head span:last-child {font-size:9px;color:#4b7891;font-weight:500}
+.luna-hud-card {
+  border:1px solid rgba(72,173,212,.22);background:linear-gradient(150deg,rgba(19,48,68,.62),rgba(9,25,40,.8));
+  border-radius:13px;padding:14px;position:relative;overflow:hidden;
+}
+.luna-hud-card::before {content:"";position:absolute;top:0;left:12px;width:40px;height:1px;background:var(--luna-cyan);box-shadow:0 0 12px #40c9f0}
+.luna-card-label {color:#69bddb;font-size:10px;letter-spacing:.12em;font-weight:800}
+.luna-card-label span:last-child {color:#4f859f;font-weight:500}
+.luna-live-point {width:7px;height:7px;border-radius:50%;background:#7edcb0;box-shadow:0 0 12px #7edcb0}
+.luna-status-core {width:92px;height:92px;margin:14px auto 8px;border-radius:50%;display:grid;place-items:center;border:1px solid #46bedd70;background:radial-gradient(circle,#174c64,#0b1e2f 70%);box-shadow:0 0 0 7px #49c7e80a,0 0 35px #29bfee28;animation:luna-core-breathe 5s infinite}
+.luna-status-core span {color:#74e8ff;font-size:55px;line-height:1}
+.luna-state {display:block;text-align:center;font-size:18px;color:#e6fbff;letter-spacing:.015em}
+.luna-state-detail {min-height:25px;text-align:center;color:#8daab9;font-size:11px;line-height:1.55;margin:5px 0 15px}
+.luna-card-footer {border-top:1px solid var(--luna-line);padding-top:11px;color:#5b91aa;font-size:9px;letter-spacing:.07em}
+.luna-card-footer strong {color:#9fe7f6;font-size:10px;font-weight:650;letter-spacing:0}
+.luna-layout[data-luna-mode="thinking"] .luna-status-core,.luna-layout[data-luna-mode="thinking"] .luna-orb {animation:luna-core-breathe 1.4s infinite;box-shadow:0 0 45px rgba(47,211,255,.38)}
+.luna-layout[data-luna-mode="listening"] .luna-status-core,.luna-layout[data-luna-mode="listening"] .luna-orb {border-color:#a8eaff;box-shadow:0 0 42px #40dbff80}
+.luna-layout[data-luna-mode="error"] .luna-status-core {border-color:#d26b7f;box-shadow:0 0 30px #cf4c722a}
+.luna-facts {margin:12px 0 0;display:grid;gap:10px}
+.luna-facts div {display:flex;justify-content:space-between;gap:14px;font-size:11px;align-items:flex-start}
+.luna-facts dt {color:#7598ac;flex-shrink:0}
+.luna-facts dd {color:#d5ecf8;min-width:0;margin:0;max-width:59%;text-align:right;overflow-wrap:anywhere}
+.luna-rail-note {color:#6e91a7;font-size:10px;line-height:1.55;margin:12px 0 0}
+.luna-quick-grid {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.luna-quick {background:rgba(16,54,73,.82);border:1px solid #2d607b;color:#bedfec;border-radius:8px;padding:11px 8px;text-align:left;font-size:11px;display:flex;align-items:center;gap:7px}
+.luna-quick span {font-size:18px;color:#54d5f7}
+.luna-quick:hover,.luna-quick:focus-visible {border-color:#62d5f4;background:#16425a}
+.luna-activity {min-height:125px}
+.luna-activity-list {margin:11px 0 0;padding-left:18px;display:grid;gap:10px;font-size:10px;line-height:1.5;color:#a2bdcc;list-style-type:none}
+.luna-activity-list li {position:relative}
+.luna-activity-list li::before {content:"";position:absolute;left:-15px;top:5px;width:6px;height:6px;border:1px solid #58c7e9;border-radius:50%}
+.luna-rail-end {font-size:9px;letter-spacing:.1em;color:#4b829e;padding:4px 3px}
+.luna-rail-end span {color:#42677d}
+@keyframes luna-ring {to {transform:rotate(360deg)}}
+@keyframes luna-core-breathe {50%{transform:scale(1.045);filter:brightness(1.15)}}
+@media(max-width:1250px){.sidebar{width:238px}.luna-rail{width:264px;padding:13px}.top-subtitle{font-size:11px}.messages{padding-left:18px;padding-right:18px}}
+@media(max-width:1080px){.luna-rail{width:228px}.luna-card-footer{flex-wrap:wrap}.luna-quick-grid{grid-template-columns:1fr}.welcome{padding:14px 0}}
+@media(max-width:900px){
+  .luna-rail{display:none;position:fixed;right:0;top:70px;bottom:0;z-index:20;width:min(340px,100vw);box-shadow:-12px 0 44px #0009;}
+  .luna-layout:not(.rail-collapsed) .luna-rail{display:flex}
+  .sidebar{width:264px}
+  .luna-orb-scene{height:210px}
+}
+@media(max-width:800px){.luna-rail{top:69px}.sidebar{width:min(285px,85vw)}}
+@media(max-width:520px){.topbar{padding:0 10px}.luna-rail-toggle{padding:7px;font-size:10px}.luna-top-signature{display:none}.luna-orb-scene{height:174px}.luna-orb{width:105px;height:105px}.luna-orb span{font-size:56px}.luna-orb-scene::before{inset:4px 65px}.luna-orb-scene::after{inset:20px 78px}.luna-orbit-left,.luna-orbit-right{display:none}.welcome p{margin-bottom:12px}.welcome h1{font-size:29px}}
+@media(prefers-reduced-motion:reduce){.luna-orb,.luna-orb-scene::before,.luna-orb-scene::after,.luna-status-core{animation:none!important}}
