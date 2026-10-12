@@ -702,7 +702,10 @@ async function send() {
                 method:"POST", headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({action:"apply_code_edit", token})
               });
-              note.textContent = "Alteração aplicada. Backup: " + result.backup_path;
+              lastCodeEdit.id = result.edit_id || null;
+              showCodeEditRecovery();
+              note.textContent = "Alteração aplicada. Backup: " + result.backup_path +
+                ". Abra ▣ Copiloto para verificar ou preparar o desfazer.";
             } catch (error) {
               note.textContent = "Edição não aplicada: " + error.message;
             }
@@ -1055,6 +1058,21 @@ setInterval(refreshStatus, 3000);
 /* Copiloto local: leitura opt-in, nenhuma captura persistida ou enviada à web. */
 const copilotState = {timer:null, busy:false, text:"", enabled:false};
 const codeEdit = {token:null, path:null};
+const lastCodeEdit = {id:null};
+const undoCodeEdit = {token:null, path:null};
+function resetCodeUndo() {
+  undoCodeEdit.token = null;
+  undoCodeEdit.path = null;
+  $("copilotUndoDiff").textContent = "";
+  $("copilotUndoDiff").hidden = true;
+  $("copilotConfirmUndo").hidden = true;
+  $("copilotCancelUndo").hidden = true;
+}
+function showCodeEditRecovery() {
+  $("copilotVerifyEdit").hidden = !lastCodeEdit.id;
+  $("copilotPrepareUndo").hidden = !lastCodeEdit.id;
+}
+
 const godotTest = {token:null, project:null, script:null};
 const agentPlan = {token:null, task:null};
 function clearAgentPlan() {
@@ -1122,6 +1140,7 @@ function stopCopilotLive() {
   copilotState.timer = null;
 }
 function closeCopilot() {
+  resetCodeUndo();
   stopCopilotLive();
   clearAgentPlan();
   resetCodeEditPreview();
@@ -1462,8 +1481,11 @@ $("copilotConfirmEdit").addEventListener("click", async () => {
       method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify({action:"apply_code_edit", token})
     });
-    $("copilotFeedback").textContent = "Arquivo atualizado após confirmação. Backup: " +
-      response.backup_path;
+    lastCodeEdit.id = response.edit_id || null;
+    resetCodeUndo();
+    showCodeEditRecovery();
+    $("copilotFeedback").textContent = "Arquivo atualizado. Backup privado: " +
+      response.backup_path + ". Agora verifique a alteração e, se necessário, prepare o desfazer.";
   } catch (error) {
     $("copilotFeedback").textContent = error.message || "Edição não aplicada.";
   } finally {
@@ -1473,6 +1495,81 @@ $("copilotConfirmEdit").addEventListener("click", async () => {
 $("copilotCancelEdit").addEventListener("click", () => {
   resetCodeEditPreview();
   $("copilotFeedback").textContent = "Prévia descartada; arquivo permanece intacto.";
+});
+
+$("copilotVerifyEdit").addEventListener("click", async () => {
+  if (!lastCodeEdit.id || copilotState.busy) return;
+  copilotState.busy = true;
+  try {
+    const report = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"verify_code_edit", edit_id:lastCodeEdit.id})
+    });
+    $("copilotFeedback").textContent = report.status === "matches_applied_edit"
+      ? "Confirmado: o conteúdo em disco corresponde à edição aplicada. Isso NÃO valida a execução do programa."
+      : "O arquivo não corresponde mais à edição original (" + report.status +
+        "); desfazer automaticamente não é seguro.";
+    if (!report.safe_to_prepare_undo) {
+      $("copilotPrepareUndo").hidden = true;
+      resetCodeUndo();
+    }
+  } catch (error) {
+    $("copilotFeedback").textContent = "Verificação indisponível: " + error.message;
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotPrepareUndo").addEventListener("click", async () => {
+  if (!lastCodeEdit.id || copilotState.busy) return;
+  resetCodeUndo();
+  copilotState.busy = true;
+  try {
+    const proposal = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"propose_code_undo", edit_id:lastCodeEdit.id})
+    });
+    undoCodeEdit.token = proposal.token;
+    undoCodeEdit.path = proposal.path;
+    $("copilotUndoDiff").textContent = proposal.diff;
+    $("copilotUndoDiff").hidden = false;
+    $("copilotConfirmUndo").hidden = false;
+    $("copilotCancelUndo").hidden = false;
+    $("copilotFeedback").textContent = "Prévia da reversão preparada. O arquivo NÃO mudou.";
+  } catch (error) {
+    $("copilotFeedback").textContent = "Não é seguro desfazer: " + error.message;
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotConfirmUndo").addEventListener("click", async () => {
+  if (!undoCodeEdit.token || copilotState.busy) return;
+  const token = undoCodeEdit.token;
+  const path = undoCodeEdit.path;
+  resetCodeUndo();
+  if (!window.confirm("Restaurar o conteúdo anterior de " + path +
+      " usando o backup verificado? Esta ação modificará o arquivo em disco.")) return;
+  copilotState.busy = true;
+  try {
+    const report = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"confirm_code_undo", token})
+    });
+    if (report.status === "reverted") {
+      lastCodeEdit.id = null;
+      showCodeEditRecovery();
+    }
+    $("copilotFeedback").textContent = report.status === "reverted"
+      ? "Conteúdo original restaurado do backup e SHA-256 confirmado."
+      : "Reversão não confirmada. Confira o arquivo.";
+  } catch (error) {
+    $("copilotFeedback").textContent = "Reversão não aplicada: " + error.message;
+  } finally {
+    copilotState.busy = false;
+  }
+});
+$("copilotCancelUndo").addEventListener("click", () => {
+  resetCodeUndo();
+  $("copilotFeedback").textContent = "Reversão descartada; o arquivo não foi modificado.";
 });
 $("copilotInstalled").addEventListener("click", () => copilotCall("apps"));
 $("copilotProcesses").addEventListener("click", () => copilotCall("processes"));
