@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from launch_luna import (  # noqa: E402
-    EXAMPLE, build_chat_args, ensure_config, main, read_config, resolve_godot,
+    EXAMPLE, build_chat_args, enable_direct_launch, ensure_config, main, read_config, resolve_godot,
 )
 
 
@@ -39,11 +39,36 @@ class LunaIniTests(unittest.TestCase):
         self.assertTrue(conf.screen)
         self.assertTrue(conf.apps)
         self.assertTrue(conf.launch)
+        self.assertTrue(conf.launch_without_confirmation)
         self.assertTrue(conf.edit)
         self.assertTrue(conf.godot_validate)
         self.assertEqual(conf.godot_path, r"C:\godot")
         self.assertTrue(conf.web_search)
         self.assertTrue(conf.episodic_memory)
+
+    def test_private_ini_can_enable_direct_launch_without_overwriting_other_settings(self):
+        config = self.ini.read_text(encoding="utf-8")
+        self.ini.write_text(config.replace("launch_without_confirmation = true",
+                                           "launch_without_confirmation = false"),
+                            encoding="utf-8")
+        before = self.ini.read_text(encoding="utf-8")
+        enable_direct_launch(self.ini)
+        after = self.ini.read_text(encoding="utf-8")
+        self.assertIn("launch_without_confirmation = true", after)
+        self.assertIn("godot_path = ", after)
+        self.assertEqual(len(after.splitlines()), len(before.splitlines()))
+        parsed = read_config(self.ini)
+        self.assertTrue(parsed.launch_without_confirmation)
+        args, warnings = build_chat_args(parsed)
+        self.assertIn("--copilot-launch-direct", args)
+        self.assertTrue(warnings)
+
+    def test_direct_launch_cannot_enable_without_apps_and_launch(self):
+        original = self.ini.read_text(encoding="utf-8")
+        self.ini.write_text(original.replace("apps = true", "apps = false"),
+                            encoding="utf-8")
+        with self.assertRaises(ValueError):
+            enable_direct_launch(self.ini)
 
     def test_boolean_flags_can_all_be_disabled_without_extra_permissions(self):
         text = self.ini.read_text(encoding="utf-8")
