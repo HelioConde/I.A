@@ -601,6 +601,47 @@ async function send() {
           });
         }
 
+        if (payload.local_action === "copilot_code_edit_proposal" &&
+            typeof payload.copilot_edit_token === "string" &&
+            typeof payload.copilot_edit_path === "string") {
+          const controls = document.createElement("div");
+          controls.className = "copilot-confirm-actions";
+          const approve = document.createElement("button");
+          approve.type = "button";
+          approve.textContent = "Aplicar diff e criar backup";
+          const reject = document.createElement("button");
+          reject.type = "button";
+          reject.textContent = "Descartar";
+          reject.className = "copilot-cancel";
+          const note = document.createElement("p");
+          note.setAttribute("role", "status");
+          controls.append(approve, reject, note);
+          pending.querySelector(".message-body").appendChild(controls);
+          const token = payload.copilot_edit_token;
+          const path = payload.copilot_edit_path;
+          reject.addEventListener("click", () => {
+            approve.disabled = true;
+            reject.disabled = true;
+            note.textContent = "Edição descartada. Arquivo intacto.";
+          });
+          approve.addEventListener("click", async () => {
+            if (approve.disabled || !window.confirm(
+                "Aplicar a alteração exibida em " + path +
+                " e criar um backup local? Revise o diff antes de continuar.")) return;
+            approve.disabled = true;
+            reject.disabled = true;
+            try {
+              const result = await requestJson("/api/copilot", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({action:"apply_code_edit", token})
+              });
+              note.textContent = "Alteração aplicada. Backup: " + result.backup_path;
+            } catch (error) {
+              note.textContent = "Edição não aplicada: " + error.message;
+            }
+          });
+        }
+
         app.messages.push({role:"assistant", content:payload.answer});
         if (payload.local_action) {
           const actionNote = document.createElement("p");
