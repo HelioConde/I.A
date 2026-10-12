@@ -23,6 +23,14 @@ VALID_PROFILES = {"economia", "equilibrado", "rapido"}
 VALID_CORE_MODES = {"", "subprocess", "persistent", "auto"}
 VALID_PROVIDERS = {"auto", "wikipedia", "google", "brave", "searxng"}
 
+# Existing installer choices; these are filenames, never URLs or downloads.
+MODEL_PRESETS = {
+    "0.6b": ("Qwen3-0.6B-Q8_0.gguf", "economia"),
+    "1.7b": ("Qwen3-1.7B-Q4_K_M.gguf", "equilibrado"),
+    "4b": ("Qwen3-4B-Q4_K_M.gguf", "equilibrado"),
+}
+
+
 
 @dataclass(frozen=True)
 class LunaConfig:
@@ -243,6 +251,62 @@ def enable_direct_launch(path: Path) -> None:
         raise ValueError("A permissão não foi persistida corretamente.")
 
 
+def select_local_model(path: Path, preset: str, *, root: Path = ROOT) -> str:
+    """Persist a previously installed GGUF without changing unrelated INI options.
+
+    This is an explicit CLI operation, not an inference/tool-triggered switch.
+    Never downloads a model or changes the current running server.
+    """
+    if preset not in MODEL_PRESETS:
+        raise ValueError("Modelo inválido: use 0.6b, 1.7b ou 4b.")
+    filename, profile = MODEL_PRESETS[preset]
+    model = root / "models" / filename
+    if not model.is_file():
+        raise ValueError(
+            "Modelo não instalado: " + filename +
+            ". Execute INICIAR-BRAIN-SSD.bat e selecione a opção " +
+            {"0.6b": "1", "1.7b": "2", "4b": "3"}[preset] + "."
+        )
+    read_config(path)  # Do not rewrite malformed/unknown local configuration.
+    lines = path.read_text(encoding="utf-8-sig").splitlines(keepends=True)
+    section = ""
+    changed: set[str] = set()
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            section = stripped[1:-1].casefold()
+            continue
+        if section != "luna" or stripped.startswith((";", "#")) or "=" not in line:
+            continue
+        key = line.split("=", 1)[0].strip().casefold()
+        if key not in ("model_file", "profile"):
+            continue
+        if key in changed:
+            raise ValueError("Opção repetida no LUNA.ini: " + key)
+        newline = "\r\n" if line.endswith("\r\n") else "\n" if line.endswith("\n") else ""
+        lines[index] = key + " = " + (filename if key == "model_file" else profile) + newline
+        changed.add(key)
+    if changed != {"model_file", "profile"}:
+        raise ValueError("LUNA.ini precisa de model_file e profile na seção [luna].")
+    # Guard against corrupting the private file: validate candidate before swap.
+    import tempfile
+    candidate = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8",
+                                         dir=path.parent, prefix=".LUNA-", suffix=".ini",
+                                         delete=False, newline="") as staged:
+            candidate = Path(staged.name)
+            staged.write("".join(lines))
+        updated = read_config(candidate)
+        if updated.model_file != filename or updated.profile != profile:
+            raise ValueError("Não foi possível validar a seleção do modelo.")
+        candidate.replace(path)
+    finally:
+        if candidate is not None:
+            candidate.unlink(missing_ok=True)
+    return filename
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=INI)
@@ -251,6 +315,7 @@ def main(argv: list[str] | None = None) -> int:
     operation.add_argument("--init-only", action="store_true", help="Criar INI e sair")
     operation.add_argument("--run", action="store_true", help="Verificar Qwen e iniciar Luna")
     operation.add_argument("--enable-direct-launch", action="store_true", help="Autorizar abertura direta de aplicativos no LUNA.ini local")
+    operation.add_argument("--select-model", choices=tuple(MODEL_PRESETS), help="Escolher GGUF já instalado e persistir no LUNA.ini")
     args = parser.parse_args(argv)
     try:
         cfg_path = args.config.expanduser().resolve()
@@ -263,6 +328,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.enable_direct_launch:
             enable_direct_launch(cfg_path)
             print("Abertura direta de aplicativos ativada no LUNA.ini local.")
+            return 0
+        if args.select_model:
+            chosen = select_local_model(cfg_path, args.select_model)
+            print("Modelo selecionado: " + chosen)
+            print("Feche a Luna atual e execute INICIAR-COPILOTO-WINDOWS.bat para aplicar.")
             return 0
         config = read_config(cfg_path)
         command, warnings = build_chat_args(config)
