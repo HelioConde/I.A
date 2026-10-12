@@ -18,6 +18,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.copilot import CopilotPermissionError, LocalCopilot
+from brain_ssd.chat.copilot_queries import copilot_answer
 from brain_ssd.chat.server import ChatEngine, create_chat_server
 
 
@@ -34,6 +35,18 @@ class TestGodotValidation(unittest.TestCase):
         self.binary = base / "Godot_v4.exe"
         self.binary.write_bytes(b"fake-binary-test-only")
         self.copilot = LocalCopilot([self.project], godot_binary=self.binary)
+
+    def test_chat_proposes_but_does_not_launch(self):
+        question = '/validar-godot "' + str(self.project) + '" :: res://scripts/player.gd'
+        with patch("brain_ssd.chat.godot_validation.subprocess.run") as runner:
+            answer = copilot_answer(question, self.copilot)
+            self.assertEqual(answer["local_action"], "copilot_godot_validation_proposal")
+            self.assertIn("--check-only", answer["answer"])
+            self.assertGreater(len(answer["copilot_godot_validation_token"]), 20)
+            runner.assert_not_called()
+            denied = copilot_answer(question, LocalCopilot([self.project]))
+            self.assertEqual(denied["local_action"], "copilot_godot_validation_disabled")
+            runner.assert_not_called()
 
     def test_permission_absent_cannot_propose_or_run(self):
         denied = LocalCopilot([self.project])
