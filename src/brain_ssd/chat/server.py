@@ -1157,6 +1157,11 @@ class ChatHandler(BaseHTTPRequestHandler):
                 elif action == "godot_error":
                     result = copilot.diagnose_godot_error(
                         data.get("path"), data.get("error"))
+                elif action == "propose_godot_validation":
+                    result = copilot.propose_godot_validation(
+                        data.get("path"), data.get("script"))
+                elif action == "confirm_godot_validation":
+                    result = copilot.confirm_godot_validation(data.get("token"))
                 elif action == "review_code":
                     result = copilot.review_code(data.get("path"))
                 elif action == "propose_code_edit":
