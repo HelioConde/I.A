@@ -99,6 +99,25 @@ pesos densos requeridos, além de comparar logits/tokens contra o baseline.
 Até isso existir, `llama.cpp` convencional permanece o único runtime de
 inferência suportado.
 
+### Protótipo nativo de residência Windows
+
+`native_weight_windows.py` e `probe_native_tensor_window.py` fornecem o menor
+protótipo verificável possível sem fontes do `llama.cpp`: mapeiam somente uma
+janela de tensor com a API de mapeamento do Windows, tocam uma vez cada página
+e consultam `QueryWorkingSetEx`. Na máquina de validação, uma janela Q8_0 de
+4 MiB começou com 0 páginas residentes e terminou com 1.024 páginas de 4 KiB
+residentes. Esse resultado mede a janela deste processo, **não** a RAM total
+do Qwen nem inferência neural.
+
+```bat
+py -3 tools\probe_native_tensor_window.py models\Qwen3-0.6B-Q8_0.gguf --tensor token_embd.weight --length 4194304
+```
+
+O runtime distribuído no repositório contém somente binários e DLLs de
+`llama.cpp`; não há fonte, headers, CMake ou ponto de extensão compilável para
+substituir seu loader. A integração real requer obter a fonte compatível,
+alterar o loader/buffers GGML e reconstruir, preservando o fallback atual.
+
 ## V3 — baseline Qwen reproduzível
 
 `tools\bench_qwen_runtime.py` mede uma pergunta curta pelo runtime convencional
