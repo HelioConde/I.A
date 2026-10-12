@@ -709,6 +709,58 @@ async function send() {
           });
         }
 
+        if (payload.local_action === "copilot_godot_validation_proposal" &&
+            typeof payload.copilot_godot_validation_token === "string") {
+          const token = payload.copilot_godot_validation_token;
+          const script = payload.copilot_godot_validation_script;
+          const project = payload.copilot_godot_validation_project;
+          const controls = document.createElement("div");
+          controls.className = "copilot-confirm-actions";
+          const confirm = document.createElement("button");
+          confirm.type = "button";
+          confirm.textContent = "Executar verificação Godot";
+          const dismiss = document.createElement("button");
+          dismiss.type = "button";
+          dismiss.className = "copilot-cancel";
+          dismiss.textContent = "Cancelar";
+          const note = document.createElement("p");
+          note.setAttribute("role", "status");
+          controls.append(confirm, dismiss, note);
+          pending.querySelector(".message-body").appendChild(controls);
+          dismiss.addEventListener("click", () => {
+            confirm.disabled = true;
+            dismiss.disabled = true;
+            note.textContent = "Cancelado; nenhum processo Godot foi iniciado.";
+          });
+          confirm.addEventListener("click", async () => {
+            if (confirm.disabled || !window.confirm(
+              "Autoriza Godot headless --check-only para " + script +
+              " no projeto " + project +
+              "?\nGodot PODE inicializar plugins/scripts ou gravar cache; não há sandbox de sistema."
+            )) return;
+            confirm.disabled = true;
+            dismiss.disabled = true;
+            note.textContent = "Executando o teste autorizado (máximo de 30 segundos)...";
+            try {
+              const report = await requestJson("/api/copilot", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({action:"confirm_godot_validation", token})
+              });
+              const output = document.createElement("pre");
+              output.className = "copilot-edit-diff";
+              output.textContent = "Estado: " + report.status +
+                "\nScript: " + report.script + "\nCódigo de saída: " +
+                report.exit_code + "\n\n" + report.output;
+              controls.append(output);
+              note.textContent = report.status === "PASS"
+                ? "Godot terminou --check-only com código 0; isso não valida o jogo inteiro."
+                : "Godot não aprovou a verificação. Inspecione a saída de erro.";
+            } catch (error) {
+              note.textContent = "Teste não executado/concluído: " + error.message;
+            }
+          });
+        }
+
         app.messages.push({role:"assistant", content:payload.answer});
         if (payload.local_action) {
           const actionNote = document.createElement("p");
