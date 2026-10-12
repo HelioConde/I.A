@@ -107,7 +107,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Verify JavaScript syntax
-        run: node --check chat/app.js
+        run: |
+          node --check chat/app.js
+          node --check chat/luna-hud.js
+          node --check hud/app.js
       - name: Verify syntax
         run: python -m compileall -q tools/run_chat.py tools/doctor_chat.py tools/install_windows_chat.py tools/auto_setup_chat_windows.py tests/test_install_windows_chat.py tests/test_auto_setup_chat_windows.py src/brain_ssd/chat tests/test_chat_windows.py tests/test_chat_history.py tests/test_chat_doctor.py tests/test_startup_diagnostics.py tests/test_chat_stream.py tests/test_chat_episodic.py tests/test_episodic_integrity.py tools/audit_episodic_db.py tests/test_memory_safety.py tests/test_semantic_bridge.py tests/test_chat_episodic_http.py tools/bench_memory_quality.py tools/bench_semantic_bridge.py tests/test_cognitive_lab.py tests/test_consolidation.py tools/run_cognitive_lab.py tools/review_cognitive_memory.py tools/run_diagnostics.py tools/export_diagnostics.py tests/test_diagnostics.py tests/test_compare_diagnostics.py tests/test_chat_static_ui.py tools/compare_diagnostics.py tests/test_windows_launchers.py
       - name: Test HTTP and chat adapter with mock CPU Core
