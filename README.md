@@ -10,6 +10,28 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Novo comando da Luna: instalar e usar o Qwen3-4B Q8_0
+
+Na pasta do projeto, feche a Luna antiga e execute no **PowerShell**:
+
+```powershell
+.\INSTALAR-QWEN4B-LUNA.bat
+```
+
+O comando baixa o GGUF Q8_0 oficial de aproximadamente 4,28 GB **somente
+se estiver ausente**, verifica SHA-256, seleciona `Qwen3-4B-Q8_0.gguf`
+no `LUNA.ini` e abre o Copiloto. O Qwen3-0.6B original é preservado.
+Para reverter sem apagar arquivos:
+
+```powershell
+py -3 .\tools\usar_qwen4b_luna.py --restore-06b
+```
+
+Veja [download, validações e limitações](docs/LUNA_QWEN_MODEL_AB.md).
+Esse é um modelo **de texto**; o modo ligação continua utilizando STT/TTS
+locais do navegador, que exigem instalação/permissões separadas.
+
+---
 ## Experimento Luna: Qwen3-4B Q8_0 vs Qwen3-0.6B Q8_0
 
 A Luna pode testar **um modelo Qwen maior, sem remover o atual**.
