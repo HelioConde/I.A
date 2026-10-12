@@ -91,6 +91,11 @@ on:
       - "tests/test_copilot.py"
       - "tests/test_web_knowledge.py"
       - "tests/test_chat_learning_news.py"
+concurrency:
+  # PR and branch pushes share a group; keep only the newest test run.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   chat-unit:
     runs-on: ubuntu-latest
