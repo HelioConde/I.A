@@ -196,6 +196,47 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
     """Return a truthful local result only for clearly selected Copilot intents."""
     if not isinstance(question, str):
         return None
+    # Bound and ground Godot diagnosis to the files in an authorized project.
+    project_command = re.fullmatch(r"/(?:projeto|analisar-projeto)\s+(.+)",
+                                    question.strip(), re.I | re.S)
+    error_command = re.fullmatch(r'/erro-godot\s+"([^"\r\n]+)"\s*::\s*(.+)',
+                                  question.strip(), re.I | re.S)
+    if project_command or error_command:
+        if copilot is None or not copilot.status().get("files_enabled"):
+            return _result("Autorize a pasta do projeto ao iniciar o Copiloto.",
+                           "copilot_disabled")
+        try:
+            if project_command:
+                report = copilot.inspect_godot_project(project_command.group(1).strip().strip('"'))
+                rows = [
+                    "Projeto Godot conferido: " + report["project_root"],
+                    f"Scripts: {report['script_count']}; cenas: {report['scene_count']}; recursos: {report['resources_count']}.",
+                    *["• " + name for name in report["files"][:12]],
+                    *["• TODO/FIXME " + item["file"] + ":" + str(item["line"])
+                      for item in report["todo"][:5]],
+                ]
+                if report["truncated"]:
+                    rows.append("A inspeção atingiu um limite de arquivos/profundidade; resultados parciais.")
+                rows.append("Não executei Godot, nem alterei o projeto. "
+                            "Use /erro-godot \"CAMINHO\" :: TEXTO DO ERRO para analisar uma falha.")
+                return _result("\n".join(rows), "copilot_godot_project")
+            path, failure = error_command.groups()
+            report = copilot.diagnose_godot_error(path, failure.strip())
+            rows = ["Diagnóstico baseado no erro fornecido e nos arquivos autorizados."]
+            for match in report["matches"][:3]:
+                rows.append("• Arquivo: " + match["file"] +
+                            (":" + str(match["reported_line"]) if match["reported_line"] else "") +
+                            " (" + match["source"] + ")")
+                for line in match["snippet"][:7]:
+                    rows.append(f"  {line['line']}: {line['text']}")
+            rows.extend("• " + item for item in report["recommendations"])
+            rows.append("Nenhuma correção foi aplicada. Verifique as evidências antes de editar.")
+            return _result("\n".join(rows), "copilot_godot_diagnosis")
+        except (CopilotPermissionError, OSError, ValueError):
+            return _result("Não foi possível analisar este projeto/erro. "
+                           "Confira a pasta autorizada e a mensagem fornecida.",
+                           "copilot_godot_unavailable")
+
     # Deterministic programming actions: no arbitrary commands or model edits.
     code_review = re.fullmatch(r"/(?:revisar|inspecionar)\s+(.+)", question.strip(), re.I | re.S)
     code_replace = re.fullmatch(
