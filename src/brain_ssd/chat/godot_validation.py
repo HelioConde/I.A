@@ -26,8 +26,11 @@ EXPIRES_SECONDS = 90
 class GodotValidator:
     def __init__(self, copilot: Any, binary: Path):
         self.copilot = copilot
-        resolved = Path(binary).expanduser().resolve(strict=True)
-        if (not resolved.is_file() or resolved.is_symlink()
+        supplied = Path(binary).expanduser()
+        if supplied.is_symlink():
+            raise ValueError("Executável Godot não deve ser um link simbólico.")
+        resolved = supplied.resolve(strict=True)
+        if (not resolved.is_file()
                 or resolved.suffix.casefold() != ".exe"
                 or "godot" not in resolved.stem.casefold()):
             raise ValueError("Selecione um executável Godot .exe real e não um link.")
@@ -46,10 +49,17 @@ class GodotValidator:
                 or any(part in ("", ".", "..") for part in relative.split("/"))
                 or not relative.casefold().endswith(".gd") or len(relative) > 260):
             raise CopilotPermissionError("Informe um script .gd dentro do projeto.")
+        # Reject symlinks in the *supplied* path before _path resolves them.
+        # Do not follow junctions or links inside the authorized project.
+        current = root
+        for part in relative.split("/"):
+            current = current / part
+            if current.is_symlink():
+                raise CopilotPermissionError("Verificação por link simbólico não permitida.")
         path = self.copilot._path(str(root / relative))
         if not path.is_file() or path.suffix.casefold() != ".gd":
             raise CopilotPermissionError("Script Godot não encontrado.")
-        if path.is_symlink() or Path(project).is_symlink():
+        if Path(project).is_symlink():
             raise CopilotPermissionError("Não execute verificações por links simbólicos.")
         return root, path, "res://" + path.relative_to(root).as_posix()
 
