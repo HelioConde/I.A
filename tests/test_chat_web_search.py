@@ -265,6 +265,30 @@ class TestWebEngine(unittest.TestCase):
         finally:
             engine.close()
 
+    def test_failed_recent_news_search_uses_correct_topic_fallback(self):
+        cases = (
+            ("Últimas novidades sobre Marte?", "sobre o assunto", "esse jogo"),
+            ("Quais as notícias atuais do Brasil?", "sobre a situação do Brasil", "esse jogo"),
+            ("Quais as últimas atualizações de Valorant?", "sobre esse jogo", "situação do Brasil"),
+        )
+        for question, expected, excluded in cases:
+            with self.subTest(question=question):
+                service = FakeWeb(fail=True)
+                runtime = Runtime()
+                engine = ChatEngine(lambda: runtime, web_search_service=service)
+                engine.start()
+                try:
+                    reply = engine.ask(question, [], web_search=True)
+                    self.assertEqual(reply["local_action"], "research_unavailable")
+                    self.assertEqual(reply["web_search_status"], "unavailable")
+                    self.assertEqual(reply["web_sources"], [])
+                    self.assertIn(expected, reply["answer"])
+                    self.assertNotIn(excluded, reply["answer"])
+                    self.assertEqual(runtime.core_backend.prompts, [])
+                    self.assertEqual(service.calls, [question])
+                finally:
+                    engine.close()
+
     def test_sse_fast_web_returns_sources_without_cpu_generation(self):
         runtime = Runtime()
         engine = ChatEngine(lambda: runtime, web_search_service=FakeWeb())
