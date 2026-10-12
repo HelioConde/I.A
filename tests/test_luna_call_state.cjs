@@ -11,6 +11,7 @@ const IDS = [
   "voiceCallCore", "voiceCallState", "voiceCallDetail", "voiceCallTranscript",
   "voiceCallAnswer", "startVoiceCall", "endVoiceCall", "muteVoiceCall",
   "interruptVoiceCall", "openVoiceCall", "closeVoiceCall", "voiceCallPanel",
+  "retryVoiceCall", "testVoiceCallMic", "testVoiceCallTts",
   "messageInput",
 ];
 
@@ -77,6 +78,7 @@ function harness() {
     get speechCancel() {return speechCancel;},
     set sending(value) { sending=value; w.lunaAppState.sending=value; },
     click(id) { return controls.get(id).click(); },
+    fireTimer() { const [id, entry] = timers.entries().next().value || []; if (!entry) return false; timers.delete(id); entry.fn(); return true; },
     state() { return controls.get("voiceCallCore").dataset.callState; },
     async drain() { await Promise.resolve(); await Promise.resolve(); },
     chat(kind, answer) { w.dispatchEvent({type:"luna:chat",detail:{kind,answer}}); },
@@ -206,4 +208,64 @@ test("cannot start a voice call while unrelated typed chat is sending", () => {
   assert.equal(h.state(),"error");
   assert.equal(h.recognition.length,0);
   assert.equal(h.w.lunaVoiceCallActive,undefined);
+});
+
+test("no-speech is a recoverable quiet turn instead of a fatal call error", () => {
+  const h = harness();
+  h.click("startVoiceCall");
+  const initial = h.recognition[0];
+  initial.onerror({error:"no-speech"});
+  assert.equal(h.state(),"listening");
+  assert.equal(h.w.lunaVoiceCallActive,true);
+  assert.equal(h.timers.size,1);
+  assert.ok(h.controls.get("voiceCallDetail").textContent.includes("Retomando escuta"));
+  assert.equal(h.sent,0);
+  assert.ok(h.fireTimer());
+  assert.equal(h.recognition.length,2);
+  assert.equal(h.recognition[1].started,true);
+  assert.equal(h.state(),"listening");
+  h.click("endVoiceCall");
+  assert.equal(h.timers.size,0);
+  assert.equal(h.state(),"ended");
+});
+
+test("long repeated no-speech offers manual recovery without silently sending", () => {
+  const h = harness();
+  h.click("startVoiceCall");
+  for (let i=0; i<10; i++) {
+    const rec = h.recognition.at(-1);
+    rec.onerror({error:"no-speech"});
+    if (i<9) assert.ok(h.fireTimer());
+  }
+  assert.equal(h.state(),"error");
+  assert.equal(h.sent,0);
+  assert.equal(h.timers.size,0);
+  assert.equal(h.controls.get("retryVoiceCall").hidden,false);
+  h.click("retryVoiceCall");
+  assert.equal(h.state(),"listening");
+  assert.equal(h.recognition.length,11);
+});
+
+test("single no-speech ends may rearm listening with paced retry", () => {
+  const h=harness();
+  h.click("startVoiceCall");
+  h.recognition[0].onend(); // no final transcript and no error
+  assert.equal(h.state(),"listening");
+  assert.equal(h.timers.size,1);
+  h.fireTimer();
+  assert.equal(h.recognition.length,2);
+});
+
+test("local voice test only runs on explicit click and uses offline Portuguese voice", () => {
+  const h = harness();
+  assert.equal(h.utterances.length,0);
+  h.click("testVoiceCallTts");
+  assert.equal(h.utterances.length,1);
+  assert.equal(h.utterances[0].lang,"pt-BR");
+  assert.equal(h.utterances[0].voice.localService,true);
+  h.utterances[0].onstart();
+  assert.equal(h.state(),"responding");
+  h.utterances[0].onend();
+  assert.equal(h.state(),"idle");
+  assert.equal(h.recognition.length,0);
 });
