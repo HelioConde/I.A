@@ -1132,6 +1132,7 @@ async function copilotStatus() {
     $("copilotAgentToEditor").disabled = !state.edit_enabled;
     $("copilotExplainCode").disabled = !state.files_enabled;
     $("copilotProposeEdit").disabled = !state.edit_enabled;
+    $("copilotDraftPatch").disabled = !state.edit_enabled;
   } catch (_) {
     $("copilotStatus").textContent = "Não foi possível verificar as permissões locais.";
   }
@@ -1457,6 +1458,58 @@ $("copilotExplainCode").addEventListener("click", async () => {
     composer.focus();
   } catch (error) {
     $("copilotFeedback").textContent = error.message || "Arquivo indisponível.";
+  }
+});
+$("copilotDraftPatch").addEventListener("click", async () => {
+  if (copilotState.busy || app.sending) return;
+  resetCodeEditPreview();
+  const instruction = $("copilotPatchInstruction").value.trim();
+  const path = $("copilotPath").value.trim();
+  const rawLine = $("copilotPatchLine").value.trim();
+  if (!path || !instruction) {
+    $("copilotFeedback").textContent =
+      "Selecione um arquivo autorizado e descreva o problema.";
+    return;
+  }
+  const focusLine = rawLine ? Number(rawLine) : null;
+  if (focusLine !== null && (!Number.isInteger(focusLine) ||
+      focusLine < 1 || focusLine > 100000)) {
+    $("copilotFeedback").textContent = "Linha de foco inválida.";
+    return;
+  }
+  copilotState.busy = true;
+  $("copilotDraftPatch").disabled = true;
+  $("copilotFeedback").textContent =
+    "Solicitando ao modelo local uma proposta pequena. Nenhum arquivo está sendo alterado.";
+  try {
+    const result = await requestJson("/api/copilot", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        action:"draft_model_patch", path, instruction, focus_line:focusLine
+      })
+    });
+    if (!result.token || !result.diff) throw new Error("Proposta sem diff ou autorização.");
+    codeEdit.token = result.token;
+    codeEdit.path = result.path;
+    $("copilotEditDiff").textContent =
+      "Motivo sugerido (não verificado): " + result.reason +
+      "\nTrecho enviado à IA: " + result.source_scope +
+      "\nVerificação: " + result.validation +
+      "\n\n" + result.diff;
+    $("copilotEditDiff").hidden = false;
+    $("copilotConfirmEdit").hidden = false;
+    $("copilotCancelEdit").hidden = false;
+    const editorPanel = $("copilotProposeEdit").closest("details");
+    if (editorPanel) editorPanel.open = true;
+    $("copilotFeedback").textContent =
+      "A IA gerou apenas uma proposta. Revise o diff e confirme separadamente.";
+  } catch (error) {
+    $("copilotFeedback").textContent =
+      "Não foi possível gerar proposta segura: " + error.message +
+      ". Você pode editar manualmente pelo fluxo de substituição exata.";
+  } finally {
+    copilotState.busy = false;
+    $("copilotDraftPatch").disabled = false;
   }
 });
 $("copilotProposeEdit").addEventListener("click", async () => {
