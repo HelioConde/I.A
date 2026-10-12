@@ -5,6 +5,8 @@ import json
 from http import HTTPStatus
 from typing import Any
 
+from brain_ssd.chat.session_facts import is_first_question_intent
+
 
 def serve_stream(handler: Any, data: dict[str, Any]) -> None:
     """The host and Origin are verified in ChatHandler before dispatch."""
@@ -15,9 +17,12 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
     question = data.get("message")
     if not isinstance(question, str) or not question.strip() or len(question.strip()) > 2000:
         raise ValueError("Digite uma mensagem de até 2.000 caracteres.")
+    first_question = None
     if conversation_id is not None and store is not None:
         # Validate the saved conversation before sending SSE response headers.
         history = store.recent_context(conversation_id)
+        if is_first_question_intent(question):
+            first_question = store.first_user_question(conversation_id)
     else:
         history = data.get("history", [])
     cancelled = engine.begin_stream(request_id)
@@ -47,6 +52,7 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
             remember_web=data.get("remember_web", False),
             fast_web=data.get("fast_web", False),
             response_tokens=data.get("response_tokens"),
+            first_question=first_question,
         )
         if cancelled.is_set():
             from brain_ssd.chat.streaming import GenerationCancelled
