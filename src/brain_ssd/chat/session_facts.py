@@ -29,6 +29,11 @@ def is_first_question_intent(question: str) -> bool:
                 and re.search(r"\b(?:fiz|enviei|disse|conversa|chat)\b", t))
 
 
+def is_first_message_intent(question: str) -> bool:
+    return (is_first_question_intent(question)
+            and bool(re.search(r"\bmensage(?:m|ns)\b", _text(question))))
+
+
 def _result(message: str, action: str) -> dict[str, Any]:
     return {
         "answer": message, "mode": "local_command",
@@ -87,14 +92,15 @@ def answer_session_fact(
             "local_assistant_status",
         )
     if is_first_question_intent(question):
+        first_kind = "mensagem" if is_first_message_intent(question) else "pergunta"
         if not first_question:
             return _result(
-                "Não consegui verificar a primeira pergunta desta conversa "
+                f"Não consegui verificar a primeira {first_kind} desta conversa "
                 "no histórico salvo. Não vou adivinhar a partir das últimas mensagens.",
                 "local_first_question_unavailable",
             )
         return _result(
-            f'A primeira pergunta registrada nesta conversa foi: "{first_question[:500]}".',
+            f'A primeira {first_kind} registrada nesta conversa foi: "{first_question[:500]}".',
             "local_first_question",
         )
     if (re.search(r"\b(?:ultim[ao]s?|recentes?)\b", q) and
