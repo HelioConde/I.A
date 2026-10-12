@@ -102,3 +102,51 @@ estima esses valores.
 
 O tamanho de contexto é fixado e registrado; deixar o padrão do modelo pode
 alocar vários gigabytes para KV cache e invalidar uma comparação de pesos.
+
+
+## Medição direta dos logits e do primeiro token — instrumento de integridade
+
+Para contornar a limitação do `llama-cli`, o projeto inclui um executável de
+**diagnóstico nativo independente**, usando a API C oficial de llama.cpp
+na revisão fixa `972b5fcc19670e597f8de9bf5cacfb85752a5fff`:
+
+- `tools/native_llama_probe/native_logits_probe.cpp`: executa prompt e amostra
+  gananciosa (`greedy`) determinística, registra token IDs, top-8 logits do
+  primeiro passo e um hash FNV64 sobre TODOS os logits desse mesmo passo;
+- `tools/native_llama_probe/CMakeLists.txt`: compila em diretório separado
+  a partir da fonte verificada; somente CPU, sem modificar o upstream;
+- `tools/bench_native_logits_windows.py`: compara `mmap` e `none` no mesmo
+  executável, GGUF e contexto; registra primeiro token, memória do processo e
+  equivalência de tokens/primeiro passo.
+
+**Não foi compilado nem testado com o Qwen real nesta atualização.** Os testes
+Python da comparação usam resultados simulados. É obrigatória validação física
+antes de considerar as métricas reais. O executável só será criado ao passar
+`--build`, e a execução do modelo só acontece ao chamar o benchmark.
+
+Use o Visual Studio Developer Command Prompt com ferramentas MSVC/CMake:
+
+```bat
+cd /d C:\Users\helio\Documents\I.A
+git switch feat/ssd-weight-streaming-lab
+git pull --ff-only origin feat/ssd-weight-streaming-lab
+py -3 -m unittest discover -s tests -p "test_bench_native_logits_windows.py" -v
+py -3 tools\bench_native_logits_windows.py --model models\Qwen3-0.6B-Q8_0.gguf --build --mode both --context 512 --threads 4 --predict 16 --output results\weight_lab\native-logits-comparison.json
+```
+
+A compilação requer o checkout fixado via
+`py -3 tools\prepare_native_llama_windows.py --fetch` já executado.
+O binário será colocado no diretório isolado
+`%LOCALAPPDATA%\BrainSSD\native-llama-source\972b5fcc1967\build-brainssd-logits`.
+O primeiro token é cronometrado dentro da API, desde o início do processo e
+inclui o carregamento do modelo; **não é diretamente comparável com o TTFT
+que o CLI antigo não expõe**.
+
+A validação atual compara **IDs dos tokens gananciosos gerados e top-8 logits
+do PRIMEIRO passo**, com tolerância absoluta `1e-5`. Também fornece hash
+bit a bit do vetor completo de logits desse primeiro passo, mas não compara
+todos os logits dos passos subsequentes. Se o hash completo diferir apesar de
+os top-8 e tokens baterem, a diferença deve ser investigada antes de declarar
+identidade matemática exata. Todas essas medições continuam sendo do
+**llama.cpp original**: ainda não existe carregador Brain-SSD de pesos em
+inferência, nem ganho adicional de RAM comprovado.
