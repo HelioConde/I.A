@@ -131,7 +131,7 @@
     stopSpeech(); state.speaking = true; setState("responding"); buttons();
     const utterance = new SpeechSynthesisUtterance(text); utterance.lang = "pt-BR"; utterance.voice = voice; utterance.rate = 1.0; utterance.volume = 1.0;
     state.utterance = utterance;
-    utterance.onend = () => { if (state.utterance !== utterance) return; state.speaking = false; state.utterance = null; buttons(); resumeListeningAfterChat(); };
+    utterance.onend = () => { if (state.utterance !== utterance) return; state.speaking = false; state.utterance = null; buttons(); if (state.active && state.muted) setState("muted"); else resumeListeningAfterChat(); };
     utterance.onerror = () => { if (state.utterance !== utterance) return; state.speaking = false; state.utterance = null; setState("error", "A voz local não conseguiu reproduzir a resposta."); buttons(); };
     try { window.speechSynthesis.speak(utterance); } catch (_) { utterance.onerror(); }
   }
