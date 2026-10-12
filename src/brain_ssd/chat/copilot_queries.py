@@ -140,47 +140,81 @@ def _app_reply(question: str, copilot: LocalCopilot, intent: str) -> dict[str, A
 
 
 def _launch_intent(question: str) -> tuple[str | None, bool, bool]:
-    wants = bool(re.search(r"\b(abra|abre|abrir|inicie|iniciar|inicia|execute|executar)\b", question))
-    if not wants:
+    """Match explicit imperatives, never broad questions or arbitrary commands."""
+    text = _plain(question).strip()
+    query_only = bool(re.search(r"\b(?:consegue|pode|poderia|sabe)\b", text))
+    if query_only:
+        return None, True, False
+    match = re.fullmatch(
+        r"(?:(?:luna|por favor)[,\s]+)?"
+        r"(?:abra|abre|abri|abrir|inicie|inicia|iniciar|execute|executar)\s+"
+        r"(?:(?:(?:o|a|um|uma|programa|aplicativo|app|jogo)\s+){0,3})"
+        r"(.+?)(?:\s+(?:agora|por favor))?[.!?]*",
+        text,
+    )
+    if not match:
         return None, False, False
-    app = None
-    if re.search(r"\b(bloco de notas|notepad)\b", question):
-        app = "notepad"
-    elif re.search(r"\b(calculadora|calculator)\b", question):
-        app = "calculator"
-    question_only = bool(re.search(r"\b(consegue|pode|poderia|sabe)\b", question))
-    imperative = bool(re.match(r"^(?:por favor,?\s+)?(?:abra|abre|inicie|inicia|execute)\b", question))
-    return app, question_only, imperative
+    name = match.group(1).strip()
+    if not name or len(name) > 100 or re.search(
+        r"\b(?:arquivo|imagem|foto|documento|pasta|url|link|site|pagina|"
+        r"terminal|comando|script|powershell|cmd|shell)\b", name
+    ):
+        return None, False, False
+    if name in ("programa", "app", "aplicativo", "programas", "aplicativos"):
+        return None, True, False
+    return name, False, True
 
 
 def _launch_reply(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
-    app, question_only, imperative = _launch_intent(question)
-    if app is None and not (question_only or imperative):
+    name, question_only, imperative = _launch_intent(question)
+    if name is None and not question_only:
         return None
-    if app is None:
-        return _result(
-            "Esta versão não abre o aplicativo solicitado. A abertura segura está limitada "
-            "a Bloco de Notas e Calculadora, com autorização da sessão e confirmação por clique.",
-            "copilot_launch_unsupported",
-        )
     if copilot is None or not copilot.launch_enabled:
         return _result(
-            "Posso preparar a abertura de Bloco de Notas ou Calculadora, mas o controle "
-            "de aplicativos está desativado. Reinicie o Copiloto e autorize esta função; "
-            "nada foi aberto.",
+            "A abertura de aplicativos está desativada. Configure launch = true "
+            "e apps = true no LUNA.ini. Nenhuma aplicação foi iniciada.",
             "copilot_launch_disabled",
         )
-    if question_only or not imperative:
+    if question_only:
+        mode = ("diretamente por ordem explícita" if copilot.launch_without_confirmation
+                else "após confirmação no botão")
         return _result(
-            "Posso preparar a abertura do aplicativo, mas nunca executá-la só porque "
-            "a IA respondeu. Diga 'Abra o Bloco de Notas' ou 'Abra a Calculadora' "
-            "e confirme no botão da conversa.",
+            "Posso abrir aplicativos registrados no menu Iniciar " + mode
+            + ". Para executar, diga 'Abra a Calculadora' ou 'Abra o Steam'. "
+            "Isso não dá permissão para executar comandos, scripts ou programas administrativos.",
             "copilot_launch_info",
         )
+    if not imperative or not name:
+        return None
+    if copilot.launch_without_confirmation:
+        try:
+            started = copilot.launch_by_name(name)
+        except (CopilotPermissionError, OSError, ValueError) as exc:
+            return _result(
+                "Não iniciei o programa '" + name + "': " + str(exc),
+                "copilot_launch_direct_unavailable",
+            )
+        return _result(
+            "Solicitei ao Windows a abertura de " + started["label"] + ". "
+            "O processo foi iniciado/encaminhado ao Explorer; ainda não confirmei "
+            "que uma janela apareceu.",
+            "copilot_launch_direct_requested",
+            extra={"copilot_launch_label": started["label"]},
+        )
+    fixed = {"bloco de notas": "notepad", "notepad": "notepad",
+             "calculadora": "calculator", "calculator": "calculator"}
+    app_id = fixed.get(name)
+    if app_id is None:
+        return _result(
+            "Para abrir esse aplicativo sem clique, configure "
+            "launch_without_confirmation = true no LUNA.ini. "
+            "No modo de confirmação, somente Bloco de Notas e Calculadora estão disponíveis.",
+            "copilot_launch_direct_disabled",
+        )
     try:
-        offer = copilot.offer_launch(app)
+        offer = copilot.offer_launch(app_id)
     except (CopilotPermissionError, OSError):
-        return _result("Não foi possível preparar a abertura. Nenhuma aplicação foi iniciada.",
+        return _result("Não foi possível preparar a abertura. Nada foi iniciado.",
                        "copilot_launch_unavailable")
     return _result(
         "Pedido de abertura de " + offer["label"] + " preparado. "
@@ -191,6 +225,42 @@ def _launch_reply(question: str, copilot: LocalCopilot | None) -> dict[str, Any]
                "copilot_launch_app": offer["app_id"],
                "copilot_launch_label": offer["label"]},
     )
+
+
+def _start_apps_catalog(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
+    text = _plain(question)
+    if not re.search(r"\b(?:programas|aplicativos|apps)\b", text):
+        return None
+    if not re.search(r"\b(?:liste|listar|mostre|mostrar|quais|todos|pagina)\b", text):
+        return None
+    if not re.search(r"\b(?:instalados|menu iniciar|disponiveis|no pc|no computador|todos|pagina)\b", text):
+        return None
+    if copilot is None or not copilot.apps_enabled:
+        return _result(
+            "O inventário de aplicativos está desativado no LUNA.ini.",
+            "copilot_apps_disabled",
+        )
+    try:
+        inventory = copilot.start_menu_apps()
+    except (CopilotPermissionError, OSError):
+        return _result("Não consegui consultar aplicativos do menu Iniciar.",
+                       "copilot_apps_unavailable")
+    match = re.search(r"\bpagina\s+(\d{1,3})\b", text)
+    page = max(1, min(int(match.group(1)), 50)) if match else 1
+    limit = 35
+    items = inventory.get("items", [])
+    total = inventory.get("total_matches", len(items))
+    subset = items[(page-1)*limit:page*limit]
+    body = ["Aplicativos registrados no menu Iniciar, página "
+            + str(page) + " (total encontrado: " + str(total) + "):"]
+    body.extend("• " + item["name"] for item in subset)
+    if not subset:
+        body.append("Nenhum item nesta página.")
+    if total > page*limit:
+        body.append("Para continuar, diga: 'Liste aplicativos instalados página " + str(page+1) + "'.")
+    body.append("Essa lista pode omitir aplicativos portáteis. Para abrir, diga "
+                "'Abra o NOME DO APLICATIVO'.")
+    return _result("\n".join(body), "copilot_start_apps_catalog")
 
 
 def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> dict[str, Any] | None:
@@ -566,6 +636,9 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
             )
         except (CopilotPermissionError, OSError) as exc:
             return _result(str(exc), "copilot_code_unavailable")
+    catalog = _start_apps_catalog(question, copilot)
+    if catalog is not None:
+        return catalog
     direct = _grounded_desktop_question(question, copilot)
     if direct is not None:
         return direct
