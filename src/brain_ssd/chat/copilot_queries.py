@@ -223,13 +223,17 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
         )
     )
     if personal_tabs:
+        correction = bool(re.search(
+            r"\b(?:mas isso|voce mandou|voce enviou|nao e|nao sao)\b", simple
+        ))
+        preface = ("Você tem razão: a resposta anterior mostrou processos, não abas. "
+                   if correction else "Ainda não consigo consultar as suas abas abertas. ")
         return _result(
-            "Você tem razão: a lista de chrome.exe/PID mostra PROCESSOS do Windows, "
-            "não as abas abertas no Chrome. Eu não consultei as URLs nem os títulos "
-            "das suas abas e não consigo enumerá-las nesta versão. "
+            preface + "A lista de chrome.exe/PID mostra PROCESSOS do Windows. "
+            "Eu não consultei as URLs nem os títulos das suas abas e "
+            "não consigo enumerá-las nesta versão. "
             "Se quiser trabalhar com uma aba, cole o link ou copie o texto dela. "
-            "A captura autorizada mostra a tela, mas não revela automaticamente "
-            "a lista completa de abas.",
+            "Uma captura autorizada mostra a tela, mas não a lista completa de abas.",
             "copilot_browser_tabs_unsupported",
         )
     # Voice transcription can refer vaguely to what is 'open in Chrome'.
