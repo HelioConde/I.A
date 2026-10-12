@@ -57,7 +57,7 @@ function harness() {
     },
     dispatchEvent(event) { for (const listener of listeners.get(event.type) || []) listener(event); },
     stopVoiceCallMessage: async () => { cancellation++; },
-    sendVoiceCallMessage: async () => { sent++; },
+    sendVoiceCallMessage: async () => { sent++; w.lunaAppState.sending=true; },
   };
   const context = {
     window:w,
@@ -125,7 +125,6 @@ test("voice turn submits once, hangup cancels active call-owned request", async 
   h.click("startVoiceCall");
   const rec=h.recognition[0];
   h.final(rec,"Explique o Brain-SSD");
-  h.sending=true;
   rec.onend();
   assert.equal(h.sent,1);
   assert.equal(h.state(),"thinking");
@@ -143,7 +142,6 @@ test("manual interruption during TTS cancels voice and resumes listening", async
   h.click("startVoiceCall");
   const rec=h.recognition[0];
   h.final(rec,"Diga olá");
-  h.sending=true;
   rec.onend();
   h.sending=false;
   h.chat("done","Olá, tudo bem?");
@@ -161,7 +159,6 @@ test("manual interruption during Qwen generation resumes after stopped event", a
   const h=harness();
   h.click("startVoiceCall");
   h.final(h.recognition[0],"Uma pergunta");
-  h.sending=true;
   h.recognition[0].onend();
   h.click("interruptVoiceCall");
   assert.equal(h.cancellation,1);
