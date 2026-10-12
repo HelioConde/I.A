@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "INICIAR-COPILOTO-WINDOWS.bat"
+      - "LUNA.exemplo.ini"
+      - "tools/launch_luna.py"
+      - "tests/test_launch_luna_ini.py"
       - "tests/test_windows_launchers.py"
       - "tests/test_copilot.py"
       - "tests/test_copilot_queries.py"
@@ -138,6 +141,7 @@ jobs:
           python -m unittest discover -s tests -p "test_compare_diagnostics.py" -v
           python -m unittest discover -s tests -p "test_chat_static_ui.py" -v
           python -m unittest discover -s tests -p "test_windows_launchers.py" -v
+          python -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
           python -m unittest discover -s tests -p "test_copilot.py" -v
           python -m unittest discover -s tests -p "test_copilot_queries.py" -v
           python -m unittest discover -s tests -p "test_copilot_question_battery.py" -v
