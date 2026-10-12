@@ -120,6 +120,21 @@ test("silence timer is removed when user resumes talking", () => {
   assert.equal(h.timers.size,0);
 });
 
+test("final STT after speechend must not erase the silence timer", () => {
+  const h=harness();
+  h.click("startVoiceCall");
+  const rec=h.recognition[0];
+  rec.onspeechend();
+  assert.equal(h.timers.size,1);
+  h.final(rec,"Final da frase");
+  assert.equal(h.timers.size,1,"Final recognition result is not renewed speech");
+  const timer=[...h.timers.values()][0];
+  assert.equal(timer.ms,1000);
+  timer.fn();
+  assert.equal(h.sent,1);
+  assert.equal(h.state(),"thinking");
+});
+
 test("voice turn submits once, hangup cancels active call-owned request", async () => {
   const h=harness();
   h.click("startVoiceCall");
