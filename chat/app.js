@@ -1,6 +1,6 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false, assistantName:"Brain-SSD" };
+const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false, assistantName:"Luna" };
 const composer = $("messageInput");
 const nativeSpeech = window.SpeechRecognition || window.webkitSpeechRecognition;
 const micState = {recognizer:null, active:false, available:false};
@@ -387,7 +387,7 @@ async function refreshStatus() {
       ? "Busca opcional: marque 'Pesquisar na web' para enviar SOMENTE aquela pergunta ao provedor " + data.web_search_provider + ". A IA continua local."
       : "Busca web desligada. Nenhuma pergunta é enviada à internet.";
     if (!webEnabled) $("webSearchToggle").checked = false;
-    app.assistantName = data.assistant_name || "Brain-SSD";
+    app.assistantName = "Luna"; // Visual identity; the actual Qwen model is shown separately.
     document.querySelectorAll(".message-label").forEach(label => {
       if (label.textContent !== "Problema na execução") label.textContent = app.assistantName;
     });
@@ -576,7 +576,7 @@ async function send() {
       const payload = JSON.parse(data);
       if (event === "started") app.streamStarted = true;
       if (event === "delta") {
-        window.dispatchEvent(new CustomEvent("luna:chat", {detail:{kind:"stream"}}));
+        if (!partial) window.dispatchEvent(new CustomEvent("luna:chat", {detail:{kind:"stream"}}));
         partial += payload.text || "";
         output.textContent = partial;
         scrollBottom();
