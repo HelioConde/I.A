@@ -174,6 +174,16 @@ class LocalCopilot:
         except (OSError, ValueError, UnidentifiedImageError):
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
 
+    def _godot_inspector(self):
+        from brain_ssd.chat.godot_diagnostics import GodotInspector
+        return GodotInspector(self)
+
+    def inspect_godot_project(self, user_path: str) -> dict:
+        return self._godot_inspector().inspect(user_path)
+
+    def diagnose_godot_error(self, user_path: str, error_text: str) -> dict:
+        return self._godot_inspector().diagnose(user_path, error_text)
+
     def _code_editor(self):
         if self._editor is None:
             from brain_ssd.chat.code_edits import CodeEditor
