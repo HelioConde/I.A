@@ -1,11 +1,15 @@
 """Code edit regression: uses scratch fixtures and never changes user files."""
 from __future__ import annotations
 
+import json
 import os
 import sys
 import tempfile
+import threading
 import time
 import unittest
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 from pathlib import Path
 from unittest.mock import patch
 
@@ -13,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from brain_ssd.chat.copilot import CopilotPermissionError, LocalCopilot
 from brain_ssd.chat.copilot_queries import copilot_answer
+from brain_ssd.chat.server import ChatEngine, create_chat_server
 
 
 class CodeEditingTests(unittest.TestCase):
@@ -194,6 +199,52 @@ class CodeEditingTests(unittest.TestCase):
             with patch.object(code_edits.time, "monotonic", return_value=1e20):
                 with self.assertRaises(CopilotPermissionError):
                     self.copilot.propose_code_undo(edit["edit_id"])
+
+    def test_http_edit_verify_and_undo_require_same_origin_and_confirmation(self):
+        server = create_chat_server(
+            ChatEngine(lambda: None, copilot=self.copilot),
+            ROOT / "chat", port=0, copilot=self.copilot,
+        )
+        worker = threading.Thread(target=server.serve_forever, daemon=True)
+        worker.start()
+        base = f"http://127.0.0.1:{server.server_address[1]}"
+        try:
+            def post(data, origin=base):
+                request = Request(
+                    base + "/api/copilot", method="POST",
+                    headers={"Origin": origin, "Content-Type": "application/json"},
+                    data=json.dumps(data).encode("utf-8"),
+                )
+                with urlopen(request, timeout=6) as response:
+                    return json.loads(response.read())
+            with patch("brain_ssd.chat.code_edits._backup_dir", return_value=self.backups):
+                proposed = post({
+                    "action": "propose_code_edit", "path": str(self.fixture),
+                    "before": "speed = 10", "after": "speed = 20",
+                })
+                with self.assertRaises(HTTPError) as forbidden:
+                    post({"action": "apply_code_edit", "token": proposed["token"]},
+                         origin="https://malicious.example")
+                self.assertEqual(forbidden.exception.code, 403)
+                self.assertIn("10", self.fixture.read_text())
+                applied = post({"action": "apply_code_edit", "token": proposed["token"]})
+                evidence = post({"action": "verify_code_edit",
+                                 "edit_id": applied["edit_id"]})
+                self.assertEqual(evidence["status"], "matches_applied_edit")
+                undo = post({"action": "propose_code_undo",
+                             "edit_id": applied["edit_id"]})
+                self.assertIn("-var speed = 20", undo["diff"])
+                self.assertIn("20", self.fixture.read_text())
+                restored = post({"action": "confirm_code_undo", "token": undo["token"]})
+                self.assertEqual(restored["status"], "reverted")
+                self.assertIn("10", self.fixture.read_text())
+                with self.assertRaises(HTTPError) as twice:
+                    post({"action": "confirm_code_undo", "token": undo["token"]})
+                self.assertEqual(twice.exception.code, 400)
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join(timeout=5)
 
     def test_bom_preserved(self):
         self.fixture.write_bytes(b"\xef\xbb\xbf" + "var nome = 1\n".encode())
