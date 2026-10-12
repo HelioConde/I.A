@@ -188,3 +188,38 @@ py -3 -m unittest discover -s tests -p "test_chat_learning_news.py" -v
 sem uma integração de navegador com autorização explícita; não há
 API meteorológica configurada nem OCR/vídeo inferido automaticamente.
 Não foi realizada validação visual/screenshot no Windows nesta alteração.
+
+## Perguntas básicas verificáveis — correção de 12/10/2026
+
+Após a bateria real de perguntas ao Qwen local, a Luna passou a responder
+**sem geração neural** quando a resposta depende exclusivamente de fatos
+do computador ou do histórico salvo:
+
+- **Data de hoje:** obtida pelo relógio/fuso local do processo Windows, nunca inferida do prompt nem da internet.
+- **Modelo utilizado:** nome exposto pelo runtime ativo (por exemplo `Qwen3-0.6B-Q8_0.gguf`), separado do nome da interface (Luna) e do projeto (Brain-SSD).
+- **Estado de conversa:** responde como assistente de software, sem simular emoções humanas.
+- **Primeira pergunta da conversa:** recuperada diretamente da primeira mensagem `user` no SQLite daquela conversa, independentemente da janela curta do Qwen.
+- **Últimas cinco mensagens:** extrato rotulado das mensagens efetivamente fornecidas pelo histórico recente, sem inventar turnos inexistentes.
+- **Capacidade de memória:** distingue histórico local SQLite de lembranças episódicas salvas explicitamente.
+- **Informações de hoje sem assunto:** pede que o usuário escolha notícias, previsão do tempo ou tarefas.
+
+O nome Luna foi aplicado ao prompt de conversa. Isso não altera pesos do Qwen
+nem garante que o modelo pequeno sempre compreenda acompanhamentos complexos.
+
+Limitações: se não houver `conversation_id` válido e histórico SQLite
+acessível, a Luna não inventará a primeira pergunta; ela explicará
+que não conseguiu verificá-la. Os extratos de cinco mensagens não são
+um resumo semântico gerado pelo Qwen. As previsões e notícias continuam
+dependendo de provedores específicos e autorização por mensagem.
+
+**Verificação no Windows:**
+
+```powershell
+Set-Location "C:\Users\helio\Documents\I.A"
+git pull --ff-only origin feat/ssd-weight-streaming-lab
+py -3 -m unittest discover -s tests -p 'test_luna_session_facts.py' -v
+py -3 -m unittest discover -s tests -p 'test_luna_real_world_regression.py' -v
+py -3 -m unittest discover -s tests -p 'test_chat_history.py' -v
+```
+
+Reinicie a Luna para atualizar o servidor Python, inclusive no modo ligação.
