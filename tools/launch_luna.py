@@ -215,6 +215,31 @@ def build_chat_args(config: LunaConfig) -> tuple[list[str], list[str]]:
     return args, messages
 
 
+def enable_direct_launch(path: Path) -> None:
+    """Opt in only after the user's explicit CLI command; preserve INI comments."""
+    original = read_config(path)
+    if not original.apps or not original.launch:
+        raise ValueError("Ative apps = true e launch = true antes da abertura direta.")
+    rows = path.read_text(encoding="utf-8-sig").splitlines(keepends=True)
+    inside = False
+    replaced = False
+    for index, line in enumerate(rows):
+        stripped = line.strip().casefold()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            inside = stripped == "[copilot]"
+            continue
+        if inside and line.split("=", 1)[0].strip().casefold() == "launch_without_confirmation":
+            newline = "\r\n" if line.endswith("\r\n") else "\n"
+            rows[index] = "launch_without_confirmation = true" + newline
+            replaced = True
+            break
+    if not replaced:
+        rows.append("\nlaunch_without_confirmation = true\n")
+    path.write_text("".join(rows), encoding="utf-8")
+    if not read_config(path).launch_without_confirmation:
+        raise ValueError("A permissão não foi persistida corretamente.")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=INI)
@@ -222,6 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     operation.add_argument("--check", action="store_true", help="Validar INI sem iniciar o modelo")
     operation.add_argument("--init-only", action="store_true", help="Criar INI e sair")
     operation.add_argument("--run", action="store_true", help="Verificar Qwen e iniciar Luna")
+    operation.add_argument("--enable-direct-launch", action="store_true", help="Autorizar abertura direta de aplicativos no LUNA.ini local")
     args = parser.parse_args(argv)
     try:
         cfg_path = args.config.expanduser().resolve()
@@ -230,6 +256,10 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(f"Configuracao local existente: {cfg_path}")
         if args.init_only:
+            return 0
+        if args.enable_direct_launch:
+            enable_direct_launch(cfg_path)
+            print("Abertura direta de aplicativos ativada no LUNA.ini local.")
             return 0
         config = read_config(cfg_path)
         command, warnings = build_chat_args(config)
