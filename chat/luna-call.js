@@ -58,7 +58,7 @@
     byId("startVoiceCall").disabled = state.active;
     byId("endVoiceCall").disabled = !state.active;
     byId("muteVoiceCall").disabled = !state.active;
-    byId("interruptVoiceCall").disabled = !state.active || (!state.speaking && !window.appVoiceSending?.());
+    byId("interruptVoiceCall").disabled = !state.active || (!state.speaking && !state.expectingAnswer && !window.appVoiceSending?.());
     byId("muteVoiceCall").textContent = state.muted ? "Ativar microfone" : "Silenciar microfone";
   }
   function resumeListeningAfterChat() {
