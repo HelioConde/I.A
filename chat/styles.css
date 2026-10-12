@@ -138,6 +138,7 @@
 .copilot-block h3 {font-size:14px;margin:0}
 .copilot-block label {font-size:12px;color:#cfdae5}
 .copilot-block input:not([type="checkbox"]) {width:100%;background:#202c3a;color:#fff;border:1px solid #567087;border-radius:7px;padding:9px;min-height:38px}
+.copilot-block select {width:100%;background:#202c3a;color:#fff;border:1px solid #567087;border-radius:7px;padding:9px;min-height:38px;cursor:pointer}
 .copilot-actions {display:flex;flex-wrap:wrap;align-items:center;gap:7px}
 .copilot-block button,.copilot-entry,#copilotUseChat {background:#263e50;color:#eaf4ff;border:1px solid #4b7792;border-radius:8px;padding:9px 11px;font-size:12px;cursor:pointer}
 .copilot-block button:disabled {opacity:.48;cursor:not-allowed}
