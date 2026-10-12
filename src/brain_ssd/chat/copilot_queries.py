@@ -200,6 +200,37 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
     Paths and image files are checked using the existing authorized-root gates.
     """
     simple = _plain(question)
+    # A user asking about their OWN tabs must not fall through to Qwen or
+    # be answered from tasklist.exe. Browser processes != open tab URLs.
+    personal_tabs = bool(
+        re.search(r"\b(?:abas?|guias?)\b", simple)
+        and (
+            re.search(r"\b(?:minhas?|meus|tenho|estou|quais?|liste|listar|mostre|verifique|consegue|"
+                      r"abert[ao]s?|mandou|enviou)\b", simple)
+            or re.search(r"\b(?:isso|nao e|nao sao)\b.*\b(?:abas?|guias?)\b", simple)
+        )
+    )
+    if personal_tabs:
+        return _result(
+            "Você tem razão: a lista de chrome.exe/PID mostra PROCESSOS do Windows, "
+            "não as abas abertas no Chrome. Eu não consultei as URLs nem os títulos "
+            "das suas abas e não consigo enumerá-las nesta versão. "
+            "Se quiser trabalhar com uma aba, cole o link ou copie o texto dela. "
+            "A captura autorizada mostra a tela, mas não revela automaticamente "
+            "a lista completa de abas.",
+            "copilot_browser_tabs_unsupported",
+        )
+    # Voice transcription can refer vaguely to what is 'open in Chrome'.
+    # Clarify rather than silently substituting a process list for tabs.
+    if (re.search(r"\b(?:chrome|google chrome|edge)\b", simple)
+            and re.search(r"\b(?:quais?|verifique|mostre|abert[ao]s?)\b", simple)
+            and not re.search(r"\b(?:processos?|pids?|programas?|aplicativos?|janelas?|abas?|guias?)\b", simple)):
+        return _result(
+            "Você quer verificar as ABAS do navegador ou os PROCESSOS do Chrome? "
+            "Consigo consultar processos, mas ainda não consigo ler a lista de abas. "
+            "Nenhuma aba foi consultada.",
+            "copilot_browser_intent_clarification",
+        )
     if (re.search(r"\b(?:abas?|guias?)\b", simple)
             and re.search(r"\b(?:navegador|chrome|edge|browser)\b", simple)
             and re.search(r"\b(?:quais|abert[ao]s?|estou|tenho|minhas|meus|liste|mostre)\b", simple)):
