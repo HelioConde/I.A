@@ -1075,7 +1075,7 @@ function showCodeEditRecovery() {
 
 const godotTest = {token:null, project:null, script:null};
 const agentPlan = {token:null, task:null};
-const agentEvidence = {path:null};
+const agentEvidence = {path:null, line:null};
 function clearAgentPlan() {
   agentPlan.token = null;
   agentPlan.task = null;
@@ -1348,6 +1348,7 @@ $("copilotAgentPlan").addEventListener("click", async () => {
   if (copilotState.busy || $("copilotPanel").hidden) return;
   clearAgentPlan();
   agentEvidence.path = null;
+  agentEvidence.line = null;
   $("copilotAgentToEditor").hidden = true;
   copilotState.busy = true;
   try {
@@ -1407,6 +1408,9 @@ $("copilotAgentRun").addEventListener("click", async () => {
     const review = (result.evidence || []).find(e => e.step === "code_inspector");
     const matchedFile = diagnosis?.facts?.matches?.[0]?.path || review?.facts?.path || null;
     agentEvidence.path = typeof matchedFile === "string" ? matchedFile : null;
+    const reportedLine = diagnosis?.facts?.matches?.[0]?.reported_line;
+    agentEvidence.line = Number.isInteger(reportedLine) && reportedLine > 0
+      ? reportedLine : null;
     $("copilotAgentToEditor").hidden = !agentEvidence.path;
     copilotState.text = text.slice(0, 1400);
     $("copilotUseChat").hidden = !copilotState.text;
@@ -1422,11 +1426,19 @@ $("copilotAgentRun").addEventListener("click", async () => {
 $("copilotAgentToEditor").addEventListener("click", () => {
   if (!agentEvidence.path || copilotState.busy) return;
   $("copilotPath").value = agentEvidence.path;
+  if (agentEvidence.line) $("copilotPatchLine").value = String(agentEvidence.line);
+  const userError = $("copilotGodotError").value.trim();
+  if (userError && !$("copilotPatchInstruction").value.trim()) {
+    $("copilotPatchInstruction").value =
+      ("Sugira uma correção mínima para este erro do Godot: " + userError).slice(0, 380);
+  }
+  const aiPanel = $("copilotDraftPatch").closest("details");
+  if (aiPanel) aiPanel.open = true;
   const editorSection = $("copilotProposeEdit").closest("details");
   if (editorSection) editorSection.open = true;
   $("copilotFeedback").textContent =
-    "Arquivo encontrado selecionado. Informe o trecho exato e a substituição; nada será alterado sem diff e aprovação.";
-  $("copilotEditBefore").focus();
+    "Arquivo e linha identificados foram selecionados. Você pode solicitar uma proposta à IA local ou editar manualmente; nenhuma alteração foi feita.";
+  $("copilotPatchInstruction").focus();
 });
 $("copilotAgentCancel").addEventListener("click", () => {
   clearAgentPlan();
