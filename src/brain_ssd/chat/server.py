@@ -717,7 +717,8 @@ class ChatEngine:
             # Encyclopedia entries are not verifiable breaking news.
             if local_result is None and needs_recent_public_sources(question):
                 if (self.web_search_service is not None
-                        and not bool(self.web_search_service.supports_general_web())
+                        and not bool(getattr(self.web_search_service, "supports_general_web",
+                                             lambda: self.web_search_service.provider in ("brave", "google", "searxng"))())
                         and not needs_brazil_news(question)):
                     local_result = {
                         "answer": (
