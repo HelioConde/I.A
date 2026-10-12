@@ -423,7 +423,8 @@ class ChatEngine:
                 if on_chunk is not None:
                     on_chunk(local["answer"])
                 return local
-        if needs_recent_public_sources(question) and not web_search:
+        if (needs_recent_public_sources(question) and not needs_brazil_news(question)
+                and not current_game_request(question) and not web_search):
             local = {
                 "answer": (
                     "Para responder sobre notícias recentes preciso de fontes atuais "
@@ -715,7 +716,8 @@ class ChatEngine:
                     "cognitive_shadow": None,
                 }
             # Encyclopedia entries are not verifiable breaking news.
-            if local_result is None and needs_recent_public_sources(question):
+            if (local_result is None and needs_recent_public_sources(question)
+                    and not needs_brazil_news(question) and not current_game_request(question)):
                 if (self.web_search_service is not None
                         and not bool(getattr(self.web_search_service, "supports_general_web",
                                              lambda: self.web_search_service.provider in ("brave", "google", "searxng"))())
