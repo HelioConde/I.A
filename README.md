@@ -10,6 +10,22 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Luna HUD — nova interface experimental
+
+A interface web do chat ganhou o visual **Luna**, inspirado em uma central de
+comando futurista: núcleo animado, painel operacional, contexto autorizado,
+estados reais do chat e ações rápidas. O Qwen local, o Agent Core e as
+permissões existentes foram preservados. O HUD não captura a tela, não
+executa comandos sozinho e não exige GPU.
+
+Execute o iniciador do Copiloto Windows após atualizar a branch
+`feat/ssd-weight-streaming-lab`. Consulte o
+[guia da Luna HUD](docs/LUNA_HUD_WINDOWS.md).
+Esta etapa ainda depende de revisão visual no PC e não implementa
+overlay sempre visível sobre outros aplicativos.
+
+---
+
 ## Copiloto local Windows — primeira etapa (experimental)
 
 O atalho **INICIAR-COPILOTO-WINDOWS.bat** oferece permissões explícitas
