@@ -3,30 +3,82 @@ const $ = id => document.getElementById(id);
 const app = { ready:false, sending:false, messages:[], conversationId:null, conversations:[], requestId:null, abortController:null, streamStarted:false, assistantName:"Luna" };
 const composer = $("messageInput");
 const nativeSpeech = window.SpeechRecognition || window.webkitSpeechRecognition;
-const micState = {recognizer:null, active:false, available:false};
-async function checkLocalMic() {
+const micState = {recognizer:null, active:false, available:false, checking:false, installing:false, availability:"unknown"};
+const localMicLanguage = {langs:["pt-BR"], processLocally:true};
+
+function localMicFeedback(message, {canInstall=false, ready=false} = {}) {
   const button = $("localMicButton");
-  // Explicit local processing support is required; never fall back to
-  // network-backed speech services without a separate consent design.
+  const setup = $("localMicSetup");
+  const install = $("installLocalSpeech");
+  const retry = $("retryLocalSpeech");
+  $("localMicStatus").textContent = message;
+  setup.hidden = ready;
+  install.hidden = !canInstall || micState.installing;
+  install.disabled = micState.installing || micState.checking;
+  retry.disabled = micState.installing || micState.checking;
+  button.disabled = !micState.available || micState.checking || micState.installing;
+  button.title = micState.available
+    ? "Clique para ativar o microfone para uma frase, processada somente neste dispositivo."
+    : message;
+}
+async function checkLocalMic() {
+  if (micState.checking || micState.installing || micState.active) return;
+  micState.checking = true;
+  micState.available = false;
+  localMicFeedback("Verificando se o navegador tem reconhecimento local pt-BR...");
+  // No remote recognition fallback: the browser must explicitly promise local STT.
   if (!nativeSpeech || !("processLocally" in nativeSpeech.prototype) ||
       typeof nativeSpeech.available !== "function") {
-    button.disabled = true;
-    button.title = "Reconhecimento de fala no dispositivo não disponível neste navegador.";
+    micState.checking = false;
+    micState.availability = "unsupported";
+    localMicFeedback("Este navegador não oferece reconhecimento de fala no dispositivo. Atualize o Chrome/Edge ou use um motor de voz offline no Windows.");
     return;
   }
   try {
-    const availability = await nativeSpeech.available({
-      langs:["pt-BR"], processLocally:true
-    });
+    const availability = await nativeSpeech.available(localMicLanguage);
+    micState.availability = availability;
     micState.available = availability === "available";
-  } catch (_) {
-    micState.available = false;
+    micState.checking = false;
+    if (availability === "available") {
+      localMicFeedback("Reconhecimento de fala local pt-BR pronto.", {ready:true});
+    } else if (availability === "downloadable") {
+      localMicFeedback("O pacote pt-BR pode ser instalado no navegador. Clique em Instalar pt-BR offline.", {canInstall:typeof nativeSpeech.install === "function"});
+    } else if (availability === "downloading") {
+      localMicFeedback("Pacote pt-BR ainda está baixando. Aguarde e clique em Verificar novamente.");
+    } else {
+      localMicFeedback("O navegador não oferece pacote de reconhecimento pt-BR local neste dispositivo. A fala online não será usada.");
+    }
+  } catch (error) {
+    micState.checking = false;
+    micState.availability = "error";
+    localMicFeedback("Não foi possível verificar a fala local. Confira permissões do navegador e clique em Verificar novamente.");
   }
-  button.disabled = !micState.available;
-  button.title = micState.available
-    ? "Clique para ativar o microfone só nesta frase, processada localmente."
-    : "Pacote pt-BR local não instalado ou não suportado. Microfone desligado.";
 }
+$("retryLocalSpeech").addEventListener("click", () => { void checkLocalMic(); });
+$("installLocalSpeech").addEventListener("click", async () => {
+  if (micState.installing || micState.checking ||
+      micState.availability !== "downloadable" || !nativeSpeech ||
+      typeof nativeSpeech.install !== "function") return;
+  // Explicit user consent before the browser downloads a local speech pack.
+  if (!window.confirm("Instalar o pacote pt-BR de reconhecimento de fala no dispositivo? O navegador poderá baixar arquivos da internet UMA VEZ para instalar o pacote; o reconhecimento permanecerá local.")) return;
+  micState.installing = true;
+  localMicFeedback("Solicitando instalação do pacote pt-BR ao navegador...");
+  try {
+    const installed = await nativeSpeech.install(localMicLanguage);
+    micState.installing = false;
+    if (installed) {
+      micState.availability = "unknown";
+      await checkLocalMic();
+    } else {
+      micState.availability = "downloadable";
+      localMicFeedback("O navegador não conseguiu instalar pt-BR. Verifique o suporte ao idioma e tente novamente.", {canInstall:true});
+    }
+  } catch (_) {
+    micState.installing = false;
+    micState.availability = "downloadable";
+    localMicFeedback("Instalação do pacote bloqueada ou indisponível neste navegador.", {canInstall:true});
+  }
+});
 function stopLocalMic() {
   if (micState.recognizer) {
     try { micState.recognizer.abort(); } catch (_) {}
@@ -58,15 +110,27 @@ $("localMicButton").addEventListener("click", () => {
   };
   recognition.onerror = event => {
     if (micState.recognizer === recognition) {
-      $("localMicButton").title = "Microfone: " + (event.error || "falha");
+      const reason = event.error || "desconhecido";
       stopLocalMic();
+      if (reason === "language-not-supported") {
+        micState.available = false;
+        micState.availability = "unknown";
+        localMicFeedback("Pacote pt-BR indisponível ou removido. Verifique novamente.");
+      } else if (reason === "not-allowed" || reason === "service-not-allowed") {
+        localMicFeedback("Microfone bloqueado. Permita o microfone para este endereço local nas configurações do navegador.");
+      } else {
+        localMicFeedback("Erro ao usar o microfone local: " + reason + ". Verifique novamente.");
+      }
     }
   };
   recognition.onend = () => {
     if (micState.recognizer === recognition) stopLocalMic();
   };
   try { recognition.start(); }
-  catch (_) { stopLocalMic(); }
+  catch (_) {
+    stopLocalMic();
+    localMicFeedback("O microfone não pôde iniciar. Verifique as permissões do navegador.");
+  }
 });
 void checkLocalMic();
 
