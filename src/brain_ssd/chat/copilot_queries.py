@@ -202,8 +202,6 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
     inventory = _inventory_intent(simple)
     if not system and not screen and inventory is None:
         return _launch_reply(simple, copilot)
-    if not system and not screen and inventory is None:
-        return None
     if copilot is None or not copilot.status()["enabled"]:
         return _result(
             "O copiloto local não está habilitado nesta sessão. Reinicie com "
