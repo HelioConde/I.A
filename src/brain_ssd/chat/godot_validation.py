@@ -7,6 +7,7 @@ requires an individual single-use confirmation, and never runs arbitrary shell.
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import secrets
 import stat
@@ -70,6 +71,15 @@ class GodotValidator:
             raise CopilotPermissionError("Um arquivo de verificação mudou de tipo.")
         return info.st_size, info.st_mtime_ns, getattr(info, "st_ino", 0)
 
+    @staticmethod
+    def _source_hash(path: Path) -> str:
+        # Detect edits even if a process restores the original size/mtime.
+        with path.open("rb") as stream:
+            body = stream.read(1024 * 1024 + 1)
+        if len(body) > 1024 * 1024:
+            raise CopilotPermissionError("Script/manifesto grande demais para validar.")
+        return hashlib.sha256(body).hexdigest()
+
     def propose(self, project: object, script: object) -> dict[str, Any]:
         root, path, resource = self._target(project, script)
         token = secrets.token_urlsafe(32)
@@ -78,7 +88,9 @@ class GodotValidator:
             "script": resource,
             "path": str(path),
             "script_signature": self._signature(path),
+            "script_hash": self._source_hash(path),
             "manifest_signature": self._signature(root / "project.godot"),
+            "manifest_hash": self._source_hash(root / "project.godot"),
             "binary_signature": self._signature(self.binary),
             "expires": time.monotonic() + EXPIRES_SECONDS,
         }
@@ -113,7 +125,9 @@ class GodotValidator:
         if (str(root) != offer["root"] or str(path) != offer["path"]
                 or resource != offer["script"]
                 or self._signature(path) != offer["script_signature"]
+                or self._source_hash(path) != offer["script_hash"]
                 or self._signature(root / "project.godot") != offer["manifest_signature"]
+                or self._source_hash(root / "project.godot") != offer["manifest_hash"]
                 or self._signature(self.binary) != offer["binary_signature"]):
             raise CopilotPermissionError(
                 "Arquivo, projeto ou Godot mudou após a autorização. Prepare outro teste."
