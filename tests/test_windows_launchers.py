@@ -81,40 +81,16 @@ class TestBatchLaunchers(unittest.TestCase):
                 self.assertLess(text.index('"tools\\doctor_chat.py" --profile economia --probe'),
                                 text.index('"tools\\run_chat.py" --profile economia'))
 
-    def test_copilot_launcher_preserves_root_drive_path_argv(self):
-        """Validate actual Windows command-line parsing, including trailing backslash."""
+    def test_copilot_launcher_uses_persistent_ini_without_shell_prompts(self):
         launcher=(ROOT/"INICIAR-COPILOTO-WINDOWS.bat").read_text(encoding="utf-8")
-        start=launcher.index('set "COPILOT_ROOT_ARG=%COPILOT_ROOT%"')
-        end=launcher.index(":ask_screen",start)
-        normalization=launcher[start:end]
-        # This is a single literal backslash, not two.
-        self.assertIn('if "%COPILOT_ROOT:~-1%"=="\\"',normalization)
-        self.assertIn('--copilot-root "%COPILOT_ROOT_ARG%" %COPILOT_SCREEN%',launcher)
-        if os.name != "nt":
-            return
-        with tempfile.TemporaryDirectory() as tmp:
-            batch=Path(tmp)/"probe.cmd"
-            batch.write_text(
-                '@echo off\nsetlocal EnableExtensions\n'
-                'set "COPILOT_ROOT=%TEST_COPILOT_ROOT%"\n'
-                + normalization
-                + '\n"%TEST_PYTHON%" -c "import sys,json;print(json.dumps(sys.argv[1:]))" '
-                  '"%COPILOT_ROOT_ARG%" --copilot-screen\n',
-                encoding="utf-8",
-            )
-            cases=[
-                ("C:\\", "C:\\."),
-                ("C:\\Pasta com espacos\\", "C:\\Pasta com espacos\\."),
-                ("C:\\Pasta com espacos", "C:\\Pasta com espacos"),
-            ]
-            for root, expected in cases:
-                with self.subTest(root=root):
-                    env=dict(os.environ,TEST_COPILOT_ROOT=root,TEST_PYTHON=sys.executable)
-                    run=subprocess.run(["cmd.exe","/d","/c",str(batch)],env=env,
-                                       capture_output=True,text=True,timeout=15)
-                    self.assertEqual(run.returncode,0,msg=run.stderr+run.stdout)
-                    args=json.loads(run.stdout.strip().splitlines()[-1])
-                    self.assertEqual(args,[expected,"--copilot-screen"])
+        self.assertIn('cd /d "%~dp0"',launcher)
+        self.assertIn('tools\\launch_luna.py',launcher)
+        self.assertIn('--run',launcher)
+        self.assertNotIn('choice /c SN',launcher)
+        self.assertNotIn('set /p',launcher)
+        self.assertNotIn('--copilot-root "%COPILOT_ROOT_ARG%"',launcher)
+        self.assertTrue((ROOT/"LUNA.exemplo.ini").is_file())
+        self.assertTrue((ROOT/"tools"/"launch_luna.py").is_file())
 
 if __name__=="__main__":
     unittest.main()
