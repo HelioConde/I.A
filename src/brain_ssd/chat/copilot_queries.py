@@ -144,6 +144,8 @@ def _launch_intent(question: str) -> tuple[str | None, bool, bool]:
     text = _plain(question).strip()
     query_only = bool(re.search(r"\b(?:consegue|pode|poderia|sabe)\b", text))
     if query_only:
+        if re.search(r"\b(?:imagem|imagen|foto|arquivo|documento|pasta|link|site)\b", text):
+            return None, False, False
         return None, True, False
     match = re.fullmatch(
         r"(?:(?:luna|por favor)[,\s]+)?"
