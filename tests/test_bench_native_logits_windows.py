@@ -15,6 +15,7 @@ def fake(mode="mmap", *, tokens=None, first=2.5, checksum="deadbeef") -> dict:
     return {
         "type": "native_llama_logits_probe", "status": "measured",
         "load_mode": mode, "context": 512, "threads": 4,
+        "lazy_mode": "off",
         "predict_limit": 16, "sampling": "greedy", "vocab_count": 300,
         "prompt_top8_logits": [
             {"token": 3, "value": first}, {"token": 12, "value": 1.0}
@@ -53,6 +54,10 @@ class NativeLogitsBenchTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             compare(fake(), altered)
         altered = fake()
+        altered["lazy_mode"] = "on"
+        with self.assertRaises(ValueError):
+            compare(fake(), altered)
+        altered = fake()
         altered["status"] = "not_implemented"
         with self.assertRaises(ValueError):
             compare(fake(), altered)
@@ -67,10 +72,16 @@ class NativeLogitsBenchTests(unittest.TestCase):
                             threads=4, predict=16)
         self.assertIn("Qwen3-0.6B-Q8_0.gguf", cmd)
         self.assertIn("mmap", cmd)
+        self.assertIn("--lazy-mode", cmd)
+        self.assertIn("off", cmd)
         self.assertEqual(cmd[0], "probe.exe")
         with self.assertRaises(ValueError):
             probe_command(Path("probe.exe"), Path("weights.gguf"),
                           mode="mlock", prompt="teste", context=512, threads=4, predict=16)
+        with self.assertRaises(ValueError):
+            probe_command(Path("probe.exe"), Path("weights.gguf"),
+                          mode="mmap", prompt="teste", context=512, threads=4, predict=16,
+                          lazy_mode="unsupported")
 
     def test_isolated_build_does_not_touch_existing_runtime(self):
         with tempfile.TemporaryDirectory() as temp:

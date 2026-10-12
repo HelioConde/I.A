@@ -46,11 +46,12 @@ def binary_path(output: Path) -> Path:
 
 
 def probe_command(binary: Path, model: Path, *, mode: str, prompt: str,
-                  context: int, threads: int, predict: int) -> list[str]:
-    if mode not in MODES or not 32 <= context <= 8192 or not 1 <= threads <= 32 \
+                  context: int, threads: int, predict: int, lazy_mode: str = "off") -> list[str]:
+    if mode not in MODES or lazy_mode not in ("off", "auto", "on") or not 32 <= context <= 8192 or not 1 <= threads <= 32 \
             or not 1 <= predict <= 128 or not 0 < len(prompt.encode("utf-8")) <= 2048:
         raise ValueError("Invalid isolated probe parameters.")
     return [str(binary), "--model", str(model), "--load-mode", mode,
+            "--lazy-mode", lazy_mode,
             "--prompt", prompt, "--context", str(context),
             "--threads", str(threads), "--predict", str(predict)]
 
@@ -61,7 +62,7 @@ def compare(first: dict, second: dict, *, atol: float = 1e-5) -> dict[str, Any]:
             or first.get("type") != "native_llama_logits_probe"
             or second.get("type") != "native_llama_logits_probe"):
         raise ValueError("Only real native probe measurements can be compared.")
-    settings = ("context", "threads", "predict_limit", "sampling", "vocab_count")
+    settings = ("context", "threads", "predict_limit", "sampling", "vocab_count", "lazy_mode")
     if any(first.get(k) != second.get(k) for k in settings):
         raise ValueError("Probe settings differ; comparisons prohibited.")
     a, b = first.get("prompt_top8_logits"), second.get("prompt_top8_logits")
@@ -96,9 +97,9 @@ def compare(first: dict, second: dict, *, atol: float = 1e-5) -> dict[str, Any]:
 
 
 def run_one(binary: Path, model: Path, *, mode: str,
-            prompt: str, context: int, threads: int, predict: int) -> dict:
+            prompt: str, context: int, threads: int, predict: int, lazy_mode: str) -> dict:
     cmd = probe_command(binary, model, mode=mode, prompt=prompt,
-                        context=context, threads=threads, predict=predict)
+                        context=context, threads=threads, predict=predict, lazy_mode=lazy_mode)
     started = time.monotonic()
     with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                           text=True, encoding="utf-8", errors="replace") as process:
@@ -150,6 +151,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--context", type=int, default=512)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--predict", type=int, default=16)
+    parser.add_argument("--lazy-mode", choices=("off", "auto", "on"), default="off",
+                        help="Upstream tensor lazy mode; this is not a Brain-SSD loader.")
     parser.add_argument("--output", type=Path,
                         default=ROOT / "results" / "weight_lab" / "native-logits-comparison.json")
     args = parser.parse_args(argv)
@@ -180,7 +183,8 @@ def main(argv: list[str] | None = None) -> int:
         runs = {
             mode: run_one(binary, model, mode=mode,
                           prompt=args.prompt, context=args.context,
-                          threads=args.threads, predict=args.predict)
+                          threads=args.threads, predict=args.predict,
+                          lazy_mode=args.lazy_mode)
             for mode in modes
         }
         comparison = (
@@ -193,6 +197,7 @@ def main(argv: list[str] | None = None) -> int:
             "binary_sha256": binary_sha, "conditions": {
                 "context": args.context, "threads": args.threads,
                 "predict": args.predict, "sampling": "greedy",
+                "lazy_mode": args.lazy_mode,
                 "cache_state": "unknown (OS page cache not reset)",
             },
             "runs": runs, "comparison": comparison,

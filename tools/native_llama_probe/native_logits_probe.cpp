@@ -32,7 +32,17 @@ struct Config {
     int threads = 4;
     int predict = 16;
     llama_load_mode load_mode = LLAMA_LOAD_MODE_MMAP;
+    llama_lazy_mode lazy_mode = LLAMA_LAZY_MODE_OFF;
 };
+
+static const char * lazy_mode_name(llama_lazy_mode mode) {
+    switch (mode) {
+        case LLAMA_LAZY_MODE_OFF:  return "off";
+        case LLAMA_LAZY_MODE_AUTO: return "auto";
+        case LLAMA_LAZY_MODE_ON:   return "on";
+    }
+    return "unknown";
+}
 
 static int bounded_int(const std::string & text, int lo, int hi) {
     if (text.empty() || text.find_first_not_of("0123456789") != std::string::npos) {
@@ -62,6 +72,11 @@ static Config parse(int argc, char ** argv) {
             if (value == "mmap") opt.load_mode = LLAMA_LOAD_MODE_MMAP;
             else if (value == "none") opt.load_mode = LLAMA_LOAD_MODE_NONE;
             else throw std::invalid_argument("load-mode must be mmap or none");
+        } else if (flag == "--lazy-mode") {
+            if (value == "off") opt.lazy_mode = LLAMA_LAZY_MODE_OFF;
+            else if (value == "auto") opt.lazy_mode = LLAMA_LAZY_MODE_AUTO;
+            else if (value == "on") opt.lazy_mode = LLAMA_LAZY_MODE_ON;
+            else throw std::invalid_argument("lazy-mode must be off, auto or on");
         } else throw std::invalid_argument("Unknown argument: " + flag);
     }
     if (opt.model.empty() || opt.prompt.empty() || opt.prompt.size() > 2048) {
@@ -106,6 +121,7 @@ static void report(const Config & opt, const std::vector<llama_token> & tokens,
     out << "{\"schema\":1,\"type\":\"native_llama_logits_probe\","
         << "\"status\":\"measured\","
         << "\"load_mode\":\"" << (opt.load_mode == LLAMA_LOAD_MODE_MMAP ? "mmap" : "none") << "\","
+        << "\"lazy_mode\":\"" << lazy_mode_name(opt.lazy_mode) << "\","
         << "\"context\":" << opt.context << ","
         << "\"threads\":" << opt.threads << ","
         << "\"predict_limit\":" << opt.predict << ","
@@ -141,6 +157,7 @@ int main(int argc, char ** argv) {
         llama_model_params model_params = llama_model_default_params();
         model_params.n_gpu_layers = 0;
         model_params.load_mode = options.load_mode;
+        model_params.lazy_mode = options.lazy_mode;
         llama_model * model = llama_model_load_from_file(options.model.c_str(), model_params);
         if (!model) throw std::runtime_error("Model failed to load");
         const auto loaded = Clock::now();

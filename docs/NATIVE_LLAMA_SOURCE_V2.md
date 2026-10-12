@@ -150,3 +150,38 @@ os top-8 e tokens baterem, a diferença deve ser investigada antes de declarar
 identidade matemática exata. Todas essas medições continuam sendo do
 **llama.cpp original**: ainda não existe carregador Brain-SSD de pesos em
 inferência, nem ganho adicional de RAM comprovado.
+
+## Execução medida em 12 de outubro de 2026
+
+O probe foi compilado com a revisão fixada e executado com o mesmo
+`Qwen3-0.6B-Q8_0.gguf` (SHA-256
+`9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031`),
+contexto 512, quatro threads e 16 tokens gananciosos. O artefato JSON local
+fica em `results/weight_lab/` e não é versionado porque contém medições da
+máquina.
+
+| Modo upstream | Pico de working set | Pico privado/commit | Primeiro token API | Integridade |
+| --- | ---: | ---: | ---: | --- |
+| `mmap` | 759.94 MB | 184.59 MB | 696.36 ms | 16 IDs, top-8 e hash FNV64 dos logits idênticos |
+| `none` | 759.90 MB | 818.10 MB | 870.63 ms | referência |
+
+Esta é inferência neural real pela API C, não uma simulação. Ainda assim,
+`mmap` é funcionalidade upstream: reduz commit privado ao referenciar os pesos
+no arquivo, mas não reduz o working set enquanto o Qwen denso acessa todos os
+pesos a cada token. Não compare diretamente esses 759.94 MB com o baseline
+histórico de 955 MB sem igualar versão, contexto e parâmetros.
+
+O probe também aceita `--lazy-mode off|auto|on`, que é passado diretamente à
+API upstream. A fonte fixada só marca `per_layer_token_embd` de Gemma4 e PLE
+de Qwen4 experimental como `TENSOR_READ_LAZY`; os tensores densos do Qwen3
+0.6B não são marcados. Portanto `--lazy-mode on` no Qwen3 é um controle
+negativo: não é um cache de pesos Brain-SSD e não pode liberar as matrizes
+obrigatórias. Ele é medido separadamente antes de qualquer afirmação.
+
+Na mesma máquina, com `mmap`, contexto 512, quatro threads e 16 tokens,
+`lazy-mode off` e `on` geraram os mesmos IDs e o mesmo hash FNV64
+`2a893aa7b7834147`. Os picos de working set foram, respectivamente,
+759,98 MB e 759,97 MB; o commit privado ficou em 184,61 MB e 184,62 MB.
+Essa diferença está dentro da variação de amostragem e **não é economia de
+memória**. O resultado confirma que habilitar a opção upstream não introduz
+streaming dos pesos densos do Qwen3.
