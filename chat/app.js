@@ -982,6 +982,8 @@ async function copilotStatus() {
     $("copilotInstalled").disabled = !state.apps_enabled;
     $("copilotProcesses").disabled = !state.apps_enabled;
     $("copilotReviewCode").disabled = !state.files_enabled;
+    $("copilotScanProject").disabled = !state.files_enabled;
+    $("copilotDiagnoseGodot").disabled = !state.files_enabled;
     $("copilotExplainCode").disabled = !state.files_enabled;
     $("copilotProposeEdit").disabled = !state.edit_enabled;
   } catch (_) {
@@ -1006,6 +1008,8 @@ async function copilotCall(action) {
   const result = $("copilotResult");
   const data = {action};
   if (["list","read","image","review_code"].includes(action)) data.path = $("copilotPath").value.trim();
+  if (["project_scan","godot_error"].includes(action)) data.path = $("copilotProjectPath").value.trim();
+  if (action === "godot_error") data.error = $("copilotGodotError").value.trim();
   if (action === "screen" || action === "screen_ocr") data.monitor = Number($("copilotMonitor").value);
   if (["apps", "processes"].includes(action)) data.search = $("copilotAppSearch").value.trim() || null;
   feedback.textContent = "Consultando recurso local...";
@@ -1017,7 +1021,30 @@ async function copilotCall(action) {
     });
     result.replaceChildren();
     copilotState.text = "";
-    if (action === "screen_ocr") {
+    if (action === "project_scan" || action === "godot_error") {
+      let summary = "";
+      if (action === "project_scan") {
+        summary = "Projeto: " + response.project_root + "\n" +
+          "Scripts: " + response.script_count + " · Cenas: " + response.scene_count +
+          " · Recursos: " + response.resources_count + "\n" +
+          (response.files || []).map(item => "• " + item).join("\n") +
+          "\n" + (response.truncated ? "Busca parcial: limite atingido.\n" : "") +
+          (response.recommendations || []).join("\n");
+      } else {
+        summary = "Diagnóstico do projeto: " + response.project_root + "\n" +
+          (response.matches || []).map(match =>
+            "Arquivo: " + match.file + (match.reported_line ? ":" + match.reported_line : "") +
+            "\n" + (match.snippet || []).map(line =>
+              "  " + line.line + ": " + line.text).join("\n")).join("\n") +
+          "\n" + (response.recommendations || []).join("\n");
+      }
+      const pre = document.createElement("pre");
+      pre.textContent = summary.slice(0, 20000);
+      result.append(pre);
+      copilotState.text = summary.slice(0, 1500);
+      $("copilotUseChat").hidden = !copilotState.text;
+      feedback.textContent = "Análise local concluída sem executar Godot. Confira as evidências.";
+    } else if (action === "screen_ocr") {
       const pre = document.createElement("pre");
       pre.textContent = response.text || "Nenhum texto legível foi identificado.";
       result.append(pre);
@@ -1093,6 +1120,8 @@ $("copilotRead").addEventListener("click", () => copilotCall("read"));
 $("copilotImage").addEventListener("click", () => copilotCall("image"));
 $("copilotSystem").addEventListener("click", () => copilotCall("system"));
 $("copilotReviewCode").addEventListener("click", () => copilotCall("review_code"));
+$("copilotScanProject").addEventListener("click", () => copilotCall("project_scan"));
+$("copilotDiagnoseGodot").addEventListener("click", () => copilotCall("godot_error"));
 $("copilotExplainCode").addEventListener("click", async () => {
   if (copilotState.busy || app.sending) return;
   const path = $("copilotPath").value.trim();
