@@ -128,6 +128,8 @@
       info.files_enabled ? "Autorizados" : "Desativados";
     element("lunaRailScreen").textContent =
       info.screen_enabled ? "Sob demanda" : "Desativada";
+    element("lunaRailLaunch").textContent = info.launch_without_confirmation
+      ? "Direto (INI)" : info.launch_enabled ? "Com clique" : "Desativado";
     if (info.error) {
       element("lunaRailFiles").textContent = "Indisponível";
       element("lunaRailScreen").textContent = "Indisponível";
