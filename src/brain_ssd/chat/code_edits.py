@@ -27,6 +27,7 @@ MAX_EDIT_BYTES = 80 * 1024
 MAX_REPLACE_BYTES = 8000
 MAX_DIFF_BYTES = 18_000
 MAX_PENDING_AGE = 90
+MAX_UNDO_SESSION_AGE = 30 * 60
 
 
 def _digest(data: bytes) -> str:
@@ -44,6 +45,8 @@ class CodeEditor:
         self.copilot = copilot
         self._lock = threading.Lock()
         self._offers: dict[str, dict[str, Any]] = {}
+        self._applied: dict[str, dict[str, Any]] = {}
+        self._undo_offers: dict[str, dict[str, Any]] = {}
 
     def _allowed(self, user_path: str) -> Path:
         if not self.copilot.edit_enabled:
@@ -180,6 +183,130 @@ class CodeEditor:
                         os.unlink(temp_path)
             except OSError:
                 raise CopilotPermissionError("Falha ao gravar backup ou atualizar arquivo.") from None
+        edit_id = secrets.token_urlsafe(24)
+        with self._lock:
+            # Only the most recent edit in the current server session is undoable.
+            self._applied.clear()
+            self._undo_offers.clear()
+            self._applied[edit_id] = {
+                "path": str(path), "backup": str(backup),
+                "before_sha": offer["expected_sha"],
+                "after_sha": _digest(offer["new_bytes"]),
+                "expires": time.monotonic() + MAX_UNDO_SESSION_AGE,
+            }
         return {"status": "applied", "path": str(path),
                 "backup_path": str(backup), "new_sha256": _digest(offer["new_bytes"]),
-                "notice": "Edição aplicada após confirmação. Backup privado criado."}
+                "edit_id": edit_id, "undo_window_seconds": MAX_UNDO_SESSION_AGE,
+                "notice": "Edição aplicada após confirmação. Backup criado; desfazer disponível nesta sessão por 30 minutos."}
+
+
+    def _current_edit(self, edit_id: object) -> dict[str, Any]:
+        if not self.copilot.edit_enabled:
+            raise CopilotPermissionError("Edição de código não autorizada nesta sessão.")
+        if not isinstance(edit_id, str) or len(edit_id) > 200:
+            raise CopilotPermissionError("Identificador de edição inválido.")
+        with self._lock:
+            item = self._applied.get(edit_id)
+        if item is None or time.monotonic() > item["expires"]:
+            raise CopilotPermissionError(
+                "Edição fora da janela de desfazer ou de outra sessão.")
+        return item
+
+    def verify(self, edit_id: object) -> dict[str, Any]:
+        """Compare current on-disk bytes to the actual applied snapshot."""
+        item = self._current_edit(edit_id)
+        path = self._allowed(item["path"])
+        current = _digest(self._read(path))
+        status = ("matches_applied_edit" if current == item["after_sha"]
+                  else "already_restored" if current == item["before_sha"]
+                  else "changed_since_apply")
+        return {
+            "status": status,
+            "path": str(path),
+            "current_sha256": current,
+            "expected_sha256": item["after_sha"],
+            "safe_to_prepare_undo": status == "matches_applied_edit",
+            "notice": "Verifica apenas o conteúdo em disco; não prova que o código funciona ou que testes passaram.",
+        }
+
+    def propose_undo(self, edit_id: object) -> dict[str, Any]:
+        """Show full reverse diff without touching the file."""
+        item = self._current_edit(edit_id)
+        path = self._allowed(item["path"])
+        current = self._read(path)
+        if _digest(current) != item["after_sha"]:
+            raise CopilotPermissionError(
+                "Arquivo mudou desde a aplicação. Não sobrescrever trabalho recente.")
+        backup = Path(item["backup"])
+        try:
+            original = backup.read_bytes()
+        except OSError:
+            raise CopilotPermissionError("Backup da edição indisponível.") from None
+        if (_digest(original) != item["before_sha"] or len(original) > MAX_EDIT_BYTES):
+            raise CopilotPermissionError("Backup não corresponde ao arquivo original.")
+        diff = "".join(difflib.unified_diff(
+            current.decode("utf-8-sig").splitlines(keepends=True),
+            original.decode("utf-8-sig").splitlines(keepends=True),
+            fromfile="atual/" + path.name,
+            tofile="restaurado/" + path.name,
+        ))
+        if not diff or len(diff.encode("utf-8")) > MAX_DIFF_BYTES:
+            raise CopilotPermissionError("Diferença de reversão inválida ou grande demais.")
+        token = secrets.token_urlsafe(32)
+        with self._lock:
+            self._undo_offers.clear()
+            self._undo_offers[token] = {
+                "edit_id": edit_id,
+                "expires": time.monotonic() + MAX_PENDING_AGE,
+            }
+        return {
+            "token": token, "path": str(path), "diff": diff,
+            "expires_seconds": MAX_PENDING_AGE,
+            "notice": "Somente prévia. Nenhum arquivo foi restaurado.",
+        }
+
+    def confirm_undo(self, token: object) -> dict[str, Any]:
+        """One-shot rollback after a second, explicit user confirmation."""
+        if not isinstance(token, str) or len(token) > 200:
+            raise CopilotPermissionError("Confirmação de reversão inválida.")
+        with self._lock:
+            request = self._undo_offers.pop(token, None)
+        if request is None or time.monotonic() > request["expires"]:
+            raise CopilotPermissionError("Pedido de reversão expirado ou já utilizado.")
+        item = self._current_edit(request["edit_id"])
+        with self._lock:
+            path = self._allowed(item["path"])
+            current = self._read(path)
+            if _digest(current) != item["after_sha"]:
+                raise CopilotPermissionError(
+                    "Arquivo alterado desde a edição; reversão cancelada.")
+            try:
+                original = Path(item["backup"]).read_bytes()
+            except OSError:
+                raise CopilotPermissionError("Backup não encontrado.") from None
+            if _digest(original) != item["before_sha"] or len(original) > MAX_EDIT_BYTES:
+                raise CopilotPermissionError("Backup modificado; reversão cancelada.")
+            try:
+                fd, temporary = tempfile.mkstemp(
+                    prefix=".brainssd-undo-", suffix=path.suffix, dir=path.parent)
+                try:
+                    with os.fdopen(fd, "wb") as stream:
+                        stream.write(original)
+                        stream.flush()
+                        os.fsync(stream.fileno())
+                    os.chmod(temporary, stat.S_IMODE(path.stat().st_mode))
+                    if _digest(self._read(path)) != item["after_sha"]:
+                        raise CopilotPermissionError("Arquivo mudou antes da reversão.")
+                    os.replace(temporary, path)
+                finally:
+                    if os.path.exists(temporary):
+                        os.unlink(temporary)
+            except OSError:
+                raise CopilotPermissionError("Não foi possível restaurar o arquivo.") from None
+            self._applied.pop(request["edit_id"], None)
+            self._undo_offers.clear()
+        return {
+            "status": "reverted", "path": str(path),
+            "restored_sha256": _digest(original),
+            "notice": "Conteúdo original restaurado a partir do backup após confirmação.",
+        }
