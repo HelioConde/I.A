@@ -164,5 +164,18 @@
     recalculate();
   });
 
+  window.addEventListener("luna:call-state", event => {
+    const call = event.detail?.state;
+    const translated = {initializing:"starting",listening:"listening",speech:"listening",
+      transcribing:"thinking",thinking:"thinking",responding:"streaming",interrupted:"ready",
+      muted:"ready",error:"error",ended:"ready"}[call];
+    if (translated) {
+      hud.listening = translated === "listening";
+      hud.sending = translated === "thinking" || translated === "streaming";
+      hud.streaming = translated === "streaming";
+      state(translated);
+    }
+  });
+
   recalculate();
 })();

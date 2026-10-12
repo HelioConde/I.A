@@ -117,7 +117,7 @@ class TestStaticUI(unittest.TestCase):
                          "lunaRailModel", "lunaQuickCopilot", "lunaQuickMetrics",
                          "lunaActivityLog"}.issubset(dom_ids))
         self.assertFalse(set(re.findall(r'element\("([A-Za-z][A-Za-z0-9_-]*)"\)', hud_js)) - dom_ids)
-        for route in ('"/luna-hud.js"', '"/luna-hud.css"'):
+        for route in ('"/luna-hud.js"', '"/luna-hud.css"', '"/luna-call.js"'):
             self.assertIn(route, server)
         for event in ("luna:connection", "luna:permission", "luna:chat", "luna:microphone"):
             self.assertIn(event, self.js)
@@ -142,20 +142,33 @@ class TestStaticUI(unittest.TestCase):
         self.assertIn('addEventListener("click", async () => {', self.js)
         self.assertNotIn('recognition.processLocally = false', self.js)
         # Installation needs an explicit click; no automatic download on page load.
-        boot = self.js.split('void checkLocalMic();', 1)[0]
-        self.assertEqual(boot.count('nativeSpeech.install(localMicLanguage)'), 1)
+        # The retry button also invokes checkLocalMic(). Inspect the complete
+        # install call site instead of splitting at that earlier retry handler.
+        self.assertEqual(self.js.count('nativeSpeech.install(localMicLanguage)'), 1)
         self.assertIn('aria-live="polite"', self.html)
         hud_style = (ROOT / "chat" / "luna-hud.css").read_text(encoding="utf-8")
         self.assertIn('.luna-mic-setup[hidden]', hud_style)
 
     def test_static_assets_are_local_and_no_inline_handlers(self):
-        self.assertEqual(self.inventory.scripts,["/app.js", "/luna-hud.js"])
+        self.assertEqual(self.inventory.scripts,["/app.js", "/luna-hud.js", "/luna-call.js"])
         self.assertEqual(self.inventory.styles,["/styles.css", "/luna-hud.css"])
         self.assertFalse(self.inventory.inline_handlers)
         self.assertFalse(re.search(r'<script[^>]+src="https?://',self.html))
         self.assertTrue(CSS.is_file())
         self.assertTrue((ROOT / "chat" / "luna-hud.js").is_file())
         self.assertTrue((ROOT / "chat" / "luna-hud.css").is_file())
+
+    def test_voice_call_is_explicit_local_and_has_manual_interrupt(self):
+        call_js = (ROOT / "chat" / "luna-call.js").read_text(encoding="utf-8")
+        self.assertIn('id="openVoiceCall"', self.html)
+        self.assertIn('id="endVoiceCall"', self.html)
+        self.assertIn('processLocally = true', call_js)
+        self.assertIn('recognition.continuous = true', call_js)
+        self.assertIn('window.stopVoiceCallGeneration', call_js)
+        self.assertIn('window.speechSynthesis.cancel()', call_js)
+        self.assertIn('Turnos alternados', self.html)
+        self.assertNotIn('getUserMedia', call_js)
+        self.assertNotIn('fetch(', call_js)
 
 
 if __name__=="__main__":

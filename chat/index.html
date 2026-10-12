@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/luna-hud.css">
   <script src="/app.js" defer></script>
   <script src="/luna-hud.js" defer></script>
+  <script src="/luna-call.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#chat">Ir para a conversa</a>
@@ -50,6 +51,7 @@
         </div>
         <div class="top-right">
           <span class="privacy-pill"><span class="tiny-lock">◆</span> IA local</span>
+          <button type="button" id="openVoiceCall" class="voice-call-open">Conversar por voz</button>
           <button type="button" id="lunaRailToggle" class="luna-rail-toggle" aria-expanded="true" aria-controls="lunaRail">Painel ◫</button>
           <button class="icon-btn copilot-open" id="openCopilot" type="button" aria-label="Abrir copiloto local" aria-expanded="false" title="Arquivos, computador e tela">▣</button>
           <button class="icon-btn info-btn" id="showDetails" type="button" aria-label="Mostrar detalhes técnicos" aria-expanded="false">ⓘ</button>
@@ -162,6 +164,23 @@
         <div class="luna-rail-end">LUNA / BRAIN-SSD <span>LOCAL INTERFACE v1</span></div>
       </aside>
       </div><!-- luna-layout -->
+
+      <section id="voiceCallPanel" class="voice-call-panel" aria-labelledby="voiceCallTitle" hidden>
+        <div class="voice-call-head"><div><span class="luna-kicker">MODO LIGAÇÃO · LOCAL</span><h2 id="voiceCallTitle">Conversar com a Luna</h2></div><button type="button" id="closeVoiceCall" class="icon-btn" aria-label="Fechar painel de ligação">×</button></div>
+        <div class="voice-call-core" id="voiceCallCore" data-call-state="idle" aria-hidden="true"><span>◈</span></div>
+        <p id="voiceCallState" class="voice-call-state" role="status" aria-live="polite">Pronta para iniciar.</p>
+        <p id="voiceCallDetail" class="voice-call-detail">O reconhecimento e a voz usam apenas recursos locais declarados pelo navegador. Nenhum áudio é salvo.</p>
+        <div class="voice-call-meter" aria-label="Atividade de voz"><span id="voiceCallMeter"></span></div>
+        <div class="voice-call-transcript"><strong>Você</strong><p id="voiceCallTranscript">Aguardando ligação.</p></div>
+        <div class="voice-call-transcript luna"><strong>Luna</strong><p id="voiceCallAnswer">A resposta falada aparecerá aqui.</p></div>
+        <div class="voice-call-actions">
+          <button type="button" id="startVoiceCall" class="voice-call-primary">Iniciar conversa por voz</button>
+          <button type="button" id="muteVoiceCall" disabled>Silenciar microfone</button>
+          <button type="button" id="interruptVoiceCall" disabled>Interromper resposta</button>
+          <button type="button" id="endVoiceCall" class="voice-call-end" disabled>Encerrar ligação</button>
+        </div>
+        <p class="voice-call-note">Turnos alternados: o microfone pausa enquanto a Luna fala para evitar eco. A interrupção é manual nesta versão.</p>
+      </section>
     </main>
   </div>
 

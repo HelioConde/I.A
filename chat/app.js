@@ -4,6 +4,9 @@ const app = { ready:false, sending:false, messages:[], conversationId:null, conv
 const composer = $("messageInput");
 const nativeSpeech = window.SpeechRecognition || window.webkitSpeechRecognition;
 const micState = {recognizer:null, active:false, available:false, checking:false, installing:false, availability:"unknown"};
+// Read-only bridge for the separate call panel; it cannot start the microphone.
+window.micStateForCall = micState;
+window.lunaAppState = app;
 const localMicLanguage = {langs:["pt-BR"], processLocally:true};
 
 function localMicFeedback(message, {canInstall=false, ready=false} = {}) {
@@ -552,7 +555,7 @@ function updateMetrics(data) {
   $("detailWorking").textContent = shadow ? shadow.working_memory_bytes + " B · " + shadow.working_topics.length + " tópicos" : "desativado";
 }
 async function send() {
-  if (micState.active) stopLocalMic();
+  if (micState.active && !window.lunaVoiceCallActive) stopLocalMic();
   const question = composer.value.trim();
   if (!app.ready || app.sending || !question) return;
   stopSpeaking();
@@ -600,6 +603,7 @@ async function send() {
   updateSend();
   let completed = false;
   let interrupted = false;
+  let completedAnswer = "";
   try {
     if (!app.conversationId) {
       const created = await requestJson("/api/conversations", {
@@ -645,6 +649,7 @@ async function send() {
         output.textContent = partial;
         scrollBottom();
       } else if (event === "done") {
+        completedAnswer = typeof payload.answer === "string" ? payload.answer : "";
         output.textContent = payload.answer;
         const speak = pending.querySelector(".voice-message");
         if (speak && voiceSupported) speak.disabled = !payload.answer?.trim();
@@ -1047,7 +1052,7 @@ async function send() {
     }
   } finally {
     window.dispatchEvent(new CustomEvent("luna:chat", {detail:{
-      kind:completed ? "done" : interrupted ? "stopped" : "failed"
+      kind:completed ? "done" : interrupted ? "stopped" : "failed", answer:completedAnswer
     }}));
     app.sending = false;
     app.requestId = null;
@@ -1057,6 +1062,7 @@ async function send() {
     scrollBottom();
     composer.focus();
   }
+  return {completed, interrupted, answer:completedAnswer};
 }
 async function stopGeneration() {
   if (!app.sending || !app.abortController) return;
@@ -1077,6 +1083,10 @@ async function stopGeneration() {
     $("stopButton").disabled = false;
   }
 }
+// The voice-call panel reuses the same SSE and cancellation paths as typed chat.
+// It never receives direct access to Copilot actions or browser permissions.
+window.sendVoiceCallMessage = send;
+window.stopVoiceCallMessage = stopGeneration;
 function resetChat() {
   stopLocalMic();
   stopSpeaking();

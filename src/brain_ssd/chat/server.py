@@ -1290,7 +1290,7 @@ class ChatHandler(BaseHTTPRequestHandler):
             except ValueError as exc:
                 self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             return
-        assets = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "application/javascript"), "/styles.css": ("styles.css", "text/css"), "/luna-hud.js": ("luna-hud.js", "application/javascript"), "/luna-hud.css": ("luna-hud.css", "text/css")}
+        assets = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "application/javascript"), "/styles.css": ("styles.css", "text/css"), "/luna-hud.js": ("luna-hud.js", "application/javascript"), "/luna-hud.css": ("luna-hud.css", "text/css"), "/luna-call.js": ("luna-call.js", "application/javascript")}
         if path not in assets:
             self._json({"error": "Não encontrado."}, HTTPStatus.NOT_FOUND)
             return
