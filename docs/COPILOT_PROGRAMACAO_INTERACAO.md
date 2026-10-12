@@ -82,3 +82,25 @@ py -3 tools\run_copilot_question_battery.py --full
 
 Testes de CI não comprovam a execução física da UI, reconhecimento de
 voz ou OCR no computador do usuário. Repita estes fluxos localmente.
+
+## Verificação e desfazer (nova etapa)
+
+Depois de clicar em **Confirmar edição no disco**, use **Verificar última
+alteração** para comprovar que o arquivo atual ainda corresponde ao SHA-256
+gravado. O resultado não garante que o código funciona.
+
+O botão **Preparar desfazer** compara o arquivo ao conteúdo aplicado,
+verifica o backup e mostra a diferença inversa. **Confirmar desfazer**
+exige nova autorização antes de restaurar o arquivo. Somente a última
+edição da sessão pode ser revertida, durante até 30 minutos, e a
+prévia expira em 90 segundos. Reversão é rejeitada se o arquivo ou
+o backup foi modificado desde a operação original.
+
+Quando o Agent Core encontra um arquivo relacionado ao erro, use
+**Selecionar arquivo encontrado no editor** para transferir seu caminho
+ao fluxo de edição, sem aplicar alterações automaticamente.
+
+Testes específicos:
+```bat
+py -3 -m unittest discover -s tests -p "test_copilot_code_edits.py" -v
+```
