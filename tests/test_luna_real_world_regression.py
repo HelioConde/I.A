@@ -168,6 +168,22 @@ class TestPastConversationRegression(unittest.TestCase):
         finally:
             engine.close()
 
+    def test_google_with_key_still_requires_per_message_consent(self):
+        class MockWeb:
+            provider = "auto"
+            _serper_key = "TEST_NOT_A_REAL_API_KEY"
+            def search(self, question):
+                raise AssertionError("No Google search without message consent")
+        engine = ChatEngine(lambda: None, web_search_service=MockWeb())
+        try:
+            response = engine.ask(
+                "utilizar as pesquisas do google sobre noticias jair bolsonaro", [],
+                web_search=False)
+            self.assertEqual(response["local_action"], "google_search_capability")
+            self.assertIn("Marque 'Pesquisar na web'", response["answer"])
+        finally:
+            engine.close()
+
     def test_google_request_without_api_key_never_claims_it_searched(self):
         class MockWeb:
             provider = "auto"
