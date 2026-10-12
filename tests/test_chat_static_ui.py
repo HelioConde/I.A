@@ -139,6 +139,11 @@ class TestStaticUI(unittest.TestCase):
         self.assertNotIn("getDisplayMedia", hud_js)
         self.assertNotIn("eval(", hud_js)
 
+    def test_local_facts_are_not_displayed_as_executed_pc_actions(self):
+        self.assertIn('payload.local_action.startsWith("local_")', self.js)
+        self.assertIn("Informação do aplicativo local, sem geração do Qwen", self.js)
+        self.assertIn('payload.local_action.startsWith("copilot_")', self.js)
+
     def test_local_microphone_setup_never_autostarts_or_falls_back_to_cloud(self):
         for identifier in ("localMicButton", "localMicSetup", "localMicStatus",
                            "installLocalSpeech", "retryLocalSpeech"):
