@@ -368,8 +368,10 @@ class LocalCopilot:
     def read_screen_text(self, monitor: int = 1, *, screenshot: dict | None = None) -> dict:
         """Optional local OCR only after a specific screen request.
 
-        OCR output is returned to the browser, never automatically passed
-        to the model, web search or SQLite conversation history.
+        OCR runs only when explicitly requested. In the Copilot panel it is
+        not sent to the model. In chat requests, transcribed text is part of
+        the displayed answer and may be retained as ordinary chat history.
+        Neither path sends the screenshot to web search.
         """
         if not self.screen_enabled:
             raise CopilotPermissionError("OCR exige autorização de captura de tela.")
