@@ -230,10 +230,15 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if not args.run:
             parser.error("Escolha --run ou --check.")
+        doctor_command = [
+            sys.executable, str(ROOT / "tools" / "doctor_chat.py"),
+            "--profile", config.profile, "--probe",
+        ]
+        # Diagnose the ACTUALLY selected GGUF, not the fallback 0.6B.
+        if config.model_file:
+            doctor_command.extend(("--model-file", config.model_file))
         preflight = subprocess.run(
-            [sys.executable, str(ROOT / "tools" / "doctor_chat.py"),
-             "--profile", config.profile, "--probe"],
-            cwd=ROOT, check=False, shell=False,
+            doctor_command, cwd=ROOT, check=False, shell=False,
         )
         if preflight.returncode:
             print("Qwen nao pronto; execute o instalador INICIAR-BRAIN-SSD.bat.", file=sys.stderr)
