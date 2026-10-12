@@ -33,6 +33,7 @@ function stopLocalMic() {
   }
   micState.recognizer = null;
   micState.active = false;
+  window.dispatchEvent(new CustomEvent("luna:microphone", {detail:{active:false}}));
   $("localMicButton").textContent = "🎤 Falar (local)";
 }
 $("localMicButton").addEventListener("click", () => {
@@ -46,6 +47,7 @@ $("localMicButton").addEventListener("click", () => {
   const original = composer.value;
   micState.recognizer = recognition;
   micState.active = true;
+  window.dispatchEvent(new CustomEvent("luna:microphone", {detail:{active:true}}));
   $("localMicButton").textContent = "■ Parar microfone";
   recognition.onresult = event => {
     if (micState.recognizer !== recognition) return;
@@ -335,7 +337,7 @@ function showWelcome() {
   const welcome = document.createElement("div");
   welcome.className = "welcome";
   welcome.id = "welcome";
-  welcome.innerHTML = '<div class="hero-symbol" aria-hidden="true">✺</div><h1>Nova conversa</h1><p>Envie uma pergunta para conversar com a IA local.</p>';
+  welcome.innerHTML = '<div class="luna-orb-scene" aria-hidden="true"><div class="luna-orb"><span>◈</span></div><small class="luna-orbit-left">CORE / LOCAL</small><small class="luna-orbit-right">BRAIN / SSD</small></div><span class="luna-kicker">NOVA SESSÃO</span><h1>Pronta para conversar.</h1><p>Sou a Luna. Faça uma pergunta ou escolha uma das ferramentas autorizadas.</p><p class="luna-welcome-state" id="lunaWelcomeState">Aguardando sua próxima mensagem.</p>';
   log.appendChild(welcome);
 }
 
@@ -356,6 +358,10 @@ async function refreshStatus() {
     if (!res.ok) throw new Error("servidor indisponível");
     const data = await res.json();
     setConnection(data.status, data.error, Boolean(data.inference_verified));
+    window.dispatchEvent(new CustomEvent("luna:connection", {detail:{
+      status:data.status, model:data.model, profile:data.profile,
+      inference_verified:Boolean(data.inference_verified)
+    }}));
     $("modeInfo").textContent = data.profile
       ? ("Perfil: " + data.profile +
         (data.core_mode === "persistent" ? " · Modelo mantido em RAM"
@@ -387,6 +393,7 @@ async function refreshStatus() {
     });
   } catch (_) {
     setConnection("error", "Servidor local desconectado. Abra o iniciador do Brain-SSD.");
+    window.dispatchEvent(new CustomEvent("luna:connection", {detail:{status:"error"}}));
   }
 }
 function updateSend() {
@@ -517,6 +524,7 @@ async function send() {
   // Consent applies only to this one search, never to the next message.
   $("webSearchToggle").checked = false;
   app.sending = true;
+  window.dispatchEvent(new CustomEvent("luna:chat", {detail:{kind:"send"}}));
   app.streamStarted = false;
   app.requestId = null;
   app.abortController = new AbortController();
@@ -568,6 +576,7 @@ async function send() {
       const payload = JSON.parse(data);
       if (event === "started") app.streamStarted = true;
       if (event === "delta") {
+        window.dispatchEvent(new CustomEvent("luna:chat", {detail:{kind:"stream"}}));
         partial += payload.text || "";
         output.textContent = partial;
         scrollBottom();
@@ -970,6 +979,9 @@ async function send() {
       addMessage("assistant", "Não consegui responder: " + error.message, "error");
     }
   } finally {
+    window.dispatchEvent(new CustomEvent("luna:chat", {detail:{
+      kind:completed ? "done" : interrupted ? "stopped" : "failed"
+    }}));
     app.sending = false;
     app.requestId = null;
     app.streamStarted = false;
@@ -1114,6 +1126,9 @@ async function copilotStatus() {
         (state.apps_enabled ? "aplicativos · " : "") +
         (state.launch_enabled ? "abertura confirmada" : "sem abertura automática")
       : "Desativado. Escolha as permissões no iniciador do Copiloto.";
+    window.dispatchEvent(new CustomEvent("luna:permission", {detail:{
+      files_enabled:Boolean(state.files_enabled), screen_enabled:Boolean(state.screen_enabled)
+    }}));
     $("copilotRoots").textContent = state.roots && state.roots.length
       ? "Pastas autorizadas: " + state.roots.join(" · ") : "Nenhuma pasta autorizada.";
     ["copilotList", "copilotRead", "copilotImage"]
@@ -1135,6 +1150,7 @@ async function copilotStatus() {
     $("copilotDraftPatch").disabled = !state.edit_enabled;
   } catch (_) {
     $("copilotStatus").textContent = "Não foi possível verificar as permissões locais.";
+    window.dispatchEvent(new CustomEvent("luna:permission", {detail:{error:true}}));
   }
 }
 function stopCopilotLive() {
