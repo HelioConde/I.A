@@ -126,7 +126,7 @@ class LunaIniTests(unittest.TestCase):
         batch = (ROOT / "INICIAR-COPILOTO-WINDOWS.bat").read_text(encoding="utf-8")
         self.assertIn("tools\\launch_luna.py", batch)
         self.assertIn("--run", batch)
-        self.assertNotIn("choice /c SN", batch.lower())
+        self.assertNotIn("choice /c sn", batch.lower())
         self.assertNotIn("set /p", batch.lower())
         ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
         self.assertIn("/LUNA.ini", ignore)
