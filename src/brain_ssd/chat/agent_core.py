@@ -62,6 +62,8 @@ class LocalAgentCore:
         error: object = None,
         path: object = None,
     ) -> dict[str, Any]:
+        if not self.copilot.status().get("enabled"):
+            raise CopilotPermissionError("Copiloto local não autorizado nesta sessão.")
         if not isinstance(task, str) or task not in _TASKS:
             raise CopilotPermissionError("Tipo de investigação não autorizado.")
         params: dict[str, str] = {}
