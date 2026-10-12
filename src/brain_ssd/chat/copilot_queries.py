@@ -200,9 +200,9 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
     Paths and image files are checked using the existing authorized-root gates.
     """
     simple = _plain(question)
-    if re.search(r"\b(?:abas?|guias?)\b", simple) and re.search(
-        r"\b(?:navegador|chrome|edge|browser|abert[ao]s?|estou|tenho|minhas|meus)\b", simple
-    ):
+    if (re.search(r"\b(?:abas?|guias?)\b", simple)
+            and re.search(r"\b(?:navegador|chrome|edge|browser)\b", simple)
+            and re.search(r"\b(?:quais|abert[ao]s?|estou|tenho|minhas|meus|liste|mostre)\b", simple)):
         return _result(
             "Ainda não consigo enumerar as abas abertas do Chrome ou Edge. "
             "A consulta de processos do Windows não identifica as URLs das abas. "
@@ -267,7 +267,17 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "específico ou listar aplicativos registrados sem essa classificação.",
             "copilot_games_registry_limited",
         )
-    if re.search(r"\b(?:voce consegue|consegue|pode|sabe)\b.*\b(?:ver|visualizar|enxergar)\b.*\b(?:monitor|tela|imagem|imagens)\b", simple):
+    if re.search(r"\b(?:o que (?:voce )?esta vendo|o que aparece|o que (?:voce )?ve)\b", simple) and re.search(
+        r"\b(?:minha tela|meu monitor|na tela|no monitor)\b", simple
+    ):
+        return _result(
+            "Ainda não capturei sua tela nesta pergunta. Posso mostrar uma captura "
+            "do monitor solicitado com sua permissão, mas este Qwen não interpreta pixels. "
+            "Diga 'Mostre o monitor 1' ou 'Mostre o monitor 2' para abrir a prévia; "
+            "para obter texto, solicite OCR local.",
+            "copilot_screen_not_observed",
+        )
+    if re.search(r"\b(?:voce consegue|consegue|pode|sabe)\b.*\b(?:ver|visualizar|enxergar)\b.*\b(?:monitor|tela|imagem|imagen|imagens)\b", simple):
         return _result(
             "Posso capturar um monitor explicitamente solicitado, quando autorizado, "
             "e exibir a captura no chat. Mas o Qwen instalado é apenas texto: "
@@ -276,7 +286,7 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "Para texto visível, peça OCR local, que pode errar.",
             "copilot_vision_limitation",
         )
-    if re.search(r"\b(?:voce consegue|consegue|pode|sabe)\b.*\b(?:visualizar|analisar|interpretar)\b.*\b(?:imagem|imagens|foto|fotos)\b", simple):
+    if re.search(r"\b(?:voce consegue|consegue|pode|sabe)\b.*\b(?:visualizar|analisar|interpretar)\b.*\b(?:imagem|imagen|imagens|foto|fotos)\b", simple):
         return _result(
             "Consigo exibir uma prévia de imagem autorizada, mas este Qwen é somente texto "
             "e não a compreende visualmente. Para texto legível de telas, posso tentar OCR "
@@ -286,7 +296,8 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
     if re.search(r"\b(?:crie|criar|cria|grave|salve|escreva|gerar|gere)\b", simple) and re.search(
         r"\b(?:arquivo|texto|txt|documento)\b", simple
     ) and (bool(re.search(r"[a-z]:[/\\\\]", simple))
-           or bool(re.search(r"\b(?:disco|pasta|diretorio|arquivo|salve|grave)\b", simple))
+           or bool(re.search(r"\b(?:arquivo|salve|grave)\b", simple))
+           or bool(re.search(r"\b(?:na|no|em|para) (?:pasta|diretorio|disco)\b", simple))
            or "crie o texto" in simple):
         return _result(
             "Posso redigir o conteúdo aqui, mas esta versão do chat não grava arquivos "
