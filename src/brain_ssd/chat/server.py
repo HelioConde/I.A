@@ -19,7 +19,7 @@ from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.local_actions import is_local_action_answer, local_command, conversation_followup
-from brain_ssd.chat.session_facts import answer_session_fact, is_first_question_intent
+from brain_ssd.chat.session_facts import answer_session_fact, is_first_question_intent, is_first_message_intent
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
@@ -1448,7 +1448,9 @@ class ChatHandler(BaseHTTPRequestHandler):
                 identifier = data.get("conversation_id")
                 if identifier is not None and self.server.history_store is not None:
                     saved_history = self.server.history_store.recent_context(identifier)
-                    first_question = (self.server.history_store.first_user_question(identifier)
+                    first_question = ((self.server.history_store.first_user_message(identifier)
+                                       if is_first_message_intent(data["message"]) else
+                                       self.server.history_store.first_user_question(identifier))
                                       if isinstance(data.get("message"), str) and
                                       is_first_question_intent(data["message"]) else None)
                     result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False), response_tokens=data.get("response_tokens"), first_question=first_question)
