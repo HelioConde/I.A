@@ -165,3 +165,50 @@
   border-radius:10px;
   margin-top:12px;
 }
+
+
+/* J.A.R.V.I.S.-inspired functionality without an always-on microphone. */
+.copilot-inventory-item {
+  margin:0;
+  padding:6px 9px;
+  background:#202e3d;
+  border-left:2px solid #5dabc4;
+  border-radius:5px;
+  overflow-wrap:anywhere;
+  font-size:12px;
+}
+.copilot-confirm-actions {
+  margin-top:12px;
+  padding:12px;
+  border:1px solid #507f91;
+  border-radius:10px;
+  background:rgba(31,66,83,.3);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:9px;
+}
+.copilot-confirm-actions button {
+  border:1px solid #62b4c8;
+  background:#234a60;
+  color:#ecfbff;
+  border-radius:8px;
+  padding:9px 12px;
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+}
+.copilot-confirm-actions button.copilot-cancel {
+  background:transparent;
+  border-color:#60717a;
+}
+.copilot-confirm-actions button:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+.copilot-confirm-actions p {
+  color:#d0e4e9;
+  width:100%;
+  margin:3px 0 0;
+  font-size:12px;
+}
