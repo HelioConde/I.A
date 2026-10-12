@@ -55,11 +55,15 @@ def time_sensitive_local_intent(question: str) -> str | None:
         r"quais? as novidades de hoje)", text
     ):
         return "ambiguous_today"
-    if (re.search(r"\b(?:clima|previsao(?: do tempo)?|tempo)\b", text)
-            and re.search(
-                r"\b(?:hoje|amanha|agora|esta semana|essa semana|vai ser|vai estar|"
-                r"previsao|esta fazendo|estara)\b", text
-            )):
+    weather_topic = bool(re.search(r"\b(?:clima|previsao(?: do tempo)?|tempo)\b", text))
+    weather_now = bool(re.search(
+        r"\b(?:hoje|amanha|agora|esta semana|essa semana|vai ser|vai estar|"
+        r"esta fazendo|estara|proximos dias)\b", text
+    ))
+    location_forecast = bool(re.search(
+        r"\bprevisao do tempo\s+(?:em|para|na|no)\s+\S+", text
+    ))
+    if weather_topic and (weather_now or location_forecast):
         return "live_weather"
     return None
 
