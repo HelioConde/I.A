@@ -900,13 +900,21 @@ async function send() {
         if (payload.local_action) {
           const actionNote = document.createElement("p");
           actionNote.className = "local-action-note";
+          const informationalAction = payload.local_action.startsWith("local_") ||
+            ["greeting", "assistant_name", "today_topic_clarification",
+             "weather_provider_unavailable", "recent_news_permission",
+             "research_permission", "research_provider_limited",
+             "google_search_capability", "research_unavailable",
+             "conversation_context"].includes(payload.local_action);
           actionNote.textContent = payload.local_action === "web_brief"
             ? "Resposta rápida baseada em trechos públicos, sem geração pelo Qwen. Desmarque 'Resposta rápida' para pedir uma síntese pela IA local."
             : payload.local_action === "learned_reply"
               ? "Resposta recuperada de um exemplo ensinado por você (SQLite local; não é treinamento do Qwen)."
               : payload.local_action.startsWith("copilot_")
                 ? "Resposta de ferramentas locais do Windows (sem análise de pixels pelo Qwen)."
-                : "Ação executada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
+                : informationalAction
+                  ? "Informação do aplicativo local, sem geração do Qwen nem execução de comandos no PC."
+                  : "Operação processada pelo aplicativo local (Python/SQLite), não pelo modelo Qwen.";
           pending.querySelector(".message-body").appendChild(actionNote);
           if (payload.local_action === "memory_save") {
             void refreshEpisodicMemory();
