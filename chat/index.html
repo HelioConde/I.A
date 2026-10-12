@@ -170,13 +170,14 @@
       <input id="copilotMonitor" type="number" min="0" max="16" value="1">
       <div class="copilot-actions">
         <button type="button" id="copilotCapture">Capturar agora</button>
+        <button type="button" id="copilotOCR">Ler texto (OCR local)</button>
         <label class="copilot-live"><input type="checkbox" id="copilotLive"> Atualizar a cada 3 s</label>
       </div>
     </section>
     <p class="copilot-feedback" id="copilotFeedback" role="status" aria-live="polite"></p>
     <div id="copilotResult" class="copilot-result" aria-label="Resultado da leitura local"></div>
     <button type="button" id="copilotUseChat" hidden>Usar texto no chat</button>
-    <p class="copilot-muted">Visualização não é interpretação: a versão atual do Qwen não enxerga imagens. Não cole senhas ou dados sensíveis no chat.</p>
+    <p class="copilot-muted">Captura é prévia; OCR local opcional reconhece texto mas não entende imagens. Nunca envie senhas ou dados sensíveis ao chat.</p>
   </aside>
   <aside class="details-panel" id="detailsPanel" aria-label="Métricas técnicas" hidden>
     <div class="details-head"><h2>Diagnóstico local</h2><button class="icon-btn" id="closeDetails" type="button" aria-label="Fechar detalhes">×</button></div>
