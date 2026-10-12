@@ -24,6 +24,7 @@ da marca e do personagem fictício.
 | Extrair texto da tela com OCR | Parcial | Tesseract e dependências locais opcionais; OCR pode errar |
 | Reconhecimento de fala por microfone | Parcial (pressionar para falar) | Só em navegadores com reconhecimento pt-BR local; sem escuta contínua |
 | Localizar erro Godot e analisar projeto | Implementado parcialmente | OCR opcional, referência res://, ainda sem validação em execução ou correção autônoma |
+| Validar sintaxe de script Godot | Implementado (opt-in + confirmação) | Executa Godot headless --check-only no projeto confiável, não equivale a testar gameplay |
 
 ### Inicialização segura
 
@@ -137,3 +138,15 @@ Documentação Windows usada para a arquitetura: registros de desinstalação
 e App Paths, APIs de processos e orientações de ShellExecute no Microsoft
 Learn. Evitar `Win32_Product`, cujo uso pode disparar verificações e
 reparações de pacotes MSI.
+
+### Estado do ciclo de programação
+
+O sistema agora permite inspecionar o projeto, localizar um erro textual,
+propor uma substituição exata com diff/backup e, separadamente, executar
+uma verificação limitada do parser Godot com consentimento por execução.
+
+**Ainda não existe agente autônomo multi-arquivo**: o Qwen pequeno não gera
+nem aplica patches de forma geral, não roda testes independentes automaticamente,
+não acompanha mudanças visuais por monitoramento contínuo e não confirma que
+um bug foi corrigido. Para essa fase serão necessários planejamento,
+verificação de artefatos, reversão, ferramentas mais robustas e validação no PC.
