@@ -75,6 +75,25 @@ ausente, o .bat oferece instalar via winget com confirmação.
 
 ---
 
+## Runtime experimental: janelas de pesos SSD → RAM
+
+Na branch experimental `feat/ssd-weight-streaming-lab` iniciamos
+um estudo **independente do runtime Qwen** para comparar leitura direta,
+LRU, prefetch por transições observadas, `mmap` e carregamento integral
+de uma janela limitada.
+
+No Windows, execute `TESTAR-PESOS-SSD-WINDOWS.bat` depois de entrar
+na branch experimental. Ele usa um arquivo sintético temporário e gera
+resultados em `results/weight_lab/`. O teste **não executa o Qwen**,
+não interpreta tensores GGUF e não modifica modelos. Existe uma opção
+de leitura somente de uma janela de bytes de arquivo GGUF real.
+
+Consulte [metodologia e comandos](docs/WEIGHT_STREAMING_LAB.md).
+Somente comparar a leitura de bytes **não demonstra** vantagem em
+tokens/s, RAM total, VRAM ou qualidade de inferência neural.
+
+---
+
 ## A ideia
 
 A inspiração é funcional, não anatômica: seres humanos não precisam ativar todas as lembranças simultaneamente para responder a uma pergunta. O Brain-SSD pesquisa a mesma **seletividade computacional** por meio de roteamento, memória episódica, contexto limitado, associação e avaliação de custo.
