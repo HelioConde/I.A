@@ -84,6 +84,11 @@ on:
       - "tests/test_chat_history.py"
       - "launcher/**"
       - "tools/build_windows_launcher.ps1"
+concurrency:
+  # PR and branch pushes share a group; keep only the newest test run.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   windows-chat:
     runs-on: windows-latest
