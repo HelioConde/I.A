@@ -65,7 +65,7 @@ class CodeEditingTests(unittest.TestCase):
         read_only = LocalCopilot([self.root])
         with self.assertRaises(CopilotPermissionError):
             read_only.propose_code_edit(str(self.fixture), "10", "20")
-        self.assertEqual(read_only.read_file(str(self.fixture))["content"], self.fixture.read_text())
+        self.assertEqual(read_only.read_file(str(self.fixture))["content"].replace("\r\n", "\n"), self.fixture.read_text())
 
     def test_exactly_one_match_and_same_text_required(self):
         self.fixture.write_text("test\nsame\ntest\n", encoding="utf-8")
