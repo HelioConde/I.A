@@ -41,3 +41,63 @@ O HUD não lê arquivos, não captura tela, não liga microfone e não executa c
 Projeto é somente um rótulo derivado do caminho que o usuário digitar; não é uma identificação automática da janela ativa. O painel não inventa medições de RAM/CPU. As métricas reais seguem disponíveis no botão Métricas.
 
 Esta é uma interface web local, não um overlay do Windows sempre visível. Ainda faltam testes de screenshot no PC Windows e revisão visual com o usuário. A branch main e o runtime Qwen não foram alterados.
+
+## Permissões e caminhos persistentes: LUNA.ini
+
+O launcher INICIAR-COPILOTO-WINDOWS.bat agora não faz perguntas interativas a cada abertura.
+Na primeira inicialização, tools/launch_luna.py cria **LUNA.ini** na raiz do projeto a partir de **LUNA.exemplo.ini**.
+O arquivo real é pessoal e está no `.gitignore`: suas escolhas não são enviadas ao GitHub por padrão.
+Cada inicialização lê novamente o INI. Se o arquivo já existir, ele **não é sobrescrito**.
+
+Abra o arquivo com `notepad .\LUNA.ini` no PowerShell e ajuste:
+
+```ini
+[luna]
+profile = economia
+; vazio = usa a estrategia do perfil existente
+core_mode =
+model_file =
+port = 8766
+open_browser = true
+episodic_memory = true
+cognitive_shadow = true
+memory_aliases = false
+web_search = true
+web_provider = auto
+
+[copilot]
+; A pedido do usuario, o exemplo usa C:/ como root.
+root = C:/
+extra_roots =
+screen = true
+apps = true
+launch = true
+edit = true
+godot_validate = true
+godot_path = C:\godot
+```
+
+Use `true` ou `false`. Para autorizar mais pastas, separe os caminhos em `extra_roots` com `;` (por exemplo: `D:/Projetos;E:/Jogos`).
+Não inclua aspas ao redor de caminhos. Se `model_file` for preenchido, use somente o nome do arquivo GGUF na pasta `models/`.
+
+**Aviso:** `root = C:/` abrange o disco inteiro, exceto caminhos protegidos pelo Copiloto. Recomendamos trocar por uma pasta de projetos se esse acesso amplo não for necessário.
+
+### Godot
+
+`godot_path` aceita o caminho completo de um executável como `C:\godot\Godot_v4.5-stable_win64.exe`,
+ou uma pasta como `C:\godot` que contenha **um** executável `Godot*.exe` em sua raiz ou em `bin/`.
+Se o executável não existir ou houver múltiplos candidatos, **somente a validação Godot é desativada com um aviso**.
+O Chat, o Copiloto, a leitura de pastas e o editor continuam disponíveis.
+Para desligar explicitamente: `godot_validate = false`.
+Mesmo quando ativo, cada verificação de scripts Godot exige confirmação individual.
+
+### Verificar sem abrir a Luna
+
+```powershell
+Set-Location "C:\Users\helio\Documents\I.A"
+py -3 .\tools\launch_luna.py --check
+py -3 -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
+```
+
+Depois execute `.\INICIAR-COPILOTO-WINDOWS.bat` normalmente.
+Se aparecer erro de INI, ajuste a opção indicada. Não há leitura de `%VAR%`, shell ou execução de comandos a partir dos valores do INI.
