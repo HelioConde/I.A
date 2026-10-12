@@ -41,6 +41,7 @@ def main() -> int:
     parser.add_argument("--copilot-screen", action="store_true", help="Habilita capturas locais solicitadas explicitamente na interface; nunca inicia monitoramento sozinho")
     parser.add_argument("--copilot-apps", action="store_true", help="Permite consultar aplicativos registrados e processos locais (nomes/PID)")
     parser.add_argument("--copilot-launch", action="store_true", help="Permite preparar abertura de Bloco de Notas e Calculadora; requer confirmação por clique")
+    parser.add_argument("--copilot-edit", action="store_true", help="Permite editar código em pastas autorizadas somente após prévia e confirmação")
     parser.add_argument("--core-mode", choices=("subprocess", "persistent", "auto"), default=None, help="auto escolhe modo persistente apenas com RAM livre suficiente")
     args = parser.parse_args()
     if args.memory_aliases and not args.episodic_memory:
@@ -50,7 +51,7 @@ def main() -> int:
     except ValueError as exc:
         parser.error(str(exc))
     try:
-        copilot = LocalCopilot(args.copilot_root, screen=args.copilot_screen, apps=args.copilot_apps, launch=args.copilot_launch) if (args.copilot_root or args.copilot_screen or args.copilot_apps or args.copilot_launch) else None
+        copilot = LocalCopilot(args.copilot_root, screen=args.copilot_screen, apps=args.copilot_apps, launch=args.copilot_launch, edit=args.copilot_edit) if (args.copilot_root or args.copilot_screen or args.copilot_apps or args.copilot_launch) else None
     except (ValueError, OSError) as exc:
         parser.error("Pasta de copiloto inválida ou inacessível.")
     diagnostics = None if args.no_diagnostics else DiagnosticLogger(args.diagnostics_dir or default_diagnostics_dir())
