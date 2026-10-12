@@ -196,6 +196,41 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
     """Return a truthful local result only for clearly selected Copilot intents."""
     if not isinstance(question, str):
         return None
+    validation_command = re.fullmatch(
+        r'/validar-godot\s+"([^"\r\n]+)"\s*::\s*(res://[^\s\r\n]+\.gd)\s*',
+        question.strip(), re.I)
+    if validation_command:
+        if copilot is None or not copilot.status().get("godot_validate_enabled"):
+            return _result(
+                "Verificação Godot desativada. Reinicie o Copiloto com uma pasta "
+                "de projeto e executável Godot escolhido por você, autorizando "
+                "cada execução separadamente.",
+                "copilot_godot_validation_disabled"
+            )
+        try:
+            offer = copilot.propose_godot_validation(
+                validation_command.group(1), validation_command.group(2))
+        except (CopilotPermissionError, OSError, ValueError):
+            return _result(
+                "Não foi possível preparar esta verificação. Confira o script, "
+                "a pasta autorizada e o executável Godot.",
+                "copilot_godot_validation_unavailable",
+            )
+        return _result(
+            "Verificação de sintaxe proposta (NADA foi executado).\n"
+            "Projeto: " + offer["project"] +
+            "\nScript: " + offer["script"] +
+            "\nGodot: " + offer["binary"] +
+            "\nArgumentos: " + " ".join(offer["command_flags"]) +
+            "\nAVISO: " + offer["warning"] +
+            "\nSe concordar, use o botão de confirmação desta mensagem. "
+            "Prazo: 90 segundos; limite da execução: 30 segundos.",
+            "copilot_godot_validation_proposal",
+            extra={"copilot_godot_validation_token": offer["token"],
+                   "copilot_godot_validation_script": offer["script"],
+                   "copilot_godot_validation_project": offer["project"]},
+        )
+
     # Bound and ground Godot diagnosis to the files in an authorized project.
     project_command = re.fullmatch(r"/(?:projeto|analisar-projeto)\s+(.+)",
                                     question.strip(), re.I | re.S)
