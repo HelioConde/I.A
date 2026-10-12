@@ -18,6 +18,8 @@ on:
       - "tests/test_weight_streaming_runtime.py"
       - "tests/test_weight_cache.py"
       - "tests/test_native_weight_windows.py"
+      - "tools/prepare_native_llama_windows.py"
+      - "tests/test_prepare_native_llama_windows.py"
       - "tests/test_bench_qwen_runtime.py"
       - "docs/WEIGHT_STREAMING_LAB.md"
       - ".github/workflows/weight-streaming-lab.yml"
@@ -41,6 +43,7 @@ jobs:
           python -m unittest discover -s tests -p "test_weight_streaming_runtime.py" -v
           python -m unittest discover -s tests -p "test_weight_cache.py" -v
           python -m unittest discover -s tests -p "test_native_weight_windows.py" -v
+          python -m unittest discover -s tests -p "test_prepare_native_llama_windows.py" -v
           python -m unittest discover -s tests -p "test_bench_qwen_runtime.py" -v
       - name: Verify matrix checksums on a synthetic 1 MiB window
         run: python tools/bench_weight_streaming.py --matrix --fixture-mib 1 --page-kib 128 --pages 8 --budget-mib 1 --turns 5 --pattern moe
