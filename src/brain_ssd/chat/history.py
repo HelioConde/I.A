@@ -118,8 +118,8 @@ class ChatHistory:
             ).fetchall()
         return [{"role": row["role"], "content": row["content"]} for row in rows]
 
-    def first_user_question(self, conversation_id: Any) -> str | None:
-        """Return the real earliest user message, not the truncated recent context."""
+    def first_user_message(self, conversation_id: Any) -> str | None:
+        """Return the first literal user message, including a greeting."""
         identifier = self._valid_id(conversation_id)
         if self.get(identifier) is None:
             raise ValueError("Conversa não encontrada.")
@@ -129,6 +129,33 @@ class ChatHistory:
                 "AND role='user' ORDER BY id ASC LIMIT 1", (identifier,),
             ).fetchone()
         return str(row["content"]) if row is not None else None
+
+    def first_user_question(self, conversation_id: Any) -> str | None:
+        """Select earliest recognizable question, not the initial greeting.
+
+        Speech recognition may omit the question mark; an explicit interrogative
+        opening is accepted. Unknown sentences are never labeled as questions.
+        """
+        import re
+        identifier = self._valid_id(conversation_id)
+        if self.get(identifier) is None:
+            raise ValueError("Conversa não encontrada.")
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT content FROM messages WHERE conversation_id=? "
+                "AND role='user' ORDER BY id ASC LIMIT 5000", (identifier,),
+            ).fetchall()
+        question_start = re.compile(
+            r"^(?:como|qual|quais|quem|que|onde|quando|quanto|quantos|quantas|"
+            r"por que|porque|voc[eê]|consegue|pode|ser[aá] que|"
+            r"me diga|me explique)\b",
+            re.IGNORECASE,
+        )
+        for row in rows:
+            message = str(row["content"]).strip()
+            if message and ("?" in message or question_start.search(message)):
+                return message
+        return None
 
     def recent_context(self, conversation_id: Any, limit: int = 8) -> list[dict[str, str]]:
         return [
