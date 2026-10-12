@@ -178,8 +178,11 @@
           <button type="button" id="muteVoiceCall" disabled>Silenciar microfone</button>
           <button type="button" id="interruptVoiceCall" disabled>Interromper resposta</button>
           <button type="button" id="endVoiceCall" class="voice-call-end" disabled>Encerrar ligação</button>
+          <button type="button" id="retryVoiceCall" class="voice-call-retry" hidden>Retomar escuta</button>
+          <button type="button" id="testVoiceCallMic" class="voice-call-test">Testar microfone (3 s)</button>
+          <button type="button" id="testVoiceCallTts" class="voice-call-test">Testar voz da Luna</button>
         </div>
-        <p class="voice-call-note">Turnos alternados: o microfone pausa enquanto a Luna fala para evitar eco. A interrupção é manual nesta versão.</p>
+        <p class="voice-call-note">Turnos alternados: o microfone pausa enquanto a Luna fala para evitar eco. A interrupção é manual nesta versão. Os testes de microfone e voz são acionados somente por clique, não gravam áudio e não confirmam, por si só, a transcrição pt-BR.</p>
       </section>
     </main>
   </div>
