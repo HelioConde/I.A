@@ -1017,7 +1017,14 @@ async function copilotCall(action) {
     });
     result.replaceChildren();
     copilotState.text = "";
-    if (action === "screen" || action === "image") {
+    if (action === "screen_ocr") {
+      const pre = document.createElement("pre");
+      pre.textContent = response.text || "Nenhum texto legível foi identificado.";
+      result.append(pre);
+      copilotState.text = response.text || "";
+      $("copilotUseChat").hidden = !copilotState.text;
+      feedback.textContent = "OCR local concluído. Confira o texto antes de usar no chat.";
+    } else if (action === "screen" || action === "image") {
       const img = document.createElement("img");
       img.alt = action === "screen" ? "Captura solicitada do monitor" : "Prévia de imagem local";
       img.src = response.image_data_url;
