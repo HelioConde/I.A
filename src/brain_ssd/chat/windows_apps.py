@@ -199,7 +199,8 @@ def start_menu_apps(name: str | None = None) -> dict[str, Any]:
     if not ps.is_file():
         raise OSError("PowerShell do Windows indisponível para consulta.")
     # This script is constant; app names are filtered in Python, never in shell.
-    command = ("Get-StartApps | Select-Object Name,AppID | "
+    command = ("[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; "
+               "Get-StartApps | Select-Object Name,AppID | "
                "ConvertTo-Json -Compress -Depth 3")
     completed = subprocess.run(
         [str(ps), "-NoLogo", "-NoProfile", "-NonInteractive",
