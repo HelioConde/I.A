@@ -238,6 +238,15 @@ class LocalCopilot:
     def apply_code_edit(self, token: str) -> dict:
         return self._code_editor().apply(token)
 
+    def verify_code_edit(self, edit_id: str) -> dict:
+        return self._code_editor().verify(edit_id)
+
+    def propose_code_undo(self, edit_id: str) -> dict:
+        return self._code_editor().propose_undo(edit_id)
+
+    def confirm_code_undo(self, token: str) -> dict:
+        return self._code_editor().confirm_undo(token)
+
     def installed_apps(self, search: str | None = None) -> dict:
         if not self.apps_enabled:
             raise CopilotPermissionError("Inventário de aplicativos não autorizado nesta sessão.")
