@@ -123,3 +123,33 @@ Confira o microfone nas permissões do site `http://127.0.0.1:8766`
 
 Alternativa futura: integrar um motor speech-to-text local próprio, independente
 do suporte de idioma no navegador, com instalação e permissões explícitas.
+
+## Revisão do chat real (12/10/2026)
+
+Após capturas de tela e histórico real do usuário, a interface recebeu correções
+de confiabilidade. Respostas do Qwen **não são evidência de que uma ferramenta
+do Windows tenha executado uma ação**.
+
+- Abas de Chrome/Edge: Luna informa que não as enumera e não inventa títulos/URLs.
+- Pastas principais: lista subpastas realmente permitidas na primeira raiz autorizada; sem diagnóstico de CPU no lugar da listagem.
+- Programas abertos: quando permitido, consulta títulos de janelas visíveis do Windows (não os confunde com processos de segundo plano).
+- Jogos instalados: não confunde o registro de programas com uma lista completa de jogos.
+- Monitor/tela: pergunta de capacidade não é uma captura; `Mostre o monitor 2` solicita a prévia. O Qwen textual não interpreta pixels.
+- Downloads: a primeira imagem é escolhida **por nome em ordem alfabética entre até 100 itens listados**; a prévia local depende de autorização/Pillow e não é reconhecimento visual.
+- Escrita em `.txt`: ainda não é ferramenta disponível; Luna diz claramente que **nenhum arquivo foi criado**. Edição de CÓDIGO permanece com diff e confirmação.
+- Google via Serper: sem `SERPER_API_KEY` ou se o provedor não usa Serper, não afirma que fez pesquisa Google. A caixa `Pesquisar na web` continua autorização por mensagem.
+- Notícias recentes em geral: sem permissão, provedor adequado ou resultados verificáveis, não inventa fatos. Os roteadores específicos já existentes para Brasil e atualizações de jogos foram preservados.
+- Legibilidade do painel direito: fontes maiores, área de rolagem independente e cartões mais compactos em altura.
+
+Testes de regressão: `tests/test_luna_real_world_regression.py` e
+`tests/test_chat_web_search.py`, com chamadas locais simuladas sem leitura
+do PC do usuário. O GitHub Actions ainda precisa executar os testes
+com logs para confirmarmos aprovação, além de revisão visual em Windows.
+
+Para validar após atualizar/reiniciar a Luna:
+
+```powershell
+py -3 -m unittest discover -s tests -p 'test_luna_real_world_regression.py' -v
+py -3 -m unittest discover -s tests -p 'test_copilot_queries.py' -v
+py -3 -m unittest discover -s tests -p 'test_chat_web_search.py' -v
+```
