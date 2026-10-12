@@ -23,6 +23,20 @@ estava desabilitado: “Pacote pt-BR local não instalado ou não suportado.
 Microfone desligado.” Portanto o teste de voz não foi iniciado e nenhuma
 permissão de microfone foi solicitada ou aceita.
 
+### Reteste de microfone — 12 de outubro de 2026
+
+Após a auditoria inicial, o botão `Falar (local)` ficou disponível em outra
+sessão da Luna. Com autorização explícita do usuário para o teste de
+microfone, ele foi acionado. A interface passou para `■ Parar microfone`, o
+estado do núcleo mudou para **Ouvindo** e exibiu “Microfone local ativado pelo
+usuário.” Isso confirma a ativação real do fluxo de microfone no navegador.
+
+Sem fala capturada pelo canal de teste, após cinco segundos o botão retornou a
+`🎤 Falar (local)` e a interface registrou `Erro ao usar o microfone local:
+no-speech`. Não houve transcrição, envio ao Qwen ou reprodução TTS; portanto
+o reconhecimento de uma frase e a conversa por voz continuam **não
+validados**. O microfone não permaneceu ativo após o erro.
+
 ## Evidências observadas
 
 - O DOM do chat (`role=log`) exibiu cada pergunta e resposta abaixo.
@@ -74,7 +88,7 @@ uma aprovação ou reprovação das funções não testadas.
 | Memória e contexto | 2/10 | Falhou ao recuperar a primeira pergunta e ao resumir cinco mensagens. |
 | Pesquisa web | 7/10 | O bloqueio por falta de autorização/configuração foi honesto; consulta real não foi concluída. |
 | Ferramentas Windows | Não avaliada | Perguntas 21–29 não executadas. |
-| Voz | Indisponível | Reconhecimento local pt-BR não estava disponível; nenhuma permissão foi contornada. |
+| Voz | 2/10 | Ativação e desligamento por `no-speech` foram observados; transcrição, Qwen e TTS não foram validados. |
 | HUD/interface | 5/10 | Elementos e estados iniciais legíveis no DOM; não houve ensaio responsivo ou captura visual final. |
 
 ## Problemas priorizados
