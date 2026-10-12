@@ -556,6 +556,34 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
         return _result("Recomendações baseadas no hardware consultado agora:\n" +
                        "\n".join("• " + item for item in recommendations),
                        "copilot_recommendations")
+    if (_is_window_request(simple) and re.search(
+        r"\b(?:quais|liste|listar|mostre|mostrar)\b", simple
+    ) and re.search(r"\b(?:abertos?|abertas?|janelas?)\b", simple)
+            and not re.search(r"\b(?:processos?|segundo plano)\b", simple)):
+        if copilot is not None and copilot.screen_enabled:
+            try:
+                windows = copilot.list_monitor_windows(0)
+                if windows:
+                    return _result(
+                        "Janelas visíveis identificadas agora pelo Windows (todos os monitores):\n"
+                        + "\n".join("• " + item["title"] for item in windows[:16])
+                        + "\nIsso não inclui processos em segundo plano nem o conteúdo das abas.",
+                        "copilot_visible_windows",
+                    )
+                return _result("Nenhuma janela visível foi identificada nesta consulta. "
+                               "Isso não prova que não haja programas em execução.",
+                               "copilot_visible_windows_empty")
+            except (CopilotPermissionError, OSError, RuntimeError):
+                return _result(
+                    "Não consegui identificar janelas visíveis. Para consultar processos "
+                    "ativos por nome/PID, peça 'Liste os processos em execução'.",
+                    "copilot_visible_windows_unavailable",
+                )
+        return _result(
+            "Listar janelas visíveis requer a permissão de tela no LUNA.ini. "
+            "A consulta de processos não comprova quais janelas estão abertas.",
+            "copilot_visible_windows_disabled",
+        )
     system = _is_system_question(simple)
     screen, monitor = _screen_request(simple)
     inventory = _inventory_intent(simple)
