@@ -896,16 +896,26 @@ class ChatEngine:
                 if (needs_recent_public_sources(question) or current_game_request(question)) and not web_sources:
                     # Do not let a small LLM invent current events when the
                     # authorized research produced no dated evidence.
-                    message = (
-                        "Não consegui obter notícias recentes e verificáveis "
-                        "sobre a situação do Brasil nesta pesquisa. "
-                        "Tente novamente ou escolha outro provedor de busca; "
-                        "não vou inventar um panorama político ou econômico."
-                        if needs_brazil_news(question) else
-                        "Não encontrei notas de atualização recentes e verificáveis "
-                        "sobre esse jogo nesta pesquisa. Tente outro provedor "
-                        "ou consulte as notas oficiais; não vou inventar patches."
-                    )
+                    if needs_brazil_news(question):
+                        message = (
+                            "Não consegui obter notícias recentes e verificáveis "
+                            "sobre a situação do Brasil nesta pesquisa. "
+                            "Tente novamente ou escolha outro provedor de busca; "
+                            "não vou inventar um panorama político ou econômico."
+                        )
+                    elif current_game_request(question):
+                        message = (
+                            "Não encontrei notas de atualização recentes e verificáveis "
+                            "sobre esse jogo nesta pesquisa. Tente outro provedor "
+                            "ou consulte as notas oficiais; não vou inventar patches."
+                        )
+                    else:
+                        message = (
+                            "Não consegui obter notícias recentes e verificáveis "
+                            "sobre o assunto nesta pesquisa. "
+                            "Tente novamente ou escolha outro provedor de busca; "
+                            "não vou inventar informações atuais sem fontes."
+                        )
                     if on_chunk:
                         on_chunk(message)
                     return {
