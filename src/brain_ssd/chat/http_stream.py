@@ -5,7 +5,7 @@ import json
 from http import HTTPStatus
 from typing import Any
 
-from brain_ssd.chat.session_facts import is_first_question_intent
+from brain_ssd.chat.session_facts import is_first_question_intent, is_first_message_intent
 
 
 def serve_stream(handler: Any, data: dict[str, Any]) -> None:
@@ -22,7 +22,9 @@ def serve_stream(handler: Any, data: dict[str, Any]) -> None:
         # Validate the saved conversation before sending SSE response headers.
         history = store.recent_context(conversation_id)
         if is_first_question_intent(question):
-            first_question = store.first_user_question(conversation_id)
+            first_question = (store.first_user_message(conversation_id)
+                              if is_first_message_intent(question) else
+                              store.first_user_question(conversation_id))
     else:
         history = data.get("history", [])
     cancelled = engine.begin_stream(request_id)
