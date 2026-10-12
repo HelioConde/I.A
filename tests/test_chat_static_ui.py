@@ -108,12 +108,35 @@ class TestStaticUI(unittest.TestCase):
         self.assertIn('continueButton.textContent = "Continuar resposta"', self.js)
         self.assertIn('className = "generation-incomplete"', self.js)
 
+    def test_luna_hud_is_wired_without_new_automatic_permissions(self):
+        hud_js = (ROOT / "chat" / "luna-hud.js").read_text(encoding="utf-8")
+        hud_css = (ROOT / "chat" / "luna-hud.css").read_text(encoding="utf-8")
+        server = (ROOT / "src" / "brain_ssd" / "chat" / "server.py").read_text(encoding="utf-8")
+        dom_ids = set(self.inventory.ids)
+        self.assertTrue({"lunaLayout", "lunaRail", "lunaRailToggle", "lunaState",
+                         "lunaRailModel", "lunaQuickCopilot", "lunaQuickMetrics",
+                         "lunaActivityLog"}.issubset(dom_ids))
+        self.assertFalse(set(re.findall(r'element\("([A-Za-z][A-Za-z0-9_-]*)"\)', hud_js)) - dom_ids)
+        for route in ('"/luna-hud.js"', '"/luna-hud.css"'):
+            self.assertIn(route, server)
+        for event in ("luna:connection", "luna:permission", "luna:chat", "luna:microphone"):
+            self.assertIn(event, self.js)
+            self.assertIn(event, hud_js)
+        self.assertIn("prefers-reduced-motion", hud_css)
+        self.assertIn("data-luna-prompt", hud_js)
+        self.assertNotIn("send();", hud_js)
+        self.assertNotIn("speechRecognition.start()", hud_js)
+        self.assertNotIn("getDisplayMedia", hud_js)
+        self.assertNotIn("eval(", hud_js)
+
     def test_static_assets_are_local_and_no_inline_handlers(self):
-        self.assertEqual(self.inventory.scripts,["/app.js"])
-        self.assertEqual(self.inventory.styles,["/styles.css"])
+        self.assertEqual(self.inventory.scripts,["/app.js", "/luna-hud.js"])
+        self.assertEqual(self.inventory.styles,["/styles.css", "/luna-hud.css"])
         self.assertFalse(self.inventory.inline_handlers)
         self.assertFalse(re.search(r'<script[^>]+src="https?://',self.html))
         self.assertTrue(CSS.is_file())
+        self.assertTrue((ROOT / "chat" / "luna-hud.js").is_file())
+        self.assertTrue((ROOT / "chat" / "luna-hud.css").is_file())
 
 
 if __name__=="__main__":
