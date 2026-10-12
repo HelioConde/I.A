@@ -45,7 +45,8 @@ class CopilotPermissionError(ValueError):
 
 class LocalCopilot:
     def __init__(self, roots: Iterable[Path] = (), *, screen: bool = False,
-                 apps: bool = False, launch: bool = False, edit: bool = False):
+                 apps: bool = False, launch: bool = False, edit: bool = False,
+                 godot_binary: Path | None = None):
         allowed = []
         for path in roots:
             root = Path(path).expanduser().resolve(strict=True)
@@ -59,6 +60,12 @@ class LocalCopilot:
         self.launch_enabled = bool(launch)
         self.edit_enabled = bool(edit) and bool(allowed)
         self._editor = None
+        self._godot_validator = None
+        self.godot_binary = Path(godot_binary) if godot_binary is not None else None
+        if self.godot_binary is not None and not self.roots:
+            raise ValueError("Verificação Godot exige pelo menos uma pasta autorizada.")
+        if self.godot_binary is not None:
+            self._godot_validator = self._create_godot_validator()
         self._launch_lock = threading.Lock()
         self._launch_requests: dict[str, tuple[str, float]] = {}
         self._screen_lock = threading.Lock()
@@ -66,13 +73,14 @@ class LocalCopilot:
 
     def status(self) -> dict:
         return {
-            "enabled": bool(self.roots or self.screen_enabled or self.apps_enabled or self.launch_enabled or self.edit_enabled),
+            "enabled": bool(self.roots or self.screen_enabled or self.apps_enabled or self.launch_enabled or self.edit_enabled or self._godot_validator),
             "roots": [str(root) for root in self.roots],
             "files_enabled": bool(self.roots),
             "screen_enabled": self.screen_enabled,
             "apps_enabled": self.apps_enabled,
             "launch_enabled": self.launch_enabled,
             "edit_enabled": self.edit_enabled,
+            "godot_validate_enabled": self._godot_validator is not None,
             "vision_enabled": False,
             "screen_interval_seconds": SCREEN_MIN_INTERVAL,
             "notice": "Capturas são imagens para prévia; o Qwen de texto ainda não interpreta pixels.",
@@ -173,6 +181,20 @@ class LocalCopilot:
             raise CopilotPermissionError("Instale Pillow para pré-visualizar imagens.") from None
         except (OSError, ValueError, UnidentifiedImageError):
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
+
+    def _create_godot_validator(self):
+        from brain_ssd.chat.godot_validation import GodotValidator
+        return GodotValidator(self, self.godot_binary)
+
+    def propose_godot_validation(self, project: str, script: str) -> dict:
+        if self._godot_validator is None:
+            raise CopilotPermissionError("Validação Godot não autorizada nesta sessão.")
+        return self._godot_validator.propose(project, script)
+
+    def confirm_godot_validation(self, token: str) -> dict:
+        if self._godot_validator is None:
+            raise CopilotPermissionError("Validação Godot não autorizada nesta sessão.")
+        return self._godot_validator.confirm(token)
 
     def _godot_inspector(self):
         from brain_ssd.chat.godot_diagnostics import GodotInspector
