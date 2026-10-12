@@ -365,7 +365,7 @@ class LocalCopilot:
                 "ram_total_gib": memory_gib, "disks": disks,
                 "python": platform.python_version()}
 
-    def read_screen_text(self, monitor: int = 1) -> dict:
+    def read_screen_text(self, monitor: int = 1, *, screenshot: dict | None = None) -> dict:
         """Optional local OCR only after a specific screen request.
 
         OCR output is returned to the browser, never automatically passed
@@ -380,7 +380,12 @@ class LocalCopilot:
             raise CopilotPermissionError(
                 "OCR local não disponível. Instale pytesseract e Tesseract OCR no Windows."
             ) from None
-        screenshot = self.capture_screen(monitor)
+        # Reuse a just-captured frame when the same explicit chat request
+        # needs both a preview and OCR; do not violate capture rate limits.
+        if screenshot is None:
+            screenshot = self.capture_screen(monitor)
+        if screenshot.get("monitor") != monitor:
+            raise CopilotPermissionError("Captura não corresponde ao monitor autorizado.")
         try:
             encoded = screenshot["image_data_url"].split(",", 1)[1]
             with Image.open(io.BytesIO(base64.b64decode(encoded))) as image:
