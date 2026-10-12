@@ -154,7 +154,7 @@ def local_command(question: str, store: EpisodicMemory | None,
                     "Você pode revisar, editar ou apagar em Memórias."
                 )
     elif (greeting_text in ("oi", "ola", "bom dia", "boa tarde", "boa noite")
-          or bool(re.fullmatch(r"(?:oi|ola) (?:bom dia|boa tarde|boa noite)", greeting_text))) or (
+          or bool(re.fullmatch(r"(?:oi|ola),? (?:bom dia|boa tarde|boa noite)", greeting_text))) or (
         store is not None
         and greeting_text.startswith(("oi ", "ola ", "bom dia ", "boa tarde ", "boa noite "))
         and (saved_name := plain(store.get_assistant_name() or "")) != ""
@@ -164,7 +164,7 @@ def local_command(question: str, store: EpisodicMemory | None,
         action = "greeting"
         chosen = (store.get_assistant_name() if store else None) or "Brain-SSD"
         answer = (f"{greeting_text.split(' ', 1)[1].capitalize()}! Em que posso ajudar?"
-                  if re.fullmatch(r"(?:oi|ola) (?:bom dia|boa tarde|boa noite)", greeting_text)
+                  if re.fullmatch(r"(?:oi|ola),? (?:bom dia|boa tarde|boa noite)", greeting_text)
                   else f"Olá! Eu sou {chosen}. Em que posso ajudar?")
     elif simple in (
         "qual seu nome", "qual e seu nome", "como voce se chama",
