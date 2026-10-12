@@ -45,7 +45,7 @@ class CopilotPermissionError(ValueError):
 
 class LocalCopilot:
     def __init__(self, roots: Iterable[Path] = (), *, screen: bool = False,
-                 apps: bool = False, launch: bool = False):
+                 apps: bool = False, launch: bool = False, edit: bool = False):
         allowed = []
         for path in roots:
             root = Path(path).expanduser().resolve(strict=True)
@@ -57,6 +57,8 @@ class LocalCopilot:
         self.screen_enabled = bool(screen)
         self.apps_enabled = bool(apps)
         self.launch_enabled = bool(launch)
+        self.edit_enabled = bool(edit) and bool(allowed)
+        self._editor = None
         self._launch_lock = threading.Lock()
         self._launch_requests: dict[str, tuple[str, float]] = {}
         self._screen_lock = threading.Lock()
@@ -64,12 +66,13 @@ class LocalCopilot:
 
     def status(self) -> dict:
         return {
-            "enabled": bool(self.roots or self.screen_enabled or self.apps_enabled or self.launch_enabled),
+            "enabled": bool(self.roots or self.screen_enabled or self.apps_enabled or self.launch_enabled or self.edit_enabled),
             "roots": [str(root) for root in self.roots],
             "files_enabled": bool(self.roots),
             "screen_enabled": self.screen_enabled,
             "apps_enabled": self.apps_enabled,
             "launch_enabled": self.launch_enabled,
+            "edit_enabled": self.edit_enabled,
             "vision_enabled": False,
             "screen_interval_seconds": SCREEN_MIN_INTERVAL,
             "notice": "Capturas são imagens para prévia; o Qwen de texto ainda não interpreta pixels.",
@@ -170,6 +173,21 @@ class LocalCopilot:
             raise CopilotPermissionError("Instale Pillow para pré-visualizar imagens.") from None
         except (OSError, ValueError, UnidentifiedImageError):
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
+
+    def _code_editor(self):
+        if self._editor is None:
+            from brain_ssd.chat.code_edits import CodeEditor
+            self._editor = CodeEditor(self)
+        return self._editor
+
+    def review_code(self, user_path: str) -> dict:
+        return self._code_editor().recommend(user_path)
+
+    def propose_code_edit(self, user_path: str, before: str, after: str) -> dict:
+        return self._code_editor().propose(user_path, before, after)
+
+    def apply_code_edit(self, token: str) -> dict:
+        return self._code_editor().apply(token)
 
     def installed_apps(self, search: str | None = None) -> dict:
         if not self.apps_enabled:
