@@ -65,7 +65,7 @@ class TestStaticUI(unittest.TestCase):
         self.assertFalse(missing, f"Broken anchor/aria-controls targets: {missing}")
         self.assertIn('lang="pt-BR"',self.html)
         self.assertIn('id="messageInput"',self.html)
-        self.assertIn('aria-label="Mensagem para o Brain-SSD"',self.html)
+        self.assertIn('aria-label="Mensagem para a Luna"',self.html)
 
     def test_no_dynamic_eval_and_protective_csp(self):
         # A console error mentioning "visualize.js" is not a Brain-SSD
