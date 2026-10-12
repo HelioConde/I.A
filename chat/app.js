@@ -1214,7 +1214,8 @@ async function copilotStatus() {
         (state.launch_without_confirmation ? "abertura direta autorizada" : state.launch_enabled ? "abertura confirmada" : "sem abertura de aplicativos")
       : "Desativado. Escolha as permissões no iniciador do Copiloto.";
     window.dispatchEvent(new CustomEvent("luna:permission", {detail:{
-      files_enabled:Boolean(state.files_enabled), screen_enabled:Boolean(state.screen_enabled)
+      files_enabled:Boolean(state.files_enabled), screen_enabled:Boolean(state.screen_enabled),
+      launch_enabled:Boolean(state.launch_enabled), launch_without_confirmation:Boolean(state.launch_without_confirmation)
     }}));
     $("copilotRoots").textContent = state.roots && state.roots.length
       ? "Pastas autorizadas: " + state.roots.join(" · ") : "Nenhuma pasta autorizada.";
