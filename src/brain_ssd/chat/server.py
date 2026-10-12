@@ -1148,6 +1148,12 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result = copilot.preview_image(data.get("path"))
                 elif action == "system":
                     result = copilot.system_info()
+                elif action == "apps":
+                    result = copilot.installed_apps(data.get("search"))
+                elif action == "processes":
+                    result = copilot.running_apps(data.get("search"))
+                elif action == "launch":
+                    result = copilot.confirm_launch(data.get("token"))
                 elif action == "screen":
                     result = copilot.capture_screen(data.get("monitor", 1))
                 else:
