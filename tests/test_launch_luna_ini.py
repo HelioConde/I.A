@@ -122,6 +122,27 @@ class LunaIniTests(unittest.TestCase):
         self.assertEqual(code, 0)
         mocked.assert_not_called()
 
+    def test_selected_model_is_checked_by_preflight_before_start(self):
+        body = self.ini.read_text(encoding="utf-8")
+        self.ini.write_text(
+            body.replace("model_file =", "model_file = Qwen3-4B-Q8_0.gguf"),
+            encoding="utf-8",
+        )
+        from unittest.mock import MagicMock
+        success = MagicMock(returncode=0)
+        with patch("launch_luna.subprocess.run", return_value=success) as doctor, \
+             patch("launch_luna.subprocess.call", return_value=0) as chat, \
+             patch("builtins.print"):
+            self.assertEqual(main(["--config", str(self.ini), "--run"]), 0)
+        doctor_args = doctor.call_args.args[0]
+        chat_args = chat.call_args.args[0]
+        self.assertIn("--model-file", doctor_args)
+        self.assertEqual(doctor_args[doctor_args.index("--model-file") + 1],
+                         "Qwen3-4B-Q8_0.gguf")
+        self.assertIn("--model-file", chat_args)
+        self.assertEqual(chat_args[chat_args.index("--model-file") + 1],
+                         "Qwen3-4B-Q8_0.gguf")
+
     def test_windows_batch_no_longer_prompts_and_uses_ini_launcher(self):
         batch = (ROOT / "INICIAR-COPILOTO-WINDOWS.bat").read_text(encoding="utf-8")
         self.assertIn("tools\\launch_luna.py", batch)
