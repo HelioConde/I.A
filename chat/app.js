@@ -1174,6 +1174,7 @@ $("copilotCancelEdit").addEventListener("click", () => {
 $("copilotInstalled").addEventListener("click", () => copilotCall("apps"));
 $("copilotProcesses").addEventListener("click", () => copilotCall("processes"));
 $("copilotCapture").addEventListener("click", () => copilotCall("screen"));
+$("copilotOCR").addEventListener("click", () => copilotCall("screen_ocr"));
 $("copilotLive").addEventListener("change", () => {
   if (!$("copilotLive").checked) { stopCopilotLive(); return; }
   copilotCall("screen");
