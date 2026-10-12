@@ -1448,7 +1448,10 @@ class ChatHandler(BaseHTTPRequestHandler):
                 identifier = data.get("conversation_id")
                 if identifier is not None and self.server.history_store is not None:
                     saved_history = self.server.history_store.recent_context(identifier)
-                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False), response_tokens=data.get("response_tokens"))
+                    first_question = (self.server.history_store.first_user_question(identifier)
+                                      if isinstance(data.get("message"), str) and
+                                      is_first_question_intent(data["message"]) else None)
+                    result = self.server.engine.ask(data.get("message"), saved_history, web_search=data.get("web_search", False), remember_web=data.get("remember_web", False), fast_web=data.get("fast_web", False), response_tokens=data.get("response_tokens"), first_question=first_question)
                     self.server.history_store.append_exchange(identifier, data["message"].strip(), result["answer"])
                     result["conversation_id"] = identifier
                 else:
