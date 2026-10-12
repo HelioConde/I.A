@@ -22,7 +22,7 @@ from brain_ssd.chat.local_actions import is_local_action_answer, local_command, 
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
-from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, current_game_request
+from brain_ssd.chat.current_affairs import needs_brazil_news, explicit_web_research, current_game_request, needs_recent_public_sources
 from brain_ssd.chat.web_knowledge import WebKnowledge, knowledge_command, format_cached_context
 from brain_ssd.chat.cognitive_lab import working_state, select_attention
 from brain_ssd.chat.memory_safety import check_memory_ambiguities, AMBIGUITY_PROMPT
@@ -378,6 +378,66 @@ class ChatEngine:
         """
         if not isinstance(prompt, str) or not 0 < len(prompt) <= MAX_MESSAGE:
             raise ValueError("Contexto da proposta excede o limite.")
+        # Google is available only with the configured Serper API key.
+        # A question about Google search is not proof a query was sent.
+        normalized = unicodedata.normalize("NFKD", question.casefold())
+        normalized = "".join(c for c in normalized if not unicodedata.combining(c))
+        google_intent = bool(re.search(r"\bgoogle\b", normalized)
+                             and re.search(r"\b(?:pesquis|busc|consult|utiliz)", normalized))
+        google_search_request = google_intent and bool(
+            re.search(r"\b(?:utilizar|use|utilize|faca|pesquise|busque|pesquisar|consulte)\b", normalized)
+            and re.search(r"\b(?:sobre|noticias|noticia|de|do|da)\b", normalized)
+        )
+        if google_intent:
+            google_enabled = bool(self.web_search_service and
+                                  getattr(self.web_search_service, "_serper_key", ""))
+            if not google_search_request or not web_search or not google_enabled:
+                if not google_enabled:
+                    message = (
+                        "Não tenho busca Google configurada nesta sessão. "
+                        "O provedor automático sem SERPER_API_KEY usa Wikipédia "
+                        "(não o Google). Configure o Serper para buscas Google reais. "
+                        "Nenhuma pesquisa Google foi realizada."
+                    )
+                elif not web_search:
+                    message = (
+                        "Busca Google via Serper disponível, mas você não autorizou "
+                        "pesquisa para esta mensagem. Marque 'Pesquisar na web' "
+                        "e reenvie o pedido. Não consultei o Google."
+                    )
+                else:
+                    message = (
+                        "O Google via Serper está configurado, mas nenhuma busca foi "
+                        "realizada por esta pergunta de capacidade. Para pesquisar, "
+                        "peça 'Pesquise no Google sobre ASSUNTO'."
+                    )
+                local = {"answer": message, "mode": "local_command",
+                         "local_action": "google_search_capability",
+                         "web_search_status": "not_requested",
+                         "metrics": {}, "active_pages": 0,
+                         "sources_from_ssd": 0,
+                         "episodic_memories_used": 0,
+                         "episodic_ambiguities_detected": 0,
+                         "episodic_ambiguities_withheld": False,
+                         "cognitive_shadow": None}
+                if on_chunk is not None:
+                    on_chunk(local["answer"])
+                return local
+        if needs_recent_public_sources(question) and not web_search:
+            local = {
+                "answer": (
+                    "Para responder sobre notícias recentes preciso de fontes atuais "
+                    "com datas. Marque 'Pesquisar na web' e reenvie. "
+                    "Não fiz consulta externa e não vou inventar acontecimentos."
+                ), "mode": "local_command", "local_action": "recent_news_permission",
+                "web_search_status": "not_requested", "metrics": {}, "active_pages": 0,
+                "sources_from_ssd": 0, "episodic_memories_used": 0,
+                "episodic_ambiguities_detected": 0,
+                "episodic_ambiguities_withheld": False, "cognitive_shadow": None
+            }
+            if on_chunk is not None:
+                on_chunk(local["answer"])
+            return local
         if self._state != "ready" or self._runtime is None:
             raise RuntimeError("Modelo local não está pronto.")
         with self._lock:
@@ -654,6 +714,25 @@ class ChatEngine:
                     "episodic_ambiguities_withheld": False,
                     "cognitive_shadow": None,
                 }
+            # Encyclopedia entries are not verifiable breaking news.
+            if local_result is None and needs_recent_public_sources(question):
+                if (self.web_search_service is not None
+                        and not bool(self.web_search_service.supports_general_web())
+                        and not needs_brazil_news(question)):
+                    local_result = {
+                        "answer": (
+                            "O provedor atual não oferece pesquisa geral de notícias "
+                            "com datas confiáveis. Sem Google via Serper, Brave ou "
+                            "SearXNG autorizado não vou tratar a Wikipédia como notícia "
+                            "de hoje. Nenhuma notícia recente foi confirmada."
+                        ), "mode": "local_command",
+                        "local_action": "recent_news_provider_limited",
+                        "web_search_status": "provider_limited",
+                        "metrics": {}, "active_pages": 0,
+                        "sources_from_ssd": 0, "episodic_memories_used": 0,
+                        "episodic_ambiguities_detected": 0,
+                        "episodic_ambiguities_withheld": False, "cognitive_shadow": None,
+                    }
             if local_result is None and current_game_request(question):
                 # The zero-key provider searches Wikipedia (encyclopedia), not
                 # live Overwatch/Valorant/LoL patch notes. Never pass stale
@@ -810,7 +889,7 @@ class ChatEngine:
                         "episodic_ambiguities_withheld": False,
                         "cognitive_shadow": None,
                     }
-                if (needs_brazil_news(question) or current_game_request(question)) and not web_sources:
+                if (needs_recent_public_sources(question) or current_game_request(question)) and not web_sources:
                     # Do not let a small LLM invent current events when the
                     # authorized research produced no dated evidence.
                     message = (
