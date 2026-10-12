@@ -40,6 +40,7 @@ class LunaConfig:
     screen: bool
     apps: bool
     launch: bool
+    launch_without_confirmation: bool
     edit: bool
     godot_validate: bool
     godot_path: str
@@ -127,7 +128,13 @@ def read_config(path: Path) -> LunaConfig:
         memory_aliases=aliases, web_search=flag("luna", "web_search"),
         web_provider=provider, roots=tuple(roots),
         screen=flag("copilot", "screen"), apps=flag("copilot", "apps"),
-        launch=flag("copilot", "launch"), edit=edit, godot_validate=validate,
+        launch=flag("copilot", "launch"),
+        launch_without_confirmation=(
+            parser.getboolean("copilot", "launch_without_confirmation")
+            if parser.has_option("copilot", "launch_without_confirmation")
+            else False
+        ),
+        edit=edit, godot_validate=validate,
         godot_path=option("copilot", "godot_path"),
     )
 
@@ -185,6 +192,13 @@ def build_chat_args(config: LunaConfig) -> tuple[list[str], list[str]]:
     ):
         if enabled:
             args.append("--copilot-" + name)
+    if config.launch_without_confirmation:
+        if not config.launch or not config.apps:
+            raise ValueError(
+                "launch_without_confirmation = true exige launch = true e apps = true."
+            )
+        args.append("--copilot-launch-direct")
+        messages.append("AVISO: abertura direta de aplicativos habilitada para ordens explícitas por texto/voz.")
     if config.godot_validate:
         godot, warning = resolve_godot(config.godot_path)
         if godot:
