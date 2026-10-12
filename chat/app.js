@@ -115,7 +115,9 @@ $("localMicButton").addEventListener("click", () => {
     if (micState.recognizer === recognition) {
       const reason = event.error || "desconhecido";
       stopLocalMic();
-      if (reason === "language-not-supported") {
+      if (reason === "no-speech") {
+        localMicFeedback("O microfone abriu, mas o navegador não detectou fala. Fale perto do microfone ou use Testar microfone no painel Conversar por voz.");
+      } else if (reason === "language-not-supported") {
         micState.available = false;
         micState.availability = "unknown";
         localMicFeedback("Pacote pt-BR indisponível ou removido. Verifique novamente.");
