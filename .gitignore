@@ -22,3 +22,6 @@ results/chat_validation/
 diagnostics/
 *.diagnostics.jsonl
 brain-ssd-diagnostics-*.zip
+
+# Personal persistent Luna permissions and paths; template is versioned.
+/LUNA.ini
