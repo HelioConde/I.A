@@ -278,7 +278,10 @@ def run_start_app(app_name: str) -> dict[str, Any]:
     if len(exact) != 1:
         raise ValueError("Nome ambíguo; informe o nome completo do aplicativo.")
     item = exact[0]
-    if _normalized_app_name(item["name"]) in _DENIED_LAUNCH_NAMES:
+    if (_normalized_app_name(item["name"]) in _DENIED_LAUNCH_NAMES or
+            any(token in _normalized_app_name(item["name"]) for token in
+                ("powershell", "terminal", "prompt de comando", "command prompt",
+                 "regedit", "registry editor", "task scheduler", "agendador de tarefas"))):
         raise ValueError("Aplicativo administrativo ou interpretador de comandos bloqueado.")
     import re
     app_id = item["app_id"]
