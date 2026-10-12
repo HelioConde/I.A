@@ -57,6 +57,9 @@ class DesktopFixture:
             ],
         }
 
+    def list_monitor_windows(self, monitor):
+        return [{"title": "Janela: Godot"}, {"title": "Janela: navegador"}]
+
     def preview_image(self, path):
         self.previews.append(path)
         return {"image_data_url": "data:image/jpeg;base64,YWJj",
@@ -107,6 +110,20 @@ class TestPastConversationRegression(unittest.TestCase):
                     "copilot_vision_limitation", "copilot_image_limitation"))
                 self.assertIn("texto", result["answer"])
         self.assertEqual(self.fake.previews, [])
+
+    def test_unobserved_screen_is_not_described_as_seen(self):
+        result = copilot_answer("O que você está vendo na minha tela?", self.fake)
+        self.assertEqual(result["local_action"], "copilot_screen_not_observed")
+        self.assertIn("não capturei", result["answer"])
+
+    def test_open_programs_are_visible_windows_not_random_processes(self):
+        result = copilot_answer("quais programas eu estou aberto ?", self.fake)
+        self.assertEqual(result["local_action"], "copilot_visible_windows")
+        self.assertIn("Janela: Godot", result["answer"])
+        self.assertNotIn("PID", result["answer"])
+
+    def test_generic_questions_about_browser_tabs_are_not_overblocked(self):
+        self.assertIsNone(copilot_answer("O que são abas do navegador?", self.fake))
 
     def test_image_in_downloads_requires_authorized_listing_and_preview(self):
         with patch("brain_ssd.chat.copilot_queries.Path.home", return_value=self.folder):
