@@ -537,7 +537,7 @@ class ChatEngine:
                     "Não tenho uma previsão meteorológica ao vivo verificada. "
                     "Mesmo com pesquisa web autorizada, a Luna ainda não possui "
                     "um serviço meteorológico específico integrado. "
-                    "Não consultei o tempo em Brasília nem em outra cidade; "
+                    "Não consultei a previsão da cidade solicitada; "
                     "não vou inventar temperatura ou chuva."
                     if web_search else
                     "Para saber o clima de hoje preciso consultar uma fonte "
