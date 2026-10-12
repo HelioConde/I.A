@@ -430,6 +430,59 @@ class ChatEngine:
             raise ValueError("Memória de pesquisas desativada nesta sessão.")
         if web_search and self.web_search_service is None:
             raise ValueError("Pesquisa web desativada nesta sessão.")
+        # Explicit chat request for a local-model patch. This is an inference,
+        # never a write. The nested generation receives a bounded authorized
+        # code sample, no conversation history and no web permission. CodeEditor
+        # creates a separate one-use token for the human confirmation button.
+        patch_command = re.fullmatch(
+            r'/sugerir-correcao\s+"([^"\r\n]+)"(?:\s+@(\d{1,6}))?\s*::\s*(.+)',
+            question, re.I | re.S,
+        )
+        if patch_command:
+            if self.copilot is None or not self.copilot.edit_enabled:
+                local = {
+                    "answer": "Edição de código desativada. Autorize uma pasta e a "
+                              "edição no iniciador do Copiloto.",
+                    "mode": "local_command", "local_action": "copilot_patch_disabled",
+                }
+            else:
+                try:
+                    file_path, focus, instruction = patch_command.groups()
+                    def generate_patch_text(prompt: str) -> str:
+                        generated = self.ask(
+                            prompt, [], web_search=False,
+                            remember_web=False, fast_web=False,
+                            response_tokens=256,
+                        )
+                        return str(generated.get("answer", ""))
+                    draft = self.copilot.propose_model_patch(
+                        file_path, instruction, generate_patch_text,
+                        focus_line=int(focus) if focus else None,
+                    )
+                    local = {
+                        "answer": "Proposta da IA local (NÃO aplicada):\n" +
+                                  draft["diff"] +
+                                  "\nMotivo alegado pela IA: " + draft["reason"] +
+                                  "\nVerificação: " + draft["validation"] +
+                                  "\nConfirme no botão desta mensagem somente "
+                                  "após revisar o diff.",
+                        "mode": "local_command",
+                        "local_action": "copilot_code_edit_proposal",
+                        "copilot_edit_token": draft["token"],
+                        "copilot_edit_path": draft["path"],
+                    }
+                except (CopilotPermissionError, ValueError, RuntimeError, OSError):
+                    local = {
+                        "answer": "Não foi possível gerar uma proposta segura. "
+                                  "Confira o arquivo, o modelo local e a permissão. "
+                                  "Nenhuma mudança foi aplicada.",
+                        "mode": "local_command",
+                        "local_action": "copilot_patch_unavailable",
+                    }
+            if on_chunk is not None:
+                on_chunk(local["answer"])
+            return local
+
         # Explicit PC/screen intents have verified local-tool answers even if
         # llama.cpp is loading or temporarily failing. Never send screenshots
         # or machine window titles into the language model or web provider.
