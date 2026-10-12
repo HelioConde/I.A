@@ -60,6 +60,8 @@ class LocalCopilot:
         self.launch_enabled = bool(launch)
         self.edit_enabled = bool(edit) and bool(allowed)
         self._editor = None
+        self._agent = None
+        self._agent_lock = threading.Lock()
         self._godot_validator = None
         self.godot_binary = Path(godot_binary) if godot_binary is not None else None
         if self.godot_binary is not None and not self.roots:
@@ -80,6 +82,7 @@ class LocalCopilot:
             "apps_enabled": self.apps_enabled,
             "launch_enabled": self.launch_enabled,
             "edit_enabled": self.edit_enabled,
+            "agent_enabled": True,  # bounded, read-only with separate plan/run steps
             "godot_validate_enabled": self._godot_validator is not None,
             "vision_enabled": False,
             "screen_interval_seconds": SCREEN_MIN_INTERVAL,
@@ -181,6 +184,20 @@ class LocalCopilot:
             raise CopilotPermissionError("Instale Pillow para pré-visualizar imagens.") from None
         except (OSError, ValueError, UnidentifiedImageError):
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
+
+    def _agent_core(self):
+        # Per-session shared token store, including concurrent HTTP requests.
+        with self._agent_lock:
+            if self._agent is None:
+                from brain_ssd.chat.agent_core import LocalAgentCore
+                self._agent = LocalAgentCore(self)
+            return self._agent
+
+    def plan_investigation(self, task: str, *, project=None, error=None, path=None) -> dict:
+        return self._agent_core().prepare(task, project=project, error=error, path=path)
+
+    def run_investigation(self, token: str) -> dict:
+        return self._agent_core().execute(token)
 
     def _create_godot_validator(self):
         from brain_ssd.chat.godot_validation import GodotValidator
