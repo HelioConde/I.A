@@ -655,7 +655,7 @@ async function send() {
         output.textContent = payload.answer;
         const speak = pending.querySelector(".voice-message");
         if (speak && voiceSupported) speak.disabled = !payload.answer?.trim();
-        if (autoVoice.enabled && voiceSupported && speak && payload.answer?.trim()) {
+        if (!window.lunaVoiceCallActive && autoVoice.enabled && voiceSupported && speak && payload.answer?.trim()) {
           readAssistantText(speak, payload.answer, {localOnly:true});
         }
         if (payload.needs_continuation && payload.mode === "experimental_chat") {
