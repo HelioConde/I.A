@@ -1173,6 +1173,20 @@ class ChatHandler(BaseHTTPRequestHandler):
                     result = copilot.confirm_godot_validation(data.get("token"))
                 elif action == "review_code":
                     result = copilot.review_code(data.get("path"))
+                elif action == "draft_model_patch":
+                    # No automatic execution: inference only produces JSON data.
+                    # Web search, chat history and stored user conversations are
+                    # never supplied to this local patch inference request.
+                    def patch_inference(prompt: str) -> str:
+                        answer = self.server.engine.ask(
+                            prompt, [], web_search=False, remember_web=False,
+                            response_tokens=256,
+                        )
+                        return str(answer.get("answer", ""))
+                    result = copilot.propose_model_patch(
+                        data.get("path"), data.get("instruction"), patch_inference,
+                        focus_line=data.get("focus_line"),
+                    )
                 elif action == "propose_code_edit":
                     result = copilot.propose_code_edit(
                         data.get("path"), data.get("before"), data.get("after"))
