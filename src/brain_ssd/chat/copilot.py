@@ -11,6 +11,7 @@ import io
 import os
 import platform
 import re
+import secrets
 import shutil
 import stat
 import sys
@@ -43,7 +44,8 @@ class CopilotPermissionError(ValueError):
 
 
 class LocalCopilot:
-    def __init__(self, roots: Iterable[Path] = (), *, screen: bool = False):
+    def __init__(self, roots: Iterable[Path] = (), *, screen: bool = False,
+                 apps: bool = False, launch: bool = False):
         allowed = []
         for path in roots:
             root = Path(path).expanduser().resolve(strict=True)
@@ -53,15 +55,21 @@ class LocalCopilot:
                 allowed.append(root)
         self.roots = tuple(allowed)
         self.screen_enabled = bool(screen)
+        self.apps_enabled = bool(apps)
+        self.launch_enabled = bool(launch)
+        self._launch_lock = threading.Lock()
+        self._launch_requests: dict[str, tuple[str, float]] = {}
         self._screen_lock = threading.Lock()
         self._last_screen = 0.0
 
     def status(self) -> dict:
         return {
-            "enabled": bool(self.roots or self.screen_enabled),
+            "enabled": bool(self.roots or self.screen_enabled or self.apps_enabled or self.launch_enabled),
             "roots": [str(root) for root in self.roots],
             "files_enabled": bool(self.roots),
             "screen_enabled": self.screen_enabled,
+            "apps_enabled": self.apps_enabled,
+            "launch_enabled": self.launch_enabled,
             "vision_enabled": False,
             "screen_interval_seconds": SCREEN_MIN_INTERVAL,
             "notice": "Capturas são imagens para prévia; o Qwen de texto ainda não interpreta pixels.",
@@ -163,6 +171,56 @@ class LocalCopilot:
         except (OSError, ValueError, UnidentifiedImageError):
             raise CopilotPermissionError("Não foi possível carregar a imagem.") from None
 
+    def installed_apps(self, search: str | None = None) -> dict:
+        if not self.apps_enabled:
+            raise CopilotPermissionError("Inventário de aplicativos não autorizado nesta sessão.")
+        if search is not None and (not isinstance(search, str) or len(search) > 100):
+            raise CopilotPermissionError("Filtro de aplicativo inválido.")
+        from brain_ssd.chat.windows_apps import installed_apps
+        try:
+            return installed_apps(search)
+        except OSError:
+            raise CopilotPermissionError("Não foi possível consultar aplicativos instalados.") from None
+
+    def running_apps(self, search: str | None = None) -> dict:
+        if not self.apps_enabled:
+            raise CopilotPermissionError("Inventário de processos não autorizado nesta sessão.")
+        if search is not None and (not isinstance(search, str) or len(search) > 100):
+            raise CopilotPermissionError("Filtro de processo inválido.")
+        from brain_ssd.chat.windows_apps import running_apps
+        try:
+            return running_apps(search)
+        except OSError:
+            raise CopilotPermissionError("Não foi possível consultar processos ativos.") from None
+
+    def offer_launch(self, app_id: str) -> dict:
+        """Prepare one short-lived, single-use proposal. Never execute here."""
+        from brain_ssd.chat.windows_apps import LAUNCH_TARGETS
+        if not self.launch_enabled:
+            raise CopilotPermissionError("Abertura de aplicativos não autorizada nesta sessão.")
+        if type(app_id) is not str or app_id not in LAUNCH_TARGETS:
+            raise CopilotPermissionError("Somente Bloco de Notas ou Calculadora podem ser propostos.")
+        token = secrets.token_urlsafe(32)
+        with self._launch_lock:
+            self._launch_requests.clear()
+            self._launch_requests[token] = (app_id, time.monotonic() + 90)
+        return {"token": token, "app_id": app_id, "label": LAUNCH_TARGETS[app_id][0],
+                "expires_seconds": 90}
+
+    def confirm_launch(self, token: object) -> dict:
+        """Called only from POST after the user clicks the UI confirmation."""
+        if not self.launch_enabled or not isinstance(token, str) or len(token) > 200:
+            raise CopilotPermissionError("Confirmação de abertura não autorizada.")
+        with self._launch_lock:
+            pending = self._launch_requests.pop(token, None)
+        if pending is None or time.monotonic() > pending[1]:
+            raise CopilotPermissionError("Pedido expirado ou já utilizado. Solicite novamente no chat.")
+        from brain_ssd.chat.windows_apps import run_approved_app
+        try:
+            return run_approved_app(pending[0])
+        except (OSError, ValueError):
+            raise CopilotPermissionError("Não foi possível iniciar o aplicativo autorizado.") from None
+
     def list_monitor_windows(self, monitor: int = 1) -> list[dict[str, str]]:
         """List *visible window titles* intersecting one monitor on Windows.
 
@@ -240,7 +298,7 @@ class LocalCopilot:
             raise CopilotPermissionError("Não foi possível consultar as janelas do Windows.") from None
 
     def system_info(self) -> dict:
-        if not (self.roots or self.screen_enabled):
+        if not (self.roots or self.screen_enabled or self.apps_enabled or self.launch_enabled):
             raise CopilotPermissionError("Ative o copiloto antes de consultar o sistema.")
         disks = []
         for root in self.roots:
