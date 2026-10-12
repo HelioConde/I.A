@@ -233,7 +233,6 @@
       return;
     }
     state.testInProgress = true;
-    const wasListening = state.active && !state.muted;
     clearRestart(); stopRecognition(); buttons();
     let stream = null, audio = null;
     try {
@@ -269,9 +268,7 @@
       stream?.getTracks().forEach(track => track.stop());
       if (audio) try { await audio.close(); } catch (_) {}
       state.testInProgress = false; buttons();
-      if (wasListening && state.active && !state.muted) {
-        setState("interrupted", "Teste concluído. Clique em Retomar escuta para continuar a ligação.");
-      }
+      // Preserve the measured diagnostic on screen; resuming is an explicit click.
     }
   });
   byId("testVoiceCallTts").addEventListener("click", () => {
