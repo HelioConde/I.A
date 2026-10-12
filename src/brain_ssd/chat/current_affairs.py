@@ -49,6 +49,10 @@ def time_sensitive_local_intent(question: str) -> str | None:
     text = unicodedata.normalize("NFKD", question.casefold())
     text = "".join(ch for ch in text if not unicodedata.combining(ch))
     text = re.sub(r"\s+", " ", text).strip(" ?!.")
+    if "informacoes de hoje" in text and re.search(
+        r"\b(?:quais|que|fornecer|consegue|disponiveis)\b", text
+    ):
+        return "ambiguous_today"
     if re.fullmatch(
         r"(?:quais? (?:sao )?(?:as )?informacoes de hoje|o que tem de novo hoje|"
         r"me atualize sobre hoje|me de as informacoes de hoje|"
