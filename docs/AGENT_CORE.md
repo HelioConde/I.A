@@ -45,3 +45,28 @@ A CI Linux/Windows segue com falhas em jobs que encerram sem etapas e sem logs a
 ## Próximo estágio
 
 Permitir que o agente, após reunir evidências, produza um patch revisável e execute testes autorizados. Uma correção só deverá ser declarada após comparação antes/depois. Controle de aplicativos, conversação contínua e visão semântica permanecem projetos futuros.
+
+## Continuação — do diagnóstico à edição reversível
+
+Quando a investigação identifica um arquivo existente, o painel exibe
+**Selecionar arquivo encontrado no editor**. Isso apenas transfere o caminho
+verificado para o editor. O usuário ainda precisa informar exatamente qual
+trecho substituir e confirmar o diff.
+
+Após uma edição aprovada, o Copiloto oferece:
+- **Verificar última alteração**: comparar SHA-256 do arquivo em disco com
+  o conteúdo realmente aplicado. Não constitui teste do software.
+- **Preparar desfazer**: conferir backup, confirmar que o arquivo não mudou e
+  mostrar um diff reverso, sem alterar arquivos.
+- **Confirmar desfazer**: restaurar o backup por substituição atômica, após
+  uma segunda confirmação na interface.
+
+A reversão cobre somente a edição mais recente **na sessão atual**,
+durante 30 minutos, e cada proposta de desfazer expira em 90 segundos.
+Se outro programa modificar o arquivo, o Copiloto bloqueia o desfazer para
+não sobrescrever trabalho novo. O backup permanece no diretório privado
+local mesmo após a janela de desfazer; a ferramenta não oferece restauro
+automático após reiniciar o servidor.
+
+Essa evolução não gera código autonomamente. Não há comparação funcional
+do jogo antes/depois nem execução de Godot integrada ao mesmo plano.
