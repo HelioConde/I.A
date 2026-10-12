@@ -19,6 +19,7 @@ from brain_ssd.chat.diagnostics import DiagnosticLogger, process_snapshot
 from brain_ssd.chat.startup_diagnostics import classify_startup_error
 from brain_ssd.chat.episodic import EpisodicMemory
 from brain_ssd.chat.local_actions import is_local_action_answer, local_command, conversation_followup
+from brain_ssd.chat.session_facts import answer_session_fact, is_first_question_intent
 from brain_ssd.chat.retrieval_gate import relevant_to_ssd_corpus
 from brain_ssd.chat.web_search import WebSearchService, WebSearchError, format_web_context, format_fast_web_answer
 from brain_ssd.chat.learning import LearnedResponses, learned_action
@@ -141,7 +142,9 @@ def build_chat_prompt(question: str, history: list[dict[str, str]], knowledge: s
     """
     parts = [
         "/no_think",
-        "Você é Brain-SSD, assistente local em português brasileiro.",
+        "Você é Luna, assistente local do projeto Brain-SSD, em português brasileiro. "
+        "O modelo de linguagem é Qwen; Brain-SSD é o sistema, não o nome do modelo. "
+        "Não alegue saber data, mensagens antigas ou ações do PC sem dados fornecidos.",
         "Responda somente à pergunta atual, com clareza e exemplos quando úteis. "
         "Não substitua respostas por cumprimentos nem copie respostas anteriores.",
         "Não invente fatos pessoais, nomes de autores, fontes SSD, memórias "
@@ -407,7 +410,8 @@ class ChatEngine:
             cancel_event: threading.Event | None = None,
             request_id: str | None = None,
             web_search: bool = False, remember_web: bool = False,
-            fast_web: bool = False, response_tokens: int | None = None) -> dict[str, Any]:
+            fast_web: bool = False, response_tokens: int | None = None,
+            first_question: str | None = None) -> dict[str, Any]:
         started = time.monotonic()
         started_cpu = time.process_time()
         trace_id = request_id or str(uuid.uuid4())
@@ -419,7 +423,8 @@ class ChatEngine:
             result = self._ask_inner(question, raw_history, on_chunk=on_chunk,
                                      cancel_event=cancel_event, request_id=trace_id,
                                      web_search=web_search, remember_web=remember_web,
-                                     fast_web=fast_web, response_tokens=response_tokens)
+                                     fast_web=fast_web, response_tokens=response_tokens,
+                                      first_question=first_question)
         except GenerationCancelled:
             if self.diagnostics:
                 self.diagnostics.emit("chat.cancelled", request_id=trace_id,
@@ -443,7 +448,8 @@ class ChatEngine:
                    on_chunk: Callable[[str], None] | None,
                    cancel_event: threading.Event | None,
                    request_id: str, web_search: bool = False, remember_web: bool = False,
-                   fast_web: bool = False, response_tokens: int | None = None) -> dict[str, Any]:
+                   fast_web: bool = False, response_tokens: int | None = None,
+                   first_question: str | None = None) -> dict[str, Any]:
         if not isinstance(question, str) or not question.strip():
             raise ValueError("Digite uma mensagem.")
         question = question.strip()
@@ -510,6 +516,18 @@ class ChatEngine:
                 on_chunk(local["answer"])
             return local
 
+        # Clock, runtime identity and conversation facts must be obtained from
+        # their authoritative local sources, not guessed by the small Qwen.
+        session_fact = answer_session_fact(
+            question, raw_history, model_name=self.status().get("model", MODEL_NAME),
+            runtime_ready=self._state == "ready", first_question=first_question,
+        )
+        if session_fact is not None:
+            if cancel_event is not None and cancel_event.is_set():
+                raise GenerationCancelled()
+            if on_chunk is not None:
+                on_chunk(session_fact["answer"])
+            return session_fact
         # Explicit PC/screen intents have verified local-tool answers even if
         # llama.cpp is loading or temporarily failing. Never send screenshots
         # or machine window titles into the language model or web provider.
