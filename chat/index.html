@@ -121,6 +121,46 @@
         </form>
         <p class="disclaimer">Luna · Brain-SSD experimental. Ações sensíveis dependem de permissões e confirmação.</p>
       </div>
+      </div><!-- luna-center -->
+      <aside class="luna-rail" id="lunaRail" aria-label="Painel de comando da Luna">
+        <div class="luna-rail-head"><span>PAINEL DE COMANDO</span><span>01 / LIVE</span></div>
+        <section class="luna-hud-card luna-presence" aria-label="Núcleo operacional da Luna">
+          <div class="luna-card-label">NÚCLEO DA LUNA <span class="luna-live-point" aria-hidden="true"></span></div>
+          <div class="luna-status-core" aria-hidden="true"><span>◈</span></div>
+          <strong id="lunaState" class="luna-state" role="status" aria-live="polite">Iniciando</strong>
+          <p id="lunaStateDetail" class="luna-state-detail">Aguardando o servidor local.</p>
+          <div class="luna-card-footer">PROCESSAMENTO LOCAL <strong id="lunaModelStatus">Verificando</strong></div>
+        </section>
+        <section class="luna-hud-card" aria-label="Contexto ativo">
+          <div class="luna-card-label">CONTEXTO ATIVO <span>02</span></div>
+          <dl class="luna-facts">
+            <div><dt>Modelo</dt><dd id="lunaRailModel">Verificando...</dd></div>
+            <div><dt>Perfil</dt><dd id="lunaRailProfile">—</dd></div>
+            <div><dt>Projeto</dt><dd id="lunaRailProject">Nenhum selecionado</dd></div>
+            <div><dt>Arquivos</dt><dd id="lunaRailFiles">Não verificado</dd></div>
+            <div><dt>Captura de tela</dt><dd id="lunaRailScreen">Não verificada</dd></div>
+          </dl>
+          <p class="luna-rail-note">Projeto apenas quando selecionado no Copiloto. Nenhuma captura automática.</p>
+        </section>
+        <section class="luna-hud-card" aria-label="Ações rápidas">
+          <div class="luna-card-label">ACESSO RÁPIDO <span>03</span></div>
+          <div class="luna-quick-grid">
+            <button type="button" class="luna-quick" id="lunaQuickCopilot"><span aria-hidden="true">▣</span> Copiloto</button>
+            <button type="button" class="luna-quick" id="lunaQuickMetrics"><span aria-hidden="true">◫</span> Métricas</button>
+            <button type="button" class="luna-quick" data-luna-prompt="/investigar-pc"><span aria-hidden="true">⌘</span> Diagnóstico</button>
+            <button type="button" class="luna-quick" data-luna-prompt="Explique como a memória SSD funciona no Brain-SSD."><span aria-hidden="true">◇</span> Memória SSD</button>
+          </div>
+          <p class="luna-rail-note">Os comandos são inseridos no chat; nenhum é executado automaticamente.</p>
+        </section>
+        <section class="luna-hud-card luna-activity" aria-label="Atividade desta tela">
+          <div class="luna-card-label">ATIVIDADE DA INTERFACE <span>04</span></div>
+          <ol id="lunaActivityLog" class="luna-activity-list">
+            <li>Interface aberta · aguardando conexão</li>
+          </ol>
+        </section>
+        <div class="luna-rail-end">LUNA / BRAIN-SSD <span>LOCAL INTERFACE v1</span></div>
+      </aside>
+      </div><!-- luna-layout -->
     </main>
   </div>
 
