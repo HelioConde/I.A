@@ -20,7 +20,10 @@ texto na tela e interagir por voz.
    edição no disco**, seguido de confirmação do navegador, aplica a
    substituição e salva um backup privado em
    `%LOCALAPPDATA%\BrainSSD\code-edit-backups\`.
-4. **Comandos do chat**: `/revisar C:\caminho\meu.gd`, ou
+4. **Recomendações verificadas**: `/recomendar pc` consulta hardware autorizado,
+   apresenta recomendações limitadas e informa quais métricas não foram medidas.
+   Não monitora permanentemente o sistema.
+5. **Comandos do chat**: `/revisar C:\caminho\meu.gd`, ou
    `/trocar "C:\caminho\meu.gd" "speed = 10" => "speed = 20"`.
    O segundo comando prepara uma proposta e botão de confirmação;
    **não modifica o arquivo automaticamente**.
