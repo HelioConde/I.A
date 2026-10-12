@@ -50,6 +50,16 @@ class TestStaticUI(unittest.TestCase):
         cls.inventory = HtmlInventory()
         cls.inventory.feed(cls.html)
 
+    def test_voice_call_ignores_unrelated_chat_and_muted_turns(self):
+        voice = (ROOT / "chat" / "luna-call.js").read_text(encoding="utf-8")
+        self.assertIn('if (!state.expectingAnswer) return; if (data.kind === "done")', voice)
+        self.assertIn('if (!state.active || state.muted || state.expectingAnswer', voice)
+        self.assertIn('if (!state.active) return; state.muted = !state.muted;', voice)
+        self.assertIn('recognition.processLocally = true', voice)
+        self.assertIn('state.active = false;', voice)
+        self.assertIn('stopRecognition();', voice)
+        self.assertIn('stopSpeech();', voice)
+
     def test_no_duplicate_dom_ids(self):
         ids = self.inventory.ids
         self.assertEqual(len(ids),len(set(ids)),"HTML contains duplicated IDs")
