@@ -196,6 +196,37 @@ def copilot_answer(question: str, copilot: LocalCopilot | None) -> dict[str, Any
     """Return a truthful local result only for clearly selected Copilot intents."""
     if not isinstance(question, str):
         return None
+    # Deterministic programming actions: no arbitrary commands or model edits.
+    code_review = re.fullmatch(r"/(?:revisar|inspecionar)\s+(.+)", question.strip(), re.I | re.S)
+    code_replace = re.fullmatch(
+        r'/trocar\s+"([^"\r\n]+)"\s+"([^"\r\n]+)"\s*=>\s*"([^"\r\n]*)"\s*',
+        question.strip(), re.I)
+    if code_review or code_replace:
+        if copilot is None:
+            return _result("Ative uma pasta de projeto no Copiloto Windows.",
+                           "copilot_disabled")
+        try:
+            if code_review:
+                result = copilot.review_code(code_review.group(1).strip().strip('"'))
+                lines = [
+                    "Revisão estática local de " + result["path"],
+                    f"Linhas: {result['line_count']} · Bytes: {result['size_bytes']}",
+                    *["• " + v for v in result["warnings"]],
+                    *["• TODO linha " + str(item["line"]) + ": " + item["text"]
+                      for item in result["todos"]],
+                    "Esta revisão não executou o projeto nem alterou arquivos.",
+                ]
+                return _result("\n".join(lines), "copilot_code_review")
+            offer = copilot.propose_code_edit(*code_replace.groups())
+            return _result(
+                "Proposta de edição para " + offer["path"] + "\n" + offer["diff"] +
+                "\nNenhuma mudança aplicada. Confirme no botão da conversa em até 90 segundos.",
+                "copilot_code_edit_proposal",
+                extra={"copilot_edit_token": offer["token"],
+                       "copilot_edit_path": offer["path"]},
+            )
+        except (CopilotPermissionError, OSError) as exc:
+            return _result(str(exc), "copilot_code_unavailable")
     simple = _plain(question)
     system = _is_system_question(simple)
     screen, monitor = _screen_request(simple)
