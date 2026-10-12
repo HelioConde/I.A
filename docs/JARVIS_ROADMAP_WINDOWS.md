@@ -164,3 +164,14 @@ nem aplica patches de forma geral, não roda testes independentes automaticament
 não acompanha mudanças visuais por monitoramento contínuo e não confirma que
 um bug foi corrigido. Para essa fase serão necessários planejamento,
 verificação de artefatos, reversão, ferramentas mais robustas e validação no PC.
+
+### Fluxo de edição reversível
+
+Uma edição de trecho autorizada pode agora ser verificada por SHA-256
+e desfeita pelo backup local após revisão do diff reverso e confirmação.
+A proteção se limita à última edição nesta sessão e exige que o arquivo
+permaneça inalterado desde a aplicação. O Agent Core pode selecionar
+um arquivo real encontrado na investigação para o editor, mas não
+produz patches de código por conta própria. A execução de testes
+funcionais continua separada e ainda não existe agente programador
+autônomo com ciclo de validação.
