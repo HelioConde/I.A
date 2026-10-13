@@ -269,3 +269,29 @@ test("local voice test only runs on explicit click and uses offline Portuguese v
   assert.equal(h.state(),"idle");
   assert.equal(h.recognition.length,0);
 });
+
+test("100 sequential simulated call turns resume listening without duplicate sends", async () => {
+  const h = harness();
+  h.click("startVoiceCall");
+  for (let i = 0; i < 100; i++) {
+    const mic = h.recognition.at(-1);
+    assert.ok(mic.started, "Microfone local nao iniciado no turno " + i);
+    h.final(mic, "Pergunta local numero " + i);
+    mic.onend();
+    assert.equal(h.sent, i + 1, "Turno deve ser submetido exatamente uma vez");
+    h.sending = false;
+    h.chat("done", "Resposta local simulada numero " + i);
+    assert.equal(h.utterances.length, i + 1);
+    assert.equal(h.state(), "responding");
+    h.utterances.at(-1).onend();
+    await h.drain();
+    assert.equal(h.state(), "listening", "Microfone deve retornar apos TTS");
+    assert.equal(h.recognition.length, i + 2);
+  }
+  h.click("endVoiceCall");
+  assert.equal(h.state(), "ended");
+  assert.equal(h.sent, 100);
+  assert.equal(h.timers.size, 0);
+  assert.equal(h.w.lunaVoiceCallActive, false);
+});
+
