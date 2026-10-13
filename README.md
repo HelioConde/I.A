@@ -10,6 +10,28 @@ O objetivo do Brain-SSD é investigar se uma IA pode **manter muito conhecimento
 
 ---
 
+## Teste pesado da Luna — Qwen3-4B Q8_0
+
+Depois de fechar a Luna, execute no PowerShell:
+
+```powershell
+.\TESTAR-LUNA-4B-PESADO.bat
+```
+
+O teste valida as regras do seletor de modelos, 1.000 turnos de
+orquestração **simulados**, estados do modo de ligação (com Node.js,
+sem microfone físico) e até 24 respostas **reais** do Qwen3-4B,
+com tempo máximo, proteção contra RAM insuficiente, histórico limitado,
+progressão por turno e relatório JSON local.
+
+É um ensaio pesado de estabilidade; ainda não comprova ganho de RAM nem
+conversa por voz ao vivo. O teste real requer o GGUF 4B Q8_0 instalado
+e 6 GiB de RAM disponível, sem downloads automáticos.
+
+[Guia de execução e interpretação dos resultados](docs/LUNA_STRESS_QWEN4B.md).
+
+---
+
 ## Novo comando da Luna: instalar e usar o Qwen3-4B Q8_0
 
 Na pasta do projeto, feche a Luna antiga e execute no **PowerShell**:
