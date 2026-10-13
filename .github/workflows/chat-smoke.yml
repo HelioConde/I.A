@@ -54,6 +54,7 @@ on:
       - "tools/launch_luna.py"
       - "tools/test_luna_models.py"
       - "tools/usar_qwen4b_luna.py"
+      - "USAR-QWEN4B-LUNA.bat"
       - "INSTALAR-QWEN4B-LUNA.bat"
       - "tests/test_usar_qwen4b_luna.py"
       - "tests/test_luna_model_comparison.py"
