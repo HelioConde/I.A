@@ -8,6 +8,7 @@ import threading
 import time
 import unicodedata
 import uuid
+from datetime import datetime
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -545,7 +546,20 @@ class ChatEngine:
         # Resolve these BEFORE checking model readiness or retrieving stale sources.
         temporal_intent = time_sensitive_local_intent(question)
         if temporal_intent:
-            if temporal_intent == "ambiguous_today":
+            if temporal_intent == "local_date":
+                now = datetime.now().astimezone()
+                weekdays = ("segunda-feira", "terça-feira", "quarta-feira",
+                            "quinta-feira", "sexta-feira", "sábado", "domingo")
+                months = ("janeiro", "fevereiro", "março", "abril", "maio",
+                          "junho", "julho", "agosto", "setembro", "outubro",
+                          "novembro", "dezembro")
+                message = (
+                    f"Hoje é {weekdays[now.weekday()]}, "
+                    f"{now.day} de {months[now.month - 1]} de {now.year}. "
+                    "Data obtida do relógio local do Windows, não de uma pesquisa web."
+                )
+                action = "local_date"
+            elif temporal_intent == "ambiguous_today":
                 message = ("Você quer informações de hoje sobre notícias, previsão do "
                            "tempo ou suas tarefas? Diga o assunto; não consultei "
                            "fontes atuais nesta mensagem.")
