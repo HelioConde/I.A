@@ -25,6 +25,24 @@ de ativar `model_file = Qwen3-4B-Q8_0.gguf`, `profile = equilibrado`,
 do `LUNA.ini`. Isso **não** comprova ainda a qualidade/velocidade da
 inferência real do Qwen3-4B; esse teste acontece quando a Luna iniciar.
 
+### Usar o 4B já instalado — sem download
+
+Após a primeira instalação, feche a Luna anterior e execute:
+
+```powershell
+.\USAR-QWEN4B-LUNA.bat
+```
+
+Esse comando chama o seletor em modo **`--activate`**, confere
+o tamanho, cabeçalho e SHA-256 do Qwen3-4B Q8_0 existente,
+valida o runtime, atualiza `LUNA.ini` e inicia a interface.
+**Não baixa modelo.** Se estiver ausente, mostra como usar
+`INSTALAR-QWEN4B-LUNA.bat` explicitamente.
+
+É diferente da opção 3 do instalador geral: ela seleciona um
+Qwen3-4B **Q4_K_M**, enquanto este atalho utiliza **Q8_0**
+sem alterar a quantização do candidato do experimento.
+
 Também é possível executar as etapas separadamente:
 
 ```powershell
