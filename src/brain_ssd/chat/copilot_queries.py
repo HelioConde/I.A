@@ -341,9 +341,19 @@ def _grounded_desktop_question(question: str, copilot: LocalCopilot | None) -> d
             "ou peça uma captura explícita do monitor; o Qwen atual não interpreta pixels.",
             "copilot_browser_tabs_unsupported",
         )
-    if re.search(r"\b(?:funcoes|funcionalidades|capacidades|recursos)\b", simple) and re.search(
-        r"\b(?:meu pc|meu computador|no pc|no computador|voce consegue|voce pode)\b", simple
-    ):
+    capabilities_question = (
+        re.search(r"\b(?:funcoes|funcionalidades|capacidades|recursos)\b", simple)
+        and re.search(
+            r"\b(?:meu pc|meu computador|no pc|no computador|voce consegue|voce pode|suas|luna)\b",
+            simple,
+        )
+    ) or re.fullmatch(
+        r"(?:o que (?:mais )?voce (?:consegue|pode) fazer|"
+        r"quais (?:sao )?(?:as )?(?:suas )?(?:funcoes|capacidades|funcionalidades)|"
+        r"o que (?:mais )?a luna (?:consegue|pode) fazer)[.!? ]*",
+        simple,
+    )
+    if capabilities_question:
         if copilot is None:
             return _result(
                 "O Copiloto não está ativo. Posso conversar com o Qwen local, "
