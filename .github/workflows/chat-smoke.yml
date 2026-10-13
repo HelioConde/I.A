@@ -57,6 +57,9 @@ on:
       - "USAR-QWEN4B-LUNA.bat"
       - "INSTALAR-QWEN4B-LUNA.bat"
       - "tests/test_usar_qwen4b_luna.py"
+      - "tools/stress_luna_qwen4b.py"
+      - "tests/test_stress_luna_qwen4b.py"
+      - "TESTAR-LUNA-4B-PESADO.bat"
       - "tests/test_luna_model_comparison.py"
       - "tests/test_launch_luna_ini.py"
       - "tests/fixtures/copilot_question_battery.json"
@@ -180,6 +183,7 @@ jobs:
           python -m unittest discover -s tests -p "test_launch_luna_ini.py" -v
           python -m unittest discover -s tests -p "test_luna_model_comparison.py" -v
           python -m unittest discover -s tests -p "test_usar_qwen4b_luna.py" -v
+          python -m unittest discover -s tests -p "test_stress_luna_qwen4b.py" -v
       - name: Synthetic episodic negative controls (not a human memory benchmark)
         run: |
           python tools/bench_episodic_memory.py
