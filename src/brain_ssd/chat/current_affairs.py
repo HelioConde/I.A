@@ -49,6 +49,13 @@ def time_sensitive_local_intent(question: str) -> str | None:
     text = unicodedata.normalize("NFKD", question.casefold())
     text = "".join(ch for ch in text if not unicodedata.combining(ch))
     text = re.sub(r"\s+", " ", text).strip(" ?!.")
+    # The local calendar date is deterministic, unlike news and weather.
+    # Allow normal polite Portuguese wording from speech transcription.
+    if (re.search(
+        r"\b(?:data de hoje|data atual|qual e a data|qual a data|"
+        r"que dia e hoje|que data e hoje|em que dia estamos)\b", text
+    ) and not re.search(r"\b(?:noticias?|previsao|historia|conteudo)\b", text)):
+        return "local_date"
     if "informacoes de hoje" in text and re.search(
         r"\b(?:quais|que|fornecer|consegue|disponiveis)\b", text
     ):
