@@ -142,11 +142,23 @@ def _app_reply(question: str, copilot: LocalCopilot, intent: str) -> dict[str, A
 def _launch_intent(question: str) -> tuple[str | None, bool, bool]:
     """Match explicit imperatives, never broad questions or arbitrary commands."""
     text = _plain(question).strip()
+    # A capability question counts as app-launch intent ONLY when it asks
+    # specifically about launching an application. Generic "poderia" or
+    # "consegue" must never hijack date, news or other chat requests.
     query_only = bool(re.search(r"\b(?:consegue|pode|poderia|sabe)\b", text))
     if query_only:
-        if re.search(r"\b(?:imagem|imagen|foto|arquivo|documento|pasta|link|site)\b", text):
-            return None, False, False
-        return None, True, False
+        launch_verb = bool(re.search(r"\b(?:abrir|iniciar|executar|rodar)\b", text))
+        app_target = bool(re.search(
+            r"\b(?:programas?|aplicativos?|apps?|jogos?|steam|chrome|edge|"
+            r"calculadora|bloco de notas|notepad|vscode|vs code|visual studio code|godot)\b",
+            text,
+        ))
+        excluded_target = bool(re.search(
+            r"\b(?:imagem|imagen|foto|arquivo|documento|pasta|link|site|"
+            r"script|comando|codigo|terminal|powershell|noticias?)\b",
+            text,
+        ))
+        return None, launch_verb and app_target and not excluded_target, False
     match = re.fullmatch(
         r"(?:(?:luna|por favor)[,\s]+)?"
         r"(?:abra|abre|abri|abrir|inicie|inicia|iniciar|execute|executar)\s+"
