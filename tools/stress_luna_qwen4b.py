@@ -230,6 +230,7 @@ def supervise(*, report_path: Path, turns: int, tokens: int, mode: str,
               "evidence":evidence,"results":[]}
     save_report(report_path, report)
     peak_rss = None
+    minimum_system_free = None
     low_ram_abort = False
     cause = None
     print(f"Iniciando teste real: {turns} turnos, modelo {CANDIDATE}. "
@@ -258,6 +259,9 @@ def supervise(*, report_path: Path, turns: int, tokens: int, mode: str,
             if measured["tree_rss_bytes"] is not None:
                 peak_rss = max(peak_rss or 0, measured["tree_rss_bytes"])
             system = windows_memory()
+            if system is not None:
+                minimum_system_free = min(minimum_system_free if minimum_system_free is not None
+                                          else system.available, system.available)
             if system and system.available < int(1.5 * 1024 ** 3):
                 low_ram_abort = True
                 cause = "RAM fisica disponivel abaixo de 1.5 GiB"
@@ -285,6 +289,7 @@ def supervise(*, report_path: Path, turns: int, tokens: int, mode: str,
         "elapsed_seconds":round(time.monotonic() - started, 3),
         "peak_process_tree_rss_sampled_bytes":peak_rss,
         "process_rss_measured":peak_rss is not None,
+        "minimum_system_available_ram_bytes":minimum_system_free,
         "ram_abort":low_ram_abort,
         "failure":cause or (fail.get("reason") if fail else None),
         "worker_exit_code":exit_code,
@@ -293,6 +298,8 @@ def supervise(*, report_path: Path, turns: int, tokens: int, mode: str,
             "Apenas execucao local real. Nenhuma ferramenta externa foi usada.",
             "RSS inclui o processo de teste e descendentes amostrados com psutil opcional; "
             "se psutil estiver ausente, o campo fica nulo.",
+            "RAM disponivel no Windows e do sistema inteiro, nao atribuivel ao Qwen. "
+            "Se psutil nao estiver instalado, RSS do processo e descendentes fica nulo.",
             "Leituras fisicas do SSD, TTFT de audio e STT/TTS nao foram medidos.",
             "Os prompts e trechos das respostas ficam apenas neste JSON local ignorado pelo Git.",
         ],
