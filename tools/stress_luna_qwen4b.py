@@ -31,7 +31,7 @@ PROMPTS = (
     "Escreva uma funcao Python que soma uma lista de inteiros e explique em uma frase.",
     "Um cliente pede um resumo de 3 linhas sobre memoria SSD. Escreva o resumo.",
     "Explique a diferenca entre memoria RAM e armazenamento SSD em linguagem simples.",
-    "Se eu disser que voce abriu meu navegador, mas voce nao abriu, como responder corretamente?",
+    "Explique por que um assistente deve confirmar uma acao antes de anunciar que teve sucesso.",
     "Responda de forma natural, como em uma chamada de voz: o que faz uma CPU?",
     "Quanto e 144 dividido por 12? Mostre o raciocinio em poucas palavras.",
     "Explique como evitar eco quando um assistente fala e escuta alternadamente.",
@@ -331,7 +331,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-minutes",type=int,default=90)
     parser.add_argument("--per-turn-seconds",type=int,default=360)
     parser.add_argument("--output",type=Path,
-                        default=ROOT / "results" / "model_comparison" / "qwen3-4b-stress.json")
+                        default=ROOT / "results" / "model_comparison" /
+                                ("qwen3-4b-stress-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S") + ".json"))
     parser.add_argument("--events",type=Path,default=None,help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     if not 1 <= args.turns <= 2000 or not 48 <= args.tokens <= 256:
