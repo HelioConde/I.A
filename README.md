@@ -18,6 +18,17 @@ Na pasta do projeto, feche a Luna antiga e execute no **PowerShell**:
 .\INSTALAR-QWEN4B-LUNA.bat
 ```
 
+Depois da primeira instalação, para **usar o Qwen3-4B Q8_0 sem baixar nada**,
+feche a Luna e execute:
+
+```powershell
+.\USAR-QWEN4B-LUNA.bat
+```
+
+Esse segundo atalho valida o GGUF já instalado, seleciona-o no LUNA.ini
+sem apagar outras configurações e inicia a Luna. A instalação
+permanece uma ação explicitamente separada.
+
 O comando baixa o GGUF Q8_0 oficial de aproximadamente 4,28 GB **somente
 se estiver ausente**, verifica SHA-256, seleciona `Qwen3-4B-Q8_0.gguf`
 no `LUNA.ini` e abre o Copiloto. O Qwen3-0.6B original é preservado.
