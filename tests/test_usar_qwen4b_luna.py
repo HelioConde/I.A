@@ -131,6 +131,33 @@ class LunaModelActivationTests(unittest.TestCase):
             dl.assert_not_called()
             dr.assert_not_called()
 
+    def test_quick_use_switch_requires_existing_verified_model_and_never_downloads(self):
+        candidate = self.add_fixture_model()
+        calls = []
+        def preflight(root, profile, probe, model_file):
+            calls.append(("preflight", profile, model_file))
+            return {"ready_for_test": True}
+        with patch.object(app, "download_candidate") as download, \
+             patch.object(app, "MIN_4B", 1), \
+             patch.object(app, "sha256_file", return_value=CANDIDATE_SHA256), \
+             patch.object(app, "inspect_installation", side_effect=preflight):
+            app.install_activate(self.ini, download=False, models=self.models)
+            download.assert_not_called()
+        self.assertTrue(candidate.is_file())
+        self.assertEqual(read_config(self.ini).model_file, CANDIDATE)
+        self.assertEqual(calls, [("preflight", "equilibrado", CANDIDATE)])
+
+    def test_quick_use_batch_never_downloads_without_explicit_installer(self):
+        path = ROOT / "USAR-QWEN4B-LUNA.bat"
+        batch = path.read_text(encoding="utf-8")
+        self.assertIn('cd /d "%~dp0"', batch)
+        self.assertIn('"tools\\usar_qwen4b_luna.py" --activate', batch)
+        self.assertIn('INICIAR-COPILOTO-WINDOWS.bat', batch)
+        self.assertNotIn('--install-activate', batch)
+        self.assertNotIn('"tools\\auto_setup_chat_windows.py"', batch)
+        self.assertIn('if errorlevel 1', batch)
+        self.assertNotIn('choice /C 123', batch)
+
     def test_batch_installs_only_with_explicit_command(self):
         path = ROOT / "INSTALAR-QWEN4B-LUNA.bat"
         batch = path.read_text(encoding="utf-8")
