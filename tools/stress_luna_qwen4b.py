@@ -238,43 +238,48 @@ def supervise(*, report_path: Path, turns: int, tokens: int, mode: str,
     with subprocess.Popen(command, stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, cwd=ROOT,
                           shell=False) as process:
-        last_turn = 0
-        last_reported = 0
-        last_start = time.monotonic()
-        observed_start = False
-        while process.poll() is None:
-            entries = load_events(events_path)
-            starts = [e for e in entries if e.get("event") == "turn_start"]
-            finishes = [e for e in entries if e.get("event") == "turn_result"]
-            if len(finishes) > last_reported:
-                last_reported = len(finishes)
-                latest = finishes[-1]
-                print(f"Turnos reais: {last_reported}/{turns} | "
-                      f"ultimo: {latest.get('elapsed_seconds')}s", flush=True)
-            if len(starts) > last_turn:
-                last_turn = len(starts)
-                last_start = time.monotonic()
-                observed_start = True
-            measured = collect_memory(process.pid)
-            if measured["tree_rss_bytes"] is not None:
-                peak_rss = max(peak_rss or 0, measured["tree_rss_bytes"])
-            system = windows_memory()
-            if system is not None:
-                minimum_system_free = min(minimum_system_free if minimum_system_free is not None
-                                          else system.available, system.available)
-            if system and system.available < int(1.5 * 1024 ** 3):
-                low_ram_abort = True
-                cause = "RAM fisica disponivel abaixo de 1.5 GiB"
-            if time.monotonic() - started > max_minutes * 60:
-                cause = "Tempo total excedido"
-            if time.monotonic() - last_start > per_turn_seconds:
-                cause = ("Tempo de inicializacao excedido" if not observed_start
-                         else "Tempo de um turno excedido")
-            if cause:
-                terminate_tree(process)
-                break
-            time.sleep(1)
-        exit_code = process.wait(timeout=15)
+        try:
+            last_turn = 0
+            last_reported = 0
+            last_start = time.monotonic()
+            observed_start = False
+            while process.poll() is None:
+                entries = load_events(events_path)
+                starts = [e for e in entries if e.get("event") == "turn_start"]
+                finishes = [e for e in entries if e.get("event") == "turn_result"]
+                if len(finishes) > last_reported:
+                    last_reported = len(finishes)
+                    latest = finishes[-1]
+                    print(f"Turnos reais: {last_reported}/{turns} | "
+                          f"ultimo: {latest.get('elapsed_seconds')}s", flush=True)
+                if len(starts) > last_turn:
+                    last_turn = len(starts)
+                    last_start = time.monotonic()
+                    observed_start = True
+                measured = collect_memory(process.pid)
+                if measured["tree_rss_bytes"] is not None:
+                    peak_rss = max(peak_rss or 0, measured["tree_rss_bytes"])
+                system = windows_memory()
+                if system is not None:
+                    minimum_system_free = min(minimum_system_free if minimum_system_free is not None
+                                              else system.available, system.available)
+                if system and system.available < int(1.5 * 1024 ** 3):
+                    low_ram_abort = True
+                    cause = "RAM fisica disponivel abaixo de 1.5 GiB"
+                if time.monotonic() - started > max_minutes * 60:
+                    cause = "Tempo total excedido"
+                if time.monotonic() - last_start > per_turn_seconds:
+                    cause = ("Tempo de inicializacao excedido" if not observed_start
+                             else "Tempo de um turno excedido")
+                if cause:
+                    terminate_tree(process)
+                    break
+                time.sleep(1)
+            exit_code = process.wait(timeout=15)
+        except KeyboardInterrupt:
+            cause = "Interrompido pelo usuario"
+            terminate_tree(process)
+            exit_code = process.wait(timeout=15)
     entries = load_events(events_path)
     results = [{k:v for k,v in item.items() if k != "event"}
                for item in entries if item.get("event") == "turn_result"]
