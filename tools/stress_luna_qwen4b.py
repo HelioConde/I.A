@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tools"))
 
 from brain_ssd.chat.performance import windows_memory
-from test_luna_models import CANDIDATE, sha256_file
+from test_luna_models import CANDIDATE, CANDIDATE_SHA256
 from usar_qwen4b_luna import verified_4b
 
 PROMPTS = (
@@ -137,7 +137,7 @@ def require_model() -> dict:
             "Para proteger o computador, sao necessarios pelo menos 6 GiB "
             "de RAM fisica disponivel. Feche outros programas e tente novamente."
         )
-    return {"model":CANDIDATE,"model_sha256":sha256_file(target),
+    return {"model":CANDIDATE,"model_sha256":CANDIDATE_SHA256,  # already verified in verified_4b()
             "model_bytes":target.stat().st_size,
             "memory_available_start_bytes":available.available,
             "memory_total_bytes":available.total}
@@ -232,15 +232,24 @@ def supervise(*, report_path: Path, turns: int, tokens: int, mode: str,
     peak_rss = None
     low_ram_abort = False
     cause = None
+    print(f"Iniciando teste real: {turns} turnos, modelo {CANDIDATE}. "
+          "Nenhuma busca web, chamada de ferramentas ou microfone.",flush=True)
     with subprocess.Popen(command, stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, cwd=ROOT,
                           shell=False) as process:
         last_turn = 0
+        last_reported = 0
         last_start = time.monotonic()
         observed_start = False
         while process.poll() is None:
             entries = load_events(events_path)
             starts = [e for e in entries if e.get("event") == "turn_start"]
+            finishes = [e for e in entries if e.get("event") == "turn_result"]
+            if len(finishes) > last_reported:
+                last_reported = len(finishes)
+                latest = finishes[-1]
+                print(f"Turnos reais: {last_reported}/{turns} | "
+                      f"ultimo: {latest.get('elapsed_seconds')}s", flush=True)
             if len(starts) > last_turn:
                 last_turn = len(starts)
                 last_start = time.monotonic()
