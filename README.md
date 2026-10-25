@@ -1,4 +1,14 @@
-# Brain-SSD
+# Brain-SSD — Laboratório de IA local
+
+**Pesquisa experimental sobre memória persistente em disco, recuperação seletiva de conhecimento e interação com modelos executados localmente.**
+
+**Propósito:** investigar alternativas para organizar informação e ativar contexto conforme a tarefa, com foco em máquinas pessoais e controle do ambiente de execução.
+
+**Comece pelo guia abaixo:** ele descreve instalação no Windows, arquitetura, experimentos, avaliações e resultados ainda não comprovados.
+
+> **Pesquisa, não produto validado:** a abordagem não simula biologicamente o cérebro e não possui superioridade demonstrada em desempenho ou qualidade em todos os cenários.
+
+---
 
 **Uma arquitetura experimental de IA local, inspirada em princípios de memória, atenção e aprendizagem do cérebro humano.**
 
