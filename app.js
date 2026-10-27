@@ -192,7 +192,8 @@ function renderMessages() {
   refs.welcome.hidden = messages.length !== 0;
   for(const message of messages) refs.messages.append(messageElement(message));
   refs.title.textContent=conversation?.title || "Nova conversa";
-  scrollBottom();
+  if(messages.length) scrollBottom();
+  else refs.scroll.scrollTop=0;
 }
 function scrollBottom() {requestAnimationFrame(()=>{refs.scroll.scrollTop=refs.scroll.scrollHeight;});}
 function syncUi() {renderList();renderMessages();updateSend();}
@@ -298,7 +299,7 @@ function sendMessage(textValue=refs.prompt.value) {
   },ANSWER_DELAY);
 }
 function syncSidebarInert() {
-  refs.sidebar.inert = window.matchMedia("(max-width:760px)").matches && !refs.sidebar.classList.contains("is-open");
+  refs.sidebar.inert = window.matchMedia("(max-width:900px)").matches && !refs.sidebar.classList.contains("is-open");
 }
 function closeSidebar() {
   refs.sidebar.classList.remove("is-open");
