@@ -21,7 +21,11 @@ O workflow `.github/workflows/pages.yml` publica exclusivamente o diretório `si
 
 O site usa caminhos relativos `./styles.css`, `./app.js` e `./favicon.svg`. Assim funciona em um projeto Pages localizado em `/I.A/`, não apenas na raiz de um domínio.
 
-**Ativação:** no GitHub, Settings → Pages → Build and deployment → Source: **GitHub Actions**. Em repositórios privados, a elegibilidade do Pages depende do plano/conta. Caso não esteja disponível, o código estático pode ser disponibilizado em um repositório público separado sem expor o núcleo experimental.
+**Ativação padrão:** no GitHub, Settings → Pages → Build and deployment → Source: **GitHub Actions**. Em repositórios privados, a elegibilidade do Pages depende do plano/conta. Caso não esteja disponível, o código estático pode ser disponibilizado em um repositório público separado sem expor o núcleo experimental.
+
+**Fallback sem runner GitHub Actions:** foi criada a branch `gh-pages` com SOMENTE quatro arquivos na raiz (`index.html`, `styles.css`, `app.js`, `favicon.svg`). Em Settings → Pages, escolha **Deploy from a branch → gh-pages → /(root) → Save**. Esse método usa o publicador de Pages e não requer rodar Playwright para servir arquivos estáticos. A publicação ainda depende da elegibilidade do Pages; essa branch é um snapshot manual e não se sincroniza automaticamente com `site/` após novas alterações.
+
+**Validação em 27/10/2026:** uma execução do workflow de Playwright falhou antes do início dos steps, com `runner_id=0`. O motivo detalhado não estava disponível pelo log retornado; não há screenshots reais nem status verde de testes. Antes de marcar QA como concluído, consulte a página do run no GitHub, corrija a indisponibilidade dos runners e execute novamente.
 
 ## Modelo de dados
 
