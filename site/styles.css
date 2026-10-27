@@ -1,4 +1,6 @@
 /* Luna / Brain-SSD — static demo. No external dependencies. */
+/* Author display declarations must never override the HTML hidden attribute. */
+[hidden]{display:none!important}
 :root {
   color-scheme:dark; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --bg:#0b101b;--canvas:#0d1220;--surface:#111827;--surface-hi:#161f31;--hover:#202b43;
@@ -22,3 +24,14 @@
 @media(max-width:400px){.prompt-grid{grid-template-columns:1fr}.hero-orbit{display:none}.welcome{padding-top:27px}.welcome h1{font-size:29px}.welcome>p{margin-bottom:20px}.prompt-card{min-height:60px}.prompt-arrow{display:none}.eyebrow{font-size:9px}.composer-hint{font-size:9px}.char-count{display:none}.current-title{max-width:140px}}
 @media(max-height:650px){.hero-orbit{height:78px;width:78px;margin:8px auto}.orb-core{font-size:50px}.welcome{padding-top:14px}.welcome h1{font-size:30px}.welcome>p{margin-bottom:16px}.prompt-card{min-height:69px}.hero-badge{padding:5px 9px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.prompt-card:hover{transform:none}}
+
+/* v2: legible controls, offline-state messaging, stronger touch targets */
+.network-notice{padding:10px 18px;text-align:center;background:#382c1e;color:#f4d9ad;border-bottom:1px solid #7b6039;font-size:12px;line-height:1.5}
+.network-notice strong{color:#ffedd0}
+.sidebar-actions .text-btn{min-height:36px}
+.prompt-card:focus-visible{box-shadow:var(--ring)}
+.message-copy::selection{background:#817bc4;color:white}
+.page-version{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;color:#94a4bd;font-size:10px}
+.page-version code{font-size:10px;color:#bcc5ea}
+@media(max-width:760px){.close-sidebar,.mobile-menu{min-height:44px;min-width:44px}.network-notice{padding:8px 10px}.sidebar-actions .text-btn{min-height:44px}.send-btn{min-height:44px;min-width:44px}.prompt-card{min-height:76px}}
+@media(prefers-reduced-motion:reduce){.hero-orbit *{animation:none!important}.typing span{animation:none!important;opacity:1!important}}
