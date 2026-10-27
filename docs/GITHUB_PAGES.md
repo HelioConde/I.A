@@ -15,17 +15,17 @@ O núcleo Brain-SSD mantém o servidor Python em `src/brain_ssd/chat/server.py`,
 | Banco de dados no servidor | Pode usar SQLite local | **Não** |
 | Indicadores | Conforme telemetria real | Apenas contagens locais e diagrama conceitual |
 
-## Infraestrutura
+## Infraestrutura — configuração ativa (27/10/2026)
 
-A fonte oficial de publicação é **Deploy from a branch → `gh-pages` → `/(root)`**. A branch contém somente os arquivos estáticos sincronizados de `site/`; o workflow `.github/workflows/pages.yml` executa **somente QA** e não tenta implantar o site. Nenhum `brain_data/`, `results/`, modelo, log, script ou SQLite integra o diretório publicado.
+**Source: GitHub Actions** em Settings → Pages. A aplicação web reside em `site/` e é publicada pelo [workflow Luna Pages — Publish (GitHub Actions)](../.github/workflows/pages-manual-publish.yml) sempre que seus arquivos, os testes ou o próprio workflow são alterados na `main`. Também existe a execução manual pela aba Actions.
 
-O site usa caminhos relativos `./styles.css`, `./app.js` e `./favicon.svg`. Assim funciona em um projeto Pages localizado em `/I.A/`, não apenas na raiz de um domínio.
+O workflow executa a validação estática `node site-tests/static-smoke.cjs` antes de enviar exclusivamente `site/` por `actions/upload-pages-artifact` e `actions/deploy-pages`. O workflow [Visual QA](../.github/workflows/pages.yml) executa Playwright separadamente. O Pages não requer PHP, Python, MySQL, SQLite, serviços de IA ou backend.
 
-**Ativação padrão:** no GitHub, Settings → Pages → Build and deployment → Source: **Deploy from a branch**, branch **`gh-pages`**, folder **`/(root)`**. Em repositórios privados, a elegibilidade do Pages depende do plano/conta. Caso não esteja disponível, o código estático pode ser disponibilizado em um repositório público separado sem expor o núcleo experimental.
+**Resultado confirmado:** o [deploy #40482973325](https://github.com/HelioConde/I.A/actions/runs/40482973325) terminou com sucesso. O [Publication Health #40481044717](https://github.com/HelioConde/I.A/actions/runs/40481044717), tentativa 3, confirmou HTTP 200 em `https://helioconde.github.io/I.A/` e em quatro arquivos essenciais (`app.js`, `styles.css`, `manifest.webmanifest`, `service-worker.js`).
 
-**Publicação sem runner GitHub Actions:** a branch `gh-pages` contém apenas a aplicação estática na raiz (`index.html`, `styles.css`, `app.js`, `favicon.svg`, `manifest.webmanifest`, `service-worker.js`, `.nojekyll`). Em Settings → Pages, escolha **Deploy from a branch → gh-pages → /(root) → Save**. Esse método usa o publicador de Pages; o Playwright continua sendo uma validação separada. A branch `gh-pages` é um snapshot e precisa ser sincronizada quando `site/` receber mudanças.
+Os arquivos usam caminhos relativos `./` para funcionar sob o prefixo `/I.A/`. O workflow não publica diretórios experimentais como `brain_data/`, `results/`, `src/`, executáveis ou bancos de dados.
 
-**Validação em 27/10/2026:** uma execução do workflow de Playwright falhou antes do início dos steps, com `runner_id=0`. O motivo detalhado não estava disponível pelo log retornado; não há screenshots reais nem status verde de testes. Antes de marcar QA como concluído, consulte a página do run no GitHub, corrija a indisponibilidade dos runners e execute novamente.
+**Atenção:** a branch `gh-pages` é apenas um snapshot histórico e não deve ser selecionada em Settings → Pages enquanto a publicação por GitHub Actions estiver ativa. A origem por branch causou confusão durante as tentativas iniciais. O 404 foi resolvido após a adoção do workflow oficial de publicação.
 
 ## Modelo de dados
 
@@ -39,7 +39,7 @@ LocalStorage não é criptografado: evite dados sensíveis, especialmente em má
 ## Design, acessibilidade e testes
 
 Consulte [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
-O workflow `.github/workflows/pages.yml` executa Playwright e salva capturas/screenshots como artefatos quando os runners estiverem disponíveis. A navegação de teste parte de `/site/` para reproduzir a publicação com prefixo de diretório. O job Pages executa os mesmos testes antes de publicar.
+O workflow `.github/workflows/pages.yml` executa Playwright e salva capturas/screenshots como artefatos quando os runners estiverem disponíveis. A navegação de teste parte de `/site/` para reproduzir a publicação com prefixo de diretório. O workflow de publicação executa os testes estáticos; o Playwright é executado em um workflow de QA independente.
 
 Testes requeridos: navegação, semântica, histórico, renomeação, exclusão, importação/exportação, interrupção, ausência de chamadas `/api`, screenshots responsivos, overflow, teclado e tratamento de erros de console.
 
@@ -72,3 +72,9 @@ O erro é de publicação/URL, não uma falha dos testes de UI. Confirmar no Git
 Existe o workflow [Luna Pages — Manual Publish (GitHub Actions)](../.github/workflows/pages-manual-publish.yml). Para utilizá-lo, selecionar **Settings → Pages → Build and deployment → Source: GitHub Actions**, e em **Actions → Luna Pages — Manual Publish (GitHub Actions) → Run workflow**. Ele valida o HTML/JS e publica somente `site/` com `actions/upload-pages-artifact` e `actions/deploy-pages`. Não roda automaticamente enquanto a configuração por branch estiver sendo utilizada.
 
 **Não há necessidade de apagar a branch `gh-pages` ou publicar o backend Python.** O workflow alternativo não altera arquivos experimentais.
+
+## Estado final — GitHub Actions confirmado
+
+- Publicação: **sucesso** no run `40482973325`.
+- Saúde HTTP: **sucesso** na terceira tentativa do run `40481044717`, incluindo resposta 200 do endereço principal e quatro recursos estáticos.
+- Não alterar a fonte em Settings → Pages para `Deploy from a branch`, salvo se houver decisão consciente de migrar a arquitetura de publicação.
