@@ -15,7 +15,7 @@ module.exports = defineConfig({
     ...devices["Desktop Chrome"]
   },
   webServer:{
-    command:"python3 -m http.server 4173 --directory . --bind 127.0.0.1",
+    command:"python3 -m http.server 4173 --directory .. --bind 127.0.0.1",
     url:"http://127.0.0.1:4173/site/",
     reuseExistingServer:!process.env.CI,
     timeout:20_000
