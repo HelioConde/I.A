@@ -57,3 +57,18 @@ O repositório contém artefatos de pesquisa, resultados grandes e dados de refe
 - Política CSP HTML restringe scripts, estilos e conexões à própria origem.
 - `node site-tests/static-smoke.cjs` executa verificações sem dependências; `site-tests/` mantém Playwright e capturas reais quando disponível.
 - **Atenção:** o repositório estava público na verificação desta atualização. Branches protegidas e artefato Pages não impedem leitura pública de outros arquivos e commits. Audite histórico e dados antes de considerar seguro para publicação.
+
+## Diagnóstico adicional — GitHub Actions / HTTP 404 (27/10/2026)
+
+Foi executado o workflow [Publication Health — run 40481044717](https://github.com/HelioConde/I.A/actions/runs/40481044717), com dois estágios independentes:
+
+- **Verify gh-pages snapshot: SUCESSO.** Todos os arquivos de `site/` correspondem ao conteúdo da branch `gh-pages` (incluindo manifesto e service worker).
+- **Verify public HTTP endpoints: FALHA.** O GitHub Actions alcançou o domínio, mas recebeu **HTTP 404** repetidamente em `https://helioconde.github.io/I.A/`, `app.js`, `styles.css`, `manifest.webmanifest` e `service-worker.js`. Uma segunda tentativa após atualização pela API de conteúdos também retornou 404.
+
+O erro é de publicação/URL, não uma falha dos testes de UI. Confirmar no GitHub: **Settings → Pages → Build and deployment → Deploy from a branch → Branch: gh-pages → Folder: /(root) → Save**. Verificar se a seção GitHub Pages mostra **Visit site** e qual é o endereço publicado. Se o endereço for diferente, atualizar a URL dos testes em `.github/workflows/pages-health.yml`.
+
+### Alternativa pronta: publicação por GitHub Actions
+
+Existe o workflow [Luna Pages — Manual Publish (GitHub Actions)](../.github/workflows/pages-manual-publish.yml). Para utilizá-lo, selecionar **Settings → Pages → Build and deployment → Source: GitHub Actions**, e em **Actions → Luna Pages — Manual Publish (GitHub Actions) → Run workflow**. Ele valida o HTML/JS e publica somente `site/` com `actions/upload-pages-artifact` e `actions/deploy-pages`. Não roda automaticamente enquanto a configuração por branch estiver sendo utilizada.
+
+**Não há necessidade de apagar a branch `gh-pages` ou publicar o backend Python.** O workflow alternativo não altera arquivos experimentais.
