@@ -8,6 +8,7 @@
   <meta name="description" content="Conheça a Luna, interface demonstrativa do projeto experimental Brain-SSD. Conversas salvas somente neste navegador, sem banco de dados ou servidor de IA.">
   <title>Luna — Brain-SSD | Laboratório de IA local</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
   <script src="./app.js" type="module"></script>
 </head>
@@ -39,6 +40,7 @@
           <button type="button" id="export-chat" class="text-btn" title="Exportar conversas JSON">Exportar</button>
           <button type="button" id="clear-chats" class="text-btn danger" title="Excluir todas as conversas">Limpar</button>
         </div>
+        <div class="page-version"><span>Site estático · V2</span><span>Sem servidor</span></div>
         <input id="import-file" type="file" accept="application/json,.json" hidden>
       </div>
     </aside>
@@ -56,6 +58,7 @@
         </div>
       </header>
       <div class="mode-notice" role="note"><span aria-hidden="true">✧</span> <strong>Modo GitHub Pages.</strong> Esta interface mostra respostas guiadas. Nenhum modelo de IA está executando aqui. <button type="button" id="notice-info">Saiba mais</button></div>
+      <div id="network-notice" class="network-notice" role="status" aria-live="polite" hidden><strong>Você está offline.</strong> A demonstração continua disponível se os arquivos já tiverem sido armazenados.</div>
       <div class="messages-scroll" id="messages-scroll">
         <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Mensagens da conversa"></div>
         <section class="welcome" id="welcome" aria-labelledby="welcome-title">
