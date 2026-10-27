@@ -57,5 +57,5 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-# Publishing is intentionally NOT configured here.
-# Pages source is gh-pages/(root); no workflow may override branch deployment.
+# This workflow tests UI and screenshots only. Publishing is performed by
+# pages-manual-publish.yml using GitHub Actions as the configured Pages source.
