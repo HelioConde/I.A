@@ -1,4 +1,4 @@
-name: Luna Pages — QA and Deploy
+name: Luna Pages — Visual QA
 
 on:
   workflow_dispatch:
@@ -23,58 +23,39 @@ permissions:
   contents: read
 
 concurrency:
-  group: luna-pages-${{ github.ref }}
+  group: luna-qa-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   browser-qa:
-    name: Playwright Chromium / screenshots
+    name: Static gate / Playwright screenshots
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Dependency-free site checks
+        run: node site-tests/static-smoke.cjs
       - name: Install Playwright dependencies
         working-directory: site-tests
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
-      - name: Run responsive and interactive browser tests
+      - name: Responsive functional regression
         working-directory: site-tests
         run: npm test
       - name: Upload screenshots and Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: luna-pages-playwright-${{ github.run_id }}
+          name: luna-qa-${{ github.run_id }}
           path: |
             site-tests/test-results/
             site-tests/playwright-report/
           if-no-files-found: ignore
           retention-days: 14
 
-  deploy:
-    name: Publish static site
-    needs: browser-qa
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - name: Package static demo ONLY
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./site
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+# Publishing is intentionally NOT configured here.
+# Pages source is gh-pages/(root); no workflow may override branch deployment.
