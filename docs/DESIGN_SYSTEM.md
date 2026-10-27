@@ -61,3 +61,13 @@ Referência: layout legado `chat/index.html` e `chat/styles.css`; informações 
 ## Revisão
 
 O modo real Windows continua com a interface `chat/` e servidor Python existentes. Sua migração completa para os tokens visuais é um trabalho separado, para preservar compatibilidade e não misturar demonstração e inferência real.
+
+## V2 — Acessibilidade, rede e PWA
+
+- O seletor CSS global `[hidden]{display:none!important}` protege o contrato semântico de ocultação mesmo quando a classe define `display`.
+- Alvos de toque mobile reforçados (botões essenciais com tamanho mínimo de 44 px); avisos de conectividade acessíveis via `role=status`.
+- Manifest e service worker armazenam apenas HTML, CSS, JavaScript e ícones estáticos; histórico do usuário permanece exclusivamente no armazenamento do navegador.
+- Política de segurança de conteúdo restringe scripts, conexão e workers à mesma origem. Evitar novos scripts embutidos ou dependências CDN.
+- Importação JSON destrutiva é confirmada em diálogo nativo e não altera o histórico ao cancelar.
+- Componentes demonstrativos nunca exibem métricas de CPU, RAM ou SSD fingindo dados reais.
+- Testar os cenários offline, `localStorage.clear()` em outra aba e elementos com `hidden` via Playwright, não apenas por inspeção do código.
