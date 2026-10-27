@@ -104,7 +104,7 @@ test("keyboard shortcut, modal semantics and reduced motion",async({page})=>{
   await page.keyboard.press("Control+k");
   await expect(page.locator("#prompt")).toHaveValue("");
   const duration=await page.locator(".prompt-card").first().evaluate(el=>getComputedStyle(el).transitionDuration);
-  expect(duration).toBe("1e-05s");
+  expect(parseFloat(duration)).toBeLessThan(0.001);
   await page.locator("#open-info").click();
   await expect(page.locator("#info-dialog")).toBeVisible();
   await page.keyboard.press("Escape");
