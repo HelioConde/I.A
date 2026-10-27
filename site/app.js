@@ -373,7 +373,7 @@ function wire() {
   window.addEventListener("online",updateNetworkStatus);
   window.addEventListener("offline",updateNetworkStatus);
   window.addEventListener("storage",event=>{
-    if(event.key===STORE_KEY&&!state.pending){load();syncUi();toast("Conversas atualizadas de outra aba.");}
+    if((event.key===STORE_KEY || event.key===null) && event.storageArea===localStorage && !state.pending){load();syncUi();toast("Conversas atualizadas de outra aba.");}
   });
 }
 function updateNetworkStatus() {
