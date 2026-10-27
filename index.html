@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b101b">
+  <meta name="description" content="Conheça a Luna, interface demonstrativa do projeto experimental Brain-SSD. Conversas salvas somente neste navegador, sem banco de dados ou servidor de IA.">
+  <title>Luna — Brain-SSD | Laboratório de IA local</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip-link" href="#chat-main">Pular para a conversa</a>
+  <div class="app-shell" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="Barra lateral de conversas">
+      <div class="brand-area">
+        <a class="brand" href="./" aria-label="Luna — página inicial">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="17" stroke="currentColor" stroke-width="1.4" opacity=".35"/><path d="M22 3l4.9 13.1L40 22l-13.1 4.9L22 40l-4.9-13.1L4 22l13.1-5.9L22 3Z" fill="currentColor"/><circle cx="22" cy="22" r="4.2" fill="#13192b"/></svg></span>
+          <span class="brand-name"><strong>Luna<span class="brand-period">.</span></strong><small>BRAIN-SSD LAB</small></span>
+        </a>
+        <button type="button" class="icon-btn close-sidebar" id="close-sidebar" aria-label="Fechar menu" title="Fechar menu">✕</button>
+      </div>
+
+      <div class="side-top">
+        <button type="button" class="primary-new" id="new-chat"><span aria-hidden="true">＋</span> Nova conversa <span class="keycap">Ctrl K</span></button>
+        <label class="search-wrapper" for="search-conversations"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.8 4.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="search-conversations" placeholder="Buscar conversas" autocomplete="off"></label>
+      </div>
+
+      <div class="section-header"><span>SUAS CONVERSAS</span><span id="conversation-count">0</span></div>
+      <nav id="conversation-list" class="conversation-list" aria-label="Conversas salvas">
+        <p class="empty-history">Suas conversas aparecerão aqui.</p>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="privacy-summary"><span class="privacy-icon" aria-hidden="true">◇</span><div><strong>Privacidade local</strong><small>Histórico apenas neste navegador</small></div></div>
+        <div class="sidebar-actions">
+          <button type="button" id="import-chat" class="text-btn" title="Importar conversas JSON">Importar</button>
+          <button type="button" id="export-chat" class="text-btn" title="Exportar conversas JSON">Exportar</button>
+          <button type="button" id="clear-chats" class="text-btn danger" title="Excluir todas as conversas">Limpar</button>
+        </div>
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+
+    <main class="main-content" id="chat-main">
+      <header class="topbar">
+        <div class="top-left">
+          <button type="button" class="icon-btn mobile-menu" id="open-sidebar" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+          <div class="chat-title-wrap"><span class="eyebrow">SEU ESPAÇO DE PESQUISA</span><strong id="current-title" class="current-title">Nova conversa</strong></div>
+        </div>
+        <div class="top-right">
+          <span class="mode-pill"><span class="mode-dot" aria-hidden="true"></span> Demonstração</span>
+          <button type="button" class="icon-btn info-button" id="open-info" aria-label="Sobre esta demonstração" title="Sobre esta demonstração" aria-haspopup="dialog">ⓘ</button>
+        </div>
+      </header>
+      <div class="mode-notice" role="note"><span aria-hidden="true">✧</span> <strong>Modo GitHub Pages.</strong> Esta interface mostra respostas guiadas. Nenhum modelo de IA está executando aqui. <button type="button" id="notice-info">Saiba mais</button></div>
+      <div class="messages-scroll" id="messages-scroll">
+        <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Mensagens da conversa"></div>
+        <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+          <div class="hero-badge"><span>✺</span> LABORATÓRIO DE IA LOCAL</div>
+          <div class="hero-orbit" aria-hidden="true"><div class="orbit-one"></div><div class="orbit-two"></div><div class="orb-core">✦</div><span class="spark spark-one">✧</span><span class="spark spark-two">✧</span></div>
+          <h1 id="welcome-title">Sua curiosidade tem<br><em>espaço para crescer.</em></h1>
+          <p>Eu sou a Luna, a interface do Brain-SSD. Explore o projeto, sua arquitetura e possibilidades em um ambiente de demonstração — com seus dados no navegador.</p>
+          <div class="prompt-grid" aria-label="Sugestões de conversa">
+            <button type="button" class="prompt-card" data-prompt="Como funciona o Brain-SSD?"><span class="prompt-icon violet">⌘</span><span><strong>Conheça o Brain-SSD</strong><small>Entenda a arquitetura de pesquisa</small></span><span class="prompt-arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="prompt-card" data-prompt="Como funciona a memória da Luna?"><span class="prompt-icon blue">◎</span><span><strong>Memória e contexto</strong><small>Como a recuperação é estudada</small></span><span class="prompt-arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="prompt-card" data-prompt="Quais são as limitações desta demonstração?"><span class="prompt-icon amber">◇</span><span><strong>Modo demonstração</strong><small>O que funciona sem servidor</small></span><span class="prompt-arrow" aria-hidden="true">↗</span></button>
+            <button type="button" class="prompt-card" data-prompt="Como executar a Luna no Windows?"><span class="prompt-icon teal">▣</span><span><strong>Execução no Windows</strong><small>Aprenda a rodar a versão local</small></span><span class="prompt-arrow" aria-hidden="true">↗</span></button>
+          </div>
+        </section>
+      </div>
+
+      <div class="composer-shell">
+        <form id="composer" class="composer" autocomplete="off">
+          <label class="sr-only" for="prompt">Escreva uma mensagem para Luna</label>
+          <textarea id="prompt" placeholder="Pergunte sobre o Brain-SSD ou explore a demonstração..." rows="1" maxlength="2000" required></textarea>
+          <div class="composer-foot"><div class="composer-hint"><span class="keyboard-hint">↵</span> Enviar <span class="dot-divider">·</span> Shift + Enter para nova linha</div><div class="composer-buttons"><span id="char-count" class="char-count">0 / 2000</span><button type="button" id="stop-response" class="stop-btn" hidden aria-label="Interromper resposta">■ Parar</button><button type="submit" id="send-button" class="send-btn" disabled aria-label="Enviar mensagem"><span aria-hidden="true">↑</span></button></div></div>
+        </form>
+        <p class="composer-disclaimer">Demonstração educativa · respostas pré-definidas · suas conversas permanecem neste navegador</p>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    </main>
+
+    <aside class="insight-panel" aria-label="Painel sobre o experimento">
+      <div class="insight-head"><span class="eyebrow">PAINEL DE PESQUISA</span><span class="sample-pill">ILUSTRATIVO</span></div>
+      <div class="insight-feature"><div class="micro-label">ESTADO DO AMBIENTE</div><div class="insight-state"><span class="state-led"></span> Demonstração estática</div><p>Sem inferência, monitoramento do hardware ou acesso ao seu computador.</p></div>
+      <div class="insight-divider"></div>
+      <div class="micro-label">ETAPAS CONCEITUAIS</div>
+      <ol class="pipeline-list"><li><span class="pipeline-node">01</span><div><strong>Entrada</strong><small>Pergunta do usuário</small></div></li><li><span class="pipeline-node">02</span><div><strong>Recuperação</strong><small>Seleção de contexto relevante</small></div></li><li><span class="pipeline-node">03</span><div><strong>Inferência</strong><small>Modelo local na versão Windows</small></div></li><li><span class="pipeline-node">04</span><div><strong>Resposta</strong><small>Geração e avaliação</small></div></li></ol>
+      <div class="insight-divider"></div>
+      <div class="micro-label">ESTA SESSÃO</div>
+      <div class="stats-grid"><div class="stat"><strong id="stat-conversations">0</strong><small>Conversas</small></div><div class="stat"><strong id="stat-messages">0</strong><small>Mensagens</small></div></div>
+      <div class="insight-note"><span aria-hidden="true">ⓘ</span> Estatísticas desta página são contagens locais. O fluxo acima é conceitual, não telemetria real.</div>
+      <a class="repository-link" href="https://github.com/HelioConde/I.A" target="_blank" rel="noopener noreferrer">Ver projeto no GitHub <span aria-hidden="true">↗</span></a>
+    </aside>
+  </div>
+
+  <dialog id="info-dialog" class="app-dialog" aria-labelledby="info-title"><form method="dialog"><button class="dialog-close" value="cancel" aria-label="Fechar">✕</button><div class="dialog-symbol" aria-hidden="true">✦</div><h2 id="info-title">Luna no GitHub Pages</h2><p>Esta é uma experiência interativa de demonstração. As respostas são roteiros educativos locais, não conteúdo gerado por inteligência artificial. Nenhum backend, modelo ou banco de dados remoto é usado.</p><p>As conversas ficam no armazenamento deste navegador, podendo ser exportadas ou apagadas. Evite escrever dados sensíveis, especialmente em dispositivos compartilhados.</p><p>Para executar a versão real da Luna com Qwen, consulte as instruções para Windows no repositório do Brain-SSD.</p><div class="dialog-actions"><button class="secondary-btn" value="close">Entendi</button></div></form></dialog>
+  <dialog id="rename-dialog" class="app-dialog" aria-labelledby="rename-title"><form id="rename-form"><button type="button" class="dialog-close" id="cancel-rename-x" aria-label="Fechar">✕</button><h2 id="rename-title">Renomear conversa</h2><label for="rename-input">Nome da conversa</label><input id="rename-input" name="rename" maxlength="80" required><div class="dialog-actions"><button type="button" id="cancel-rename" class="secondary-btn">Cancelar</button><button type="submit" class="primary-btn">Salvar nome</button></div></form></dialog>
+  <dialog id="confirm-dialog" class="app-dialog" aria-labelledby="confirm-title"><form method="dialog"><h2 id="confirm-title">Confirmar exclusão</h2><p id="confirm-description"></p><div class="dialog-actions"><button value="cancel" class="secondary-btn">Cancelar</button><button value="confirm" class="danger-btn">Excluir</button></div></form></dialog>
+</body>
+</html>

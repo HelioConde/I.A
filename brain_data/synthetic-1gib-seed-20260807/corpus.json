@@ -1,8 +1,0 @@
-{
-  "content_version": 1,
-  "data_file": "brain.dat",
-  "generation": "sha256(seed, 1MiB-unit-index) repeated within each unit",
-  "schema_version": 1,
-  "seed": 20260807,
-  "size_bytes": 1073741824
-}
