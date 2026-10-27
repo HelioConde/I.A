@@ -20,7 +20,7 @@ const refs = {
 const state = {conversations: [], activeId: null, pending: null, pendingTimer: null, toastTimer: null, editingId: null, readOnly: false, warningShown: false};
 const scriptReplies = [
   {
-    test: /mem[oó]ria|contexto|ssd|armazenamento|epis[oó]dic/i,
+    test: /mem[oó]ria|contexto|armazenamento|epis[oó]dic/i,
     reply: "No Brain-SSD, a memória persistente é uma área de pesquisa: o sistema organiza registros e tenta recuperar apenas o contexto relevante antes de gerar a resposta. O projeto distingue recuperar dados de treinar os pesos do modelo.\n\nNa versão Windows, algumas dessas etapas podem ser experimentadas com um modelo Qwen local e componentes Python. Nesta página você vê somente uma explicação educativa, sem executar inferência."
   },
   {
@@ -293,13 +293,18 @@ function sendMessage(textValue=refs.prompt.value) {
     refs.prompt.focus();
   },ANSWER_DELAY);
 }
+function syncSidebarInert() {
+  refs.sidebar.inert = window.matchMedia("(max-width:760px)").matches && !refs.sidebar.classList.contains("is-open");
+}
 function closeSidebar() {
   refs.sidebar.classList.remove("is-open");
+  syncSidebarInert();
   refs.backdrop.hidden=true;
   $("open-sidebar").setAttribute("aria-expanded","false");
 }
 function openSidebar() {
-  refs.sidebar.classList.add("is-open");refs.backdrop.hidden=false;
+  refs.sidebar.classList.add("is-open");
+  syncSidebarInert();refs.backdrop.hidden=false;
   $("open-sidebar").setAttribute("aria-expanded","true");
   $("close-sidebar").focus();
 }
@@ -355,8 +360,9 @@ function wire() {
     if(event.key==="Escape"&&refs.sidebar.classList.contains("is-open"))closeSidebar();
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();newChat();}
   });
+  window.addEventListener("resize",syncSidebarInert);
   window.addEventListener("storage",event=>{
     if(event.key===STORE_KEY&&!state.pending){load();syncUi();toast("Conversas atualizadas de outra aba.");}
   });
 }
-wire();load();syncUi();fitTextarea();
+wire();load();syncUi();fitTextarea();syncSidebarInert();
