@@ -64,3 +64,17 @@ Memória explícita, cache cognitivo, busca web e organização de fatos aparece
 [Arquitetura](docs/ARCHITECTURE.md) · [Hipóteses](docs/HYPOTHESIS_REGISTRY.md) · [Benchmarks](docs/BENCHMARKS.md) · [Roadmap](docs/ROADMAP.md) · [Guia de Windows](docs/CHAT_WINDOWS.md) · [Histórico técnico anterior](docs/README_HISTORY_2026-10-25.md)
 
 **Criado por [Hélio Conde](https://github.com/HelioConde).** Projeto de pesquisa independente, sem alegações de equivalência biológica ou validação clínica.
+
+
+## Demonstração web — Luna (GitHub Pages)
+
+A nova experiência em [`site/`](site/) é uma **demonstração estática** do Brain-SSD/Luna, sem servidor ou banco de dados. Inclui layout responsivo, conversa com **respostas educativas pré-definidas**, histórico e busca no LocalStorage, importação/exportação JSON e painel conceitual. **Não executa Qwen nem simula métricas reais como resultados experimentais.**
+
+- [Abrir a demonstração no Pages](https://helioconde.github.io/I.A/) — requer publicação habilitada em Settings → Pages → GitHub Actions e elegibilidade do plano.
+- [Arquitetura, diferenças entre modos e instruções de publicação](docs/GITHUB_PAGES.md).
+- [Design System e critérios de acessibilidade](docs/DESIGN_SYSTEM.md).
+- [Testes Playwright e screenshots](site-tests/tests/pages.spec.js).
+
+O workflow [Luna Pages — QA and Deploy](.github/workflows/pages.yml) valida o site com Playwright e publica **somente `site/`** após os testes passarem na branch `main`. Para testar localmente, rode `python -m http.server 4173` na raiz e acesse `http://localhost:4173/site/`. Para testes de navegador, entre em `site-tests/`, rode `npm install`, `npx playwright install chromium` e `npm test` (Python deve estar disponível como `python3` no ambiente de teste).
+
+**Alternativa sem GitHub Actions:** a branch [\`gh-pages\`](https://github.com/HelioConde/I.A/tree/gh-pages) contém somente os arquivos estáticos prontos para Settings → Pages → Deploy from a branch → \`gh-pages\` → \`/(root)\`. Essa opção não depende de runner CI, mas ainda requer elegibilidade do Pages e configuração manual.\n\n**Privacidade:** não torne o repositório público sem auditar também o histórico Git. Em hospedagens públicas, publique apenas o diretório estático. O modo Windows com Python, SQLite, experimentos e inferência real permanece separado.
