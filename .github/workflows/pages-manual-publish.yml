@@ -1,10 +1,15 @@
-name: Luna Pages — Manual Publish (GitHub Actions)
+name: Luna Pages — Publish (GitHub Actions)
 
-# Alternative to Deploy from a branch, available only after switching
-# Settings > Pages > Build and deployment > Source to GitHub Actions.
-# Never publishes the Python backend or experiment datasets.
+# GitHub Pages Settings > Pages > Build and deployment > Source: GitHub Actions
+# Publish ONLY site/, never Python sources, experiments, results, or user data.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "site-tests/**"
+      - ".github/workflows/pages-manual-publish.yml"
 
 permissions:
   contents: read
@@ -17,23 +22,28 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish isolated static demo
+    name: Publish validated static Luna
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout validated main
+      - name: Checkout main
         uses: actions/checkout@v4
-      - name: Validate static files before deployment
+      - name: Prepare Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate static application before deployment
         run: node site-tests/static-smoke.cjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload only the static site
+      - name: Upload only site/
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./site
-      - name: Deploy site to GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
