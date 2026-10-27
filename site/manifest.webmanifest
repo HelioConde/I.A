@@ -1,0 +1,20 @@
+{
+  "name": "Luna — Brain-SSD Lab",
+  "short_name": "Luna",
+  "description": "Demonstração estática do Brain-SSD, com histórico salvo localmente no navegador.",
+  "lang": "pt-BR",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b101b",
+  "theme_color": "#0b101b",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
