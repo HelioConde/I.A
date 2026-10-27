@@ -1,0 +1,39 @@
+name: Luna Pages — Manual Publish (GitHub Actions)
+
+# Alternative to Deploy from a branch, available only after switching
+# Settings > Pages > Build and deployment > Source to GitHub Actions.
+# Never publishes the Python backend or experiment datasets.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: luna-pages-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish isolated static demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout validated main
+        uses: actions/checkout@v4
+      - name: Validate static files before deployment
+        run: node site-tests/static-smoke.cjs
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload only the static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+      - name: Deploy site to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
