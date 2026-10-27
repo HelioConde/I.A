@@ -70,14 +70,16 @@ Memória explícita, cache cognitivo, busca web e organização de fatos aparece
 
 A nova experiência em [`site/`](site/) é uma **demonstração estática** do Brain-SSD/Luna, sem servidor ou banco de dados. Inclui layout responsivo, conversa com **respostas educativas pré-definidas**, histórico e busca no LocalStorage, importação/exportação JSON e painel conceitual. **Não executa Qwen nem simula métricas reais como resultados experimentais.**
 
-- [Abrir a demonstração no Pages](https://helioconde.github.io/I.A/) — publicação configurada via `gh-pages` → `/(root)` em Settings → Pages.
+- [Abrir a demonstração no Pages](https://helioconde.github.io/I.A/) — publicado via **GitHub Actions**, com HTTP 200 confirmado.
 - [Arquitetura, diferenças entre modos e instruções de publicação](docs/GITHUB_PAGES.md).
 - [Design System e critérios de acessibilidade](docs/DESIGN_SYSTEM.md).
 - [Testes Playwright e screenshots](site-tests/tests/pages.spec.js).
 
-O workflow [Luna Pages — Visual QA](.github/workflows/pages.yml) executa verificações e Playwright quando há runners disponíveis; **não publica o site**. A implantação usa a branch `gh-pages`. Para testar localmente, rode `python -m http.server 4173` na raiz e acesse `http://localhost:4173/site/`. Para testes de navegador, entre em `site-tests/`, rode `npm install`, `npx playwright install chromium` e `npm test` (Python deve estar disponível como `python3` no ambiente de teste).
+O workflow [Luna Pages — Visual QA](.github/workflows/pages.yml) executa testes com Playwright; a publicação é realizada pelo workflow [Luna Pages — Publish (GitHub Actions)](.github/workflows/pages-manual-publish.yml), que envia **somente `site/`**. Para testar localmente, rode `python -m http.server 4173` na raiz e acesse `http://localhost:4173/site/`. Para testes de navegador, entre em `site-tests/`, rode `npm install`, `npx playwright install chromium` e `npm test` (Python deve estar disponível como `python3` no ambiente de teste).
 
-**Alternativa sem GitHub Actions:** a branch [\`gh-pages\`](https://github.com/HelioConde/I.A/tree/gh-pages) contém somente os arquivos estáticos prontos para Settings → Pages → Deploy from a branch → \`gh-pages\` → \`/(root)\`. Essa opção não depende de runner CI, mas ainda requer elegibilidade do Pages e configuração manual.\n\n**Privacidade:** o repositório foi identificado como público em 27/10/2026: revise os arquivos e histórico Git, mesmo que o Pages publique apenas arquivos estáticos. O modo Windows com Python, SQLite, experimentos e inferência real permanece separado.
+**Histórico de publicação:** a branch [`gh-pages`](https://github.com/HelioConde/I.A/tree/gh-pages) permanece como snapshot estático, mas **não é mais a fonte ativa**. Settings → Pages deve continuar configurado em **GitHub Actions**.
+
+**Privacidade:** o repositório foi identificado como público em 27/10/2026: revise os arquivos e histórico Git, mesmo que o Pages publique apenas arquivos estáticos. O modo Windows com Python, SQLite, experimentos e inferência real permanece separado.
 
 
 ### Melhorias V2
@@ -87,4 +89,12 @@ O workflow [Luna Pages — Visual QA](.github/workflows/pages.yml) executa verif
 - PWA offline para o **shell estático** (manifest + service worker); nenhuma mensagem pessoal entra no cache do service worker.
 - CSP de origem única, banner de conexão e verificações estáticas sem dependências.
 - QA: `node site-tests/static-smoke.cjs` na raiz e capturas Playwright em cinco resoluções via `site-tests/`.
-- O deploy oficial usa a raiz de `gh-pages`; futuras alterações em `site/` precisam ser sincronizadas nessa branch.
+- O deploy oficial é automático por GitHub Actions quando `site/`, `site-tests/` ou o workflow de publicação muda na `main`. A branch `gh-pages` não precisa ser atualizada para o Pages.
+
+
+### Publicação verificada — 27/10/2026
+
+- **Deploy:** [Actions run 40482973325](https://github.com/HelioConde/I.A/actions/runs/40482973325) — sucesso.
+- **Verificação pública:** [Publication Health run 40481044717](https://github.com/HelioConde/I.A/actions/runs/40481044717), tentativa 3 — cinco respostas HTTP 200 (HTML, JS, CSS, manifest e service worker).
+- **Site:** https://helioconde.github.io/I.A/
+- **Fonte em Settings → Pages:** GitHub Actions, não `gh-pages`.
