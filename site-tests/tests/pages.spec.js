@@ -73,6 +73,8 @@ test("exports and imports versioned JSON data",async({page})=>{
   await page.locator("#import-file").setInputFiles({
     name:"conversas.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(exported))
   });
+  await expect(page.getByRole("heading",{name:"Substituir histórico?"})).toBeVisible();
+  await page.locator('#confirm-dialog button[value="confirm"]').click();
   await expect(page.getByText("1 conversa(s) importada(s).")).toBeVisible();
   await expect(page.locator(".message.assistant")).toHaveCount(1);
 });
@@ -127,4 +129,57 @@ test("invalid import and malicious message text are safely handled",async({page}
   await page.locator("#send-button").click();
   await expect(page.locator(".message.user .message-copy")).toHaveText(malicious);
   await expect(page.locator(".message.user img")).toHaveCount(0);
+});
+
+test("welcome, send and stop honor hidden attribute",async({page})=>{
+  await expect(page.locator("#welcome")).toBeVisible();
+  await expect(page.locator("#stop-response")).toBeHidden();
+  await page.locator("#prompt").fill("Olá");
+  await page.locator("#send-button").click();
+  await expect(page.locator("#welcome")).toBeHidden();
+  await expect(page.locator("#send-button")).toBeHidden();
+  await expect(page.locator("#stop-response")).toBeVisible();
+  await expect(page.locator(".message.assistant")).toBeVisible();
+  await expect(page.locator("#stop-response")).toBeHidden();
+  await expect(page.locator("#send-button")).toBeVisible();
+});
+test("import replacement cancellation preserves existing conversation",async({page})=>{
+  await page.locator("#prompt").fill("Luna existente");
+  await page.locator("#send-button").click();
+  await expect(page.locator(".message.assistant")).toBeVisible();
+  const foreign={version:1,activeId:null,conversations:[{
+    id:"imported-1234",title:"Importada",messages:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
+  }]};
+  await page.locator("#import-file").setInputFiles({
+    name:"import.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(foreign))
+  });
+  await expect(page.locator("#confirm-dialog")).toBeVisible();
+  await page.locator('#confirm-dialog button[value="cancel"]').click();
+  await expect(page.locator(".conversation-row")).toHaveCount(1);
+  await expect(page.locator("#current-title")).toContainText("Luna existente");
+});
+test("offline shell remains available after service worker installation",async({page,context})=>{
+  await page.evaluate(()=>navigator.serviceWorker.ready);
+  await page.reload();
+  await context.setOffline(true);
+  try{
+    await page.reload();
+    await expect(page.locator("#network-notice")).toBeVisible();
+    await expect(page.locator("#welcome-title")).toBeVisible();
+    await page.locator("#prompt").fill("offline");
+    await page.locator("#send-button").click();
+    await expect(page.locator(".message.assistant")).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
+});
+test("clearing data in another tab clears the current history",async({page,context})=>{
+  await page.locator("#prompt").fill("Teste duas abas");
+  await page.locator("#send-button").click();
+  await expect(page.locator(".message.assistant")).toBeVisible();
+  const second=await context.newPage();
+  await second.goto("./");
+  await second.evaluate(()=>localStorage.clear());
+  await expect(page.locator(".conversation-row")).toHaveCount(0);
+  await second.close();
 });
