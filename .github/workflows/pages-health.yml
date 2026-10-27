@@ -1,0 +1,107 @@
+name: Luna Pages — Publication Health
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pages-health.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  branch-parity:
+    name: Verify gh-pages snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout source (main)
+        uses: actions/checkout@v4
+        with:
+          path: source
+          persist-credentials: false
+      - name: Checkout published branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: published
+          persist-credentials: false
+      - name: Compare exact published static assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          source = Path("source/site")
+          published = Path("published")
+          expected = {p.relative_to(source).as_posix(): p.read_bytes()
+                      for p in source.rglob("*") if p.is_file()}
+          actual = {p.relative_to(published).as_posix(): p.read_bytes()
+                    for p in published.rglob("*")
+                    if p.is_file() and ".git" not in p.relative_to(published).parts}
+          missing = sorted(expected.keys() - actual.keys())
+          extra = sorted(actual.keys() - expected.keys())
+          different = sorted(k for k in expected.keys() & actual.keys()
+                             if expected[k] != actual[k])
+          for label, names in (("MISSING", missing), ("UNEXPECTED", extra), ("OUTDATED", different)):
+              for name in names:
+                  print(f"::error::{label} in gh-pages: {name}")
+          if missing or extra or different:
+              raise SystemExit("Published branch differs from site/. Sync gh-pages root after validating main.")
+          print(f"PASS: gh-pages exactly matches site/ ({len(expected)} static files; no extra files).")
+          PY
+
+  published-site:
+    name: Verify public HTTP endpoints
+    needs: branch-parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check live HTML, JavaScript, CSS, and PWA assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request, urlopen
+          from urllib.error import HTTPError, URLError
+          from time import sleep
+
+          root = "https://helioconde.github.io/I.A/"
+          checks = {
+              "": (b"Luna", "HTML"),
+              "app.js": (b"brain-ssd-luna-demo-v1", "JavaScript"),
+              "styles.css": (b"--brand", "CSS"),
+              "manifest.webmanifest": (b"Brain-SSD", "manifest"),
+              "service-worker.js": (b"luna-demo-static-v2", "service worker"),
+          }
+          failed = []
+          for path, (needle, label) in checks.items():
+              address = root + path
+              error = None
+              for attempt in range(1, 4):
+                  try:
+                      request = Request(address, headers={
+                          "User-Agent": "Luna-Pages-Health/1.0",
+                          "Cache-Control": "no-cache",
+                      })
+                      with urlopen(request, timeout=12) as response:
+                          body = response.read(2_000_000)
+                          status = response.status
+                      if status != 200 or needle not in body:
+                          raise ValueError(f"HTTP {status}, expected marker not found ({label})")
+                      print(f"PASS: {address} (HTTP {status}, {label})")
+                      error = None
+                      break
+                  except (HTTPError, URLError, TimeoutError, ValueError) as exc:
+                      error = str(exc)
+                      print(f"Attempt {attempt}/3: {address}: {error}")
+                      if attempt < 3:
+                          sleep(5)
+              if error is not None:
+                  failed.append((address, error))
+          if failed:
+              for address, error in failed:
+                  print(f"::error::GitHub Pages HTTP check failed: {address}: {error}")
+              raise SystemExit("GitHub Pages not verified. Check Settings > Pages > Visit site and published branch.")
+          print("PASS: public Pages HTML, JS, CSS, manifest, and service worker all verified.")
+          PY
