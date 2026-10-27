@@ -96,7 +96,11 @@ function parseData(raw) {
 function load() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return;
+    if (!raw) {
+      state.conversations=[];
+      state.activeId=null;
+      return;
+    }
     if (raw.length > MAX_IMPORT_BYTES) throw new Error("Arquivo local excedeu o limite de segurança.");
     const data = parseData(raw);
     state.conversations = data.conversations;
@@ -323,10 +327,15 @@ async function importData(file) {
   if(file.size>MAX_IMPORT_BYTES){toast("Arquivo muito grande (limite de 2 MB).");return;}
   try{
     const data=parseData(await file.text());
-    cancelPending(false);
-    state.conversations=data.conversations;
-    state.activeId=state.conversations.some(c=>c.id===data.activeId)?data.activeId:null;
-    save();syncUi();toast(state.conversations.length+" conversa(s) importada(s).");
+    const applyImport=()=>{
+      cancelPending(false);
+      state.conversations=data.conversations;
+      state.activeId=state.conversations.some(c=>c.id===data.activeId)?data.activeId:null;
+      save();syncUi();toast(state.conversations.length+" conversa(s) importada(s).");
+    };
+    if(state.conversations.length) {
+      confirmAction("Substituir histórico?", "Esta importação substituirá as conversas já salvas neste navegador. Exporte um backup antes de continuar.",applyImport);
+    } else applyImport();
   }catch(err){toast("Importação recusada: "+(err instanceof Error?err.message:"JSON inválido"));}
   finally{refs.importFile.value="";}
 }
@@ -361,8 +370,20 @@ function wire() {
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();newChat();}
   });
   window.addEventListener("resize",syncSidebarInert);
+  window.addEventListener("online",updateNetworkStatus);
+  window.addEventListener("offline",updateNetworkStatus);
   window.addEventListener("storage",event=>{
-    if(event.key===STORE_KEY&&!state.pending){load();syncUi();toast("Conversas atualizadas de outra aba.");}
+    if((event.key===STORE_KEY || event.key===null) && event.storageArea===localStorage && !state.pending){load();syncUi();toast("Conversas atualizadas de outra aba.");}
   });
 }
-wire();load();syncUi();fitTextarea();syncSidebarInert();
+function updateNetworkStatus() {
+  const status=$("network-notice");
+  status.hidden=navigator.onLine!==false;
+}
+function registerOfflineCache() {
+  if(!("serviceWorker" in navigator) || !window.isSecureContext) return;
+  navigator.serviceWorker.register("./service-worker.js",{scope:"./"}).catch((error)=>{
+    console.warn("Cache offline não registrado:",error instanceof Error?error.message:"indisponível");
+  });
+}
+wire();load();syncUi();fitTextarea();syncSidebarInert();updateNetworkStatus();registerOfflineCache();

@@ -17,13 +17,13 @@ O núcleo Brain-SSD mantém o servidor Python em `src/brain_ssd/chat/server.py`,
 
 ## Infraestrutura
 
-O workflow `.github/workflows/pages.yml` publica exclusivamente o diretório `site/` com `upload-pages-artifact` e `deploy-pages`. Nenhum `brain_data/`, `results/`, modelo, log, script ou SQLite integra o artefato do Pages.
+A fonte oficial de publicação é **Deploy from a branch → `gh-pages` → `/(root)`**. A branch contém somente os arquivos estáticos sincronizados de `site/`; o workflow `.github/workflows/pages.yml` executa **somente QA** e não tenta implantar o site. Nenhum `brain_data/`, `results/`, modelo, log, script ou SQLite integra o diretório publicado.
 
 O site usa caminhos relativos `./styles.css`, `./app.js` e `./favicon.svg`. Assim funciona em um projeto Pages localizado em `/I.A/`, não apenas na raiz de um domínio.
 
-**Ativação padrão:** no GitHub, Settings → Pages → Build and deployment → Source: **GitHub Actions**. Em repositórios privados, a elegibilidade do Pages depende do plano/conta. Caso não esteja disponível, o código estático pode ser disponibilizado em um repositório público separado sem expor o núcleo experimental.
+**Ativação padrão:** no GitHub, Settings → Pages → Build and deployment → Source: **Deploy from a branch**, branch **`gh-pages`**, folder **`/(root)`**. Em repositórios privados, a elegibilidade do Pages depende do plano/conta. Caso não esteja disponível, o código estático pode ser disponibilizado em um repositório público separado sem expor o núcleo experimental.
 
-**Fallback sem runner GitHub Actions:** foi criada a branch `gh-pages` com SOMENTE quatro arquivos na raiz (`index.html`, `styles.css`, `app.js`, `favicon.svg`). Em Settings → Pages, escolha **Deploy from a branch → gh-pages → /(root) → Save**. Esse método usa o publicador de Pages e não requer rodar Playwright para servir arquivos estáticos. A publicação ainda depende da elegibilidade do Pages; essa branch é um snapshot manual e não se sincroniza automaticamente com `site/` após novas alterações.
+**Publicação sem runner GitHub Actions:** a branch `gh-pages` contém apenas a aplicação estática na raiz (`index.html`, `styles.css`, `app.js`, `favicon.svg`, `manifest.webmanifest`, `service-worker.js`, `.nojekyll`). Em Settings → Pages, escolha **Deploy from a branch → gh-pages → /(root) → Save**. Esse método usa o publicador de Pages; o Playwright continua sendo uma validação separada. A branch `gh-pages` é um snapshot e precisa ser sincronizada quando `site/` receber mudanças.
 
 **Validação em 27/10/2026:** uma execução do workflow de Playwright falhou antes do início dos steps, com `runner_id=0`. O motivo detalhado não estava disponível pelo log retornado; não há screenshots reais nem status verde de testes. Antes de marcar QA como concluído, consulte a página do run no GitHub, corrija a indisponibilidade dos runners e execute novamente.
 
@@ -39,10 +39,21 @@ LocalStorage não é criptografado: evite dados sensíveis, especialmente em má
 ## Design, acessibilidade e testes
 
 Consulte [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
-O workflow `.github/workflows/pages-qa.yml` executa Playwright e salva capturas/screenshots como artefatos. A navegação de teste parte de `/site/` para reproduzir a publicação com prefixo de diretório. O job Pages executa os mesmos testes antes de publicar.
+O workflow `.github/workflows/pages.yml` executa Playwright e salva capturas/screenshots como artefatos quando os runners estiverem disponíveis. A navegação de teste parte de `/site/` para reproduzir a publicação com prefixo de diretório. O job Pages executa os mesmos testes antes de publicar.
 
 Testes requeridos: navegação, semântica, histórico, renomeação, exclusão, importação/exportação, interrupção, ausência de chamadas `/api`, screenshots responsivos, overflow, teclado e tratamento de erros de console.
 
 ## Revisão de segurança
 
 O repositório contém artefatos de pesquisa, resultados grandes e dados de referência. Antes de alterar a visibilidade do repositório, revisar **separadamente todo o histórico Git**, além dos arquivos atuais, procurando credenciais, logs e informações pessoais. Tornar o repositório público só para ativar Pages pode expor o histórico inteiro; preferir hospedar apenas os artefatos estáticos em repositório próprio quando necessário.
+
+## Melhoria V2 — 27/10/2026
+
+- Corrigida a exibição de componentes com o atributo HTML `hidden`, garantindo que boas-vindas, botões e avisos respeitem os estados da interface.
+- Importar um JSON exige confirmação antes de substituir conversas existentes; cancelar não apaga o histórico.
+- Sincronização entre abas contempla a remoção da chave LocalStorage.
+- Manifest e service worker para a versão estática: somente o shell público do aplicativo é cacheado, **nunca dados de conversas**. Respostas continuam demonstrativas também offline.
+- Banner acessível em caso de indisponibilidade de conexão e controles maiores em telas móveis.
+- Política CSP HTML restringe scripts, estilos e conexões à própria origem.
+- `node site-tests/static-smoke.cjs` executa verificações sem dependências; `site-tests/` mantém Playwright e capturas reais quando disponível.
+- **Atenção:** o repositório estava público na verificação desta atualização. Branches protegidas e artefato Pages não impedem leitura pública de outros arquivos e commits. Audite histórico e dados antes de considerar seguro para publicação.
