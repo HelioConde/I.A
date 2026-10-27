@@ -183,3 +183,22 @@ test("clearing data in another tab clears the current history",async({page,conte
   await expect(page.locator(".conversation-row")).toHaveCount(0);
   await second.close();
 });
+
+test("small phone opens at the top of the welcome instead of autoscrolling",async({page})=>{
+  await page.setViewportSize({width:320,height:568});
+  await page.reload();
+  await expect(page.locator("#welcome")).toBeVisible();
+  const offset=await page.locator("#messages-scroll").evaluate((el)=>el.scrollTop);
+  expect(offset).toBe(0);
+  await expect(page.locator("#welcome-title")).toBeInViewport();
+});
+test("tablet gives the chat full width and offers accessible navigation",async({page})=>{
+  await page.setViewportSize({width:768,height:1024});
+  await page.reload();
+  await expect(page.locator("#open-sidebar")).toBeVisible();
+  const width=await page.locator(".main-content").evaluate((el)=>Math.round(el.getBoundingClientRect().width));
+  expect(width).toBeGreaterThanOrEqual(760);
+  await page.locator("#open-sidebar").click();
+  await expect(page.locator("#sidebar")).toHaveClass(/is-open/);
+  await page.locator("#close-sidebar").click();
+});
