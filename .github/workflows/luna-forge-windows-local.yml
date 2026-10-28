@@ -1,0 +1,59 @@
+name: Luna Forge - Windows local installer smoke
+
+on:
+  push:
+    branches: [feature/luna-forge-zero]
+    paths:
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE-WINDOWS.ps1"
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/luna_local.py"
+      - ".github/workflows/luna-forge-windows-local.yml"
+  pull_request:
+    paths:
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE-WINDOWS.ps1"
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/luna_local.py"
+      - ".github/workflows/luna-forge-windows-local.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Parse local install PowerShell
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          $file = "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE-WINDOWS.ps1"
+          [System.Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) { $errors | Out-String | Write-Error; exit 1 }
+          Write-Host "PowerShell syntax OK"
+      - name: Validate standalone menu Python
+        shell: pwsh
+        run: |
+          python -m py_compile experiments/luna-forge-zero/luna_local.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Exercise installer without starting training
+        shell: cmd
+        run: |
+          call experiments\luna-forge-zero\INSTALAR-LUNA-FORGE.cmd -SkipInitialTraining
+      - name: Check Brain-SSD pages and model status
+        shell: pwsh
+        run: |
+          $base = "experiments/luna-forge-zero"
+          $py = "$base/.venv/Scripts/python.exe"
+          & $py "$base/brain_ssd_bridge.py" status
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path "$base/knowledge_pages/manifest.json")) { throw "Knowledge pages missing" }
+          Write-Host "Windows installer smoke PASS"
