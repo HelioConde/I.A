@@ -18,8 +18,7 @@
   const platforms = [{x:335,y:458,w:170,h:15},{x:750,y:415,w:190,h:15},{x:1150,y:465,w:190,h:15}];
   const stars = Array.from({length:72},(_,i)=>({x:(i*89.3+37)%W,y:24+(i*41.7)%360,r:.5+(i%4)*.4}));
   const keys = new Set(), particles = [], projectiles = [], floaters = [];
-  const sound = {ctx:null, enabled:false};
-  let selected = "melee", s, bannerUntil = 0, ambientTime = 0, last = 0, cam = 0, touchDown = false;
+  let selected = "melee", s, bannerUntil = 0, ambientTime = 0, last = 0, cam = 0;
   function freshPlayer(archetype) {
     const c=CLASSES[archetype];
     return {archetype,x:140,y:FLOOR-61,w:36,h:61,vx:0,vy:0,grounded:true,facing:1,hp:c.hp,maxHp:c.hp,mp:100,maxMp:100,invuln:0,attackCooldown:0,attackAnim:0,attackCombo:0,comboTime:0,dashCooldown:0,dashTime:0,walkPhase:0};
@@ -109,7 +108,7 @@
   window.addEventListener("blur",()=>{if(s.mode==="dungeon")togglePause();keys.clear()});
   document.querySelectorAll("[data-key]").forEach(b=>{
     const code=b.dataset.key;
-    const start=e=>{e.preventDefault();touchDown=true;if(s.mode!=="dungeon")return;if(code==="Space")jump();else if(code==="KeyZ")attack();else if(code==="KeyX")special();else keys.add(code)};
+    const start=e=>{e.preventDefault();if(s.mode!=="dungeon")return;if(code==="Space")jump();else if(code==="KeyZ")attack();else if(code==="KeyX")special();else keys.add(code)};
     const end=e=>{e.preventDefault();keys.delete(code);touchDown=false};
     b.addEventListener("pointerdown",start);b.addEventListener("pointerup",end);b.addEventListener("pointercancel",end);b.addEventListener("pointerleave",end);
   });
@@ -159,7 +158,6 @@
     }
     if(!hit)popNumber(p.x,p.y-18,"✦","#d6c3ff");
   }
-  function collide1D(a,b){return a.x<a.x+a.w && a.x+a.w>b.x && a.x<b.x+b.w}
   function update(dt){
     ambientTime+=dt;
     if(s.mode!=="dungeon")return;
@@ -323,9 +321,7 @@
     if(s.mode==="menu"){
       // Decorative hero silhouettes behind menu; the gameplay state remains unstarted.
       ctx.globalAlpha=.55;
-      const p=s.player,originalX=p.x,originalY=p.y;
-      p.x=175;p.y=FLOOR-p.h;drawHero(p);
-      p.x=originalX;p.y=originalY;
+      drawHero({...s.player,x:175,y:FLOOR-s.player.h});
       ctx.globalAlpha=1;
     }else{
       for(const e of s.enemies)drawEnemy(e);
