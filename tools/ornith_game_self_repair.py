@@ -124,7 +124,7 @@ def main()->int:
         raw=result.stdout or ""
         f=args.out/("model-"+name+"-"+str(attempt)+".raw.txt")
         f.write_text(raw,encoding="utf-8")
-        return {"answer":extract_llama_cli_source(raw),"real_model":result.returncode==0,
+        return {"answer":extract_llama_cli_source(raw,prompt),"real_model":result.returncode==0,
                 "raw_sha256":sha(raw.encode("utf-8"))}
     evidence,code=repair(original,infer,attempts=args.attempts)
     evidence.update({"model":"ornith-1.5-9b","model_sha256":sha_file(args.model),
