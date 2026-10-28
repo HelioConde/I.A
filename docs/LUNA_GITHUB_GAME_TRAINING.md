@@ -45,3 +45,12 @@ As saídas sob \`external_data/\` devem permanecer locais, fora do Git; os arqui
 4. Medir baseline vs candidato em código jogável, latência, consumo de RAM e contexto.
 5. Registrar as fontes no Brain-SSD em páginas recuperáveis, com limite de ativação, integridade e evidências; não confundir RAG com treinamento dos pesos.
 6. Somente após aprovação humana promover checkpoint, mantendo rollback.
+
+
+## Avaliação de geração após treinar (segunda execução)
+
+- [Run com verificação de sintaxe — 40685078383](https://github.com/HelioConde/I.A/actions/runs/40685078383): SUCCESS na coleta, treinamento, verificação de checkpoint, avaliação e artefatos.
+- [Artifact com pesos, relatório e avaliação](https://github.com/HelioConde/I.A/actions/runs/40685078383/artifacts/12813848999).
+- Cinco amostras JavaScript novas produzidas pelo modelo, nenhuma passou em node --check (0/5).
+- Nenhum teste de gameplay foi executado; é inadequado promover o modelo.
+- O próximo ciclo deve aprender com pares enunciado→função/teste e usar avaliações reais.
