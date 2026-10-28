@@ -57,6 +57,7 @@ def main():
         print("12 - Contar Lua nas pastas excluidas (SOMENTE metadados, sem treino)")
         print("13 - Revisar subpastas de cliente/jogo LOCALMENTE (metadados, sem treino)")
         print("14 - Verificar formatos de Lua na pasta Elsword (4 KiB por arquivo, sem treino)")
+        print("15 - Medir geracao Lua da Luna propria em 3 tarefas originais nao treinadas")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -173,6 +174,11 @@ def main():
             print("Somente assinaturas dos primeiros 4 KiB por Lua; nenhum arquivo salvo ou enviado.")
             print("Pastas de backup, contas, credenciais e anti-cheat permanecem excluidas.")
             run(HERE/"audit_elsword_lua_headers.py","--source",root)
+        elif option=="15":
+            print("Teste da MiniCoder PROPRIA ja treinada; nao usa Qwen nem scripts comerciais.")
+            print("As tarefas nao tem respostas no conjunto de treino. A avaliacao NAO verifica sintaxe nem gameplay.")
+            print("Nao altera os pesos nem executa codigo gerado.")
+            run(HERE/"benchmark_original_lua.py")
         else:
             print("Opcao invalida.")
 
