@@ -40,3 +40,16 @@ Também existe um workflow opt-in [Qwen3 4B Comparison](../.github/workflows/qwe
 ## Limitações de interpretação
 
 O 4B pode caber na RAM com 16GB totais, mas **o consumo físico, latência e temperatura do Windows pessoal não foram medidos pelo runner**. O teste atual cobre HTML/CSS estático, não um jogo completo. Mesmo um resultado verde não comprova autonomia até o jogo final; a próxima etapa requer teste visual e funcional de código produzido pelo próprio modelo em sandbox e posterior revisão humana.
+
+## Resultado real Qwen3-4B — 2026-10-28
+
+**[GitHub Actions run 40627940558](https://github.com/HelioConde/I.A/actions/runs/40627940558): 2/2 arquivos aceitos pelo validador estático.** Os jobs de integridade e de inferência nativa foram concluídos; o modelo carregado foi exatamente `Qwen3-4B-Q4_K_M.gguf`.
+
+- Arquivo `index.html`: primeira saída foi rejeitada (`invalid_complete_json_or_file`); a **segunda tentativa corrigida** passou (`static_candidate_ready`).
+- Arquivo `styles.css`: passou na primeira tentativa (`static_candidate_ready`).
+- **Três gerações reais**, para dois arquivos aceitos; ambos os arquivos foram avaliados na mesma rubrica de `s0-plan` usada com o 0.6B.
+- **Comparativo:** 0.6B = 0/2 arquivos aceitos; 4B = 2/2 arquivos aceitos **nesta execução**.
+- O modelo **não executou o código**; `code_executed=false`, `gameplay_verified=false`, `workspace_modified=false`, `draft_saved=false`. Isso prova capacidade de proposta multiarquivo sob critérios estáticos, **não um jogo funcional feito pela IA**.
+- O artifact `luna-game-coder-4b-40627940558` fornece métricas sanitizadas. O teste é uma amostra pequena e não comprova superioridade geral do 4B sem repetições e holdouts.
+
+**Próximo marco:** executar candidatas geradas pelo 4B em sandbox isolada com testes reais de navegador; manter aprovação explícita antes de modificar projetos.
