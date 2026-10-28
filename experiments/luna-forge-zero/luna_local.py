@@ -61,6 +61,7 @@ def main():
         print("16 - TREINAR Luna Lua V2 do zero (somente 6 mecanicas originais)")
         print("17 - Comparar Luna Lua V2 em 3 tarefas novas (sem executar codigo)")
         print("18 - Diagnosticar Luna V2 (greedy, memoria de treino, sintaxe luac opcional)")
+        print("19 - Contar e identificar arquivos KOM localmente (somente 72 bytes/cabecalho)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -201,6 +202,14 @@ def main():
             print("Nao altera pesos, nao le Elsword nem executa o codigo gerado.")
             run(HERE/"benchmark_original_lua_v2.py",
                 "--decode","greedy","--calibrate","--syntax","--chars","240")
+        elif option=="19":
+            root=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta para analisar cabecalhos KOM [{root}]: ").strip().strip('"')
+            if supplied:
+                root=Path(supplied)
+            print("Auditoria de .kom: le no maximo 72 bytes de cada arquivo, sem extrair nem treinar.")
+            print("Arquivos internos, nomes de scripts e conteudo nao sao lidos.")
+            run(HERE/"audit_kom_headers.py","--source",root)
         else:
             print("Opcao invalida.")
 
