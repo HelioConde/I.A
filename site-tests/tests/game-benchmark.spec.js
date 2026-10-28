@@ -172,3 +172,61 @@ test("mobile: actual on-screen controls move and attack", async ({page}, testInf
   expect(target==null||target.hp<beforeHit.hp).toBe(true);
   await testInfo.attach("touch-gameplay-mobile",{body:await page.screenshot(),contentType:"image/png"});
 });
+
+
+test("player feedback: preview contains selected area, observations and GitHub issue URL", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", {name:/Você joga/})).toBeVisible();
+  await page.getByTestId("playtest-type").selectOption({label:"Tenho uma sugestão"});
+  await page.locator("#playtest-category").selectOption({label:"Movimentação e pulo"});
+  await page.locator("#playtest-class").selectOption({label:"Lyra · Arqueira"});
+  await page.getByTestId("playtest-problem").fill("O pulo parece lento quando troco de direção.");
+  await page.locator("#playtest-good").fill("A seleção das classes é clara.");
+  await page.locator("#playtest-expected").fill("Quero conseguir trocar de direção no ar.");
+  const report = await page.getByTestId("playtest-report").inputValue();
+  expect(report).toContain("ALPHA 0.1.0");
+  expect(report).toContain("Tenho uma sugestão");
+  expect(report).toContain("Lyra · Arqueira");
+  expect(report).toContain("A seleção das classes é clara.");
+  expect(report).toContain("O pulo parece lento");
+  expect(report).toContain("Quero conseguir trocar");
+  expect(report).toContain("Não capturado");
+  const issue = page.getByTestId("playtest-github");
+  await expect(issue).toHaveAttribute("target","_blank");
+  const url = new URL(await issue.getAttribute("href"));
+  expect(url.origin + url.pathname).toBe("https://github.com/HelioConde/I.A/issues/new");
+  expect(url.searchParams.get("title")).toContain("Tenho uma sugestão");
+  expect(url.searchParams.get("body")).toContain("O pulo parece lento");
+  await testInfo.attach("player-feedback-desktop", {
+    body: await page.screenshot({fullPage:true}), contentType:"image/png",
+  });
+});
+
+test("player feedback: capture real running engine state, no silent submission", async ({page}) => {
+  await begin(page,"magic");
+  const live = await snapshot(page);
+  expect(live.mode).toBe("dungeon");
+  await page.getByTestId("playtest-capture").click();
+  await expect(page.locator("#playtest-capture-result")).toContainText("dungeon");
+  await expect(page.locator("#playtest-capture-result")).toContainText("magic");
+  const report = await page.getByTestId("playtest-report").inputValue();
+  expect(report).toContain("Modo: dungeon");
+  expect(report).toContain("Classe do motor: magic");
+  expect(report).toContain("Região: 1");
+  expect(report).toContain("Inimigos restantes:");
+  await expect(page.locator("#playtest-status")).toContainText("Nada foi enviado");
+});
+
+test("player feedback: mobile layout fits viewport and form remains usable", async ({page},testInfo) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto("/");
+  await page.getByTestId("playtest-problem").fill("No celular o botão de ataque ficou difícil.");
+  await expect(page.getByTestId("playtest-report")).toHaveValue(/No celular o botão/);
+  await expect(page.getByTestId("playtest-copy")).toBeVisible();
+  await expect(page.locator("#playtest-download")).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(2);
+  await testInfo.attach("player-feedback-mobile", {
+    body: await page.screenshot({fullPage:true}), contentType:"image/png",
+  });
+});
