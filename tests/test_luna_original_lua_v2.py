@@ -66,6 +66,13 @@ class LunaOriginalLuaV2Tests(unittest.TestCase):
                 self.assertEqual(candidate["holdout_gameplay"],"NOT_TESTED")
                 self.assertFalse(candidate["code_executed"])
                 self.assertNotIn("raw_generated_text",str(candidate))
+                greedy=probe_v2.probe(ckpt=out,chars=2,decode="greedy",
+                                      calibrate=True,include_output=False)
+                self.assertEqual(greedy["decode_mode"],"greedy")
+                self.assertEqual(greedy["generation_temperature"],0)
+                self.assertEqual(greedy["holdout_prompts"],3)
+                self.assertTrue(greedy["training_prompt_calibration"]["brief_was_present_in_training"])
+                self.assertNotIn("raw_generated_text",str(greedy))
             self.assertEqual(len(list(root.glob("lua-v2-*/weights.pt"))),1)
 
     def test_refuses_unauthorized_checkpoint_path_and_invalid_budgets(self):
@@ -79,7 +86,9 @@ class LunaOriginalLuaV2Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 v2.train(steps=invalid)
         with self.assertRaises(ValueError):
-            probe_v2.probe(chars=241)
+            probe_v2.probe(chars=961)
+        with self.assertRaises(ValueError):
+            probe_v2.probe(decode="unknown")
 
 if __name__=="__main__":
     unittest.main()
