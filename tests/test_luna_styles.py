@@ -18,7 +18,7 @@ p#status{color:white}
 class LunaStylesTests(unittest.TestCase):
     def test_prompt_demand_true_nonoverlap_and_scroll(self):
         self.assertIn("SOBRE",TASK.upper()) if False else None
-        self.assertIn("SEPARADOS",TASK)
+        self.assertIn("sem sobreposição",TASK)
         self.assertIn("overflow:hidden",TASK)
         self.assertIn("Canvas",TASK)
 
