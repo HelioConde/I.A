@@ -11,7 +11,7 @@ on:
     paths:
       - "tools/repair_luna_game_class_ai.py"
       - "tests/test_luna_game_class_ai.py"
-      - ".github/workflows/luna-classes-original.yml"
+      - ".github/workflows/luna-class-ai-game.yml"
 
 permissions:
   contents: read
