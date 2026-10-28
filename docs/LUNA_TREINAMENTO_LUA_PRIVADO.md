@@ -291,3 +291,25 @@ $py=Join-Path $lab ".venv\Scripts\python.exe"
 ~~~
 
 Sem o parser luac, o modelo pode ser analisado, mas sintaxe fica indisponivel. Para treino posterior: desenvolver corpus proprio maior e diverso, holdout por mecanica e projeto, testes funcionais reais e contexto suficiente para uma funcao completa. Sinais lexicais e loss de treino nao justificam declarar a Luna pronta para programar.
+
+
+## Conteudo adicional em arquivos .kom (nova opcao 19)
+
+O usuario confirmou que existe muito material nos pacotes .kom. Nossas contagens anteriores (5880 arquivos Lua na pasta Elsword) NAO incluem arquivos internos de pacotes .kom. Formatos KOM usados em versoes de Grand Chase/Elsword sao contêineres que podem reunir codigo e recursos, e variam conforme versao/cliente. Isso ainda nao demonstra que cada pacote tenha scripts Lua.
+
+A opcao **19** chama audit_kom_headers.py. A auditoria percorre arquivos com extensao .kom e le no maximo **72 bytes por arquivo**, identificando assinaturas conhecidas KOG GC TEAM MASSFILE V.0.2 ou V.0.3 e, quando o layout tem valores plausiveis, contando itens declarados pelos cabecalhos. Ela nunca le indice/tabela XML ou nomes de entradas, nunca descompacta, decodifica, executa, modifica ou faz upload de arquivos, e ignora HShield, contas, credenciais, backups e outras subpastas protegidas.
+
+A soma de itens declarados NAO informa quantos sao arquivos Lua (podem ser imagens, audio, modelos, scripts etc). Assinaturas desconhecidas ficam como "unknown", sem forcar interpretacao. Os arquivos .kom continuam fora do treino.
+
+Execute no PowerShell:
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Falha no git pull" }
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\audit_kom_headers.py" --source "$env:USERPROFILE\Documents\grand chase files"
+~~~
+
+Ou use a opcao 19 do menu. Compartilhe somente os totais agregados, especialmente kom_files_sampled, format_counts, declared_internal_item_count_sum_unverified, errors e partial. Nao copie ou descompacte scripts comerciais para treinamento sem avaliar direitos e procedencia.
