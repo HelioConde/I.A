@@ -1,5 +1,9 @@
 # Brain-SSD — Roadmap incremental
 
+## Prioridade de produto — Luna GameDev (trilha separada)
+
+O foco funcional da assistente Luna passa a ser **desenvolvimento de jogos**, com o **Luna Arcade S1** como avaliação final da capacidade de construir um jogo de ação/plataforma original. Os marcos de produto G0–G7, evidências e limites constam em [LUNA_GAMEDEV_VISION.md](LUNA_GAMEDEV_VISION.md). **Isto não altera** a ordem dos experimentos científicos Fases 1–4E nem autoriza prefetch, substituição de RAM por SSD ou modificações aos baselines congelados. O primeiro incremento produz perfis e planejamento Web 2D/Godot 4, não um jogo finalizado.
+
 ## Marco atual
 
 Fases 1–4D estão concluídas e congeladas. A trilha intermediária **Fase 4E-W — Windows Native Validation** foi concluída como `PASS_WITH_WARNINGS` e não altera a ordem científica. A **Fase 4E — Physical TARGET_8GB Validation** em Debian permanece pendente e deve ocorrer antes de qualquer implementação da Neuroarchitecture V2. Os componentes V2 abaixo são planejamento sujeito aos resultados físicos e a aprovação explícita.

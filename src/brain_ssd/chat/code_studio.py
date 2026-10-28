@@ -18,7 +18,7 @@ MAX_FILES = 20
 MAX_FILE_BYTES = 48000
 MAX_TOTAL_BYTES = 250000
 ALLOWED_EXTENSIONS = {".html", ".css", ".js", ".jsx", ".ts", ".tsx", ".py",
-                      ".json", ".md", ".txt", ".svg"}
+                      ".json", ".md", ".txt", ".svg", ".gd", ".tscn", ".tres", ".godot"}
 BLOCKED_PARTS = {".git", ".github", "node_modules", "__pycache__", "dist",
                  "build", "models", "brain_data", "results", "secrets"}
 BLOCKED_NAMES = {".env", "package-lock.json", "yarn.lock", "pnpm-lock.yaml"}
@@ -132,6 +132,12 @@ def review_proposal(data: dict[str, Any]) -> dict[str, Any]:
                 json.loads(code)
             except ValueError:
                 errors.append("JSON inválido.")
+        elif kind in (".gd", ".tscn", ".tres", ".godot"):
+            hints.append("Requer Godot 4 instalado para validar parse/import; revisão estática não é execução.")
+            if kind == ".tscn" and "[gd_scene" not in code[:256]:
+                errors.append("Cena Godot sem cabeçalho [gd_scene].")
+            if kind == ".tres" and "[gd_resource" not in code[:256]:
+                errors.append("Recurso Godot sem cabeçalho [gd_resource].")
         elif kind == ".html":
             inspector = HTMLSignals()
             inspector.feed(code)
