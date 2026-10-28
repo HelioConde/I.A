@@ -52,6 +52,8 @@ def main():
         print("7 - Resumir estruturas do Lua (funcoes/condicoes/lacos, sem treinar)")
         print("8 - Testar ultimo candidato treinado (somente visualizar codigo)")
         print("9 - GameCoder pratica (Ollama local + validar sintaxe JavaScript)")
+        print("10 - Treinar Luna MiniCoder com Lua local autorizado (experimental/privado)")
+        print("11 - Testar MiniCoder treinado com Lua privado (sem executar codigo)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -119,6 +121,31 @@ def main():
                 task=input("Descreva a mecanica JavaScript que deseja criar: ").strip()
                 if task:
                     run(HERE/"luna_coder_ollama.py","generate","--model",model,"--task",task)
+        elif option=="10":
+            print("ATENCAO: Scripts comerciais podem ter direitos autorais e dados privados.")
+            print("Treinar localmente nao concede direitos sobre o codigo. Nao compartilhe os pesos privados.")
+            print("Somente .lua UTF-8 em amostra limitada; backups, executaveis, arquivos comprimidos e pastas sensiveis sao excluidos.")
+            folder=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta [Enter = {folder}]: ").strip().strip('"')
+            if supplied:
+                folder=Path(supplied)
+            consent=input("Confirma que revisou a procedencia e tem direitos/permissao para TREINAR localmente esses scripts? Digite TENHO DIREITOS: ").strip()
+            if consent.upper()=="TENHO DIREITOS":
+                rc=run(HERE/"train_private_lua.py","dry-run","--source",folder,"--acknowledge-rights")
+                if rc==0:
+                    print("O dry-run acima mostrou somente contagens, sem exportar conteudo.")
+                    final=input("Iniciar treino PRIVADO experimental (64 MiB amostrados, 300 passos)? Digite TREINAR: ").strip()
+                    if final.upper()=="TREINAR":
+                        run(HERE/"train_private_lua.py","train","--source",folder,"--acknowledge-rights","--max-mib","64","--steps","300")
+                    else:
+                        print("Treinamento cancelado. Nenhum peso alterado.")
+            else:
+                print("Sem confirmacao de direitos, o treino nao foi iniciado.")
+        elif option=="11":
+            print("Somente modelo privado da Luna, NAO Qwen. Codigo gerado NAO sera executado.")
+            task=input("Qual mecanica Lua deseja que ela tente criar? ").strip()
+            if task:
+                run(HERE/"preview_private_lua.py","generate","--task",task)
         else:
             print("Opcao invalida.")
 
