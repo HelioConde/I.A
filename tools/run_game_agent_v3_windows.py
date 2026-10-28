@@ -18,7 +18,7 @@ from brain_ssd.local_runtime.pipeline import clean_answer
 
 def main() -> int:
     parser=argparse.ArgumentParser(description="Luna GameDev raw JavaScript coding trial")
-    parser.add_argument("--model-file",default="Qwen3-4B-Q4_K_M.gguf")
+    parser.add_argument("--model-file",default="auto",help="auto: prefer Ornith 1.5 9B if installed+SHA-valid, else Qwen3 4B")
     parser.add_argument("--profile",choices=("economia","equilibrado"),default="equilibrado")
     parser.add_argument("--attempts",type=int,choices=(1,2,3),default=2)
     parser.add_argument("--save-draft",action="store_true")
@@ -28,13 +28,19 @@ def main() -> int:
         print("Windows real with Qwen GGUF required",file=sys.stderr)
         return 2
     from brain_ssd.chat.runtime import LocalChatRuntime
+    from luna_game_model_selector import choose_game_coder
+    try:
+        selected_label,selected_file=choose_game_coder(ROOT,args.model_file)
+    except (ValueError,FileNotFoundError) as exc:
+        print(str(exc),file=sys.stderr)
+        return 2
     engine=None
     report={"benchmark":"Luna GameDev Native JavaScript v3",
             "created_utc":datetime.now(timezone.utc).isoformat(),
-            "model":args.model_file,"status":"ERROR",
+            "model":selected_file,"model_selector":selected_label,"status":"ERROR",
             "code_executed":False,"workspace_modified":False}
     try:
-        engine=LocalChatRuntime(ROOT,profile=args.profile,model_file=args.model_file)
+        engine=LocalChatRuntime(ROOT,profile=args.profile,model_file=selected_file)
         def infer(prompt:str,max_tokens:int)->dict:
             measured=engine.core_backend.generate(GenerationRequest(
                 prompt=prompt,max_tokens=max_tokens,temperature=0.2,
