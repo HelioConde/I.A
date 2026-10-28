@@ -34,6 +34,16 @@ Foi adicionado o teste regressivo `outperform baseline: releasing mobile control
 5. O Chromium testa o controle mobile real, confirmando ausência do ReferenceError, e reexecuta os testes originais.
 6. Relatório identifica claramente **“patch proposto por Qwen”** e **“integração, testes e revisão conduzidos pelo ChatGPT”**. Esse primeiro bugfix demonstra colaboração verificável, **não autonomia completa**.
 
+## Primeiro patch realmente produzido pela Luna — Qwen3-4B
+
+- **Baseline do ChatGPT:** [run Chromium 40632444557](https://github.com/HelioConde/I.A/actions/runs/40632444557): **11 testes passaram e o 12º falhou**. Erro reproduzido em duas tentativas: `touchDown is not defined` no `pointerup` mobile.
+- **Primeiro teste da IA:** [run 40632459539](https://github.com/HelioConde/I.A/actions/runs/40632459539): duas propostas reais rejeitadas por ainda mencionar a variável sem declaração. Resultado INCOMPLETE, preservado.
+- **Segunda instrução, nova avaliação v1.1:** [run Qwen3-4B 40632642743](https://github.com/HelioConde/I.A/actions/runs/40632642743): **uma geração real aprovada na revisão de sintaxe/contrato**, sem executar código. O texto do modelo foi exatamente `const end=e=>{e.preventDefault();keys.delete(code)};`.
+- **Aplicação:** ChatGPT revisou a linha gerada, substituiu apenas o handler do evento e acrescentou regressão unitária exigindo coincidência exata com a linha proposta. O conteúdo dessa linha é atribuído ao **Qwen3-4B da Luna**; toda integração, testes e infraestrutura são do ChatGPT.
+- **Resultado do navegador após patch:** consultar o último workflow `Luna Arcade S1 — Playable Game QA` deste PR. Não declarar correção comprovada até que os 12 testes passem.
+
+Esse patch é apenas **um avanço pequeno demonstrável**, não o cumprimento da meta de ser melhor que o jogo de referência em todas as dimensões. Ainda faltam as melhorias de jogabilidade, novas fases, qualidade visual comparativa e autoria contínua do modelo.
+
 ## Próximos desafios, sempre com teste antes/depois
 
 - F1: melhorar movimentação com entrada de salto antecipada e tolerância de pulo depois de sair da plataforma. A Luna precisa alterar a física, com testes reproduzíveis dos tempos.
