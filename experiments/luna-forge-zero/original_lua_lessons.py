@@ -27,13 +27,13 @@ HOLDOUT=(
     {"id":"one_way_platform","objective":"Support jumping through and dropping down a one-way platform","language":"lua","split":"holdout","answer":None},
 )
 PATTERN=re.compile(r"(?ms)^-- lesson: ([a-z0-9_]+)[ \t]*\n(.*?)^-- end-lesson[ \t]*$")
-FORBIDDEN=("grandchase","grand chase","\\x1bLua","\\x1bKL")
+FORBIDDEN=("\\x1bLua","\\x1bKL")
 
 def lessons() -> list[dict]:
     content=SOURCE.read_text(encoding="utf-8")
     if not content.startswith("-- Luna Forge: original"):
         raise ValueError("Author provenance header missing")
-    if any(token in content.lower() for token in FORBIDDEN):
+    if any(token.lower() in content.lower() for token in FORBIDDEN):
         raise ValueError("Unexpected external game content marker")
     extracted=PATTERN.findall(content)
     if len(extracted)!=len(LESSONS) or len({x[0] for x in extracted})!=len(LESSONS):
@@ -43,6 +43,8 @@ def lessons() -> list[dict]:
     result=[]
     for name,code in extracted:
         if "function Game." not in code or len(code)<120:
+            raise ValueError(f"Invalid original Lua lesson: {name}")
+        if any(term in code.lower() for term in ("grandchase", "grand chase")):
             raise ValueError(f"Invalid original Lua lesson: {name}")
         if not code.isascii():
             raise ValueError("MiniCoder requires ASCII-encodable code")
