@@ -1,0 +1,162 @@
+name: Luna Original — Qwen Visual Redesign and Clickability
+on:
+  push:
+    branches:
+      - "lab/luna-style-*"
+    paths:
+      - ".github/lab-requests/luna-style-*.md"
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/refine_luna_original_styles.py"
+      - "tests/test_luna_styles.py"
+      - ".github/workflows/luna-style-redesign.yml"
+
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: luna-style-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  css-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Ensure original Qwen style task rejects remote links and hidden mobile
+        run: |
+          python -m compileall -q tools/refine_luna_original_styles.py
+          python -m unittest discover -s tests -p "test_luna_styles.py" -v
+
+  qwen-style:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-style-')) }}
+    needs: css-contract
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-refine-raw-40647732624
+          run-id: 40647732624
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: results/luna-original-refined
+      - name: Install official verified 4B Qwen model and CPU runtime
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Real Qwen redesigns its own complete responsive CSS
+        shell: pwsh
+        run: |
+          python tools/refine_luna_original_styles.py --attempts 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Qwen CSS did not pass static criteria; preserve honest incomplete run."
+            exit 0
+          }
+          exit $rc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luna-style-raw-${{ github.run_id }}
+          path: results/luna-original-style/
+          if-no-files-found: warn
+          retention-days: 30
+
+  stage-css-review:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-style-')) }}
+    needs: qwen-style
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-style-raw-${{ github.run_id }}
+          path: results/luna-original-style
+      - name: Verify model authored exact stylesheet bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('results/luna-original-style')
+          r=json.loads((p/'provenance.json').read_text(encoding='utf-8'))
+          assert r['status']=='STATIC_CSS_CANDIDATE'
+          assert r['model_authored_styles'] is True and r['assistant_css_code_used'] is False
+          for name in ('index.html','styles.css','game.js'):
+            assert hashlib.sha256((p/name).read_bytes()).hexdigest()==r['provenance_sha256'][name],name
+          print('Real Qwen generated all page CSS; exact hash verified.')
+          PY
+      - name: Stage independent original Luna visual design for review
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/styles-review-${{ github.run_id }}"
+          mkdir -p site/luna-style-review
+          cp results/luna-original-style/{index.html,styles.css,game.js,provenance.json} site/luna-style-review/
+          git add site/luna-style-review
+          git -c user.name="Luna Qwen3-4B Authentic CSS" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): Qwen authored CSS with no overlapping class selection"
+          git push origin "luna/styles-review-${{ github.run_id }}"
+          echo "CSS review branch only. No main publish."
+
+  chromium-style:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-style-')) }}
+    needs: stage-css-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-style-raw-${{ github.run_id }}
+          path: results/luna-original-style
+      - name: Serve actual Qwen webpage locally
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory results/luna-original-style > /tmp/luna-style.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-style.log
+          exit 1
+      - name: Install real Chromium and test clickability on desktop and mobile
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Reject overlapped Start button and class selection
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+        run: npx playwright test --config playwright.luna-original.config.cjs --grep "visual usability"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luna-style-qa-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
