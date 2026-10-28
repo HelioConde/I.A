@@ -1,0 +1,71 @@
+name: Luna Arcade S1 — Playable Game QA
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/arcade/**"
+      - "site-tests/tests/game-benchmark.spec.js"
+      - "site-tests/playwright.game.config.cjs"
+      - ".github/workflows/arcade-qa.yml"
+  push:
+    branches: [main]
+    paths:
+      - "site/arcade/**"
+      - "site-tests/tests/game-benchmark.spec.js"
+      - "site-tests/playwright.game.config.cjs"
+      - ".github/workflows/arcade-qa.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arcade-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      LUNA_GAME_URL: http://127.0.0.1:4799
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify JavaScript compiles
+        run: |
+          node --check site/arcade/game.js
+          node --check site-tests/tests/game-benchmark.spec.js
+      - name: Install Playwright Chromium
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Launch actual candidate game on localhost
+        shell: bash
+        run: |
+          python -m http.server 4799 --bind 127.0.0.1 --directory site/arcade > /tmp/arcade-server.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -f -s http://127.0.0.1:4799/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/arcade-server.log
+          exit 1
+      - name: Run gameplay on real Chromium and save responsive screenshots
+        working-directory: site-tests
+        run: npx playwright test --config playwright.game.config.cjs
+      - name: Upload actual browser QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-arcade-s1-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
