@@ -39,6 +39,22 @@ Acima apenas imprime origem, hash e tamanho, sem download. Para autorizar aproxi
 
 Arquivo em `models/Ornith-1.5-9B-Q4_K_M.gguf`, com SHA-256 oficial, sem substituir qualquer modelo anterior.
 
+## Runtime oficial Windows atualizado e separado
+
+A edição antiga do llama.cpp no Brain-SSD pode não reconhecer o Qwen3.5 usado pelo Ornith. Um segundo instalador, **independente e com SHA-256 fixo**, coloca o llama-cli da release oficial **b11946 (28/10/2026)** em uma pasta dedicada, sem substituir o chat normal ou o runtime de pesquisa congelado:
+
+    py tools/install_ornith_game_runtime.py
+    py tools/install_ornith_game_runtime.py --confirm-download
+    py tools/install_ornith_game_model.py --confirm-download
+
+O primeiro comando apenas inspeciona; os dois seguintes baixam os binários (~24 MB) e o GGUF (~5,78 GB) mediante autorização explícita.
+
+Depois, o modo GameDev pode selecionar o GGUF correto, **somente se o modelo e o runtime moderno estiverem presentes**:
+
+    py tools/run_game_agent_v3_windows.py --model-file auto --attempts 2
+
+No caminho Ornith, o script usa o CLI atualizado e separa automaticamente cabeçalho/prompt/estatísticas dos bytes gerados; no fallback Qwen3-4B preserva a inferência já validada. Não alterar os modelos do chat comum.
+
 ## Benchmark comparativo de código de jogo
 
 Workflow: [Luna GameDev — Ornith 9B vs Qwen 4B Real Coding Trial](../.github/workflows/luna-ornith-game-benchmark.yml). Usa o **mesmo prompt** e critérios nos dois modelos GGUF reais:
@@ -67,6 +83,25 @@ Para forçar o novo (requer instalação local e runtime compatível com Qwen3.5
     py tools/run_game_agent_v3_windows.py --model-file ornith-1.5-9b --attempts 2
 
 Os códigos gerados pelo modelo só viram jogos publicados após revisão e testes reais. O modo `auto` não baixa arquivos, não altera perfil de chat e não muda as versões existentes.
+
+## Resultados de inferência real e replay no Chromium
+
+Primeira execução: https://github.com/HelioConde/I.A/actions/runs/40653494692
+
+- Os dois modelos foram realmente executados, com pesos GGUF oficiais verificados por SHA-256.
+- A ferramenta inicial apresentou um **falso erro de sintaxe** porque llama-cli b1-f4d8af6 imprime na saída o banner, uma cópia truncada do prompt e o rodapé de desempenho. Esse texto não foi escrito pelo modelo e **não deve ser interpretado como JavaScript**.
+- Os quatro arquivos originais (duas tentativas de cada modelo) foram preservados; não foram substituídos por código do assistente.
+
+Replay corrigido, sem regeneração: https://github.com/HelioConde/I.A/actions/runs/40659377921
+
+| Modelo | Tentativa válida para teste | Chromium passou | Chromium falhou |
+|---|---|---|---|
+| Ornith-1.5-9B Q4 | segunda | **2/4** | salto (NaN em vy), ataque KeyZ |
+| Qwen3-4B Q4 | primeira | **1/4** | inicialização/erros JS, movimento/salto, ataque |
+
+Esse resultado **não é prova de superioridade geral**; é um único prompt de minijogo. O Ornith teve um resultado inicial melhor, mas ambos falharam no comportamento real. O modo GameDev pode experimentar Ornith, porém o Qwen3-4B permanece disponível e a qualidade de um jogo completo ainda necessita QA.
+
+Próxima etapa: [autorreparo real do Ornith](../.github/workflows/luna-ornith-self-repair.yml). O próprio modelo deve corrigir duas linhas de seu jogo (velocidade vertical indefinida e uso incorreto de KeyboardEvent.key), mantendo autoria auditável e exigindo que pulo/combo realmente funcionem no navegador.
 
 ## Gate para alterar o padrão
 
