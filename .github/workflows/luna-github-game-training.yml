@@ -7,6 +7,7 @@ on:
     paths:
       - "experiments/luna-forge-zero/github_corpus.py"
       - "experiments/luna-forge-zero/train_github.py"
+      - "experiments/luna-forge-zero/evaluate_github_codegen.py"
       - "experiments/luna-forge-zero/luna_codegen_model.py"
       - "tests/test_luna_github_corpus.py"
       - ".github/workflows/luna-github-game-training.yml"
@@ -37,6 +38,10 @@ jobs:
         run: |
           cd experiments/luna-forge-zero
           python train_github.py --data external_data --out external_data/model_candidate --steps 180 --batch 12 --threads 2
+      - name: Evaluate candidate JS syntax without running game code
+        run: |
+          cd experiments/luna-forge-zero
+          python evaluate_github_codegen.py --checkpoint external_data/model_candidate --out external_data/model_candidate/syntax_report.json
       - name: Verify checkpoint hash and publication guard
         run: |
           python - <<'PY'
@@ -57,6 +62,7 @@ jobs:
             experiments/luna-forge-zero/external_data/manifest.json
             experiments/luna-forge-zero/external_data/LICENSE_NOTICES.json
             experiments/luna-forge-zero/external_data/model_candidate/report.json
+            experiments/luna-forge-zero/external_data/model_candidate/syntax_report.json
             experiments/luna-forge-zero/external_data/model_candidate/weights.pt
           if-no-files-found: warn
           retention-days: 14
