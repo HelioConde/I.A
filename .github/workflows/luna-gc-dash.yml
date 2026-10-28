@@ -1,0 +1,169 @@
+name: Luna GC-style S1.1 — Genuine Qwen Double-Tap Dash
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-gc-dash-*"
+    paths:
+      - ".github/lab-requests/luna-gc-dash-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/luna_gc_s1_dash_trial.py"
+      - "tests/test_luna_gc_dash_trial.py"
+      - "site-tests/tests/luna-gc-dash.spec.js"
+      - "site-tests/playwright.luna-gc-dash.config.cjs"
+      - ".github/workflows/luna-gc-dash.yml"
+permissions:
+  contents: read
+concurrency:
+  group: luna-gc-dash-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify real Qwen patch-only contract; no assistant game fallback
+        run: |
+          python -m compileall -q tools/luna_gc_s1_dash_trial.py
+          python -m unittest discover -s tests -p "test_luna_gc_dash_trial.py" -v
+          node --check site-tests/tests/luna-gc-dash.spec.js
+
+  qwen-dash:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-gc-dash-')) }}
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install SHA256-pinned Qwen3-4B local CPU GGUF
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Have actual Luna model author three dash snippets with no assistant gameplay code
+        shell: pwsh
+        run: |
+          python tools/luna_gc_s1_dash_trial.py --attempts 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Model failed dash contract: record genuine incomplete trial, do not publish."
+            exit 0
+          }
+          exit $rc
+      - name: Save all model responses, original game SHA and proposed candidate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-gc-dash-model-${{ github.run_id }}
+          path: results/luna-gc-s1-dash/
+          if-no-files-found: warn
+          retention-days: 30
+
+  browser:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-gc-dash-')) }}
+    needs: qwen-dash
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-gc-dash-model-${{ github.run_id }}
+          path: results/luna-gc-s1-dash
+      - name: Verify exact Qwen model source, hashes and all three generated snippets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          folder=Path("results/luna-gc-s1-dash")
+          r=json.loads((folder/"provenance.json").read_text(encoding="utf-8"))
+          assert r["status"]=="STATIC_CANDIDATE","Model did not finish all three real dash snippets"
+          assert len(r["attempts"])==3
+          assert all(t["accepted"] for t in r["attempts"])
+          assert r["assistant_gameplay_code_used"] is False
+          assert hashlib.sha256((folder/"game.js").read_bytes()).hexdigest()==r["output_sha256"]
+          print("Confirmed Qwen-authored dash candidate and exact source hash")
+          PY
+          node --check results/luna-gc-s1-dash/game.js
+      - name: Install Chromium for real keyboard behavior
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve Qwen dash variant in isolated localhost
+        shell: bash
+        run: |
+          python -m http.server 4814 --bind 127.0.0.1 --directory results/luna-gc-s1-dash > /tmp/luna-gc-dash.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4814/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-gc-dash.log
+          exit 1
+      - name: Verify original six tests still pass from hero selection to boss victory
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4814
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - name: Prove actual double-tap speedup and no key-repeat dash exploit
+        working-directory: site-tests
+        env:
+          LUNA_GC_DASH_URL: http://127.0.0.1:4814
+        run: npx playwright test --config playwright.luna-gc-dash.config.cjs
+      - name: Capture actual game evidence / browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-gc-dash-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  review-branch:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-gc-dash-')) }}
+    needs: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-gc-dash-model-${{ github.run_id }}
+          path: results/luna-gc-s1-dash
+      - name: Stage original Luna-generated dash for review without modifying public game
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/gc-dash-review-${{ github.run_id }}"
+          mkdir -p site/luna-gc-dash-review
+          cp results/luna-gc-s1-dash/{game.js,index.html,styles.css,provenance.json} site/luna-gc-dash-review/
+          git add site/luna-gc-dash-review/
+          git -c user.name="Luna Qwen GGUF Verified GameDev" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): real model double-tap dash passes browser gameplay"
+          git push origin "luna/gc-dash-review-${{ github.run_id }}"
