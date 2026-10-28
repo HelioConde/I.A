@@ -5,7 +5,7 @@ from unittest.mock import patch
 import sys,unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
-from luna_game_model_selector import choose_game_coder,ORNITH_FILE,QWEN_FILE
+from luna_game_model_selector import choose_game_coder,ORNITH_FILE,QWEN_FILE,MODERN_ORNITH_RUNTIME
 
 class SelectorTests(unittest.TestCase):
     def test_prefer_ornith_only_if_present_and_verified(self):
@@ -15,6 +15,10 @@ class SelectorTests(unittest.TestCase):
             with patch("luna_game_model_selector.verified_file",return_value=True):
                 self.assertEqual(choose_game_coder(base)[1],QWEN_FILE)
                 (base/"models"/ORNITH_FILE).write_bytes(b"GGUF")
+                self.assertEqual(choose_game_coder(base)[1],QWEN_FILE)
+                modern=base/MODERN_ORNITH_RUNTIME
+                modern.parent.mkdir(parents=True,exist_ok=True)
+                modern.write_bytes(b"stub")
                 self.assertEqual(choose_game_coder(base)[1],ORNITH_FILE)
                 self.assertEqual(choose_game_coder(base,"qwen3-4b")[1],QWEN_FILE)
 
