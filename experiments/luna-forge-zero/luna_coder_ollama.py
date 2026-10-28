@@ -14,6 +14,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from luna_core_qa import review as core_review
+
 HOST="127.0.0.1"
 PORT=11434
 DEFAULT_MODEL="qwen2.5-coder:3b"
@@ -124,6 +126,11 @@ def generate(task: str, model: str=DEFAULT_MODEL, repair: bool=True) -> dict:
     checked=syntax_check(initial)
     code=initial
     attempts=1
+    reason="none"
+    quality=core_review(task,code)
+    # One additional generation is allowed: first priority is syntax; after
+    # syntax is valid, let the teacher highlight missing mechanics. This is
+    # heuristic feedback, NOT a test that executes generated JavaScript.
     if repair and checked["status"]=="fail":
         messages.extend([
             {"role":"assistant","content":initial[:9000]},
@@ -134,12 +141,40 @@ def generate(task: str, model: str=DEFAULT_MODEL, repair: bool=True) -> dict:
             )},
         ])
         candidate=extract_code(chat(model,messages))
-        second_check=syntax_check(candidate)
+        checked=syntax_check(candidate)
+        code=candidate
+        quality=core_review(task,code)
+        reason="syntax"
         attempts=2
-        code,checked=candidate,second_check
+    elif repair and checked["status"]=="pass" and quality["task_type"]=="horizontal_movement":
+        issues=quality["rubric"].get("issues_to_review",[])
+        if issues:
+            messages.extend([
+                {"role":"assistant","content":initial[:9000]},
+                {"role":"user","content":(
+                    "Luna Core found missing movement requirements (these are "
+                    "STATIC indicators, not proof of behavior):\n"+
+                    "\n".join("- "+item for item in issues)+
+                    "\nRevise the full function: accept signed left/right input, "
+                    "handle neutral input and delta-time-scaled deceleration, "
+                    "clamp negative and positive max speed. Return ONLY complete JavaScript."
+                )},
+            ])
+            candidate=extract_code(chat(model,messages))
+            next_syntax=syntax_check(candidate)
+            next_quality=core_review(task,candidate)
+            attempts=2
+            reason="mechanic_heuristics"
+            # Retain first syntactically valid version if correction fails
+            # parsing OR does not increase the count of expected indicators.
+            before=quality["rubric"]["indicators_detected"]
+            after=next_quality["rubric"]["indicators_detected"]
+            if next_syntax["status"]=="pass" and after>before:
+                code,checked,quality=candidate,next_syntax,next_quality
     return {
         "backend":"ollama-local-pretrained-coder","model":model,"task":task.strip(),
         "generated_code":code,"syntax":checked,"attempts":attempts,
+        "revision_reason":reason,"core_quality_review":quality,
         "generated_code_executed":False,"behavior_verified":False,
         "project_files_modified":False,"cloud_calls":0,
         "active_luna_weights_modified":False,
