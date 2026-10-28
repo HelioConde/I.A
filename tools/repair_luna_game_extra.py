@@ -43,42 +43,16 @@ TASKS=[
     "end":None,
     "allow_statement":True,
     "goal":"O Chromium comprovou que findClosestEnemy NÃO EXISTE no seu código. "
-           "Substitua a linha attackTarget = findClosestEnemy(); por uma única "
-           "instrução JavaScript que escolhe um inimigo existente do array enemies "
-           "e atribui a attackTarget (idealmente o inimigo vivo mais próximo de player.x). "
-           "É permitido usar enemies.find ou enemies.reduce. "
-           "Não chame nenhuma função desconhecida. Retorne apenas UMA instrução, com ; opcional.",
-    "requires":("attackTarget","enemies"),
-    "max_tokens":220,
+           "Substitua a linha attackTarget = findClosestEnemy(); por UMA instrução "
+           "SIMPLES, de no máximo 100 caracteres: atribua a attackTarget o PRIMEIRO "
+           "objeto do array enemies cujo atributo e.hp seja MAIOR QUE ZERO, ou null "
+           "quando não houver nenhum. Use enemies.find. NÃO calcule distâncias, "
+           "NÃO use e.alive (esse atributo não existe), NÃO use findClosestEnemy. "
+           "Retorne somente uma instrução JavaScript, sem explicação.",
+    "requires":("attackTarget","enemies","hp"),
+    "max_tokens":115,
   },
-  {
-    "id":"respect_selected_class",
-    "start":"  document.getElementById('hero').value = 'melee';",
-    "end":"\n  gameLoop();",
-    "goal":"No start do jogo, você forçava o select #hero para melee e ignorava "
-           "a classe escolhida. Substitua esta linha com JavaScript que LÊ heroSelect.value "
-           "e faz pelo menos uma diferença funcional no objeto player.hp e/ou attackRange "
-           "entre melee, ranged e magic. NÃO altere heroSelect.value. "
-           "Não chame gameLoop(), ela já será chamada logo após o bloco. "
-           "Retorne somente o código da seleção de atributos.",
-    "requires":("heroSelect","player"),
-    "max_tokens":330,
-  },
-  {
-    "id":"keep_enemies_in_arena",
-    "start":"    // Enemy movement\n",
-    "end":"    // Check for enemy collision\n",
-    "goal":"Seu código fazia enemy.x += 1 até sair do Canvas e removia a "
-           "criatura sem o jogador derrotá-la. Corrija APENAS a lógica de movimento "
-           "dos enemies dentro de gameLoop() de forma que cada inimigo vivo "
-           "possa aproximar-se de player.x, mas NUNCA seja removido do array "
-           "simplesmente por cruzar a borda da tela. Respeite limites x=0..940. "
-           "O dano e remoção por hp <= 0 já foram implementados por você no "
-           "bloco de ataque anterior. Retorne só um bloco JavaScript; não "
-           "inclua o marcador Check for enemy collision.",
-    "requires":("enemies","player","x"),
-    "max_tokens":420,
-  },
+
 ]
 
 def digest(blob:bytes)->str:
