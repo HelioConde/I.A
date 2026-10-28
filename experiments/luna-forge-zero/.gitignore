@@ -6,3 +6,4 @@ state/
 reports/
 *.log
 external_data/
+.venv/
