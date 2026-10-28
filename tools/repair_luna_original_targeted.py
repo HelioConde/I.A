@@ -154,6 +154,13 @@ def sanitize_model_piece(raw: str, task: dict[str, Any]) -> tuple[bool, str, str
         values = [int(v) for v in re.findall(r"\battackRange\s*=\s*(\d{2,3})\s*;", text)]
         if len(values) != 3 or min(values) < 80 or max(values) > 230 or len(set(values)) < 2:
             return False, "unplayable_or_undifferentiated_attack_ranges", ""
+    if task["id"].startswith("repair_range_"):
+        m=re.fullmatch(r"attackRange\s*=\s*(\d{2,3})\s*;?",text)
+        limits={"repair_range_melee":(90,130),"repair_range_ranged":(140,230),
+                "repair_range_magic":(130,220)}
+        lo,hi=limits[task["id"]]
+        if m is None or not lo<=int(m.group(1))<=hi:
+            return False, "unplayable_attacker_range", ""
     if task["end"] is None and ("\n" in text or "{" in text or (";" in text and not task.get("allow_statement"))):
         return False, "expression_not_single", ""
     if task["id"] == "wave_progression" and ("mode =" in text or "mode=" in text):
