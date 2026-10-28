@@ -77,9 +77,9 @@ class LunaOriginalLuaV2Tests(unittest.TestCase):
 
     def test_training_terminators_are_not_treated_as_lua_code(self):
         self.assertEqual(probe_v2.remove_training_terminator(
-            "function f() end\\nEND\\n"),"function f() end")
+            "function f() end\nEND\n"),"function f() end")
         self.assertEqual(probe_v2.remove_training_terminator(
-            "function f() end\\nFIM"),"function f() end")
+            "function f() end\nFIM"),"function f() end")
         self.assertEqual(probe_v2.remove_training_terminator(
             "function f() end"),"function f() end")
 
