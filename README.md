@@ -4,6 +4,12 @@
   <p><img alt="Python" src="https://img.shields.io/badge/Python-Experimentos-3776AB?logo=python&logoColor=white"> <img alt="Windows" src="https://img.shields.io/badge/Windows-Launcher-2563eb"> <img alt="Status" src="https://img.shields.io/badge/status-pesquisa%20experimental-64748b"></p>
 </div>
 
+## Direção de produto — Luna GameDev
+
+A **Luna** terá foco principal em **criar jogos**, não apenas responder perguntas gerais: game design, programação, cenas, controles, sprites/arte, playtest, revisão visual e depuração. **Luna Arcade S1** é o desafio inicial de qualidade (um jogo original de ação/plataforma com três classes), não o nome da IA. Os experimentos científicos do Brain-SSD permanecem separados e congelados.
+
+Atualmente há preparação e revisão de propostas de código, além de perfis de **Web 2D** e **Godot 4**; a Luna **ainda não** cria, testa e publica um jogo completo de forma autônoma. Veja a [visão GameDev](docs/LUNA_GAMEDEV_VISION.md) e o [Code Studio](docs/LUNA_CODE_STUDIO.md).
+
 ## A pergunta de pesquisa
 
 **É possível manter um grande conjunto de conhecimentos em armazenamento persistente e recuperar apenas o contexto necessário para cada pergunta?**
