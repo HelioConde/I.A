@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      LAB_SUITE: ${{ github.event_name == 'workflow_dispatch' && inputs.suite == 'extended' && 'extended' || 'smoke' }}
+      LAB_SUITE: ${{ ((github.event_name == 'workflow_dispatch' && inputs.suite == 'extended') || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-extended-'))) && 'extended' || 'smoke' }}
       PYTHONUNBUFFERED: "1"
       PYTHONPATH: src
     steps:
@@ -71,7 +71,7 @@ jobs:
           retention-days: 14
 
   synthetic-windows:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.suite == 'extended' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.suite == 'extended') || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-extended-')) }}
     runs-on: windows-latest
     timeout-minutes: 25
     env:
