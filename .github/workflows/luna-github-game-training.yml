@@ -7,6 +7,10 @@ on:
     paths:
       - "experiments/luna-forge-zero/github_corpus.py"
       - "experiments/luna-forge-zero/train_github.py"
+      - "experiments/luna-forge-zero/original_lua_gameplay.lua"
+      - "experiments/luna-forge-zero/test_original_lua_gameplay.lua"
+      - "experiments/luna-forge-zero/original_lua_lessons.py"
+      - "tests/test_luna_original_lua_lessons.py"
       - "experiments/luna-forge-zero/action_platform_curriculum.json"
       - "experiments/luna-forge-zero/grandchase_research_catalog.json"
       - "experiments/luna-forge-zero/grandchase_reference_gate.py"
@@ -35,6 +39,15 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_luna_grandchase_references.py -v
           python experiments/luna-forge-zero/grandchase_reference_gate.py audit
+      - name: Validate independently authored Lua lessons and heldout tasks
+        run: |
+          python -m unittest discover -s tests -p test_luna_original_lua_lessons.py -v
+          python experiments/luna-forge-zero/original_lua_lessons.py verify
+      - name: Run behavioral tests on ORIGINAL Lua module (not any game client)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.4
+          lua5.4 experiments/luna-forge-zero/test_original_lua_gameplay.lua
       - name: Download only pinned MIT-licensed code (no asset files)
         run: |
           cd experiments/luna-forge-zero
@@ -45,7 +58,7 @@ jobs:
       - name: Train tiny MiniCoder from random weights on external game code
         run: |
           cd experiments/luna-forge-zero
-          python train_github.py --data external_data --out external_data/model_candidate --curriculum action_platform_curriculum.json --steps 180 --batch 12 --threads 2
+          python train_github.py --data external_data --out external_data/model_candidate --curriculum action_platform_curriculum.json --steps 180 --batch 12 --threads 2 --lua-lessons
       - name: Evaluate candidate JS syntax without running game code
         run: |
           cd experiments/luna-forge-zero
@@ -60,6 +73,8 @@ jobs:
           assert not r['promotion_allowed']
           assert r['grandchase_raw_repositories_in_training']==0
           assert r['original_curriculum_examples']==8
+          assert r['original_lua_lessons']==6
+          assert r['heldout_lua_answers_in_training']==0
           assert len(r['origin_repositories'])>=3
           assert len(r['heldout_repositories'])>=1
           print('Source checkpoints and heldout verified:',r['holdout_next_char_loss_before'],r['holdout_next_char_loss_after'])
