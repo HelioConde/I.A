@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real native Qwen3 game JavaScript trial, source never executed."""
+"""Real native model GameDev JS trial, Qwen3-4B or Ornith-1.5-9B, source never executed."""
 from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
@@ -25,7 +25,7 @@ def main() -> int:
     parser.add_argument("--report",type=Path,default=Path("results/game_agent/qwen-raw-js-v3.json"))
     args=parser.parse_args()
     if os.name!="nt":
-        print("Windows real with Qwen GGUF required",file=sys.stderr)
+        print("Windows x64 with locally verified GGUF required",file=sys.stderr)
         return 2
     from brain_ssd.chat.runtime import LocalChatRuntime
     from luna_game_model_selector import choose_game_coder
@@ -40,17 +40,35 @@ def main() -> int:
             "model":selected_file,"model_selector":selected_label,"status":"ERROR",
             "code_executed":False,"workspace_modified":False}
     try:
-        engine=LocalChatRuntime(ROOT,profile=args.profile,model_file=selected_file)
-        def infer(prompt:str,max_tokens:int)->dict:
-            measured=engine.core_backend.generate(GenerationRequest(
-                prompt=prompt,max_tokens=max_tokens,temperature=0.2,
-            ))
-            if measured.get("return_code")!=0:
-                raise RuntimeError("MODEL_FAILED")
-            output=clean_answer(str(measured.get("stdout") or ""))
-            metrics=measured.get("metrics") or {}
-            return {"answer":output,"model_generated":bool(output),
-                    "finish_reason":metrics.get("finish_reason")}
+        if selected_label=="ornith-1.5-9b":
+            # This model is Qwen3.5-based and needs newer llama.cpp than the
+            # frozen research/legacy chat runtime; never silently reuse it.
+            from benchmark_luna_game_models import command,extract_llama_cli_source
+            from luna_game_model_selector import MODERN_ORNITH_RUNTIME
+            import subprocess
+            cli=ROOT/MODERN_ORNITH_RUNTIME
+            model=ROOT/"models"/selected_file
+            def infer(prompt:str,max_tokens:int)->dict:
+                run=subprocess.run(command(cli,model,prompt,max_tokens),
+                                   capture_output=True,text=True,encoding="utf-8",
+                                   errors="replace",timeout=900,check=False)
+                if run.returncode:
+                    raise RuntimeError("ORNITH_NATIVE_RUNTIME_FAILED")
+                output=extract_llama_cli_source(run.stdout or "")
+                return {"answer":output,"model_generated":bool(output),
+                        "finish_reason":None}
+        else:
+            engine=LocalChatRuntime(ROOT,profile=args.profile,model_file=selected_file)
+            def infer(prompt:str,max_tokens:int)->dict:
+                measured=engine.core_backend.generate(GenerationRequest(
+                    prompt=prompt,max_tokens=max_tokens,temperature=0.2,
+                ))
+                if measured.get("return_code")!=0:
+                    raise RuntimeError("MODEL_FAILED")
+                output=clean_answer(str(measured.get("stdout") or ""))
+                metrics=measured.get("metrics") or {}
+                return {"answer":output,"model_generated":bool(output),
+                        "finish_reason":metrics.get("finish_reason")}
         result=run_native_game_js_trial(infer,attempts=args.attempts,save_source=args.save_draft)
         source=result.pop("source",None)
         report.update(result)
