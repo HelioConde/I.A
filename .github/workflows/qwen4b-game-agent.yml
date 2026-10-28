@@ -1,6 +1,15 @@
 name: Luna GameDev — Qwen3 4B Comparison
 on:
   workflow_dispatch:
+    inputs:
+      stage:
+        description: "s0-plan = initial HTML/CSS, s1-movement = JS character physics"
+        type: choice
+        required: true
+        default: s0-plan
+        options:
+          - s0-plan
+          - s1-movement
   push:
     branches:
       - "lab/luna-game-4b-*"
@@ -42,6 +51,7 @@ jobs:
     timeout-minutes: 65
     env:
       PYTHONUNBUFFERED: "1"
+      LAB_STAGE: ${{ (github.event_name == 'workflow_dispatch' && inputs.stage == 's1-movement') || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-game-4b-movement-')) && 's1-movement' || 's0-plan' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,21 +63,23 @@ jobs:
       - name: Download 2.5 GB official 4B GGUF, verify exact revision/size/hash
         shell: pwsh
         run: python tools/install_game_coder_model.py --confirm-download
-      - name: Attempt same s0 game HTML+CSS task using real 4B model
+      - name: Attempt requested game stage using real Qwen3-4B
         shell: pwsh
         run: |
-          python tools/run_game_agent_v2_windows.py --stage s0-plan --model-file Qwen3-4B-Q4_K_M.gguf --profile equilibrado --attempts 2 --report results/game_agent/qwen3-4b.json
+          python tools/run_game_agent_v2_windows.py --stage $env:LAB_STAGE --model-file Qwen3-4B-Q4_K_M.gguf --profile equilibrado --attempts 2 --save-draft --report results/game_agent/qwen3-4b.json
           $rc=$LASTEXITCODE
           if ($rc -eq 1) {
             Write-Host "Qwen3-4B did not satisfy the predefined coding benchmark; preserving valid negative result."
             exit 0
           }
           exit $rc
-      - name: Publish sanitized comparison metadata, never generated code
+      - name: Publish metrics and accepted AI draft (synthetic code only)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: luna-game-coder-4b-${{ github.run_id }}
-          path: results/game_agent/qwen3-4b.json
+          path: |
+            results/game_agent/qwen3-4b.json
+            results/game_agent/draft-*.json
           if-no-files-found: warn
           retention-days: 14
