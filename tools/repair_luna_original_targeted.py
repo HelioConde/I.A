@@ -150,6 +150,10 @@ def sanitize_model_piece(raw: str, task: dict[str, Any]) -> tuple[bool, str, str
         r"enemies\.(?:splice|filter|pop|shift)\s*\(|enemies\.length\s*=|\bmode\s*=\s*[\x27\x22]victory", text
     ):
         return False, "enemy_disappearance_or_false_victory", ""
+    if task["id"] == "repair_attack_ranges":
+        values = [int(v) for v in re.findall(r"\battackRange\s*=\s*(\d{2,3})\s*;", text)]
+        if len(values) != 3 or min(values) < 80 or max(values) > 230 or len(set(values)) < 2:
+            return False, "unplayable_or_undifferentiated_attack_ranges", ""
     if task["end"] is None and ("\n" in text or "{" in text or (";" in text and not task.get("allow_statement"))):
         return False, "expression_not_single", ""
     if task["id"] == "wave_progression" and ("mode =" in text or "mode=" in text):
