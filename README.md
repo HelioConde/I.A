@@ -98,3 +98,11 @@ O workflow [Luna Pages — Visual QA](.github/workflows/pages.yml) executa teste
 - **Verificação pública:** [Publication Health run 40481044717](https://github.com/HelioConde/I.A/actions/runs/40481044717), tentativa 3 — cinco respostas HTTP 200 (HTML, JS, CSS, manifest e service worker).
 - **Site:** https://helioconde.github.io/I.A/
 - **Fonte em Settings → Pages:** GitHub Actions, não `gh-pages`.
+
+## Luna Code Studio — desafio de programação
+
+O próximo alvo de capacidade é criar um **jogo original de ação em plataformas, inspirado nas mecânicas da Season 1 de Grand Chase**: movimento, combos, classes, inimigos, chefe e interface. Este é um **benchmark a atingir**, não um jogo já construído pela Luna. O código deverá ser criado por etapas com aprovação explícita e validado por Playwright e revisão visual. Os assets, a marca e o código original do jogo comercial não serão copiados.
+
+- [Etapas e QA do Code Studio](docs/LUNA_CODE_STUDIO.md)
+- [Benchmark de aceitação](benchmarks/arcade_s1/brief.json)
+- [Testes Playwright para jogo candidato](site-tests/tests/game-benchmark.spec.js)

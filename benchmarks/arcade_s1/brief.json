@@ -1,0 +1,127 @@
+{
+  "benchmark_version": 1,
+  "id": "luna-arcade-s1-capstone",
+  "title": "Luna Arcade S1 — jogo original de ação/plataforma inspirado na estrutura inicial de Grand Chase",
+  "principle": "Reproduzir sensação e fluxos funcionais da Season 1 sem copiar arquivos, músicas, marcas, personagens, cenários ou código proprietários. Uma réplica 1:1 audiovisual não é exigida nem autorizada por este benchmark.",
+  "historical_reference": "Combate lateral em plataformas, três arquétipos (guerreiro/arqueiro/mago), partidas de missão com monstros, progressão até chefe, PvP e lobby; entradas de teclado, ataque combinado e especiais.",
+  "project_target": "Jogo HTML5 Canvas ou DOM+Canvas que execute offline em navegador moderno, com arte e nomes originais; pronto para publicação estática em GitHub Pages no modo um jogador.",
+  "cross_cutting": [
+    "Roda offline por index.html e assets locais; sem CDN, login, API remota, pagamentos ou banco de dados",
+    "Estado do jogo modelado separadamente da renderização, delta-time estável e timestep determinístico nos testes",
+    "Código modular, nomes descritivos, sem eval ou Function; testes unitários reproduzíveis",
+    "Teclado: setas para mover, espaço para saltar, Z para ataque, X para habilidade; controles documentados, remapeáveis futuramente",
+    "UX/UI com acessibilidade de menus, contraste, foco, legibilidade e estados loading/pause/gameover; 390x844 e 1366x768",
+    "Arte, trilha e efeitos originais ou licenciados; sem uso de assets oficiais do jogo de referência",
+    "Expor somente QA read-only por window.__LUNA_GAME_QA__.snapshot() com estado REAL atualizado pelo motor: mode, player, enemies, stage",
+    "O agente nunca deve inventar resultados Playwright ou afirmar que passou sem executar a suíte"
+  ],
+  "stages": [
+    {
+      "id": "s0-plan",
+      "title": "Planejar arquitetura e game design document",
+      "requirements": [
+        "Definir estados title/select/lobby/dungeon/pause/victory/defeat",
+        "Definir módulos de física, entrada, combate, inimigos, renderização, interface e testes",
+        "Definir milestones com critérios automáticos e manual visual",
+        "Produzir documentos e um index.html acessível demonstrativo, sem declarar que já existe gameplay"
+      ]
+    },
+    {
+      "id": "s1-movement",
+      "title": "Personagem e física de plataforma",
+      "requirements": [
+        "Seleção funcional de guerreiro, arqueiro e mago com nomes e visuais originais",
+        "Movimento horizontal consistente com delta-time, gravidade, colisão e plataformas de alturas variadas",
+        "Pulo, queda e dash com sinais visuais e controle responsivo",
+        "Câmera lateral e animações de idle/run/jump/fall usando arte original",
+        "Interface com botão Iniciar e modo de treinamento; hook QA read-only ligado à simulação real"
+      ]
+    },
+    {
+      "id": "s2-combat",
+      "title": "Combate básico real e hitboxes",
+      "requirements": [
+        "Ataque Z com combo de pelo menos 3 golpes e janela de cancelamento definida",
+        "Hitboxes/hurtboxes reais, dano com invulnerabilidade temporária e knockback",
+        "Inimigo de treinamento com HP, animação, reação e morte verificáveis",
+        "HP e MP exibidos e sincronizados com o estado da simulação",
+        "Feedback visual (dano, efeitos e som opcional original) e testes de colisão"
+      ]
+    },
+    {
+      "id": "s3-dungeon",
+      "title": "Missão PvE do início ao fim",
+      "requirements": [
+        "Ao menos dois trechos/arenas de plataforma com inimigos e deslocamento",
+        "Porta de fim de trecho liberada pela derrota dos inimigos (referência estrutural à S1)",
+        "IA simples com patrulha, perseguição e ataque legíveis",
+        "Chefe com pelo menos dois padrões e telegráficos, derrota/vitória e reinício",
+        "HUD, pause/resume, derrota por HP zero e fluxo completo do menu à vitória"
+      ]
+    },
+    {
+      "id": "s4-classes",
+      "title": "Três estilos de jogo distintos",
+      "requirements": [
+        "Guerreiro corpo-a-corpo com combo, alcance curto e resistência",
+        "Arqueiro com projéteis e tempo de recuperação",
+        "Mago com projéteis ou área, gasto e recuperação de MP",
+        "Mesma fase deve poder ser concluída com cada classe",
+        "QA de balanceamento básico para evitar classe impossível"
+      ]
+    },
+    {
+      "id": "s5-presentation",
+      "title": "Interface final e acabamento visual",
+      "requirements": [
+        "Menu principal, seleção, sala/lobby de missão, instruções, pausa, vitória e derrota",
+        "Design system com tokens, contrastes, tipografia, layout responsive e estados de teclado",
+        "Cenário com profundidade/parallax e animações originais coerentes",
+        "Experiência legível em mobile; jogo pode usar controles touch opcionais",
+        "Capturas Playwright desktop/mobile e revisão manual de colisões e alinhamentos"
+      ]
+    },
+    {
+      "id": "s6-multiplayer",
+      "title": "Multiplayer opcional, projeto separado",
+      "requirements": [
+        "Primeiro PvP local dois controles e regras justas para validação sem servidor",
+        "Se houver multiplayer online, projeto separado com servidor autoritativo WebSocket",
+        "Não alegar multiplayer online em GitHub Pages puro, que só hospeda arquivos estáticos",
+        "Sincronização, reconexão, segurança, latência e teste de dois clientes"
+      ]
+    },
+    {
+      "id": "s7-capstone",
+      "title": "Validação final do desafio de engenharia",
+      "requirements": [
+        "Jogo jogável do menu à vitória com três arquétipos e sem travamento",
+        "Playwright testa menu, classes, movimento, salto, combate, vitória, derrota, pause e restart",
+        "Ao menos um teste de colisão real, e revisão de FPS/input latency em desktop",
+        "QA visual manual e screenshots 390x844, 768x1024, 1366x768 e 1600x900",
+        "Executar suite e guardar relatórios; consertar falhas antes de declarar concluído",
+        "Publicar versão demo estática com arte original; anexar avaliação humana da fidelidade de mecânicas"
+      ]
+    }
+  ],
+  "scoring": {
+    "gameplay_functionality": 40,
+    "combat_and_classes": 20,
+    "visual_ui_ux": 15,
+    "software_quality_and_tests": 15,
+    "performance_and_accessibility": 10
+  },
+  "graduation": {
+    "threshold_percent": 90,
+    "hard_gates": [
+      "Nenhuma falha bloqueante em Playwright na build candidata",
+      "Nenhuma referência a assets ou código proprietário",
+      "Um ciclo de dungeon completo com chefe e vitória",
+      "Três classes selecionáveis e jogáveis",
+      "Teste manual confirmou que o visual exibido corresponde à simulação real",
+      "Nenhum erro JavaScript não tratado no fluxo principal",
+      "Alterações aplicadas somente após revisão humana"
+    ],
+    "warning": "Critérios são uma meta de engenharia; nenhum jogo pronto ou nota é afirmado na criação deste benchmark."
+  }
+}

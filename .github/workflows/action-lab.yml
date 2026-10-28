@@ -22,6 +22,8 @@ on:
       - ".github/lab-requests/**"
       - "tools/action_lab.py"
       - "tests/**"
+      - "benchmarks/arcade_s1/**"
+      - "tools/code_studio.py"
       - "src/brain_ssd/**"
       - "chat/**"
   pull_request:
@@ -31,6 +33,8 @@ on:
       - ".github/lab-requests/**"
       - "tools/action_lab.py"
       - "tests/**"
+      - "benchmarks/arcade_s1/**"
+      - "tools/code_studio.py"
       - "src/brain_ssd/**"
       - "chat/**"
 
