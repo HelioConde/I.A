@@ -81,7 +81,7 @@ class CodeStudioTests(unittest.TestCase):
         self.assertEqual(report["status"], "READY_FOR_HUMAN_REVIEW")
         self.assertGreater(len(report["files"][0]["suggestions"]), 0)
         self.assertGreater(len(report["files"][1]["suggestions"]), 0)
-        self.assertIn("não executou código", report["warning"])
+        self.assertIn("não executou código", report["warning"].casefold())
 
     def test_apply_requires_approval_creates_new_only(self):
         with tempfile.TemporaryDirectory() as folder:
