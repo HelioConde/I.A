@@ -105,10 +105,10 @@ jobs:
           r=json.loads((base/'provenance.json').read_text(encoding='utf-8'))
           assert r['status']=='STATIC_REFINED_CANDIDATE',"Incomplete model game, no preview branch."
           assert r['assistant_gameplay_code_used'] is False
-          assert r['patches_accepted']==1
+          assert r['patches_accepted']==3
           for name in ('index.html','styles.css','game.js'):
             assert hashlib.sha256((base/name).read_bytes()).hexdigest()==r['provenance_sha256'][name],name
-          print('One genuine Qwen attack-range balance patch verified.')
+          print('Three genuine Qwen one-line attack-range patches verified.')
           PY
           node --check results/luna-original-ranges/game.js
       - name: Stage authentic model source on private-to-main review branch
