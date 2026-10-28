@@ -50,6 +50,45 @@ class CoreMovementReviewTests(unittest.TestCase):
         self.assertFalse(result["quality_approved"])
         self.assertFalse(result["behavior_verified"])
 
+    def test_actual_style_qwen_revision_has_blockers_despite_valid_javascript(self):
+        # The observed 2/5-style mistake: accelerationX assigned but never
+        # used, per-frame drag, frame scheduler and logging outside the task.
+        source=(
+          "function moveHorizontal(character, deltaTime, acceleration, friction, maxSpeed){"
+          "character.accelerationX=acceleration*deltaTime;"
+          "character.velocityX *= (1-friction);"
+          "character.velocityX=Math.max(-maxSpeed,Math.min(maxSpeed,character.velocityX));"
+          "character.positionX+=character.velocityX*deltaTime;}"
+          "function gameLoop(deltaTime){console.log(deltaTime);requestAnimationFrame(gameLoop);}"
+          "requestAnimationFrame(gameLoop);"
+        )
+        rubric=qa.review("Crie movimento horizontal com atrito e deltaTime",source)["rubric"]
+        self.assertEqual(rubric["indicators_detected"],2)
+        self.assertTrue(rubric["unsolicited_scheduler_detected"])
+        self.assertTrue(rubric["frame_multiplier_detected"])
+        self.assertFalse(rubric["movement_velocity_acceleration_link_detected"])
+        self.assertGreaterEqual(rubric["blocking_issue_count"],3)
+        self.assertFalse(rubric["quality_approved"])
+        self.assertFalse(rubric["behavior_verified"])
+
+    def test_standalone_reference_has_no_loop_blockers(self):
+        source=(
+          "function moveHorizontal(character,axis,deltaTime,options){"
+          "const acceleration=options.acceleration;"
+          "const friction=options.friction;"
+          "const maxSpeed=options.maxSpeed;"
+          "character.velocityX += axis*acceleration*deltaTime;"
+          "if(axis===0){const f=friction*deltaTime;"
+          "character.velocityX=character.velocityX>0?"
+          "Math.max(0,character.velocityX-f):Math.min(0,character.velocityX+f);}"
+          "character.velocityX=Math.max(-maxSpeed,Math.min(maxSpeed,character.velocityX));"
+          "character.positionX+=character.velocityX*deltaTime;return character;}"
+        )
+        rubric=qa.review("movimento horizontal independente do FPS",source)["rubric"]
+        self.assertEqual(rubric["blocking_issue_count"],0)
+        self.assertEqual(rubric["indicators_detected"],5)
+        self.assertFalse(rubric["behavior_verified"])
+
     def test_unrelated_task_needs_separate_tests(self):
         result=qa.review("Create an inventory menu", "function menu(){}")
         self.assertEqual(result["task_type"],"general")
