@@ -154,14 +154,16 @@ def generate_patches(
     infer: Callable[[str, int], dict[str, Any]],
     *,
     attempts: int = 2,
-    checker: Callable[[str], bool] = node_check
+    checker: Callable[[str], bool] = node_check,
+    tasks: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], str | None]:
     """Patch fragments from actual model, no assistant-generated code."""
     if not 1 <= attempts <= 3:
         raise ValueError("invalid_attempts")
     state = original
     history = []
-    for task in TASKS:
+    active_tasks = TASKS if tasks is None else tasks
+    for task in active_tasks:
         prefix, old, suffix = region(state, task)
         feedback = ""
         accepted = False
@@ -200,14 +202,14 @@ def generate_patches(
         history.append({"task":task["id"], "accepted":accepted,"attempts":trials})
         if not accepted:
             break
-    good = len(history)==len(TASKS) and all(item["accepted"] for item in history)
+    good = len(history)==len(active_tasks) and all(item["accepted"] for item in history)
     return {
         "benchmark":"Luna Genuine Model Self-Repair Patches v3",
         "source_run":REFERENCE_RUN,
         "source_sha256":sha(original.encode("utf-8")),
         "tasks":history,
         "patches_accepted":len([p for p in history if p["accepted"]]),
-        "required_patches":len(TASKS),
+        "required_patches":len(active_tasks),
         "status":"STATIC_PATCHED_CANDIDATE" if good else "INCOMPLETE",
         "model_only_patch_content":True,
         "gameplay_verified":False,
