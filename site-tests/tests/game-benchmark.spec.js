@@ -149,3 +149,26 @@ test("real mission: fight creatures, traverse three regions and defeat the boss"
   }
   }
 });
+
+
+test("mobile: actual on-screen controls move and attack", async ({page}, testInfo) => {
+  await page.setViewportSize({width:390,height:844});
+  const initial=await begin(page,"melee");
+  const move=page.getByRole("button",{name:"Mover para direita"});
+  await expect(move).toBeVisible();
+  await move.dispatchEvent("pointerdown",{pointerId:1,pointerType:"touch"});
+  await page.waitForTimeout(280);
+  await move.dispatchEvent("pointerup",{pointerId:1,pointerType:"touch"});
+  const after=await snapshot(page);
+  expect(after.player.x).toBeGreaterThan(initial.player.x+5);
+  const attack=page.getByRole("button",{name:"Atacar"});
+  await expect(attack).toBeVisible();
+  const beforeHit=after.enemies.find(e=>e.training);
+  await attack.dispatchEvent("pointerdown",{pointerId:2,pointerType:"touch"});
+  await attack.dispatchEvent("pointerup",{pointerId:2,pointerType:"touch"});
+  await page.waitForTimeout(130);
+  const afterHit=await snapshot(page);
+  const target=afterHit.enemies.find(e=>e.training);
+  expect(target==null||target.hp<beforeHit.hp).toBe(true);
+  await testInfo.attach("touch-gameplay-mobile",{body:await page.screenshot(),contentType:"image/png"});
+});
