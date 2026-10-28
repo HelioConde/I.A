@@ -8,6 +8,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/luna_coder_ollama.py"
+      - "tests/test_luna_local_ollama.py"
       - "experiments/luna-forge-zero/preview_local_candidate.py"
       - "tests/test_luna_candidate_preview.py"
       - "experiments/luna-forge-zero/inventory_local_data.py"
@@ -23,6 +25,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/luna_coder_ollama.py"
+      - "tests/test_luna_local_ollama.py"
       - "experiments/luna-forge-zero/preview_local_candidate.py"
       - "tests/test_luna_candidate_preview.py"
       - "experiments/luna-forge-zero/inventory_local_data.py"
@@ -79,6 +83,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_candidate_preview.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test offline local Ollama GameCoder and JS syntax validation
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_ollama.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise installer without starting training
         shell: cmd
