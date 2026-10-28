@@ -24,6 +24,10 @@ TASK = (
     "'const end=', sem markdown, sem explicações e sem criar estado global. "
     "Não inclua código de outros sistemas, APIs de rede ou arquivos."
 )
+TASK_V2 = TASK + ("\nA nova linha deve ter exclusivamente DUAS operações: cancelar o evento "
+                  "com e.preventDefault() e remover a tecla de keys com keys.delete(code). "
+                  "Não utilize quaisquer outras variáveis ou efeitos colaterais. "
+                  "Use apenas JavaScript em uma linha. Não repita o trecho original. ")
 FORBIDDEN = re.compile(r"\b(?:eval|Function|fetch|import|require|WebSocket|XMLHttpRequest|Worker)\s*\(|"
                        r"\b(?:localStorage|sessionStorage|document|window|globalThis)\b", re.I)
 ONE_LINE = re.compile(
@@ -80,7 +84,7 @@ def run_first_fix(
     accepted: str | None = None
     feedback = ""
     for i in range(attempts):
-        prompt = "/no_think\n" + TASK
+        prompt = "/no_think\n" + TASK_V2
         if feedback:
             prompt += "\nTentativa anterior recusada: " + feedback + ". Responda somente a linha corrigida."
         try:
@@ -95,7 +99,8 @@ def run_first_fix(
             else:
                 ok, why = validate_candidate(proposed, source, checker)
             rows.append({"attempt": i+1, "real_model": verified, "accepted": ok,
-                         "reason": why, "chars": len(proposed)})
+                         "reason": why, "chars": len(proposed),
+                         "model_output_excerpt": proposed[:400]})
             if ok:
                 accepted = proposed
                 break
@@ -104,7 +109,8 @@ def run_first_fix(
             feedback = "runtime_" + type(exc).__name__
             rows.append({"attempt": i+1, "real_model": False, "accepted": False, "reason": feedback})
     return {
-        "benchmark": "Luna Outperform Reference — Touch Release Bug v1",
+        "benchmark": "Luna Outperform Reference — Touch Release Bug v1.1",
+        "prompt_revision": 2,
         "baseline_sha256": original_hash,
         "original_line": BUGGY_LINE,
         "status": "CANDIDATE_FOR_REVIEW" if accepted else "INCOMPLETE",
