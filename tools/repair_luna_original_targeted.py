@@ -142,7 +142,7 @@ def sanitize_model_piece(raw: str, task: dict[str, Any]) -> tuple[bool, str, str
     missing = [word for word in task["requires"] if word not in text]
     if missing:
         return False, "missing_contract:" + ",".join(missing), ""
-    if task["end"] is None and ("\n" in text or ";" in text or "{" in text):
+    if task["end"] is None and ("\n" in text or "{" in text or (";" in text and not task.get("allow_statement"))):
         return False, "expression_not_single", ""
     if task["id"] == "wave_progression" and ("mode =" in text or "mode=" in text):
         return False, "wave_spawn_must_not_declare_victory", ""
