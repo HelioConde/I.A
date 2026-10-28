@@ -14,6 +14,7 @@ import re
 import subprocess
 import time
 from benchmark_luna_game_models import command, sha
+from luna_cli_answer_parser import extract_native_answer
 
 ROOT=Path(__file__).resolve().parents[1]
 START="// Attack\n"
@@ -144,7 +145,8 @@ def main()->int:
             (args.out/("model-attempt-"+str(len(last_out)+1)+".txt")).write_bytes(raw.encode())
             last_out.append({"exit":proc.returncode,
                              "seconds":round(time.monotonic()-started,1)})
-            return {"answer":raw,"model_generated":proc.returncode==0}
+            return {"answer":extract_native_answer(raw) if proc.returncode==0 else "",
+                    "model_generated":proc.returncode==0}
         except subprocess.TimeoutExpired:
             last_out.append({"exit":"timeout","seconds":600})
             return {"answer":"","model_generated":False}
