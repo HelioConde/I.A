@@ -59,3 +59,9 @@ O 4B pode caber na RAM com 16GB totais, mas **o consumo físico, latência e tem
 O workflow do Qwen3-4B agora permite selecionar `stage=s1-movement` manualmente ou disparar uma branch `lab/luna-game-4b-movement-*`. Esse teste pede à Luna um arquivo `src/game.js` com canvas, estado do jogador, gravidade e teclado. A saída aceita pode ser arquivada como **rascunho sintético gerado pelo modelo**, mas jamais é aplicada ou executada automaticamente. O status de aceitação continua a medir apenas contrato JSON, palavras-chave, análise estática e `node --check`, **não movimento real**. Um teste posterior em navegador isolado será necessário para comprovar comportamento.
 
 A opção `s0-plan` original continua funcionando, com os mesmos critérios e nome de relatório. Em CI, `--save-draft` faz gravação controlada somente em `results/game_agent/draft-<stage>.json`, que é parte do artifact de avaliação e não substitui arquivos do projeto.
+
+## Resultado real da etapa S1 — movimento em JavaScript (2026-10-28)
+
+[Run 40628359254](https://github.com/HelioConde/I.A/actions/runs/40628359254) com o Qwen3-4B oficial: **INCOMPLETE, 0/1 arquivo aceito**. O modelo realizou duas gerações reais para `src/game.js`: primeira saída rejeitada por `invalid_complete_json_or_file` e segunda por `javascript_syntax_error`. **Nenhum arquivo foi aceito, salvo como draft, executado ou aplicado ao jogo**. O workflow concluiu com sucesso como execução de diagnóstico, não como sucesso de programação.
+
+**Conclusão técnica:** o 4B conseguiu duas propostas iniciais de HTML/CSS em S0, mas não superou a tarefa mais complexa S1 de JavaScript/física sob o protocolo JSON v2. A próxima avaliação deve separar claramente erros de codificação JSON aninhada, sintaxe JavaScript e semântica de gameplay; usar formato de código mais apropriado pode ajudar, mas qualquer mudança de protocolo será um benchmark novo (v3), sem alterar retroativamente esta falha.
