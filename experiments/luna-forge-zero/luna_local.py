@@ -113,9 +113,12 @@ def main():
             print("Nenhum arquivo e enviado, executado ou alterado. Node.js verifica apenas a sintaxe.")
             rc=run(HERE/"luna_coder_ollama.py","status")
             if rc==0:
+                print("Modelo opcional: Enter = qwen2.5-coder:3b; 2 = qwen3.5:4b (se instalado).")
+                chosen=input("Escolha [Enter/2]: ").strip()
+                model="qwen3.5:4b" if chosen=="2" else "qwen2.5-coder:3b"
                 task=input("Descreva a mecanica JavaScript que deseja criar: ").strip()
                 if task:
-                    run(HERE/"luna_coder_ollama.py","generate","--task",task)
+                    run(HERE/"luna_coder_ollama.py","generate","--model",model,"--task",task)
         else:
             print("Opcao invalida.")
 
