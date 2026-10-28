@@ -21,6 +21,7 @@ SMOKE = (
     "test_chat_windows.py",
     "test_code_studio.py",
     "test_game_coding_trial.py",
+    "test_game_agent_v2.py",
     "test_chat_local_actions.py",
     "test_memory_safety.py",
     "test_chat_completion_quality.py",

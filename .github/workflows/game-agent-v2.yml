@@ -1,0 +1,74 @@
+name: Luna Game Agent v2 — Real Multi-file Qwen Trial
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-game-v2-*"
+    paths:
+      - ".github/lab-requests/game-v2-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brain_ssd/chat/game_agent_v2.py"
+      - "tools/run_game_agent_v2_windows.py"
+      - "tests/test_game_agent_v2.py"
+      - ".github/workflows/game-agent-v2.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-game-agent-v2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate agent syntax and negative-case regressions
+        run: |
+          python -m compileall -q src/brain_ssd/chat/game_agent_v2.py tools/run_game_agent_v2_windows.py
+          PYTHONPATH=src python -m unittest discover -s tests -p "test_game_agent_v2.py" -v
+
+  real-windows-native-qwen:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-game-v2-')) }}
+    needs: synthetic-contract
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned Qwen3-0.6B and llama.cpp, verify hashes
+        shell: pwsh
+        run: python tools/install_windows_chat.py --all
+      - name: Verify native model preflight
+        shell: pwsh
+        run: python tools/doctor_chat.py --profile equilibrado --probe
+      - name: Attempt actual native multi-file game project generation
+        shell: pwsh
+        run: |
+          python tools/run_game_agent_v2_windows.py --stage s0-plan --profile equilibrado --attempts 2
+          $rc = $LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Model did not generate a fully accepted proposal. This remains a valid negative benchmark result."
+            exit 0
+          }
+          exit $rc
+      - name: Upload sanitized real candidate metrics, no generated code
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-game-agent-v2-${{ github.run_id }}
+          path: results/game_agent/v2-latest.json
+          if-no-files-found: warn
+          retention-days: 14
