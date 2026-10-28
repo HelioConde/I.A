@@ -65,6 +65,52 @@ class LocalRightsGatedLuaTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"Poucos arquivos"):
                 mod.prepare(root,max_mib=1)
 
+    def test_dry_run_reports_why_lua_files_are_unavailable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)/"private_game"
+            root.mkdir()
+            # Extension inventories see these files, but the private trainer
+            # deliberately refuses to traverse protected directories.
+            hidden=root/"Elsword"
+            hidden.mkdir()
+            for i in range(25):
+                (hidden/f"combat_{i}.lua").write_text(SAMPLE,encoding="utf-8")
+            (root/"tiny.lua").write_text("return 1",encoding="utf-8")
+            summary,train,holdout=mod.prepare(root,max_mib=1,strict=False)
+            self.assertFalse(summary["training_ready"])
+            self.assertEqual(summary["source_lua_files_discovered"],1)
+            self.assertEqual(summary["excluded_entry_counts"]["protected_directory_skipped"],1)
+            self.assertEqual(summary["excluded_entry_counts"]["files_under_256_bytes"],1)
+            self.assertEqual((train,holdout),([],[]))
+            report=json.dumps(summary,ensure_ascii=False)
+            self.assertNotIn(str(root),report)
+            self.assertNotIn("combat_0.lua",report)
+            with self.assertRaises(mod.InsufficientLuaData) as ctx:
+                mod.prepare(root,max_mib=1)
+            self.assertFalse(ctx.exception.summary["training_ready"])
+            import subprocess,sys
+            cli=subprocess.run([sys.executable,str(LAB/"train_private_lua.py"),
+                "dry-run","--source",str(root),"--acknowledge-rights","--max-mib","1"],
+                capture_output=True,text=True,timeout=15)
+            self.assertEqual(cli.returncode,3,cli.stderr)
+            data=json.loads(cli.stdout)
+            self.assertFalse(data["training_ready"])
+            self.assertEqual(data["weights_modified"],False)
+            self.assertNotIn(str(root),cli.stdout)
+
+    def test_minimum_holdout_is_deterministic_when_ten_files_are_eligible(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            for i in range(10):
+                (root/f"script_{i}.lua").write_text(SAMPLE,encoding="utf-8")
+            summary,train,heldout=mod.prepare(root,max_mib=1)
+            self.assertTrue(summary["training_ready"])
+            self.assertEqual((len(train),len(heldout)),(8,2))
+            summary2,train2,heldout2=mod.prepare(root,max_mib=1)
+            self.assertEqual(summary,summary2)
+            self.assertEqual(train,train2)
+            self.assertEqual(heldout,heldout2)
+
     def test_compiled_and_sensitive_files_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp)
