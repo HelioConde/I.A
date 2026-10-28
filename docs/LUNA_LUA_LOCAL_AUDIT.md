@@ -39,3 +39,31 @@ O relatório ficará em `reports/lua_format_audit.json` na pasta experimental e 
 ## Próxima etapa (ainda não implementada)
 
 Confirmar o formato e a proveniência dos scripts. Só material sobre o qual haja autorização de uso e treinamento pode entrar no conjunto de aprendizado. Priorizar novos exemplos originais e testes de movimento, combate e animações escritos pela Luna, avaliando funções e comportamento em Godot/JS. O treinador `train_github.py` NÃO lê estes arquivos nem o relatório; apenas projetos externos licenciados e currículo original.
+
+
+## Resultado da auditoria de 28/10/2026
+
+Relatorio fornecido pelo usuario, baseado em 5.902 arquivos `.lua` (873.402.247 bytes):
+
+| Classificacao de formato | Arquivos |
+|---|---:|
+| Candidatos a texto UTF-8 | 5.789 |
+| Codificacao nao UTF-8 ou formato binario desconhecido | 94 |
+| Bytecode Lua ou KL | 18 |
+| Somente espacos em branco | 1 |
+
+Conclusao: cerca de **98,1%** dos arquivos `.lua` parecem ser texto UTF-8 nos primeiros 4096 bytes. Isso nao significa codigo sintaticamente valido, licencia aberta, origem propria ou direito de treinar a IA. Nenhum script foi exportado ou usado para treino.
+
+## Nova opcao 7 — perfil estrutural, ainda sem treinamento
+
+`profile_local_lua.py` amostra ate 64 KiB de cada arquivo Lua e conta apenas ocorrencias agregadas de palavras-chave (`function`, `if`, `for`, `while`, `return`) e classes estruturais. Comentarios e strings comuns sao ignorados na contagem. A analise nao e parser; pode errar em Lua complexo, especialmente em comentarios longos e arquivos amostrados parcialmente.
+
+```powershell
+$repo = "$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+$lab = Join-Path $repo "experiments\luna-forge-zero"
+$saida = Join-Path $lab "reports\lua_structure_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
+& "$lab\.venv\Scripts\python.exe" "$lab\profile_local_lua.py" "$env:USERPROFILE\Documents\grand chase files" --out "$saida"
+```
+
+O resultado inclui SOMENTE contagens e agregados, nenhum nome ou texto de arquivo. A pasta `reports` nao e versionada. Este script **nao** copia codigo, nao roda `luac`/scripts, nao extrai KOM/RAR, nao executa nada nem muda pesos. O professor Core devera usar futuras tarefas **originais** e codigo com permissao confirmada.
