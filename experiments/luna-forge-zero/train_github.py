@@ -18,7 +18,7 @@ from luna_codegen_model import Config, LunaMiniCoder
 from github_corpus import verify
 
 
-def prepare(data: Path, curriculum: Path | None = None):
+def prepare(data: Path, curriculum: Path | None = None, lua_lessons: bool = False):
     verify(data)
     rows=[json.loads(line) for line in (data/"corpus.jsonl").read_text(encoding="utf-8").splitlines()]
     groups={"train":defaultdict(list),"holdout":defaultdict(list)}
@@ -38,14 +38,22 @@ def prepare(data: Path, curriculum: Path | None = None):
             example=("TASK: "+item["objective"]+"\nLANGUAGE: "+item["language"]+"\nCODE:\n"+code+"\nEND\n").encode("ascii",errors="replace")
             if len(example)>129:
                 groups["train"]["luna-original-curriculum"].append(torch.tensor(list(example),dtype=torch.long))
+    if lua_lessons:
+        from original_lua_lessons import verify as verify_lua, lessons as original_lua_lessons
+        verify_lua()
+        for item in original_lua_lessons():
+            source=("TASK: "+item["objective"]+"\nLANGUAGE: lua\nCODE:\n"+item["code"]+"\nEND\n").encode("ascii",errors="strict")
+            if len(source)<=129:
+                raise ValueError("Lua lesson too small for current MiniCoder context")
+            groups["train"]["luna-original-lua"].append(torch.tensor(list(source),dtype=torch.long))
     if len(groups["train"])<3 or len(groups["holdout"])<1:
         raise ValueError("Expected multiple independent training projects and an untouched holdout project")
     return groups
 
-def train(data: Path, out: Path, steps=180, batch_size=12, threads=2, seed=20261028, curriculum: Path | None = None):
+def train(data: Path, out: Path, steps=180, batch_size=12, threads=2, seed=20261028, curriculum: Path | None = None, lua_lessons: bool = False):
     if not 1<=steps<=2500 or not 1<=batch_size<=32 or not 1<=threads<=8:
         raise ValueError("Invalid CPU budget")
-    groups=prepare(data, curriculum=curriculum)
+    groups=prepare(data, curriculum=curriculum, lua_lessons=lua_lessons)
     torch.manual_seed(seed);torch.set_num_threads(threads)
     rng=random.Random(seed)
     cfg=Config()
@@ -99,9 +107,12 @@ def train(data: Path, out: Path, steps=180, batch_size=12, threads=2, seed=20261
     torch.save(model.state_dict(),out/"weights.pt")
     digest=hashlib.sha256((out/"weights.pt").read_bytes()).hexdigest()
     report={
-        "status":"experiment_not_promoted","training":"random initialization; external MIT game source code plus separately authored original mechanics when selected",
+        "status":"experiment_not_promoted","training":"random initialization; external MIT game source code plus separately authored original JS/Godot and Lua game mechanics when selected",
         "architecture":asdict(cfg),"config":asdict(cfg),"parameters":sum(p.numel() for p in model.parameters()),
-        "origin_repositories":[x for x in keys["train"] if x!="luna-original-curriculum"],"heldout_repositories":keys["holdout"],
+        "origin_repositories":[x for x in keys["train"] if x not in {"luna-original-curriculum","luna-original-lua"}],"heldout_repositories":keys["holdout"],
+        "original_lua_lessons":len(groups["train"].get("luna-original-lua",[])),
+        "original_lua_module_sha256":hashlib.sha256((Path(__file__).resolve().parent/"original_lua_gameplay.lua").read_bytes()).hexdigest() if lua_lessons else None,
+        "heldout_lua_answers_in_training":0,
         "original_curriculum_examples":len(groups["train"].get("luna-original-curriculum",[])),
         "original_curriculum_sha256":hashlib.sha256(Path(curriculum).read_bytes()).hexdigest() if curriculum else None,
         "grandchase_raw_repositories_in_training":0,
@@ -111,7 +122,7 @@ def train(data: Path, out: Path, steps=180, batch_size=12, threads=2, seed=20261
         "holdout_improved":after<before,"history":history,"elapsed_sec":round(perf_counter()-start,2),
         "interpretation":"Predicting characters, not evidence of ability to create runnable games",
         "promotion_allowed":False,"weights_used_in_chat":False,
-        "model_provenance":"trained from scratch; pinned MIT code plus separately original Luna-authored examples; no code from the nine Grand Chase repositories"
+        "model_provenance":"trained from scratch; pinned MIT code plus separately original Luna-authored JS/Godot/Lua examples; no code from Grand Chase client repositories"
     }
     (out/"report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding="utf-8")
     return report
@@ -124,7 +135,8 @@ def main():
     ap.add_argument("--batch",type=int,default=12)
     ap.add_argument("--threads",type=int,default=2)
     ap.add_argument("--curriculum",type=Path,default=None)
+    ap.add_argument("--lua-lessons",action="store_true",help="Add Luna-authored, tested Lua mechanics; never read external game scripts")
     args=ap.parse_args()
-    report=train(args.data,args.out,args.steps,args.batch,args.threads,curriculum=args.curriculum)
+    report=train(args.data,args.out,args.steps,args.batch,args.threads,curriculum=args.curriculum,lua_lessons=args.lua_lessons)
     print(json.dumps({key:value for key,value in report.items() if key!="history"},indent=2,ensure_ascii=False))
 if __name__=="__main__":main()
