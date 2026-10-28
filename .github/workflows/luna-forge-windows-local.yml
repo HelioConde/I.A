@@ -8,6 +8,9 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/train_private_lua.py"
+      - "experiments/luna-forge-zero/preview_private_lua.py"
+      - "tests/test_luna_private_lua_training.py"
       - "experiments/luna-forge-zero/luna_coder_ollama.py"
       - "experiments/luna-forge-zero/luna_core_qa.py"
       - "tests/test_luna_core_qa.py"
@@ -27,6 +30,9 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/train_private_lua.py"
+      - "experiments/luna-forge-zero/preview_private_lua.py"
+      - "tests/test_luna_private_lua_training.py"
       - "experiments/luna-forge-zero/luna_coder_ollama.py"
       - "experiments/luna-forge-zero/luna_core_qa.py"
       - "tests/test_luna_core_qa.py"
@@ -97,6 +103,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_local_ollama.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test offline Lua dataset security and no-upload guarantees
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_private_lua_training.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise installer without starting training
         shell: cmd
