@@ -50,6 +50,32 @@ def assess_horizontal_movement(code: str) -> dict:
         r"(?:\b(?:axis|direction|inputX|inputAxis|moveInput)\s*!==?\s*0\b)|"
         r"(?:\b(?:axis|direction|inputX|inputAxis|moveInput)\s*\?\s*)",
         s,re.I))
+    # These extra red flags are independent of the original five indicators.
+    # They catch bugs observed in a real local-model answer: accelerationX
+    # computed but never used to update velocity, and an unsolicited RAF loop.
+    # They are only STATIC signals and can produce false positives.
+    assigned_acceleration=bool(re.search(
+        r"\\b(?:accelerationX|accelX)\\b\\s*=",s,re.I))
+    velocity_accel_use=bool(re.search(
+        r"\\b(?:velocityX|vx|speedX)\\b\\s*(?:\\+\\=|\\-\\=|=)[^;\\n]*"
+        r"\\b(?:accelerationX|accelX|acceleration|accel|axis|direction|inputX)\\b",s,re.I))
+    unused_acceleration=assigned_acceleration and not velocity_accel_use
+    unwanted_loop=bool(re.search(
+        r"\\b(?:requestAnimationFrame|setInterval|setTimeout|gameLoop)\\s*\\(",s,re.I))
+    unwanted_log=bool(re.search(r"\\bconsole\\s*\\.\\s*log\\s*\\(",s,re.I))
+    frame_multiplier=bool(re.search(
+        r"\\b(?:velocityX|vx|speedX)\\b\\s*\\*=\\s*\\(?\\s*1\\s*-\\s*(?:friction|drag|damping)\\s*\\)?",s,re.I))
+    # Recording blockers separately prevents a five-indicator rubric from
+    # describing extra loops or unused acceleration as acceptable gameplay.
+    blocking_issues=[]
+    if unused_acceleration:
+        blocking_issues.append("A aceleracao e atribuida a accelerationX, mas nao altera velocityX; personagem nao acelera.")
+    if unwanted_loop:
+        blocking_issues.append("Loop/frame scheduler criado sem pedido; requestAnimationFrame envia timestamp, nao deltaTime.")
+    if unwanted_log:
+        blocking_issues.append("Console/log de demonstração nao faz parte da funcao pura solicitada.")
+    if frame_multiplier:
+        blocking_issues.append("Multiplicacao (1 - friction) por quadro nao e independente do FPS.")
     checks={
       "player_direction_input":has_input,
       "delta_time_used_in_position":has_time and delta_position,
@@ -71,6 +97,11 @@ def assess_horizontal_movement(code: str) -> dict:
       "indicators_detected":sum(checks.values()),
       "indicators_total":len(checks),
       "issues_to_review":missing,
+      "blocking_issues":blocking_issues,
+      "blocking_issue_count":len(blocking_issues),
+      "movement_velocity_acceleration_link_detected":velocity_accel_use,
+      "frame_multiplier_detected":frame_multiplier,
+      "unsolicited_scheduler_detected":unwanted_loop,
       "generated_code_executed":False,
       "behavior_verified":False,
       "quality_approved":False,
