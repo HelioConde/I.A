@@ -21,6 +21,19 @@ O documento de requisitos executáveis está em [brief.json](../benchmarks/arcad
 
 A meta de 90/100 e os hard gates são usados somente após executar o jogo. A Luna não pode se atribuir nota sem build jogável, logs de teste, vídeo ou capturas reais e revisão humana.
 
+### Especialização em motores de jogos (2026-10-28)
+
+A Luna continua sendo a IA; **Luna Arcade S1 é o jogo-laboratório**. Antes de gerar código, selecione um motor, verifique o plano (sem status de sucesso fictício) e construa pequenas etapas revisáveis:
+
+~~~powershell
+python tools/code_studio.py engines
+python tools/code_studio.py plan --engine web2d
+python tools/code_studio.py prompt --stage s1-movement --engine web2d
+python tools/code_studio.py prompt --stage s0-plan --engine godot4
+~~~
+
+O perfil Web 2D já possui contrato de QA Playwright; Godot 4 possui formato de projetos GDScript e `.tscn`/`.tres` com **revisão estática parcial**, sem execução do editor nesta fase. A prioridade futura é um loop completo jogo → teste → correção, documentado em [visão Luna GameDev](LUNA_GAMEDEV_VISION.md). Nenhum dos comandos listados executa o modelo ou finaliza o jogo automaticamente.
+
 ### Como criar um primeiro projeto (versão experimental)
 
 O Code Studio é uma ferramenta de **propostas e revisão**, não um agente autônomo completo. Execute no repositório Brain-SSD:
