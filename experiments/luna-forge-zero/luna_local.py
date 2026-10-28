@@ -25,6 +25,7 @@ def code(prompt: str) -> int:
 def train_external() -> int:
     """Treinamento somente com codigos externos MIT e exemplos originais Luna."""
     if run(HERE/"grandchase_reference_gate.py","audit"): return 1
+    if run(HERE/"original_lua_lessons.py","verify"): return 1
     data=HERE/"external_data"
     if not (data/"manifest.json").is_file():
         if run(HERE/"github_corpus.py","collect","--out",data): return 1
@@ -32,7 +33,7 @@ def train_external() -> int:
     out=data/("local-candidate-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f"))
     if run(HERE/"train_github.py","--data",data,"--curriculum",
            HERE/"action_platform_curriculum.json","--out",out,
-           "--steps","180","--batch","12","--threads","4"): return 1
+           "--steps","180","--batch","12","--threads","4","--lua-lessons"): return 1
     if run(HERE/"evaluate_github_codegen.py","--checkpoint",out,"--out",
            out/"syntax_report.json"): return 1
     print("Checkpoint experimental:",out)
@@ -45,7 +46,7 @@ def main():
         print("1 - Verificar os modelos")
         print("2 - Planejar um jogo (Planner)")
         print("3 - Testar MiniCoder (experimental)")
-        print("4 - Treinar candidato com codigos MIT externos (opt-in)")
+        print("4 - Treinar candidato (MIT + exemplos Lua/JS originais; opt-in)")
         print("5 - Inventariar pasta local (somente metadados; sem treinar)")
         print("6 - Analisar formatos dos arquivos Lua (somente amostra, sem treinar)")
         print("7 - Resumir estruturas do Lua (funcoes/condicoes/lacos, sem treinar)")
@@ -64,7 +65,7 @@ def main():
                 print("Saida nao validada. Nao execute codigo gerado sem revisao.")
                 code(prompt)
         elif option=="4":
-            confirm=input("Confirmar download de codigos externos MIT + treinamento? Digite SIM: ").strip()
+            confirm=input("Confirmar treinamento com MIT + Lua original (sem Grand Chase)? Digite SIM: ").strip()
             if confirm=="SIM": train_external()
             else: print("Cancelado.")
         elif option=="5":
