@@ -187,3 +187,36 @@ $py=Join-Path $lab ".venv\Scripts\python.exe"
 ~~~
 
 A saida deve ser compartilhada somente como JSON de totais, com os campos lua_files_sampled, classification_counts, excluded_sensitive_subdirectories, errors e partial. Texto UTF-8 detectado na amostra nao e comprovacao de sintaxe nem de licenca. Os arquivos comerciais continuam excluidos do treino automatico.
+
+
+## Etapa 16 - Perfil de 64 KiB e benchmark da Luna propria
+
+O usuario executou o perfil Lua de Elsword em 28/10/2026:
+- 5880 amostras, sendo 5786 candidatas a texto UTF-8 e 94 de formato desconhecido;
+- 129202591 bytes de amostra lidos, 399 arquivos ainda maiores que 65536 bytes;
+- com funcoes ou controle: 1520 + 94 + 78 = **1692**;
+- com limite de 4 KiB: 145 + 47 + 47 = **239**; acrescimo de **1453** amostras com estruturas;
+- 4094 amostras sem estruturas detectadas, mas isso nao significa ausencia de codigo;
+- 18531 ocorrencias de function, 29485 de if, 13961 de local, 5350 de return e 48694 de end;
+- 0 erros, 0 scripts treinados. Nenhuma permissao de treinamento foi inferida.
+
+**O codigo comercial nao foi incorporado ao treino.** Como proximo passo, criar um teste do modelo realmente treinado com fontes originais/permissivas em vez de expandir indefinidamente a leitura de codigo comercial.
+
+### Opcao 15 - Benchmark Lua da MiniCoder propria, sem execucao de scripts
+
+Nova ferramenta benchmark_original_lua.py. Carrega um checkpoint MiniCoder local verificado por SHA-256 sob external_data/local-candidate-*, e gera respostas para tres desafios originais sem resposta no conjunto de treinamento supervisionado: chefe com fases, inimigo com campo de visao e plataforma atravessavel.
+
+Mostra a saida gerada no terminal; oferece --no-output para nao mostrar texto. Apresenta apenas sinais lexicais fracos como function, end, return e presenca de assinatura de funcao. Indica explicitamente lua_syntax NOT_TESTED e gameplay_behavior NOT_TESTED. Nao usa Qwen, nao le Elsword, nao altera pesos nem executa o codigo gerado.
+
+PowerShell:
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Falha no git pull" }
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\benchmark_original_lua.py"
+~~~
+
+Alternativa: opcao 15 do menu. A MiniCoder continua um modelo pequeno, de apenas 116480 parametros e janela de 128 caracteres. Estruturas lexicais nao comprovam sintaxe Lua valida nem gameplay. As tarefas sem resposta servem apenas para acompanhar a qualidade das amostras ao longo do tempo; nao substituem benchmark funcional. O treino futuro deve usar somente codigo original ou licenciado.
