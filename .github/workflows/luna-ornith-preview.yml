@@ -1,0 +1,89 @@
+name: Luna Ornith 9B — Authentic Playable Browser Preview
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/luna-ornith-lab/**"
+      - ".github/workflows/luna-ornith-preview.yml"
+  push:
+    branches: [main]
+    paths:
+      - "site/luna-ornith-lab/**"
+      - ".github/workflows/luna-ornith-preview.yml"
+permissions:
+  contents: read
+concurrency:
+  group: luna-ornith-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate authentic Ornith code bytes, model SHA and two real model patches
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,json
+          root=pathlib.Path('site/luna-ornith-lab')
+          meta=json.loads((root/'provenance.json').read_text(encoding='utf-8'))
+          assert meta['model']=='ornith-1.5-9b'
+          assert meta['original_inference']==40653494692
+          assert meta['model_sha256']=='70c112196e0b7023803c9762752e46d29e612a92c83f995bc3ba1ceb07e8fab6'
+          assert meta['patch_count']==2 and meta['assistant_gameplay_code_used'] is False
+          src=(root/'game.js').read_bytes()
+          assert hashlib.sha256(src).hexdigest()=='e6e8f5536d6b633e9b69f9e06b7abc6210ad77dd5e1bef1371b16404ca85e7de'
+          assert meta['repaired_sha256']==hashlib.sha256(src).hexdigest()
+          assert b"fetch(" not in src and b"WebSocket" not in src and b"eval(" not in src
+          assert (root/'index.html').is_file()
+          print('Exact Ornith-authored JS is staged, no model code replaced.')
+          PY
+          node --check site/luna-ornith-lab/game.js
+  chromium:
+    needs: provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    env:
+      LUNA_GAMEDEV_MODEL_URL: http://127.0.0.1:4813
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Serve only Ornith-generated game script in clean localhost environment
+        shell: bash
+        run: |
+          python -m http.server 4813 --bind 127.0.0.1 --directory site/luna-ornith-lab > /tmp/luna-ornith-preview.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4813/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-ornith-preview.log
+          exit 1
+      - name: Install real Chromium browser
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Test model-authored game initializes, moves, jumps, damages and fits mobile
+        working-directory: site-tests
+        run: npx playwright test --config playwright.model-gamedev.config.cjs
+      - name: Save screenshots and browser trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-ornith-original-preview-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
