@@ -82,7 +82,13 @@ O default do script específico §run_game_agent_v3_windows.py§ é §auto§: Or
 | Ornith-1.5-9B | unsafe_code | javascript_syntax_error | Não iniciada: saída inválida |
 | Qwen3-4B | javascript_syntax_error | javascript_syntax_error | Não iniciada: saída inválida |
 
-Ornith não ganhou nem perdeu a comparação em gameplay, porque **nenhum candidato compilou**. O Qwen4B já criou um jogo completo antes, por múltiplas tarefas e reparos menores; não comparar esse resultado com uma geração única.
+**Correção do diagnóstico:** esse veredito do avaliador foi um falso negativo parcial. O programa incluiu o cabeçalho interativo e o prompt ecoado pelo `llama-cli` no conteúdo analisado como código. Reanalisando os artifacts brutos reais, três candidatos JavaScript (Ornith tentativa 2 e Qwen tentativas 1 e 2) passaram em `node --check` após remover apenas o envelope do terminal. A primeira resposta do Ornith continha HTML, apesar do pedido de JS, e continua inválida para o desafio. **Nenhuma versão foi aprovada em jogabilidade ainda**. A repetição controlada em [run 40657552587](https://github.com/HelioConde/I.A/actions/runs/40657552587) executa os quatro outputs originais sem nenhuma nova inferência nem código de substituição. O Qwen4B já criou um jogo completo antes, por múltiplas tarefas e reparos menores; não comparar esse resultado com uma geração única.
+
+## Ajuste do avaliador llama.cpp
+
+Foi adicionado `tools/luna_cli_answer_parser.py` para eliminar **apenas** o cabeçalho, o eco do prompt e as métricas emitidas pelo terminal interativo; o corpo da resposta original do GGUF permanece byte-a-byte idêntico (fora espaços externos e, quando explicitamente solicitado, wrappers Markdown). O tratamento recusa formatos de terminal desconhecidos em vez de inventar um candidato.
+
+O script `tools/replay_luna_game_models.py` verifica origem e SHA dos pesos e reaproveita artifacts brutos do run 40653494692, sem nova inferência. Os resultados desta repetição são os critérios válidos para classificar o código e o comportamento no Chromium. O benchmark novo de patch de combate também usa esse leitor corrigido.
 
 ## Benchmark incremental mais próximo de trabalho real
 
