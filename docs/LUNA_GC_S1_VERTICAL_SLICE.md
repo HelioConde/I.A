@@ -45,3 +45,11 @@ No trial comparativo `40653494692`, Ornith 1.5 9B e Qwen3-4B **ambos falharam** 
 ## Autoria auditável
 
 Cada modelo GGUF e arquivo original possui hash; texto exato dos patches é arquivado. A execução e validação são conduzidas pelo ChatGPT, mas os trechos JS creditados à Luna devem vir de inferência real do modelo. Não usar substituições feitas pelo assistente para "passar" no teste; se o modelo falhar, resultado INCOMPLETE. Os patches aceitos serão integrados somente após inspeção do Chromium e revisão do PR.
+
+## Registro de testes reais S1.1
+
+- Run [40666341586](https://github.com/HelioConde/I.A/actions/runs/40666341586): modelo 4B executado, primeiro trecho aceito e segundo recusado por não tratar repetição do teclado; sem alteração no jogo publicado.
+- Run [40666656928](https://github.com/HelioConde/I.A/actions/runs/40666656928): o modelo gerou três snippets válidos em sintaxe. **6/6 testes originais passaram, mas só 1/3 testes de dash passou**. O navegador mediu velocidades insuficientes nos dois lados; o código atualiza o instante incorretamente. Nenhuma publicação.
+- Run [40667151597](https://github.com/HelioConde/I.A/actions/runs/40667151597): terceira tentativa real com exigência de validação semântica (timestamp atualizado só depois da decisão de velocidade, primeiro toque não pode ser dash, e.repeat deve ser considerado). Resultado deve ser conferido antes de qualquer promoção.
+
+**Não usar status 'workflow success' como evidência de dash funcionando:** é necessário aprovação explícita dos três testes de comportamento, além da suíte anterior.
