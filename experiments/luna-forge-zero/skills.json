@@ -1,0 +1,6 @@
+[
+  {"title":"Godot 4 - movimento e colisão","text":"CharacterBody2D: use velocity e move_and_slide() dentro de _physics_process; valide project.godot, colisão e execução headless."},
+  {"title":"Web Canvas - movimento e pulo","text":"JavaScript Canvas 2D: requestAnimationFrame, delta time, gravidade, velocity, KeyboardEvent.code e teste Chromium via Playwright."},
+  {"title":"Combate de jogo","text":"Ataque exige hitbox, hurtbox, animação, dano e feedback; valide vida, invencibilidade e morte por testes automatizados."},
+  {"title":"Avaliação Luna GameCoder","text":"Só promova pesos novos após testes cegos inéditos em Godot ou Chromium, revisão humana, hashes e comparação com baseline."}
+]
