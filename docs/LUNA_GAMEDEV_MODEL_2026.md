@@ -68,6 +68,27 @@ Para forçar o novo (requer instalação local e runtime compatível com Qwen3.5
 
 Os códigos gerados pelo modelo só viram jogos publicados após revisão e testes reais. O modo `auto` não baixa arquivos, não altera perfil de chat e não muda as versões existentes.
 
+## Autorreparo realmente comprovado com Ornith 1.5 9B
+
+[**Run 40660720374: geração Ornith e Playwright Chromium**](https://github.com/HelioConde/I.A/actions/runs/40660720374) (28/10/2026).
+
+O script executou o mesmo GGUF Ornith-1.5-9B Q4_K_M oficial por inferência nativa real em um runner. **Somente duas linhas de JavaScript foram substituídas pelo código produzido pelo próprio modelo**; nenhum código de gameplay do ChatGPT foi injetado:
+
+- Inicialização do campo velocity de player (o modelo corrigiu a origem do NaN em y), aceita na **primeira tentativa**.
+- Leitura física das teclas por `e.code` (Space e KeyZ), aceita na **segunda tentativa**.
+
+Os resultados ficaram registrados com SHA-256 de cada resposta nativa, o hash do JavaScript original e o hash do arquivo resultante. Os arquivos brutos e as saídas originais da IA estão no artifact [luna-ornith-repaired-40660720374](https://github.com/HelioConde/I.A/actions/runs/40660720374/artifacts/12803638271).
+
+A versão inicial passou em **2/4 testes reais de navegador**; depois dessas duas alterações do modelo, o Chromium passou em **4/4 testes (9,4 segundos)**, incluindo:
+- inicialização com inimigo vivo, sem erros JS;
+- movimento e pulo real via teclado, com física finita;
+- aproximação e dano real do ataque KeyZ em um inimigo;
+- versão mobile sem overflow horizontal.
+
+**Conclusão correta:** Ornith demonstrou habilidade de **autorreparar um minijogo básico**. Isso NÃO prova que supera o Luna Arcade S1 com três classes/chefe, nem que cria sozinho uma experiência de alta qualidade visual. Para isso, a avaliação precisa incluir arte, animações, fases e feedback humano.
+
+O runtime Windows moderno b11946 foi instalado separadamente e inicializado com sucesso no [run 40661177510](https://github.com/HelioConde/I.A/actions/runs/40661177510). A inferência completa do GGUF foi demonstrada em Linux CI, mas **não foi instalada na máquina pessoal do usuário**.
+
 ## Gate para alterar o padrão
 
 O default do script específico §run_game_agent_v3_windows.py§ é §auto§: Ornith é escolhido apenas se instalado e validado por hash; caso contrário Qwen3-4B. A preferência não implica que o novo modelo já seja superior em jogos. Nenhum modelo de chat comum foi substituído. Quando o Ornith demonstrar geração real e jogo testado com vantagem sobre Qwen3-4B, ativar seu perfil GameDev, mantendo Qwen como fallback e sem alterar chat comum nem dados locais. A publicação de um jogo superior também exige QA visual e avaliação do usuário.

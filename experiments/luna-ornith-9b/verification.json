@@ -1,0 +1,24 @@
+{
+  "validation": "Chromium Playwright 4/4",
+  "model": "Ornith-1.5-9B Q4_K_M",
+  "model_code_sha256": "e6e8f5536d6b633e9b69f9e06b7abc6210ad77dd5e1bef1371b16404ca85e7de",
+  "source_inference_run": 40653494692,
+  "self_repair_run": 40660720374,
+  "playwright_browser_run": 40660720374,
+  "playwright_results": {
+    "passed": 4,
+    "total": 4
+  },
+  "covered": [
+    "initial enemy rendered without JavaScript exceptions",
+    "real ArrowRight movement and Space jump",
+    "KeyZ causes actual enemy HP loss",
+    "no horizontal overflow at mobile viewport"
+  ],
+  "attribution": {
+    "game_js": "Ornith native GGUF inference, with two further Ornith-authored line repairs",
+    "html_test_harness": "ChatGPT",
+    "tests_and_integration": "ChatGPT"
+  },
+  "caveat": "Basic isolated benchmark game; not a full game or evidence of visual superiority."
+}
