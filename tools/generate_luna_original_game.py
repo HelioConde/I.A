@@ -217,7 +217,7 @@ def main()->int:
                     "finish_reason":(response.get("metrics") or {}).get("finish_reason")}
         report,files=generate_all(infer,retries=args.retries)
         for name,source in files.items():
-            (OUT/name).write_text(source,encoding="utf-8")
+            (OUT/name).write_bytes(source.encode("utf-8"))
         return 0 if report["generation_complete"] else 1
     except Exception as exc:
         report["error_type"]=type(exc).__name__
