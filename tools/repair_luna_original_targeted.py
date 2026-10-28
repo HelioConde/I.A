@@ -109,10 +109,11 @@ def normalize(raw: bytes) -> bytes:
 def region(code: str, task: dict[str, Any]) -> tuple[str, str, str]:
     start = task["start"]
     end = task["end"]
-    if task["id"] == "victory_gate":
+    if task["id"] in ("victory_gate", "wave_progression"):
         indices = [m.start() for m in re.finditer(re.escape(start), code)]
-        if len(indices) != 1:
-            raise ValueError("final_victory_marker_not_unique")
+        expected = 2 if task["id"] == "wave_progression" else 1
+        if len(indices) != expected:
+            raise ValueError("victory_marker_count_mismatch")
         pos = indices[0]
     else:
         if code.count(start) != 1:
