@@ -92,3 +92,58 @@ test("UX: render responsive menus without JS errors or page overflow", async ({ 
   }
   expect(errors).toEqual([]);
 });
+
+
+test("real mission: fight creatures, traverse three regions and defeat the boss", async ({page}, testInfo) => {
+  test.setTimeout(90000);
+  await begin(page, "melee");
+  await testInfo.attach("real-gameplay", {body: await page.screenshot(), contentType:"image/png"});
+  for (let room=1; room<=3; room++) {
+    const started=Date.now();
+    let actions=0;
+    while (Date.now()-started<28000) {
+      const state=await snapshot(page);
+      if(state.mode==="victory")break;
+      if(state.mode==="defeat")throw new Error("Player was defeated in room "+room+" after "+actions+" actions");
+      if(state.cleared)break;
+      const living=state.enemies;
+      expect(living.length).toBeGreaterThan(0);
+      const player=state.player;
+      const target=living.slice().sort((a,b)=>Math.abs(a.x-player.x)-Math.abs(b.x-player.x))[0];
+      const dx=target.x-player.x;
+      // Navigate with real keyboard events; snapshots only observe game state.
+      if (dx>100) {
+        await page.keyboard.down("ArrowRight");
+        await page.waitForTimeout(Math.min(440,Math.max(80,(dx-72)/1.5)));
+        await page.keyboard.up("ArrowRight");
+      } else if (dx < -10) {
+        await page.keyboard.down("ArrowLeft");
+        await page.waitForTimeout(Math.min(350,Math.max(65,(-dx+40)/1.7)));
+        await page.keyboard.up("ArrowLeft");
+      } else {
+        await page.keyboard.press("ArrowRight");
+      }
+      await page.keyboard.press("KeyZ");
+      if(actions%2===0)await page.keyboard.press("KeyX");
+      await page.waitForTimeout(270);
+      actions++;
+    }
+    const after=await snapshot(page);
+    if(room<3){
+      expect(after.mode).toBe("dungeon");
+      expect(after.cleared).toBe(true);
+      await expect(page.getByTestId("next-room")).toBeVisible();
+      await page.getByTestId("next-room").click();
+      await expect.poll(async ()=>(await snapshot(page))?.stage).toBe(room+1);
+    }else{
+      expect(after.mode).toBe("victory");
+      expect(after.enemies).toHaveLength(0);
+      expect(after.score).toBeGreaterThan(0);
+      await expect(page.getByText("O vale foi salvo")).toBeVisible();
+      await testInfo.attach("real-victory", {body: await page.screenshot(),contentType:"image/png"});
+      await page.getByRole("button",{name:/Jogar novamente/}).click();
+      await expect.poll(async ()=>(await snapshot(page))?.stage).toBe(1);
+      await expect.poll(async ()=>(await snapshot(page))?.mode).toBe("dungeon");
+    }
+  }
+});
