@@ -47,6 +47,7 @@ def main():
         print("3 - Testar MiniCoder (experimental)")
         print("4 - Treinar candidato com codigos MIT externos (opt-in)")
         print("5 - Inventariar pasta local (somente metadados; sem treinar)")
+        print("6 - Analisar formatos dos arquivos Lua (somente amostra, sem treinar)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -76,6 +77,17 @@ def main():
                 print("Lendo apenas nomes, extensoes e tamanhos. Nao abre os arquivos.")
                 run(HERE/"inventory_local_data.py",folder,"--out",destination)
                 print("Relatorio local:",destination)
+        elif option=="6":
+            default_folder=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta para verificar arquivos Lua [{default_folder}]: ").strip().strip('"')
+            folder=Path(supplied) if supplied else default_folder
+            if not folder.is_dir():
+                print("Pasta nao encontrada. Nada alterado.")
+            else:
+                destination=HERE/"reports"/("lua_format_audit-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
+                print("Apenas 4 KB iniciais por arquivo .lua. Sem guardar codigo e sem treinar.")
+                rc=run(HERE/"analyze_local_lua.py",folder,"--out",destination)
+                if rc==0: print("Relatorio local:",destination)
         else:
             print("Opcao invalida.")
 
