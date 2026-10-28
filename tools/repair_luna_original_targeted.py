@@ -146,6 +146,10 @@ def sanitize_model_piece(raw: str, task: dict[str, Any]) -> tuple[bool, str, str
         ".alive" in text or "findClosestEnemy" in text or len(text) > 150
     ):
         return False, "unsafe_or_nonsensical_target_selection", ""
+    if task["id"] == "keep_enemies_in_arena" and re.search(
+        r"enemies\.(?:splice|filter|pop|shift)\s*\(|enemies\.length\s*=|\bmode\s*=\s*[\x27\x22]victory", text
+    ):
+        return False, "enemy_disappearance_or_false_victory", ""
     if task["end"] is None and ("\n" in text or "{" in text or (";" in text and not task.get("allow_statement"))):
         return False, "expression_not_single", ""
     if task["id"] == "wave_progression" and ("mode =" in text or "mode=" in text):
