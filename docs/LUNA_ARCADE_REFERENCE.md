@@ -53,6 +53,22 @@ python tools/evaluate_game_coding_windows.py --profile equilibrado --model-file 
 
 O segundo comando exige o arquivo GGUF exato na pasta `models/`. Cada avaliação grava `results/game_agent/latest.json`, sem aplicar alterações no jogo.
 
+## Baseline real de programação da Luna (2026-10-28)
+
+[Execução Qwen GameDev 40626460629](https://github.com/HelioConde/I.A/actions/runs/40626460629), Qwen3-0.6B-Q8_0 no Windows temporário do GitHub:
+
+- 2 respostas **realmente geradas pelo modelo**, nenhuma regra local; 
+- 2/2 propostas com JSON completo, caminho aceito, termos necessários e sintaxe JavaScript aprovada por `node --check`;
+- 0/2 respostas **aprovadas pela política congelada v1**: ambas foram classificadas `suspected_truncated` pelo detector genérico de completude;
+- não houve execução do código gerado; portanto ainda não existe prova de correção funcional ou de autonomia de desenvolvimento de jogos;
+- o avaliador v1 não deve ter seus resultados reclassificados retroativamente. Um v2 precisará de desafio holdout, teste de semântica real e critérios de completude próprios de saída estruturada.
+
+O relatório de métricas está no artifact `luna-qwen-game-code-40626460629` da execução.
+
+## Próximo modelo recomendado para comparação
+
+No Windows com 16 GB RAM, o GGUF **Qwen2.5-Coder-7B-Instruct Q4_K_M**, com pesos de aproximadamente 4,68 GB, é um candidato especializado em código; também comparar Qwen3-4B-Q4_K_M já disponível localmente. Não afirmar desempenho nem RAM real antes de medir no computador. O formato Qwen2.5 requer validar a compatibilidade do prompt/chat template do app antes de comparar.
+
 ## O que falta para uma IA de jogos autônoma
 
 - Fazer **o próprio modelo** gerar o jogo em vez do assistente entregar o jogo de referência;
