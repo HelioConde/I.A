@@ -96,7 +96,7 @@ def train(data: Path, out: Path, steps=180, batch_size=12, threads=2, seed=20261
         opt.step()
         if step==1 or step%50==0 or step==steps:
             val=evaluation()
-            record={"step":step,"train_loss":round(float(loss),5),"unseen_repo_loss":val}
+            record={"step":step,"train_loss":round(loss.detach().item(),5),"unseen_repo_loss":val}
             history.append(record)
             print(json.dumps(record),flush=True)
     after=evaluation()
