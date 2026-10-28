@@ -98,3 +98,38 @@ $py=Join-Path $lab ".venv\Scripts\python.exe"
 ~~~
 
 O dry-run nao altera pesos e termina com status 3 quando nao ha dados suficientes. Nao compartilhe arquivos de jogo ou credenciais, apenas o JSON agregado. Se as amostras estiverem em pastas excluidas, nao desabilite filtros nem mova conteudo para contornar a protecao; revise a origem e os direitos primeiro. A autorizacao continua sendo pre-requisito.
+
+
+## Resultado real: 5902 Lua no inventario, apenas 2 aptos para treino
+
+Em 28/10/2026, o usuario informou no dry-run v2:
+- 22 arquivos Lua nos diretorios permitidos;
+- 2 diretorios inteiros protegidos e omitidos do treinador;
+- 3 Lua menores que 256 bytes;
+- 19 arquivos regulares candidatos, sendo 17 Lua compilados e apenas 2 elegiveis;
+- 1641 bytes amostrados; train 2, holdout 0; training_ready false;
+- nenhum peso alterado e nenhuma transferencia.
+
+A diferenca entre 5902 e 22 nao prova que todos os restantes sejam legiveis nem licenciados. O codigo foi projetado para nunca tentar treinar com material nos diretorios excluidos.
+
+### Nova opcao 12 — auditoria por categoria de pastas, sem ler scripts
+
+A opcao 12 chama audit_excluded_lua_metadata.py, que conta extensoes, tamanhos e subpastas. Nao abre o conteudo, executa, copia ou envia arquivos. O resultado mostra contagens agregadas, sem nomes de arquivos ou caminhos:
+
+- permitted: .lua fora das arvores protegidas;
+- game_or_client_excluded: arquivos dentro de arvores excluidas ligadas a cliente/jogo;
+- sensitive_or_backup_excluded: arquivos dentro de arvores de banco, backup, contas e dados sensiveis;
+- repository_metadata_excluded: metadados internos de repositorios;
+- lua_files_counted / lua_files_under_protected_directories: distribuicao geral.
+
+No PowerShell, apos atualizar:
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\audit_excluded_lua_metadata.py" "$env:USERPROFILE\Documents\grand chase files"
+~~~
+
+A auditoria nao indica permissao para treinar, nao altera os filtros nem os checkpoints. Compartilhe apenas o relatorio agregado. Nao mova scripts para contornar exclusoes; selecione apenas material cuja utilizacao para treinamento foi autorizada.
