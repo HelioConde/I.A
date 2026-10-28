@@ -36,3 +36,9 @@ python tools/run_game_agent_v3_windows.py --model-file Qwen3-4B-Q4_K_M.gguf --at
 O arquivo original do `Luna Arcade S1` não é modificado. O rascunho gerado deve ser revisado e testado num navegador isolado antes de ser incorporado a outro projeto.
 
 A execução de CI opt-in está em [game-agent-v3.yml](../.github/workflows/game-agent-v3.yml). Relatório `results/game_agent/qwen-raw-js-v3.json`. O teste compara um **formato de saída diferente** do anterior, portanto valores de aprovação são diagnósticos e não uma comparação controlada de capacidade geral dos modelos.
+
+## Primeira medição real v3 — 2026-10-28
+
+[Run Qwen3-4B 40629078418](https://github.com/HelioConde/I.A/actions/runs/40629078418): contrato e instalação concluídos; **resultado do modelo: INCOMPLETE (0/1 arquivo aceito)**. Foram duas gerações reais de JavaScript nativo (1224 e 1390 caracteres). Ambas falharam na rubrica pelo sinal ausente `Space` (tecla de salto); o verificador interrompe nessa etapa, portanto **não confirmou nem negou a sintaxe completa nem o comportamento funcional** das propostas. Nenhum draft foi salvo ou executado.
+
+O resultado indica necessidade de verificar se o modelo usa outra representação válida de tecla de espaço (por exemplo `event.key === ' '`) antes de imputar deficiência de pulo. Qualquer alteração na rubrica deverá ser feita como avaliação nova, não alterar retroativamente este resultado. O pipeline v3 é útil para registrar e depurar falhas, mas ainda não satisfaz o desafio do jogo completo.
