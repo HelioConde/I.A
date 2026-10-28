@@ -89,10 +89,10 @@ def train(data: Path, out: Path, steps=180, batch_size=12, threads=2, seed=20261
     digest=hashlib.sha256((out/"weights.pt").read_bytes()).hexdigest()
     report={
         "status":"experiment_not_promoted","training":"random initialization; external MIT game source code",
-        "architecture":asdict(cfg),"parameters":sum(p.numel() for p in model.parameters()),
+        "architecture":asdict(cfg),"config":asdict(cfg),"parameters":sum(p.numel() for p in model.parameters()),
         "origin_repositories":keys["train"],"heldout_repositories":keys["holdout"],
         "dataset_sha256":hashlib.sha256((data/"corpus.jsonl").read_bytes()).hexdigest(),
-        "weights_sha256":digest,"steps":steps,"batch":batch_size,"seed":seed,
+        "weights_sha256":digest,"sha256":digest,"steps":steps,"batch":batch_size,"seed":seed,
         "holdout_next_char_loss_before":before,"holdout_next_char_loss_after":after,
         "holdout_improved":after<before,"history":history,"elapsed_sec":round(perf_counter()-start,2),
         "interpretation":"Predicting characters, not evidence of ability to create runnable games",
