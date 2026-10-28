@@ -8,6 +8,7 @@
   <title>Luna Arcade S1 · O Vale das Estrelas</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./game.js" defer></script>
+  <script src="./playtest.js" defer></script>
 </head>
 <body>
   <div class="shell">
@@ -47,6 +48,98 @@
         </div>
         <div class="frame-bottom"><div class="control-guide"><span><kbd>←</kbd><kbd>→</kbd> Mover</span><span><kbd>ESPAÇO</kbd> Pular</span><span><kbd>Z</kbd> Ataque</span><span><kbd>X</kbd> Especial</span><span><kbd>SHIFT</kbd> Investida</span><span><kbd>ESC</kbd> Pausar</span></div><span class="version">ALPHA 0.1.0</span></div>
       </div>
+      <section class="playtest-section" id="avaliar-jogo" aria-labelledby="playtest-title">
+        <div class="playtest-heading">
+          <div>
+            <span class="eyebrow">LABORATÓRIO ABERTO · FEEDBACK DOS JOGADORES</span>
+            <h2 id="playtest-title">Você joga. <em>A Luna evolui.</em></h2>
+            <p>Teste o jogo e conte o que acertamos ou erramos. Seu relato ajuda a definir o próximo conjunto de correções.</p>
+          </div>
+          <span class="playtest-version">ALPHA · TESTE PÚBLICO</span>
+        </div>
+        <form id="playtest-form" class="playtest-form" autocomplete="off" novalidate>
+          <div class="playtest-fields">
+            <label>Tipo de avaliação
+              <select id="playtest-type" data-testid="playtest-type">
+                <option>Encontrei um problema</option>
+                <option>Gostei de algo</option>
+                <option>Tenho uma sugestão</option>
+              </select>
+            </label>
+            <label>Parte do jogo
+              <select id="playtest-category">
+                <option>Movimentação e pulo</option>
+                <option>Combate e golpes</option>
+                <option>Personagens e classes</option>
+                <option>Fases e inimigos</option>
+                <option>Chefe e vitória</option>
+                <option>Visual e animações</option>
+                <option>Menus e interface</option>
+                <option>Desempenho e travamentos</option>
+                <option>Controles no celular</option>
+                <option>Outro</option>
+              </select>
+            </label>
+            <label>Personagem
+              <select id="playtest-class">
+                <option>Não se aplica</option>
+                <option>Kael · Espadachim</option>
+                <option>Lyra · Arqueira</option>
+                <option>Orin · Mago</option>
+                <option>Todos</option>
+              </select>
+            </label>
+            <label>Região
+              <select id="playtest-region">
+                <option>Menu / início</option>
+                <option>01 · Clareira</option>
+                <option>02 · Ruínas</option>
+                <option>03 · Santuário / chefe</option>
+                <option>Partida inteira</option>
+              </select>
+            </label>
+            <label>Dispositivo
+              <select id="playtest-device">
+                <option>Computador · teclado</option>
+                <option>Notebook</option>
+                <option>Celular · toque</option>
+                <option>Tablet</option>
+                <option>Controle / gamepad</option>
+              </select>
+            </label>
+          </div>
+          <div class="playtest-texts">
+            <label>O que o jogo acertou?
+              <textarea id="playtest-good" rows="3" maxlength="1200" placeholder="Ex.: o cenário ficou bonito, gostei da resposta dos golpes..."></textarea>
+            </label>
+            <label>O que está errado ou precisa melhorar?
+              <textarea id="playtest-problem" data-testid="playtest-problem" rows="3" maxlength="1200" placeholder="Ex.: o personagem desliza depois de parar, o chefe ataca pouco..." ></textarea>
+            </label>
+            <label>Como deveria funcionar?
+              <textarea id="playtest-expected" rows="2" maxlength="1200" placeholder="Descreva o comportamento esperado ou uma ideia de melhoria."></textarea>
+            </label>
+          </div>
+          <div class="playtest-diagnostics">
+            <div><strong>Diagnóstico opcional</strong><p>Captura classe, fase, posição e vida do personagem. Não grava nem envia dados automaticamente.</p></div>
+            <button type="button" id="playtest-capture" class="playtest-secondary" data-testid="playtest-capture">Capturar estado da partida</button>
+            <span id="playtest-capture-result" role="status">Nenhum estado capturado.</span>
+          </div>
+          <div class="playtest-share">
+            <div class="playtest-share-head">
+              <strong>Seu relatório</strong>
+              <span>Você escolhe como compartilhar</span>
+            </div>
+            <textarea id="playtest-report" data-testid="playtest-report" readonly rows="5" aria-label="Relatório pronto para copiar"></textarea>
+            <div class="playtest-actions">
+              <button type="button" id="playtest-copy" class="playtest-primary" data-testid="playtest-copy">Copiar para enviar no ChatGPT <span>↗</span></button>
+              <a id="playtest-github" class="playtest-secondary" data-testid="playtest-github" href="https://github.com/HelioConde/I.A/issues/new" rel="noopener noreferrer" target="_blank">Abrir issue no GitHub <span>↗</span></a>
+              <button type="button" id="playtest-download" class="playtest-secondary">Salvar relatório TXT</button>
+              <button type="button" id="playtest-screenshot" class="playtest-secondary">Salvar cena PNG</button>
+            </div>
+            <p id="playtest-status" class="playtest-status" role="status" aria-live="polite">O site não envia relatos sozinho. Você pode copiar e colar o texto nesta conversa ou abrir uma issue no GitHub (exige login).</p>
+          </div>
+        </form>
+      </section>
       <section class="below">
         <div><span class="eyebrow">UM PROJETO DA LUNA</span><h2>Uma aventura, <em>infinitas versões.</em></h2><p>Este protótipo é um laboratório jogável para testar física, classes, combates e qualidade de código. A meta é que a Luna aprenda a construir, testar e melhorar seus próprios jogos.</p></div>
         <div class="features"><span><b>03</b><small>CLASSES JOGÁVEIS</small></span><span><b>03</b><small>ÁREAS DE MISSÃO</small></span><span><b>01</b><small>CHEFE FINAL</small></span></div>
