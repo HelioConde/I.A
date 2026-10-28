@@ -48,6 +48,7 @@ def main():
         print("4 - Treinar candidato com codigos MIT externos (opt-in)")
         print("5 - Inventariar pasta local (somente metadados; sem treinar)")
         print("6 - Analisar formatos dos arquivos Lua (somente amostra, sem treinar)")
+        print("7 - Resumir estruturas do Lua (funcoes/condicoes/lacos, sem treinar)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -87,6 +88,17 @@ def main():
                 destination=HERE/"reports"/("lua_format_audit-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
                 print("Apenas 4 KB iniciais por arquivo .lua. Sem guardar codigo e sem treinar.")
                 rc=run(HERE/"analyze_local_lua.py",folder,"--out",destination)
+                if rc==0: print("Relatorio local:",destination)
+        elif option=="7":
+            default_folder=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta para perfil estrutural Lua [{default_folder}]: ").strip().strip('"')
+            folder=Path(supplied) if supplied else default_folder
+            if not folder.is_dir():
+                print("Pasta nao encontrada. Nada alterado.")
+            else:
+                destination=HERE/"reports"/("lua_structure-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
+                print("Somente contagens agregadas, ate 64 KiB por Lua. Nenhum codigo salvo ou treinado.")
+                rc=run(HERE/"profile_local_lua.py",folder,"--out",destination)
                 if rc==0: print("Relatorio local:",destination)
         else:
             print("Opcao invalida.")
