@@ -50,6 +50,10 @@ Cada modelo GGUF e arquivo original possui hash; texto exato dos patches é arqu
 
 - Run [40666341586](https://github.com/HelioConde/I.A/actions/runs/40666341586): modelo 4B executado, primeiro trecho aceito e segundo recusado por não tratar repetição do teclado; sem alteração no jogo publicado.
 - Run [40666656928](https://github.com/HelioConde/I.A/actions/runs/40666656928): o modelo gerou três snippets válidos em sintaxe. **6/6 testes originais passaram, mas só 1/3 testes de dash passou**. O navegador mediu velocidades insuficientes nos dois lados; o código atualiza o instante incorretamente. Nenhuma publicação.
-- Run [40667151597](https://github.com/HelioConde/I.A/actions/runs/40667151597): terceira tentativa real com exigência de validação semântica (timestamp atualizado só depois da decisão de velocidade, primeiro toque não pode ser dash, e.repeat deve ser considerado). Resultado deve ser conferido antes de qualquer promoção.
+- Run [40667151597](https://github.com/HelioConde/I.A/actions/runs/40667151597): terceira tentativa real com exigência de validação semântica (timestamp atualizado só depois da decisão de velocidade, primeiro toque não pode ser dash, e.repeat deve ser considerado). Qwen criou primeiro fragmento mas não conseguiu corrigir o handler de direita em duas tentativas: atualizou o timestamp ANTES de decidir a velocidade, produzindo falso dash. Resultado INCOMPLETE; nenhum JS modificado em main.
 
 **Não usar status 'workflow success' como evidência de dash funcionando:** é necessário aprovação explícita dos três testes de comportamento, além da suíte anterior.
+
+### Próxima decisão técnica
+
+O Qwen3-4B demonstrou capacidade de escrever código curto, mas nesta primeira sequência não satisfez ainda a lógica de um dash funcional. O sistema não deve enganar o usuário com um botão 'dash' cosmético. Antes de insistir em mais tentativas idênticas, comparar o mesmo patch com o candidato Ornith-1.5-9B, gerado por inferência real e com a mesma validação; considerar no futuro escrever cada feature como testes de comportamento de uma função isolada em vez de trechos extensos e frágeis. **Somente o backend GameDev muda; chat e jogo publicado permanecem intactos.**
