@@ -40,6 +40,13 @@ TASKS=(
 def sha(blob:bytes)->str:
     return hashlib.sha256(blob).hexdigest()
 
+def sha_file(path:Path)->str:
+    digest=hashlib.sha256()
+    with path.open('rb') as source:
+        for chunk in iter(lambda:source.read(4*1024*1024),b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
 def validate_piece(text:str,task:dict)->tuple[bool,str,str]:
     s=text.strip()
     fence=chr(96)*3
@@ -120,7 +127,7 @@ def main()->int:
         return {"answer":extract_llama_cli_source(raw),"real_model":result.returncode==0,
                 "raw_sha256":sha(raw.encode("utf-8"))}
     evidence,code=repair(original,infer,attempts=args.attempts)
-    evidence.update({"model":"ornith-1.5-9b","model_sha256":sha(args.model.read_bytes()),
+    evidence.update({"model":"ornith-1.5-9b","model_sha256":sha_file(args.model),
                      "original_inference":40653494692,
                      "original_browser_replay":SOURCE_RUN})
     if code is not None:
