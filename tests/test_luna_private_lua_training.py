@@ -27,7 +27,7 @@ class LocalRightsGatedLuaTests(unittest.TestCase):
             for n in range(38):
                 (root/f"game_{n:02d}.lua").write_text(SAMPLE,encoding="utf-8")
             (root/"binary.lua").write_bytes(b"\x1bLua"+b"x"*1000)
-            (root/"secrets.lua").write_text("local password = 'x'\n"+SAMPLE)
+            (root/"sensitive_data.lua").write_text("local password = 'x'\n"+SAMPLE)
             (root/"utf16.lua").write_bytes(("\ufeff"+SAMPLE).encode("utf-16-le"))
             (root/"account.bak").write_bytes(b"private database data")
             (root/"client.rar").write_bytes(b"private archive bytes")
