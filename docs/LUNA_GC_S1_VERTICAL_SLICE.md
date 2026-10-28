@@ -30,6 +30,9 @@ Referências mecânicas: controles e MP https://grandchase.fandom.com/wiki/Game_
 4. **S1.4 — plataforma vertical.** Pelo menos três níveis de altura, colisão por cima, queda, dash aéreo e câmera; testes de pulo entre plataformas, não atravessar indevidamente e recuperação.
 5. **S1.5 — inimigos e boss.** IA com sinais antecipados, padrões distintos, hitstun, penalidades de dano e boss original em várias fases; testes que provam o perigo e as aberturas para atacar.
 6. **S1.6 — apresentação.** Produção de sprites, animações, efeitos, fundos e HUD com assets originais; aprovação humana baseada em capturas e comparações de referência, sem atribuir arte de outras fontes à Luna.
+7. **S1.7 — missões, seleção de fases e progressão.** Mapa, objetivos, recompensas, desbloqueios e inventário local exportável; sem reivindicar conteúdo ou arte de GC.
+8. **S1.8 — salas e cooperação/PvP.** Lobby, escolha de sala e partidas com estado sincronizado; GitHub Pages continua como frontend estático, mas partidas online **exigem um backend WebSocket**. Não simular multiplayer usando apenas localStorage.
+9. **S1.9 — polimento e qualidade.** Sons originais, opções gráficas, configurações de teclado, 60 FPS quando possível, acessibilidade, controle mobile opcional e sessões longas de playtest humano.
 
 ## Resultado mínimo para usar a palavra "semelhante ao GC S1"
 
