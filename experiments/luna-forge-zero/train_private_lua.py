@@ -51,12 +51,13 @@ def check_root(folder: Path) -> Path:
         raise ValueError("Dados de treinamento precisam estar fora do repositorio")
     return resolved
 
-def list_safe_lua(folder: Path) -> tuple[list[Path],int,int]:
+def list_safe_lua(folder: Path, *, diagnostic: Counter | None = None) -> tuple[list[Path],int,int]:
     """Only gather in-process paths; never serialize path or filenames."""
     root=check_root(folder)
     paths=[]
     seen=0
     skipped_links=0
+    stats=diagnostic if diagnostic is not None else Counter()
     def onerror(error):
         raise OSError("Nao foi possivel ler uma subpasta") from error
     for current,dirs,names in os.walk(root,topdown=True,followlinks=False,onerror=onerror):
@@ -65,7 +66,12 @@ def list_safe_lua(folder: Path) -> tuple[list[Path],int,int]:
             item=Path(current)/name
             if not no_links(item):
                 skipped_links+=1
-            elif name.lower() not in SKIP_PATH_PARTS:
+                stats["directory_links_skipped"]+=1
+            elif name.lower() in SKIP_PATH_PARTS:
+                # Count excluded directories only. Never descend into them,
+                # so the global Lua extension inventory can be much larger.
+                stats["protected_directory_skipped"]+=1
+            else:
                 allowed.append(name)
         dirs[:]=allowed
         for name in names:
@@ -75,20 +81,26 @@ def list_safe_lua(folder: Path) -> tuple[list[Path],int,int]:
             candidate=Path(current)/name
             if not no_links(candidate):
                 skipped_links+=1
+                stats["file_links_skipped"]+=1
                 continue
-            if any(p.lower() in SKIP_PATH_PARTS for p in candidate.relative_to(root).parts[:-1]):
-                continue
-            # Exclude file names implying sensitive content; other names
-            # are only used in RAM, never printed or persisted.
-            if any(token in name.lower() for token in ("password","secret","account","billing","login","credential","auth","token")):
+            if any(token in name.lower() for token in
+                   ("password","secret","account","billing","login","credential","auth","token")):
+                stats["sensitive_filename_skipped"]+=1
                 continue
             try:
                 info=os.stat(candidate,follow_symlinks=False)
             except OSError:
+                stats["file_stat_errors"]+=1
                 continue
-            if not stat.S_ISREG(info.st_mode) or info.st_size<256:
+            if not stat.S_ISREG(info.st_mode):
+                stats["not_regular_file"]+=1
+                continue
+            if info.st_size<256:
+                stats["files_under_256_bytes"]+=1
                 continue
             paths.append(candidate)
+    stats["lua_seen_in_permitted_directories"]=seen
+    stats["candidate_regular_lua_files"]=len(paths)
     return paths,seen,skipped_links
 
 def safe_sample(path: Path, limit: int=MAX_READ) -> tuple[bytes|None,str]:
@@ -114,46 +126,73 @@ def safe_sample(path: Path, limit: int=MAX_READ) -> tuple[bytes|None,str]:
         return None,"too_short"
     return clean,"eligible"
 
+class InsufficientLuaData(ValueError):
+    """No raw source text or file paths are included in this error."""
+    def __init__(self, summary: dict):
+        self.summary=summary
+        super().__init__("Poucos arquivos Lua elegiveis para treino/holdout isolados. "
+                         "Leia os totais em excluded_entry_counts e skipped_by_reason.")
+
 def prepare(folder: Path, *, seed: int=20261028,
-            max_mib: int=64, limit_per_file: int=MAX_READ) -> tuple[dict,list,list]:
-    """Sample a capped subset; ensure holdout files never enter training."""
+            max_mib: int=64, limit_per_file: int=MAX_READ,
+            strict: bool=True) -> tuple[dict,list,list]:
+    """Sample a capped subset; reserve entire files for untouched holdout.
+
+    strict=False is a diagnostic dry-run: always return aggregate counts
+    even when zero files are eligible, and never report filenames.
+    """
     if not 1<=max_mib<=MAX_BUDGET_MIB:
         raise ValueError("max_mib must be 1..96")
     if not 1024<=limit_per_file<=MAX_READ:
         raise ValueError("per-file sample must be 1024..65536 bytes")
     root=check_root(folder)
-    paths,seen,skipped_links=list_safe_lua(root)
+    excluded=Counter()
+    paths,seen,skipped_links=list_safe_lua(root,diagnostic=excluded)
     random.Random(seed).shuffle(paths)
     allowed=max_mib*1024*1024
     budget=0
-    train=[]
-    holdout=[]
+    eligible=[]
     skipped=Counter()
+    budget_reached=False
     for path in paths:
-        if budget>=allowed:
+        remaining=allowed-budget
+        if remaining<=limit_per_file:
+            budget_reached=True
             break
         try:
-            payload,reason=safe_sample(path,limit=min(limit_per_file,allowed-budget))
+            payload,reason=safe_sample(path,limit=min(limit_per_file,remaining))
         except OSError:
             skipped["read_error"]+=1
             continue
         if payload is None:
             skipped[reason]+=1
             continue
-        # Stable per-file split without logging filenames or content hashes.
-        # Holdout never participates in gradient updates.
+        # Deterministic per-file split. Hash is used only inside RAM;
+        # it never appears in reports or names of the private checkpoints.
         rel=path.relative_to(root).as_posix().encode("utf-8")
-        is_holdout=int.from_bytes(hashlib.sha256(rel).digest()[:4],"big")%10==0
-        (holdout if is_holdout else train).append(payload)
+        key=hashlib.sha256(rel).digest()
+        eligible.append((key,payload))
         budget+=len(payload)
-    if len(train)<8 or len(holdout)<2:
-        raise ValueError("Poucos arquivos Lua elegiveis para treino/holdout isolados")
+
+    # The old hash-modulo-10 split could accidentally produce 0-1 holdouts
+    # even with 10+ eligible files, raising the generic ValueError.
+    eligible.sort(key=lambda x:x[0])
+    n=len(eligible)
+    holdout_count=min(n-8,max(2,round(n*.1))) if n>=10 else 0
+    holdout=[payload for _,payload in eligible[:holdout_count]]
+    train=[payload for _,payload in eligible[holdout_count:]]
+    ready=len(train)>=8 and len(holdout)>=2
     summary={
-        "schema":"luna-private-lua-training-v1",
+        "schema":"luna-private-lua-training-v2",
         "source_location":"user-local-only; filenames and paths never saved",
         "source_lua_files_discovered":seen,
-        "sampled_files":len(train)+len(holdout),
+        "source_scan_excludes_protected_subdirectories":True,
+        "excluded_entry_counts":dict(sorted(excluded.items())),
+        "eligible_regular_lua_files_before_content_filter":len(paths),
+        "sampled_files":n,
         "train_files":len(train),"heldout_files":len(holdout),
+        "training_ready":ready,
+        "sample_budget_reached":budget_reached,
         "sampled_source_bytes":budget,
         "max_read_per_file_bytes":limit_per_file,
         "max_dataset_mib":max_mib,
@@ -161,8 +200,17 @@ def prepare(folder: Path, *, seed: int=20261028,
         "skipped_links":skipped_links,
         "source_files_exported":0,"commercial_assets_used":0,
         "backups_and_archives_opened":0,"network_requests":0,
-        "disclaimer":"Experimental byte/character modeling; no proof of code or game ability. Weights may memorize protected source and must stay private."
+        "diagnostic_guidance":(
+            "Directory exclusions were found. The initial extension inventory "
+            "may have counted Lua files under directories this trainer refuses to read."
+            if excluded["protected_directory_skipped"] else
+            "If many source files are rejected, inspect skipped_by_reason. "
+            "Do not disable security filters to force training."
+        ),
+        "disclaimer":"Experimental byte/character modeling only. Respect rights, do not upload weights."
     }
+    if strict and not ready:
+        raise InsufficientLuaData(summary)
     return summary,train,holdout
 
 def parent_checkpoint():
@@ -287,11 +335,18 @@ def main():
     if not args.acknowledge_rights:
         raise SystemExit("Training source rights not confirmed. Inspect permission and pass --acknowledge-rights.")
     if args.action=="dry-run":
-        summary,_,_=prepare(args.source,max_mib=args.max_mib)
+        summary,_,_=prepare(args.source,max_mib=args.max_mib,strict=False)
         print(json.dumps({**summary,"weights_modified":False,"source_files_executed":0},
                          ensure_ascii=False,indent=2))
+        if not summary["training_ready"]:
+            raise SystemExit(3)
         return
-    train(args.source,max_mib=args.max_mib,steps=args.steps,batch=args.batch,threads=args.threads)
+    try:
+        train(args.source,max_mib=args.max_mib,steps=args.steps,batch=args.batch,threads=args.threads)
+    except InsufficientLuaData as exc:
+        print(json.dumps({**exc.summary,"weights_modified":False},
+                         ensure_ascii=False,indent=2))
+        raise SystemExit(3) from None
 
 if __name__=="__main__":
     main()
