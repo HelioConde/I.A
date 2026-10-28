@@ -19,7 +19,6 @@ from datetime import datetime, timezone
 ROOT = Path(__file__).resolve().parents[1]
 SMOKE = (
     "test_chat_windows.py",
-    "test_chat_runtime.py",
     "test_chat_local_actions.py",
     "test_memory_safety.py",
     "test_chat_completion_quality.py",
@@ -39,6 +38,8 @@ EXTENDED = SMOKE + (
     "test_hybrid.py",
 )
 SUITES = {"smoke": SMOKE, "extended": EXTENDED}
+WINDOWS_ONLY = ("test_chat_runtime.py",)
+
 RAN_PATTERN = re.compile(r"Ran\s+(\d+)\s+tests?\s+in\s+", re.IGNORECASE)
 
 
@@ -115,7 +116,8 @@ def main() -> int:
         parser.error("--timeout must be between 5 and 600 seconds")
     started = time.monotonic()
     results = []
-    for module in SUITES[args.suite]:
+    modules = SUITES[args.suite] + (WINDOWS_ONLY if os.name == "nt" else ())
+    for module in modules:
         print("Running " + module + " ...", flush=True)
         item = execute(module, timeout=args.timeout)
         results.append(item)
