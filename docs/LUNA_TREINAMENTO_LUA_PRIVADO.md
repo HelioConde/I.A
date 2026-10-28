@@ -161,3 +161,29 @@ $py=Join-Path $lab ".venv\Scripts\python.exe"
 Nao envie caminhos de instalacoes, nomes de usuarios ou arquivos privados; e suficiente informar a **categoria e a contagem**. A partir da revisao dos direitos, use exclusivamente uma subpasta sobre a qual haja autorizacao real para treinamento; nao remova controles que bloqueiam backups, credenciais, executaveis ou codigo anti-cheat.
 
 O uso posterior de uma subpasta como fonte do treinador exige confirmar permissao e passar pelo dry-run novamente. Nao encaminhar ao GitHub nem publicar checkpoints de scripts comerciais.
+
+
+## Proxima etapa: verificar formato dos 5880 Lua na pasta Elsword
+
+O relatorio de 28/10/2026 identificou 5880 extensoes .lua na pasta Elsword. A contagem por metadados nao confirma que os arquivos sao codigo Lua legivel, valido ou autorizado para treinamento. Nao presuma que o nome Elsword indique scripts do Grand Chase.
+
+**Opcao 14 — Verificar formatos de Lua na pasta Elsword**.
+- exige a selecao de uma pasta chamada Elsword;
+- le somente os primeiros 4096 bytes de cada arquivo regular .lua;
+- ignora subpastas de backups, contas, dados privados e anti-cheat, e nao segue links;
+- classifica formatacao aparente (texto UTF-8, bytecode, UTF-16 ou desconhecido) sem testar sintaxe;
+- retorna apenas contagens, jamais texto-fonte, caminhos ou nomes de arquivos;
+- nao executa, extrai, envia, copia ou treina scripts e nao altera pesos.
+
+PowerShell (apos atualizar o projeto):
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Falha no git pull" }
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\audit_elsword_lua_headers.py" --source "$env:USERPROFILE\Documents\grand chase files\Elsword"
+~~~
+
+A saida deve ser compartilhada somente como JSON de totais, com os campos lua_files_sampled, classification_counts, excluded_sensitive_subdirectories, errors e partial. Texto UTF-8 detectado na amostra nao e comprovacao de sintaxe nem de licenca. Os arquivos comerciais continuam excluidos do treino automatico.
