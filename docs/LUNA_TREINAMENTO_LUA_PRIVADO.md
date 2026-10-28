@@ -68,3 +68,33 @@ O resultado ainda **não foi validado sintaticamente nem funcionalmente**. É um
 - `source_files_exported`, `backups_and_archives_opened`, `network_requests`: todos zero pelo desenho do script.
 
 Não publique nem suba para GitHub as pastas de checkpoints ou o conteúdo original.
+
+
+## Diagnostico da falha: Poucos arquivos Lua elegiveis (28/10/2026)
+
+O dry-run do usuario abortou antes de treinar, mas isto nao significa que a pasta esteja vazia. O inventario incluiu 5.902 arquivos .lua em toda a arvore. O treinador ignora subpastas protegidas e filtra arquivos pequenos, credenciais, binarios e amostras nao UTF-8. A divisao aleatoria anterior tambem podia produzir menos de dois arquivos holdout.
+
+A versao corrigida informa os campos abaixo **sem nomes de arquivos, caminhos ou conteudo** mesmo quando nao ha corpus suficiente:
+
+- training_ready: somente true quando existem 8 amostras para treino e 2 para holdout;
+- source_lua_files_discovered: conta apenas arquivos sob diretorios permitidos, pode ser menor que 5902;
+- excluded_entry_counts.protected_directory_skipped: quantas subpastas foram totalmente ignoradas;
+- excluded_entry_counts.files_under_256_bytes: arquivos pequenos ignorados;
+- eligible_regular_lua_files_before_content_filter: arquivos candidatos apos filtrar diretorios e tamanho;
+- skipped_by_reason: tipos de rejeicao apos a leitura limitada de amostras;
+- sampled_files/train_files/heldout_files: divisao de arquivos aptos;
+- sample_budget_reached: limite agregado da amostra foi atingido.
+
+A nova divisao deterministica garante **pelo menos 2 arquivos holdout** quando existem pelo menos 10 arquivos aptos, sem enfraquecer exclusoes de privacidade.
+
+Para inspecionar APENAS o relatorio, apos atualizar o repo, execute no PowerShell:
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\train_private_lua.py" dry-run --source "$env:USERPROFILE\Documents\grand chase files" --acknowledge-rights
+~~~
+
+O dry-run nao altera pesos e termina com status 3 quando nao ha dados suficientes. Nao compartilhe arquivos de jogo ou credenciais, apenas o JSON agregado. Se as amostras estiverem em pastas excluidas, nao desabilite filtros nem mova conteudo para contornar a protecao; revise a origem e os direitos primeiro. A autorizacao continua sendo pre-requisito.
