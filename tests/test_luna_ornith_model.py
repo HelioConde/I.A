@@ -34,6 +34,12 @@ class ModelTests(unittest.TestCase):
       clean("Loading model...banner with no prompt delimiter")
     self.assertNotIn("Prompt:",clean(raw))
 
+  def test_short_prompt_untruncated_native_echo(self):
+    from benchmark_luna_game_models import extract_llama_cli_source
+    prompt="Retorne uma linha: const k = e.code;"
+    raw="Loading model...\n\n> "+prompt+"\nconst k = e.code;\n\n[ Prompt: 10.0 t/s | Generation: 6.0 t/s ]\n\n> \nExiting..."
+    self.assertEqual(extract_llama_cli_source(raw,prompt),"const k = e.code;")
+
   def test_cli(self):
     args=command(Path("/tmp/llama-cli"),Path("/tmp/model.gguf"),PROMPT,900)
     self.assertIn("--no-warmup",args)
