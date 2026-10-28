@@ -1,0 +1,80 @@
+name: Luna GameDev — Preserve Verified Ornith Game Source
+on:
+  push:
+    branches:
+      - "lab/luna-ornith-evidence-*"
+    paths:
+      - ".github/lab-requests/ornith-evidence-*.md"
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  stage-model-authored-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-ornith-repaired-40660720374
+          run-id: 40660720374
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: original-model-artifact
+      - name: Verify SHA of actual model-authored file before preserving
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('original-model-artifact')
+          obj=json.loads((p/'provenance.json').read_text())
+          assert obj['status']=='STATIC_REPAIR' and obj['patch_count']==2
+          assert obj['assistant_gameplay_code_used'] is False
+          assert obj['original_inference']==40653494692
+          assert obj['model_sha256']=='70c112196e0b7023803c9762752e46d29e612a92c83f995bc3ba1ceb07e8fab6'
+          actual=hashlib.sha256((p/'game.js').read_bytes()).hexdigest()
+          assert actual==obj['repaired_sha256']=='e6e8f5536d6b633e9b69f9e06b7abc6210ad77dd5e1bef1371b16404ca85e7de'
+          print('Model-authored original JS and two genuine Ornith patches verified by exact SHA-256.')
+          PY
+          node --check original-model-artifact/game.js
+      - name: Preserve original model code on a review branch (never overwrite current game)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/ornith9b-playtested-40660720374"
+          mkdir -p experiments/luna-ornith-9b
+          cp original-model-artifact/game.js experiments/luna-ornith-9b/game.js
+          cp original-model-artifact/provenance.json experiments/luna-ornith-9b/provenance.json
+          cat >experiments/luna-ornith-9b/index.html <<'HTML'
+          <!doctype html>
+          <html lang="pt-BR"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Ornith 9B · benchmark de jogo da Luna</title></head>
+          <body style="margin:0;background:#0e1425;overflow-x:hidden;color:#fff">
+          <canvas id="game" width="800" height="480"
+            style="display:block;width:100%;max-width:800px;height:auto"></canvas>
+          <script src="game.js" defer></script></body></html>
+          HTML
+          cat >experiments/luna-ornith-9b/README.md <<'MD'
+          # Jogo experimental escrito pelo Ornith 1.5 9B
+          
+          **Autoria do arquivo `game.js`: Ornith 1.5 9B, inferência GGUF local**.
+          A versão inicial foi gerada no run [40653494692](https://github.com/HelioConde/I.A/actions/runs/40653494692).
+          Duas correções de `player.vy` e `KeyboardEvent.code` foram geradas pelo **mesmo modelo** no
+          [run 40660720374](https://github.com/HelioConde/I.A/actions/runs/40660720374).
+          O arquivo `provenance.json` contém respostas, SHA-256, tentativas e autoria.
+          
+          O arquivo `index.html` é um **harness de teste escrito pelo ChatGPT**, não pelo Ornith.
+          Esse é um **minijogo de benchmark**, não o jogo completo Luna Arcade S1. O Chromium
+          passou em **4/4 testes** (movimentação, pulo, dano a inimigos, responsive mobile);
+          não representa aprovação de qualidade artística ou de um jogo longo.
+          
+          Este branch **não publica nem substitui** `/I.A/luna-created/`.
+          MD
+          git add experiments/luna-ornith-9b
+          git -c user.name="Luna model evidence (GitHub Actions)" -c user.email="actions@users.noreply.github.com" commit -m "evidence(luna): store verified original Ornith9B game source and genuine repairs"
+          git push origin "luna/ornith9b-playtested-40660720374"
