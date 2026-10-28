@@ -38,15 +38,43 @@ test("actual keyboard movement, jump, combat, and no console errors",async({page
   await page.waitForTimeout(100);
   const afterJump=await snap(page);
   expect(afterJump.player.y).toBeLessThan(y-2);
-  const beforeAttack=await snap(page);
-  for(let i=0;i<5;i++){await page.keyboard.press("KeyZ");await page.waitForTimeout(150)}
-  const afterAttack=await snap(page);
-  const previousHp=beforeAttack.enemies.map(e=>e.hp).reduce((a,b)=>a+b,0);
-  const laterHp=afterAttack.enemies.map(e=>e.hp).reduce((a,b)=>a+b,0);
-  expect(afterAttack.wave>beforeAttack.wave || laterHp<previousHp || afterAttack.mode==="victory").toBe(true);
+  expect(afterJump.mode).toBe("game");
+  let damaged=false;
+  const startWave=afterJump.wave;
+  for(let step=0;step<75;step++){
+    const state=await snap(page);
+    if(state.wave>startWave){damaged=true;break}
+    const target=state.enemies.find(x=>x.hp>0);
+    if(!target){await page.waitForTimeout(80);continue}
+    const dx=target.x-state.player.x;
+    if(dx>75){
+      await page.keyboard.down("ArrowRight");await page.waitForTimeout(95);
+      await page.keyboard.up("ArrowRight");
+    }else if(dx< -20){
+      await page.keyboard.down("ArrowLeft");await page.waitForTimeout(90);
+      await page.keyboard.up("ArrowLeft");
+    }
+    const beforeHp=target.hp;
+    await page.keyboard.press("KeyZ");
+    await page.waitForTimeout(100);
+    const after=await snap(page);
+    if(after.wave>state.wave || after.enemies.some(e=>e.hp<beforeHp) ||
+       (after.enemies.length<state.enemies.length)){damaged=true;break}
+  }
+  expect(damaged,"An actual enemy must take damage or be defeated by real attacks").toBe(true);
   await info.attach("luna-original-combat",{body:await page.screenshot(),contentType:"image/png"});
   expect(errors).toEqual([]);
 });
+
+test("all three chosen classes have functional, distinct gameplay stats",async({page})=>{
+  const hp=[];
+  for(const cls of ["melee","ranged","magic"]){
+    const state=await begin(page,cls);
+    hp.push(state.player.hp);
+  }
+  expect(new Set(hp).size,"At least two classes must have different real HP stats").toBeGreaterThanOrEqual(2);
+});
+
 test("end-to-end: player can defeat three waves, boss, achieve victory and restart",async({page},info)=>{
   test.setTimeout(135000);
   const errors=[];page.on("pageerror",e=>errors.push(e.message));
