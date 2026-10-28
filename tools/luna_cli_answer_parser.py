@@ -15,7 +15,7 @@ def extract_native_answer(stdout: str) -> str:
         # Some llama-completion builds emit raw text without a banner.
         return value.strip()
     # For long CLI prompts the echo is truncated to one line.
-    marker=re.search(r"(?m)^> [^\n]*\(truncated\)[^\n]*\n",value)
+    marker=re.search(r"(?m)^[^\n]*\(truncated\)[^\n]*\n",value)
     if marker is None:
         marker=re.search(r"(?m)^> [^\n]*\n",value)
     if marker is None:
