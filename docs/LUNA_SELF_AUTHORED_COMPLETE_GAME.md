@@ -30,6 +30,16 @@ O Qwen precisa gerar **os bytes de cada arquivo**; o assistente é autor apenas 
 
 O jogo da Luna será testável em `https://helioconde.github.io/I.A/luna-created/` e a referência em `https://helioconde.github.io/I.A/arcade/`. O jogador poderá testar ambas e relatar bugs, visual, responsividade, classes, combate e qualidade das fases. Uma versão funcional mas inferior à referência **não atinge ainda** a meta adicional de superar a referência em qualidade.
 
+
+## Evidência real — primeiro jogo do Qwen3-4B (28/10/2026)
+
+- [Inferência nativa 40636116071](https://github.com/HelioConde/I.A/actions/runs/40636116071): **3/3 arquivos efetivamente gerados pela Luna em uma tentativa cada**: `index.html`, `styles.css`, `game.js`; hash SHA-256 registrado no artifact `luna-original-raw-40636116071`.
+- [Auditoria e navegador 40636973421](https://github.com/HelioConde/I.A/actions/runs/40636973421): arquivos originais preservados e validados após normalização CRLF→LF; **2 de 4 testes de navegador aprovados**. Falhas reais: pulo não funcionou e progressão declarou vitória cedo, sem terceira onda completa.
+- [Fonte original da própria Luna, em branch de revisão](https://github.com/HelioConde/I.A/tree/luna/generated-review-40636116071/site/luna-created): **é um protótipo incompleto, não publicado como jogo final**. A primeira versão foi criada pela Luna, mas ainda não pode ser chamada de jogável do início ao fim.
+- [Tentativa de autoreparo pelo Qwen](https://github.com/HelioConde/I.A/actions/runs/40637251344): nova geração do JavaScript solicitada com os defeitos do Chromium, sem substituição por código do ChatGPT. O resultado requer conferência da execução mais recente.
+
+**Nenhuma versão pública final da Luna foi aprovada nesta primeira avaliação.** A meta exige testes verdes e revisão humana antes de publicação.
+
 ## Estado atual e próximos passos
 
 A infraestrutura de geração, registro de autoria e teste está implementada, mas **o resultado do modelo será registrado somente depois da execução real**. Se a geração ou os testes falharem, atualizar este documento com execução identificada e causas, mantendo a meta aberta.
