@@ -12,7 +12,9 @@ on:
       - "tools/install_ornith_game_runtime.py"
       - "tools/luna_game_model_selector.py"
       - "tools/run_game_agent_v3_windows.py"
+      - "tools/setup_luna_gamedev_v4.py"
       - "tests/test_ornith_runtime_install.py"
+      - "tests/test_luna_gamedev_setup.py"
       - "tests/test_luna_game_model_selector.py"
       - ".github/workflows/luna-ornith-windows-runtime.yml"
 permissions:
@@ -30,6 +32,7 @@ jobs:
           python -m compileall -q tools/install_ornith_game_runtime.py tools/luna_game_model_selector.py tools/run_game_agent_v3_windows.py
           python -m unittest discover -s tests -p "test_ornith_runtime_install.py" -v
           python -m unittest discover -s tests -p "test_luna_game_model_selector.py" -v
+          python -m unittest discover -s tests -p "test_luna_gamedev_setup.py" -v
 
   windows-runtime:
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-ornith-runtime-')) }}
