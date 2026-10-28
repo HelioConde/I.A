@@ -7,6 +7,8 @@ import unittest
 from unittest import mock
 
 HERE=Path(__file__).resolve().parents[1]/"experiments"/"luna-forge-zero"
+import sys
+sys.path.insert(0,str(HERE))
 spec=importlib.util.spec_from_file_location("luna_coder_ollama",HERE/"luna_coder_ollama.py")
 backend=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(backend)
