@@ -22,3 +22,4 @@ results/chat_validation/
 diagnostics/
 *.diagnostics.jsonl
 brain-ssd-diagnostics-*.zip
+results/action_lab/
