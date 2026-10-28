@@ -257,3 +257,37 @@ if ($LASTEXITCODE -ne 0) { throw "Falha ao treinar a Luna V2" }
 ~~~
 
 A avaliacao so deve ser interpretada comparativamente com a baseline V0 do usuario, de 0/3 assinaturas detectadas. O modelo V2 nao substitui a Luna atual automaticamente e nao pretende recriar um jogo comercial.
+
+
+## Resultado V2 real: treino melhor, generalizacao ainda 0/3 (28/10/2026)
+
+O usuario treinou a V2 scratch e executou o benchmark local:
+- checkpoint lua-v2-20261028-185228-215159, SHA256 86acaa4755627bcb42f6e413138b8bea9da6b8307ded3c23721fb443522b11cf;
+- loss em janelas de TREINO 72.9614 -> 0.96618 (melhora muito, MAS nao e validacao holdout);
+- tarefas novas: boss_attack_phases, enemy_line_of_sight e one_way_platform;
+- 0/3 assinaturas de funcao, fragmentos de texto incoerente;
+- sintaxe e gameplay NOT_TESTED, modelo nao promovido, arquivos comerciais nao usados.
+
+O diagnostico correto e: memorizar padroes de seis funcoes nao basta para criar jogos. A reducao de 98.7% na perda de TREINO nao prova transferencia. Nao aumentar steps aleatoriamente nem liberar pasta Elsword para compensar.
+
+### Opcao 18 - Diagnosticar decoder, sobreajuste e sintaxe
+
+A opcao 18 e nova e executa benchmark_original_lua_v2.py com as opcoes greedy, calibrate e syntax:
+- decodificacao greedy (temperatura zero) para verificar se o problema decorre parcialmente da amostragem estocastica;
+- training_prompt_calibration testa uma tarefa realmente presente no treino; se essa reproduz codigo e o holdout nao, evidencia adicional de memorizacao;
+- lua_syntax usa luac -p se instalado para analisar o codigo gerado, sem executa-lo. Se ausente, retorna UNAVAILABLE_NO_LUAC;
+- nenhuma nova etapa de treino; nenhum checkpoint modificado; nenhum arquivo comercial lido ou enviado;
+- nenhuma garantia de Lua valido sem o parser, nenhum teste de gameplay e nenhuma promocao do modelo.
+
+PowerShell, depois do git pull:
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Falha no git pull" }
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\benchmark_original_lua_v2.py" --decode greedy --calibrate --syntax --chars 240
+~~~
+
+Sem o parser luac, o modelo pode ser analisado, mas sintaxe fica indisponivel. Para treino posterior: desenvolver corpus proprio maior e diverso, holdout por mecanica e projeto, testes funcionais reais e contexto suficiente para uma funcao completa. Sinais lexicais e loss de treino nao justificam declarar a Luna pronta para programar.
