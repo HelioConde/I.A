@@ -53,3 +53,9 @@ O 4B pode caber na RAM com 16GB totais, mas **o consumo físico, latência e tem
 - O artifact `luna-game-coder-4b-40627940558` fornece métricas sanitizadas. O teste é uma amostra pequena e não comprova superioridade geral do 4B sem repetições e holdouts.
 
 **Próximo marco:** executar candidatas geradas pelo 4B em sandbox isolada com testes reais de navegador; manter aprovação explícita antes de modificar projetos.
+
+## Etapa seguinte: física e movimentação em JavaScript (S1)
+
+O workflow do Qwen3-4B agora permite selecionar `stage=s1-movement` manualmente ou disparar uma branch `lab/luna-game-4b-movement-*`. Esse teste pede à Luna um arquivo `src/game.js` com canvas, estado do jogador, gravidade e teclado. A saída aceita pode ser arquivada como **rascunho sintético gerado pelo modelo**, mas jamais é aplicada ou executada automaticamente. O status de aceitação continua a medir apenas contrato JSON, palavras-chave, análise estática e `node --check`, **não movimento real**. Um teste posterior em navegador isolado será necessário para comprovar comportamento.
+
+A opção `s0-plan` original continua funcionando, com os mesmos critérios e nome de relatório. Em CI, `--save-draft` faz gravação controlada somente em `results/game_agent/draft-<stage>.json`, que é parte do artifact de avaliação e não substitui arquivos do projeto.
