@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
+from luna_cli_answer_parser import extract_native_answer
 
 PROMPT=(
  "Você é Luna GameDev. Responda SOMENTE JavaScript bruto (sem Markdown). "
@@ -92,7 +93,7 @@ def generate(runtime:Path,model:Path,out:Path,label:str,attempts:int=2)->dict:
             raw=proc.stdout or ""
             (out/("attempt-"+str(attempt)+".raw.txt")).write_text(raw,encoding="utf-8")
             if proc.returncode:raise ValueError("runtime_exit_"+str(proc.returncode))
-            candidate=clean(raw)
+            candidate=clean(extract_native_answer(raw))
             if not syntax_valid(candidate):raise ValueError("javascript_syntax_error")
             (out/"game.js").write_bytes(candidate.encode("utf-8"))
             report["game_js_sha256"]=hashlib.sha256(candidate.encode("utf-8")).hexdigest()

@@ -1,0 +1,133 @@
+name: Luna Model — Replay Original Attack Repair Candidates
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-attack-replay-*"
+    paths:
+      - ".github/lab-requests/attack-replay-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/replay_luna_attack_patches.py"
+      - ".github/workflows/luna-attack-replay.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: luna-attack-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate parser and authenticity checks without model downloads
+        run: |
+          python -m compileall -q tools/replay_luna_attack_patches.py
+          python -m unittest discover -s tests -p "test_luna_cli_answer_parser.py" -v
+          python -m unittest discover -s tests -p "test_luna_attack_model_patch.py" -v
+
+  source-and-browser:
+    needs: contract
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-attack-replay-')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ornith-1.5-9b, qwen3-4b]
+        attempt: [1,2,3]
+    env:
+      LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Restore raw model output from run 40656525253 (no new inference)
+        uses: actions/download-artifact@v4
+        with:
+          name: luna-attack-${{ matrix.model }}-40656525253
+          run-id: 40656525253
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+      - name: Parse real model fragment, reject unsafe, verify SHA and Node syntax
+        id: candidate
+        shell: bash
+        run: |
+          dest="results/attack-replayed/${{ matrix.model }}/${{ matrix.attempt }}"
+          set +e
+          python tools/replay_luna_attack_patches.py \
+            --artifact-dir "results/attack_models/${{ matrix.model }}" \
+            --label "${{ matrix.model }}" --attempt "${{ matrix.attempt }}" \
+            --out "$dest"
+          code=$?
+          set -e
+          if [[ "$code" == "0" ]]; then
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$code" == "1" ]]; then
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+            echo "Original model fragment failed static validation; do not execute it." >> "$GITHUB_STEP_SUMMARY"
+          else
+            exit "$code"
+          fi
+      - name: Stage verified model patch only in disposable local game
+        if: steps.candidate.outputs.valid == 'true'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,json
+          p=pathlib.Path("results/attack-replayed/${{ matrix.model }}/${{ matrix.attempt }}")
+          data=json.loads((p/"provenance.json").read_text(encoding="utf-8"))
+          assert data['status']=='STATIC_CANDIDATE' and data['assistant_gameplay_code_used'] is False
+          assert hashlib.sha256((p/"game.js").read_bytes()).hexdigest()==data['candidate_sha256']
+          print('Original model source SHA and syntax attested.')
+          PY
+          node --check "results/attack-replayed/${{ matrix.model }}/${{ matrix.attempt }}/game.js"
+          cp "results/attack-replayed/${{ matrix.model }}/${{ matrix.attempt }}/game.js" site/luna-created/game.js
+      - name: Install Chromium for actual 1-hit attack validation
+        if: steps.candidate.outputs.valid == 'true'
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve original game with ONLY model-produced combat patch
+        if: steps.candidate.outputs.valid == 'true'
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory site/luna-created > /tmp/luna-attack-replay.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-attack-replay.log
+          exit 1
+      - name: Require exact 10 HP once and all six existing playable-game tests
+        if: steps.candidate.outputs.valid == 'true'
+        working-directory: site-tests
+        run: |
+          npx playwright test --config playwright.luna-attack.config.cjs
+          npx playwright test --config playwright.luna-original.config.cjs
+      - name: Save evidence for every successful or failed attempt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-attack-model-replay-${{ matrix.model }}-${{ matrix.attempt }}-${{ github.run_id }}
+          path: |
+            results/attack-replayed/${{ matrix.model }}/${{ matrix.attempt }}/
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30

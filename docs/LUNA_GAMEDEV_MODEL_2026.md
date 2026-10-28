@@ -71,3 +71,40 @@ Os códigos gerados pelo modelo só viram jogos publicados após revisão e test
 ## Gate para alterar o padrão
 
 O default do script específico §run_game_agent_v3_windows.py§ é §auto§: Ornith é escolhido apenas se instalado e validado por hash; caso contrário Qwen3-4B. A preferência não implica que o novo modelo já seja superior em jogos. Nenhum modelo de chat comum foi substituído. Quando o Ornith demonstrar geração real e jogo testado com vantagem sobre Qwen3-4B, ativar seu perfil GameDev, mantendo Qwen como fallback e sem alterar chat comum nem dados locais. A publicação de um jogo superior também exige QA visual e avaliação do usuário.
+
+
+## Resultado medido do primeiro desafio completo (28/10/2026)
+
+[Run real 40653494692](https://github.com/HelioConde/I.A/actions/runs/40653494692): **ambos INCOMPLETE** apesar de execução de inferência nativa e verificações SHA dos GGUF.
+
+| Modelo | Tentativa 1 | Tentativa 2 | Jogabilidade |
+|---|---|---|---|
+| Ornith-1.5-9B | unsafe_code | javascript_syntax_error | Não iniciada: saída inválida |
+| Qwen3-4B | javascript_syntax_error | javascript_syntax_error | Não iniciada: saída inválida |
+
+**Correção do diagnóstico:** esse veredito do avaliador foi um falso negativo parcial. O programa incluiu o cabeçalho interativo e o prompt ecoado pelo `llama-cli` no conteúdo analisado como código. Reanalisando os artifacts brutos reais, três candidatos JavaScript (Ornith tentativa 2 e Qwen tentativas 1 e 2) passaram em `node --check` após remover apenas o envelope do terminal. A primeira resposta do Ornith continha HTML, apesar do pedido de JS, e continua inválida para o desafio. **Nenhuma versão foi aprovada em jogabilidade ainda**. A repetição controlada em [run 40657552587](https://github.com/HelioConde/I.A/actions/runs/40657552587) executa os quatro outputs originais sem nenhuma nova inferência nem código de substituição. O Qwen4B já criou um jogo completo antes, por múltiplas tarefas e reparos menores; não comparar esse resultado com uma geração única.
+
+## Ajuste do avaliador llama.cpp
+
+Foi adicionado `tools/luna_cli_answer_parser.py` para eliminar **apenas** o cabeçalho, o eco do prompt e as métricas emitidas pelo terminal interativo; o corpo da resposta original do GGUF permanece byte-a-byte idêntico (fora espaços externos e, quando explicitamente solicitado, wrappers Markdown). O tratamento recusa formatos de terminal desconhecidos em vez de inventar um candidato.
+
+O script `tools/replay_luna_game_models.py` verifica origem e SHA dos pesos e reaproveita artifacts brutos do run 40653494692, sem nova inferência. Os resultados desta repetição são os critérios válidos para classificar o código e o comportamento no Chromium. O benchmark novo de patch de combate também usa esse leitor corrigido.
+
+## Benchmark incremental mais próximo de trabalho real
+
+[Workflow Luna GameDev — Actual Game Bug Repair](../.github/workflows/luna-attack-model-comparison.yml) e [PR #20](https://github.com/HelioConde/I.A/pull/20).
+
+Os dois modelos recebem o MESMO bloco real de `site/luna-created/game.js`. Bug observado no código: `attackTarget.hp -= 10` ocorre **todo quadro**, enquanto isAttacking permanece verdadeiro, então um KeyZ pode zerar HP do inimigo em um único ataque. A IA deve gerar apenas a substituição do bloco e preservar o resto do jogo. O avaliador rejeita saída sem impedir acertos repetidos e exige Node syntax.
+
+O Chromium de teste valida que o primeiro KeyZ tira **exatamente 10 HP**, roda novamente os seis testes completos de jogo e registra screenshots. O bloco aceito é escrito pela inferência real do respectivo modelo, sem reatribuir código do ChatGPT como modelo. Não atualiza jogo público automaticamente.
+
+**Modelo GameDev local:** o mecanismo `auto` prefere Ornith apenas quando instalado e com hash íntegro. Isso é uma opção experimental, **não uma alegação de que já venceu em qualidade**. Se o novo GGUF não abrir no runtime Windows, atualizar o llama.cpp usado pelo GameDev separadamente; não mexer no Core de pesquisa.
+
+
+## Evidência corrigida da comparação — 28/10/2026
+
+- [Replay de 4 arquivos reais de código](https://github.com/HelioConde/I.A/actions/runs/40657552587): **Ornith tentativa 2: 2/4 testes browser**, **Qwen tentativa 1: 1/4**. Outras duas tentativas não cumpriram o contrato de código do jogo. Não é vitória suficiente de nenhum modelo. O Ornith teve melhor pontuação nessa amostra, mas falhou em pulo e dano.
+- [Replay dos 6 patches reais de combate](https://github.com/HelioConde/I.A/actions/runs/40658035574): após limpar corretamente o prompt ecoado, 5 das 6 tentativas produziram patch JavaScript aceitável; uma do Ornith não garantia um único acerto. Quatro dessas tentativas passaram no teste **KeyZ = exatamente 10 HP**, porém **todas falharam em pelo menos uma parte da suíte original de jogo completo**. Não há patch autorizado para produção.
+- **Regressão encontrada:** ao corrigir o dano exagerado por quadro, a variável `attackDuration = 50` mantém o personagem em animação de ataque por muitos quadros, e o jogador perde HP antes de conseguir derrotar três ondas. A próxima correção deve equilibrar duração/cadência sem reintroduzir dano por frame.
+
+**Conclusão:** Ornith-1.5-9B permanece **modelo GameDev experimental**, preferido automaticamente só se GGUF estiver íntegro e runtime compatível. Qwen3-4B continua como fallback. A meta de um jogo superior ainda exige arquitetura incremental, QA de arte, animações e revisão humana. Não comparar porcentagens SWE-bench com sucesso em jogos e não publicar patches que reprovam o navegador.

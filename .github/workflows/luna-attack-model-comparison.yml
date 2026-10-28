@@ -1,0 +1,161 @@
+name: Luna GameDev — Ornith9B vs Qwen4B Actual Game Bug Repair
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-attack-model-*"
+    paths:
+      - ".github/lab-requests/attack-model-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/benchmark_luna_attack_patch.py"
+      - "tests/test_luna_attack_model_patch.py"
+      - "site-tests/tests/luna-attack-single-hit.spec.js"
+      - "site-tests/playwright.luna-attack.config.cjs"
+      - ".github/workflows/luna-attack-model-comparison.yml"
+permissions:
+  contents: read
+concurrency:
+  group: luna-attack-model-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify attack bug, original source and strict model-only sandbox contract
+        run: |
+          python -m compileall -q tools/benchmark_luna_attack_patch.py
+          python -m unittest discover -s tests -p "test_luna_attack_model_patch.py" -v
+          python -m unittest discover -s tests -p "test_luna_cli_answer_parser.py" -v
+          node --check site-tests/tests/luna-attack-single-hit.spec.js
+
+  real-native:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-attack-model-')) }}
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ornith-1.5-9b, qwen3-4b]
+    env:
+      CI: "true"
+      PYTHONUNBUFFERED: "1"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+      LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Restore CPU llama.cpp build cache (immutable pinned commit)
+        uses: actions/cache@v4
+        with:
+          path: llama-build
+          key: luna-llama-cpu-ubuntu22-f4d8af60-cmake-release-v1
+      - name: Build pinned llama.cpp CLI with CPU-only 4-thread support
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+      - name: Download and SHA-verify same official model GGUF as previous test
+        shell: bash
+        run: |
+          if [[ "${{ matrix.model }}" == "ornith-1.5-9b" ]]; then
+            python tools/install_ornith_game_model.py --confirm-download --allow-linux-ci
+          else
+            python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install;print(install())"
+          fi
+      - name: Real GGUF writes only the attack-block replacement, not whole game
+        id: candidate
+        shell: bash
+        run: |
+          if [[ "${{ matrix.model }}" == "ornith-1.5-9b" ]]; then
+            model=models/Ornith-1.5-9B-Q4_K_M.gguf
+          else
+            model=models/Qwen3-4B-Q4_K_M.gguf
+          fi
+          mkdir -p "results/attack_models/${{ matrix.model }}"
+          set +e
+          python tools/benchmark_luna_attack_patch.py \
+            --model "$model" --runtime llama-build/bin/llama-cli \
+            --label "${{ matrix.model }}" --out "results/attack_models/${{ matrix.model }}" \
+            --attempts 3
+          code=$?
+          set -e
+          if [[ $code -eq 0 ]]; then
+            echo "accepted=true" >> "$GITHUB_OUTPUT"
+          elif [[ $code -eq 1 ]]; then
+            echo "accepted=false" >> "$GITHUB_OUTPUT"
+            echo "Model did NOT generate a valid repair. Preserving negative evidence." >> "$GITHUB_STEP_SUMMARY"
+          else
+            exit "$code"
+          fi
+      - name: Validate exactly model-produced gameplay patch before running browser
+        if: steps.candidate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path("results/attack_models/${{ matrix.model }}")
+          r=json.loads((p/"provenance.json").read_text(encoding="utf-8"))
+          assert r["status"]=="STATIC_PATCH_CANDIDATE"
+          assert r["model_generated_patch"] is True
+          assert r["assistant_gameplay_code_used"] is False
+          assert hashlib.sha256((p/"game.js").read_bytes()).hexdigest()==r["game_js_sha256"]
+          print("Verified authentic model-authored attack block")
+          PY
+          node --check "results/attack_models/${{ matrix.model }}/game.js"
+          cp "results/attack_models/${{ matrix.model }}/game.js" site/luna-created/game.js
+      - name: Install Chromium to test genuine model-generated gameplay
+        if: steps.candidate.outputs.accepted == 'true'
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Start patched Luna game in disposable localhost test runner only
+        if: steps.candidate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory site/luna-created > /tmp/luna-attack-game.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-attack-game.log
+          exit 1
+      - name: Actual KeyZ damage once plus existing 6 full-game tests
+        if: steps.candidate.outputs.accepted == 'true'
+        working-directory: site-tests
+        run: |
+          npx playwright test --config playwright.luna-attack.config.cjs
+          npx playwright test --config playwright.luna-original.config.cjs
+      - name: Preserve real model inputs, raw outputs, hashes and gameplay trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-attack-${{ matrix.model }}-${{ github.run_id }}
+          path: |
+            results/attack_models/${{ matrix.model }}/
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: warn
+          retention-days: 30
