@@ -10,6 +10,7 @@ on:
       - "experiments/luna-forge-zero/original_lua_gameplay.lua"
       - "experiments/luna-forge-zero/test_original_lua_gameplay.lua"
       - "experiments/luna-forge-zero/original_lua_lessons.py"
+      - "experiments/luna-forge-zero/evaluate_lua_codegen.py"
       - "tests/test_luna_original_lua_lessons.py"
       - "experiments/luna-forge-zero/action_platform_curriculum.json"
       - "experiments/luna-forge-zero/grandchase_research_catalog.json"
@@ -63,6 +64,10 @@ jobs:
         run: |
           cd experiments/luna-forge-zero
           python evaluate_github_codegen.py --checkpoint external_data/model_candidate --out external_data/model_candidate/syntax_report.json
+      - name: Evaluate GENERATED Lua code with luac parsing only
+        run: |
+          cd experiments/luna-forge-zero
+          python evaluate_lua_codegen.py --checkpoint external_data/model_candidate --out external_data/model_candidate/lua_syntax_report.json
       - name: Verify checkpoint hash and publication guard
         run: |
           python - <<'PY'
@@ -75,6 +80,10 @@ jobs:
           assert r['original_curriculum_examples']==8
           assert r['original_lua_lessons']==6
           assert r['heldout_lua_answers_in_training']==0
+          lua=json.loads((d/'lua_syntax_report.json').read_text())
+          assert lua['syntax_verifier_available'] is True
+          assert lua['generated_code_executed'] is False
+          assert lua['training_promotion_allowed'] is False
           assert len(r['origin_repositories'])>=3
           assert len(r['heldout_repositories'])>=1
           print('Source checkpoints and heldout verified:',r['holdout_next_char_loss_before'],r['holdout_next_char_loss_after'])
@@ -88,6 +97,7 @@ jobs:
             experiments/luna-forge-zero/external_data/LICENSE_NOTICES.json
             experiments/luna-forge-zero/external_data/model_candidate/report.json
             experiments/luna-forge-zero/external_data/model_candidate/syntax_report.json
+            experiments/luna-forge-zero/external_data/model_candidate/lua_syntax_report.json
             experiments/luna-forge-zero/external_data/model_candidate/weights.pt
           if-no-files-found: warn
           retention-days: 14
