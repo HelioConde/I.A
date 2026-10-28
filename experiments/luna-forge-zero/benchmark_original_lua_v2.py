@@ -13,6 +13,13 @@ from original_lua_lessons import HOLDOUT
 from benchmark_original_lua import prompt_for,summarize
 from train_original_lua_v2 import DEST_ROOT, samples
 
+def remove_training_terminator(text: str) -> str:
+    """Remove only the literal training terminator before Lua syntax parsing."""
+    for token in ("\nEND\n", "\nFIM"):
+        if token in text:
+            text=text.split(token,1)[0]
+    return text
+
 def find_candidates():
     root=DEST_ROOT.resolve()
     if not root.is_dir():
@@ -69,6 +76,7 @@ def probe(*,ckpt:Path|None=None,chars:int=220,seed:int=20261028,
     def generate_one(prompt, index):
         torch.manual_seed(seed+index)
         produced=model.generate(prompt,chars=chars,temperature=temperature)[len(prompt):]
+        produced=remove_training_terminator(produced)
         parsed=syntax_check_lua(produced) if check_syntax else "NOT_TESTED"
         return produced,parsed
     results=[]
