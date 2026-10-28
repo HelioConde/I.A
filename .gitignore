@@ -23,3 +23,12 @@ diagnostics/
 *.diagnostics.jsonl
 brain-ssd-diagnostics-*.zip
 results/action_lab/
+
+# Luna Forge local/private models, raw training data and diagnostics.
+# Never publish model weights trained on non-redistributable local sources.
+experiments/luna-forge-zero/private_lua_training/
+experiments/luna-forge-zero/external_data/
+experiments/luna-forge-zero/checkpoints/
+experiments/luna-forge-zero/reports/
+experiments/luna-forge-zero/knowledge_pages/
+experiments/luna-forge-zero/.venv/
