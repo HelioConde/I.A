@@ -75,6 +75,14 @@ class LunaOriginalLuaV2Tests(unittest.TestCase):
                 self.assertNotIn("raw_generated_text",str(greedy))
             self.assertEqual(len(list(root.glob("lua-v2-*/weights.pt"))),1)
 
+    def test_training_terminators_are_not_treated_as_lua_code(self):
+        self.assertEqual(probe_v2.remove_training_terminator(
+            "function f() end\\nEND\\n"),"function f() end")
+        self.assertEqual(probe_v2.remove_training_terminator(
+            "function f() end\\nFIM"),"function f() end")
+        self.assertEqual(probe_v2.remove_training_terminator(
+            "function f() end"),"function f() end")
+
     def test_refuses_unauthorized_checkpoint_path_and_invalid_budgets(self):
         with tempfile.TemporaryDirectory() as tmp:
             bad=Path(tmp)/"unknown"
