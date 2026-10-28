@@ -51,6 +51,7 @@ def main():
         print("6 - Analisar formatos dos arquivos Lua (somente amostra, sem treinar)")
         print("7 - Resumir estruturas do Lua (funcoes/condicoes/lacos, sem treinar)")
         print("8 - Testar ultimo candidato treinado (somente visualizar codigo)")
+        print("9 - GameCoder pratica (Ollama local + validar sintaxe JavaScript)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -107,6 +108,14 @@ def main():
             task=input("Qual funcao JavaScript original a GameCoder deve tentar criar? ").strip()
             if task:
                 run(HERE/"preview_local_candidate.py","generate","--task",task,"--chars","180")
+        elif option=="9":
+            print("Usa modelo de codigo pre-treinado LOCAL no Ollama, nao os 116K pesos do MiniCoder.")
+            print("Nenhum arquivo e enviado, executado ou alterado. Node.js verifica apenas a sintaxe.")
+            rc=run(HERE/"luna_coder_ollama.py","status")
+            if rc==0:
+                task=input("Descreva a mecanica JavaScript que deseja criar: ").strip()
+                if task:
+                    run(HERE/"luna_coder_ollama.py","generate","--task",task)
         else:
             print("Opcao invalida.")
 
