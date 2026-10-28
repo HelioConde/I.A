@@ -9,6 +9,8 @@ on:
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
       - "experiments/luna-forge-zero/luna_coder_ollama.py"
+      - "experiments/luna-forge-zero/luna_core_qa.py"
+      - "tests/test_luna_core_qa.py"
       - "tests/test_luna_local_ollama.py"
       - "experiments/luna-forge-zero/preview_local_candidate.py"
       - "tests/test_luna_candidate_preview.py"
@@ -26,6 +28,8 @@ on:
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
       - "experiments/luna-forge-zero/luna_coder_ollama.py"
+      - "experiments/luna-forge-zero/luna_core_qa.py"
+      - "tests/test_luna_core_qa.py"
       - "tests/test_luna_local_ollama.py"
       - "experiments/luna-forge-zero/preview_local_candidate.py"
       - "tests/test_luna_candidate_preview.py"
@@ -83,6 +87,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_candidate_preview.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify Luna Core static movement quality signals
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_core_qa.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Test offline local Ollama GameCoder and JS syntax validation
         shell: pwsh
