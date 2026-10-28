@@ -60,7 +60,7 @@ class RuntimeTrainPrivateLuaTests(unittest.TestCase):
             with patch.object(preview_private_lua,"OUTPUT_ROOT",output):
                 verified,stored=preview_private_lua.verify_checkpoint(private_dir)
             self.assertEqual(verified["parent_weights_sha256"],sha)
-            self.assertEqual(stored,private_dir/"weights.pt")
+            self.assertEqual(stored.resolve(),(private_dir/"weights.pt").resolve())
             self.assertNotIn(str(game),json.dumps(verified))
             self.assertNotIn("game_000.lua",json.dumps(verified))
 
