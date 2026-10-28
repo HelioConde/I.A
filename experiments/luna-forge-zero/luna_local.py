@@ -54,6 +54,7 @@ def main():
         print("9 - GameCoder pratica (Ollama local + validar sintaxe JavaScript)")
         print("10 - Treinar Luna MiniCoder com Lua local autorizado (experimental/privado)")
         print("11 - Testar MiniCoder treinado com Lua privado (sem executar codigo)")
+        print("12 - Contar Lua nas pastas excluidas (SOMENTE metadados, sem treino)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -146,6 +147,14 @@ def main():
             task=input("Qual mecanica Lua deseja que ela tente criar? ").strip()
             if task:
                 run(HERE/"preview_private_lua.py","generate","--task",task)
+        elif option=="12":
+            source=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta para contagem de metadados [{source}]: ").strip().strip('"')
+            if supplied:
+                source=Path(supplied)
+            print("Contando extensoes em diretorios protegidos SEM abrir arquivos.")
+            print("O resultado mostra somente totais, nao nomes, caminhos ou codigo.")
+            run(HERE/"audit_excluded_lua_metadata.py",source)
         else:
             print("Opcao invalida.")
 
