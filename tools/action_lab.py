@@ -23,6 +23,7 @@ SMOKE = (
     "test_game_coding_trial.py",
     "test_game_agent_v2.py",
     "test_game_agent_v3.py",
+    "test_game_outperform_v1.py",
     "test_game_coder_model_install.py",
     "test_chat_local_actions.py",
     "test_memory_safety.py",
