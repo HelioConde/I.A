@@ -46,6 +46,7 @@ def main():
         print("2 - Planejar um jogo (Planner)")
         print("3 - Testar MiniCoder (experimental)")
         print("4 - Treinar candidato com codigos MIT externos (opt-in)")
+        print("5 - Inventariar pasta local (somente metadados; sem treinar)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -64,6 +65,17 @@ def main():
             confirm=input("Confirmar download de codigos externos MIT + treinamento? Digite SIM: ").strip()
             if confirm=="SIM": train_external()
             else: print("Cancelado.")
+        elif option=="5":
+            default_folder=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta para analisar [{default_folder}]: ").strip().strip('"')
+            folder=Path(supplied) if supplied else default_folder
+            if not folder.is_dir():
+                print("Pasta nao encontrada. Nenhum arquivo alterado.")
+            else:
+                destination=HERE/"reports"/("local_inventory-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
+                print("Lendo apenas nomes, extensoes e tamanhos. Nao abre os arquivos.")
+                run(HERE/"inventory_local_data.py",folder,"--out",destination)
+                print("Relatorio local:",destination)
         else:
             print("Opcao invalida.")
 
