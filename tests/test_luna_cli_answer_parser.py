@@ -26,9 +26,9 @@ class ParserTests(unittest.TestCase):
 
     def test_multiline_no_think_prompt_echo_does_not_poison_generated_patch(self):
         log=(
-            "Loading model... \\nmodel : model.gguf\\n\\n> /no_think\\n"
-            "Você é Luna GameDev, corrija o código anterior ... (truncated)\\n"
-            +CODE+"\\n\\n[ Prompt: 15 t/s | Generation: 5 t/s ]\\n> \\nExiting..."
+            "Loading model... \nmodel : model.gguf\n\n> /no_think\n"
+            "Você é Luna GameDev, corrija o código anterior ... (truncated)\n"
+            +CODE+"\n\n[ Prompt: 15 t/s | Generation: 5 t/s ]\n> \nExiting..."
         )
         self.assertEqual(extract_native_answer(log),CODE)
 
