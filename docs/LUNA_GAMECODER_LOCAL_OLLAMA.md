@@ -67,3 +67,27 @@ O backend não instala modelos automaticamente nem usa URLs fornecidas pelo usu�
 A requisição da ferramenta vai somente ao servidor no endereço 127.0.0.1. Nenhum script comercial de Grand Chase, arquivo .bak, DLL, EXE, RAR ou KOM é lido. `node --check` faz a análise de sintaxe, sem executar a saída gerada. O código é mostrado no terminal e não é salvo como projeto. Não copie código gerado automaticamente para jogos ou execute sem revisão.
 
 O checkpoint local `external_data/local-candidate-20261028-163736-598275` continua acessível na **opção 8** como testemunho do modelo MiniCoder experimental.
+
+
+## Luna Core — revisao de mecanica alem da sintaxe (28/10/2026)
+
+Uma execucao real local do `qwen2.5-coder:3b` devolveu JavaScript que passou em `node --check`, mas seu movimento apresentava problemas: **sem controle esquerda/direita**, **atrito aplicado uma vez por quadro** (nao corrigido por deltaTime), **limite apenas para velocidade positiva** e **ausencia de tratamento de entrada neutra**.
+
+Foi criado o verificador heuristico `luna_core_qa.py`. Ele inspeciona texto em memoria, sem executar o JS e sem guardar/copiar arquivos. Para tarefas de movimento horizontal, registra cinco **indicadores estaticos**, nao provas:
+- existencia de entrada direcional `axis`/`direction` ou controles esquerda/direita;
+- uso de deltaTime na integracao de posicao;
+- indicio de limite de velocidade positivo **e negativo**;
+- indicio de atrito escalonado por deltaTime (e alerta para `velocityX *= friction`);
+- indicio de tratamento de entrada neutra para desacelerar.
+
+O codigo observado no Windows atenderia somente o indicador de integracao de posicao por deltaTime (**1/5 indicadores**). O verificador e intencionalmente heuristico: tambem pode dar falsos positivos e falsos negativos; ate mesmo **5/5 nunca significa aprovacao funcional**.
+
+A opcao 9 agora executa o seguinte processo, sem modificar o MiniCoder:
+1. gerar JS usando o modelo pretreinado Ollama local;
+2. testar **sintaxe**, via `node --check`, sem executar;
+3. revisar os indicadores estaticos de mecanica via Luna Core;
+4. se a sintaxe falhar, pedir uma tentativa de reparo; **se a sintaxe passar, mas faltarem indicadores**, pedir no maximo uma tentativa para melhorar a mecanica;
+5. se a revisao piorar a pontuacao heuristica ou invalidar a sintaxe, preservar a primeira resposta sintaticamente valida;
+6. exibir `core_quality_review` com pendencias e `behavior_verified: false`.
+
+Proximo objetivo: um runner **realmente isolado** para testes comportamentais e validacao humana de jogos gerados, sem executar codigo arbitrario diretamente no PC do usuario. A Luna Core ainda nao deve promover pesos de candidatos do zero baseada nessa heuristica.
