@@ -76,3 +76,28 @@ Se o clone estiver em outra pasta (por exemplo `Luna-Forge-Local-2`), ajuste o p
 - Nao envia dados e nao treina. Nao substitui o processo independente de revisao de licencas e autorizacao de uso.
 
 `client.rar`, `s1-client-br-2008-03-04.7z`, `Account.bak`, `Game01.bak`, `ES_BILLING.bak`, `Statistics.bak`, `grandchase.exe` e `main.exe` nao sao considerados exemplos aprovados para treinar GameCoder.
+
+
+## Resultado de uma instalação real no Windows — 28/10/2026
+
+Registro local fornecido pelo usuário: instalação isolada em `C:\Users\helio\Documents\Luna-Forge-Local`, PyTorch CPU instalado, Planner treinado (4.500 prompts sintéticos), MiniCoder V0 treinado (350 passos), 4 páginas Brain-SSD criadas. O primeiro comando `sim` em minúsculas foi recusado porque o menu exigia `SIM`; o usuário repetiu em maiúsculas e a opção 4 treinou com sucesso um novo candidato em `external_data/local-candidate-20261028-163736-598275`.
+
+Resultados informados pelo treinamento local:
+- Corpus externo 25 arquivos MIT, dos quais 19 no treino e 6 no repositório holdout; 8 lições originais JS/GDScript e 6 lições originais Lua, sem scripts do cliente comercial.
+- 180 passos, MiniCoder 116.480 parâmetros, perda holdout 35,617650 → 3,304493, 0/5 gerações JavaScript sintaticamente válidas.
+- Candidato guardado isoladamente. **O menu antigo (opção 3) ainda carregava o checkpoint inicial**, não o recém-treinado.
+- Avisos não fatais: NumPy ausente; conversão de tensor com gradiente para escalar.
+
+Correções publicadas:
+- A instalação da `.venv` agora inclui NumPy. Em uma instalação **já existente**, execute uma vez (não apaga modelos):
+
+```powershell
+$lab="$env:USERPROFILE\Documents\Luna-Forge-Local\experiments\luna-forge-zero"
+& "$lab\.venv\Scripts\python.exe" -m pip install "numpy>=1.26,<3"
+```
+
+- A conversão de perda usa `loss.detach().item()`, evitando aviso relacionado ao autograd.
+- Menu 4 aceita `sim`, `SIM` e variações de maiúsculas/minúsculas (ainda exige confirmação).
+- **Menu 8 — testar candidato local mais recente**: somente visualização da geração, sem executar o código gerado ou promovê-lo para o modelo ativo. Faz verificação SHA-256 antes do carregamento e escolhe somente arquivos `local-candidate-*` dentro de `external_data`. O menu 3 permanece como teste do MiniCoder inicial, explicitamente identificado.
+
+Após `git pull --ff-only`, execute `ABRIR-LUNA-FORGE.cmd` e escolha **8**. A qualidade do MiniCoder ainda não é suficiente para produzir jogos; a opção serve apenas como um teste honesto do checkpoint local.
