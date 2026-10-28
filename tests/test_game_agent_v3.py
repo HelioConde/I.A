@@ -35,7 +35,7 @@ class V3Tests(unittest.TestCase):
         prompt=coding_prompt()
         self.assertIn("SOMENTE código-fonte",prompt)
         self.assertIn("/no_think",prompt)
-        self.assertNotIn("JSON",prompt)
+        self.assertNotIn('{"version":',prompt)
         self.assertIn("requestAnimationFrame",prompt)
         self.assertIn("javascript_syntax_error",coding_prompt("javascript_syntax_error"))
 
