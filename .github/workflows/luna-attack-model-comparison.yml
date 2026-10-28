@@ -36,6 +36,7 @@ jobs:
         run: |
           python -m compileall -q tools/benchmark_luna_attack_patch.py
           python -m unittest discover -s tests -p "test_luna_attack_model_patch.py" -v
+          python -m unittest discover -s tests -p "test_luna_cli_answer_parser.py" -v
           node --check site-tests/tests/luna-attack-single-hit.spec.js
 
   real-native:
