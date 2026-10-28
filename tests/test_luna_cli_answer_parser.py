@@ -24,6 +24,14 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(clean(extract_native_answer(LOG)),CODE+"\n")
         self.assertEqual(extract_native_answer(CODE),CODE)
 
+    def test_multiline_no_think_prompt_echo_does_not_poison_generated_patch(self):
+        log=(
+            "Loading model... \\nmodel : model.gguf\\n\\n> /no_think\\n"
+            "Você é Luna GameDev, corrija o código anterior ... (truncated)\\n"
+            +CODE+"\\n\\n[ Prompt: 15 t/s | Generation: 5 t/s ]\\n> \\nExiting..."
+        )
+        self.assertEqual(extract_native_answer(log),CODE)
+
     def test_fail_closed_when_terminal_format_changes(self):
         with self.assertRaisesRegex(ValueError,"prompt_echo"):
             extract_native_answer("Loading model... \nNO_PROMPT\n[ Prompt: 2 t/s | Generation: 3 t/s ]")
