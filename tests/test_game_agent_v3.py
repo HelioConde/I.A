@@ -74,7 +74,7 @@ class V3Tests(unittest.TestCase):
         self.assertTrue(trial["accepted_source"])
         self.assertEqual(trial["source"],GOOD)
         self.assertEqual(trial["attempt_count"],2)
-        self.assertIn("Diagnóstico",prompts[1][0])
+        self.assertIn("validador encontrou",prompts[1][0])
         self.assertTrue(all(tokens==1200 for _,tokens in prompts))
         self.assertFalse(trial["code_executed"])
         self.assertFalse(trial["gameplay_verified"])
