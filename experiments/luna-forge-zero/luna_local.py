@@ -58,6 +58,8 @@ def main():
         print("13 - Revisar subpastas de cliente/jogo LOCALMENTE (metadados, sem treino)")
         print("14 - Verificar formatos de Lua na pasta Elsword (4 KiB por arquivo, sem treino)")
         print("15 - Medir geracao Lua da Luna propria em 3 tarefas originais nao treinadas")
+        print("16 - TREINAR Luna Lua V2 do zero (somente 6 mecanicas originais)")
+        print("17 - Comparar Luna Lua V2 em 3 tarefas novas (sem executar codigo)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -179,6 +181,19 @@ def main():
             print("As tarefas nao tem respostas no conjunto de treino. A avaliacao NAO verifica sintaxe nem gameplay.")
             print("Nao altera os pesos nem executa codigo gerado.")
             run(HERE/"benchmark_original_lua.py")
+        elif option=="16":
+            print("Treina NOVOS pesos V2 a partir do zero usando apenas 6 mecanicas LUA originais.")
+            print("Modelo experimental (~1M parametros, janela 256), nao altera a Luna atual.")
+            print("Nao le pasta Elsword e nao utiliza codigo comercial. Salva pesos localmente.")
+            confirm=input("Iniciar 600 passos de treino CPU? Digite TREINAR V2: ").strip()
+            if confirm.upper()=="TREINAR V2":
+                run(HERE/"train_original_lua_v2.py","--steps","600","--batch","4","--threads","4")
+            else:
+                print("Treinamento V2 cancelado.")
+        elif option=="17":
+            print("Testa ultimos pesos V2 locais nos 3 desafios originais SEM respostas.")
+            print("Nao verifica sintaxe nem gameplay e nunca executa o codigo produzido.")
+            run(HERE/"benchmark_original_lua_v2.py")
         else:
             print("Opcao invalida.")
 
