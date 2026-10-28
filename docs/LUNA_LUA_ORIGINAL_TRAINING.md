@@ -60,3 +60,18 @@ Para exportar os seis exemplos originais em um arquivo de treinamento separado:
 ```
 
 **Limitação:** mini-modelo de ~116 mil parâmetros, contexto de 128 caracteres e ausência de sintaxe/funcionalidade comprovada na geração. A prioridade técnica seguinte é modelo de código maior e avaliações executáveis isoladas, sem copiar um jogo comercial.
+
+
+### Rodada de avaliação também com Lua gerado
+
+[GitHub Actions 40721236227](https://github.com/HelioConde/I.A/actions/runs/40721236227) concluiu com sucesso todos os checks, incluindo `lua5.4` nos exemplos originais e `luac5.4 -p` nos exemplos **gerados pela GameCoder**.
+
+- 32/32 verificações de funcionamento do módulo Lua **autoral** passaram;
+- MiniCoder treinado com 19 arquivos MIT externos + 8 exercícios originais JS/GDScript + 6 lições Lua;
+- Holdout externo de previsão de caracteres: 35,617650 antes, 3,304493 depois;
+- Modelo gerou **0/5 exemplos Lua com sintaxe válida** e **0/5 JavaScript com sintaxe válida**;
+- Código gerado não foi executado; comportamentos gerados não foram testados;
+- Promoção automática da candidata = **false**;
+- [Artefato com pesos e relatórios 12829983955](https://github.com/HelioConde/I.A/actions/runs/40721236227/artifacts/12829983955).
+
+**Conclusão técnica:** a pipeline de treino e QA foi operacionalizada, mas o MiniCoder atual ainda é pequeno demais e não demonstrou habilidade de gerar funções completas. Priorizar tokenizer/contexto maiores e treinamento instrução-para-código, com suites de testes de gameplay **cegas**, mantendo revisão de licença e sem usar códigos comerciais.
