@@ -40,7 +40,7 @@ Foi adicionado o teste regressivo `outperform baseline: releasing mobile control
 - **Primeiro teste da IA:** [run 40632459539](https://github.com/HelioConde/I.A/actions/runs/40632459539): duas propostas reais rejeitadas por ainda mencionar a variável sem declaração. Resultado INCOMPLETE, preservado.
 - **Segunda instrução, nova avaliação v1.1:** [run Qwen3-4B 40632642743](https://github.com/HelioConde/I.A/actions/runs/40632642743): **uma geração real aprovada na revisão de sintaxe/contrato**, sem executar código. O texto do modelo foi exatamente `const end=e=>{e.preventDefault();keys.delete(code)};`.
 - **Aplicação:** ChatGPT revisou a linha gerada, substituiu apenas o handler do evento e acrescentou regressão unitária exigindo coincidência exata com a linha proposta. O conteúdo dessa linha é atribuído ao **Qwen3-4B da Luna**; toda integração, testes e infraestrutura são do ChatGPT.
-- **Resultado do navegador após patch:** consultar o último workflow `Luna Arcade S1 — Playable Game QA` deste PR. Não declarar correção comprovada até que os 12 testes passem.
+- **Resultado no Chromium após aplicar o patch:** [run 40632815875](https://github.com/HelioConde/I.A/actions/runs/40632815875): **12 de 12 testes aprovados**, incluindo o controle mobile corrigido e a vitória com os três personagens. O teste que falhou na referência passou sem regressão observada na suíte.
 
 Esse patch é apenas **um avanço pequeno demonstrável**, não o cumprimento da meta de ser melhor que o jogo de referência em todas as dimensões. Ainda faltam as melhorias de jogabilidade, novas fases, qualidade visual comparativa e autoria contínua do modelo.
 
