@@ -15,33 +15,27 @@ SOURCE=ROOT/"results"/"luna-original-refined"
 OUT=ROOT/"results"/"luna-original-style"
 SOURCE_RUN=40647732624
 TASK=(
-    "/no_think\nVocê é Luna GameDev. Você já escreveu HTML, CSS e JavaScript do "
-    "jogo Luna: Constelação Perdida. AGORA gere uma nova versão ORIGINAL e "
-    "muito melhor de seu próprio arquivo styles.css. Responda SOMENTE código "
-    "CSS bruto completo, SEM Markdown, SEM HTML e SEM explicação.\n"
-    "Estrutura HTML EXISTENTE, não pode ser alterada nesta tarefa: "
-    "<body><main><h1>Luna: Constelação Perdida</h1>"
-    "<p id='status'>...</p><select id='hero'>...</select>"
-    "<button id='start'>Iniciar aventura</button>"
-    "<canvas id='game' width='960' height='540'></canvas></main></body>.\n"
-    "O CSS ANTERIOR tinha defeito GRAVE: botão #start e seletor #hero ocupavam "
-    "EXATAMENTE a mesma posição (top:50%; left:50%; transform(-50%,-50%)), "
-    "impedindo selecionar o personagem com mouse. Corrija de verdade: "
-    "h1, #status, #hero, #start e canvas devem aparecer legíveis, com "
-    "#hero e #start VISUALMENTE SEPARADOS, sem position:absolute nas duas "
-    "opções, sem se sobrepor. Sugestão de layout: body gradiente noturno "
-    "com estrelas discretas via radial-gradient; main com display:grid ou "
-    "display:flex, max-width:1050px, margin:auto, padding:24px; "
-    "h1 grande no topo; #hero e #start na linha seguinte com margens, "
-    "e canvas abaixo com width:100%; max-width:960px; height:auto; "
-    "aspect-ratio:16/9; fundo de arena; borda e brilho; botão dourado e "
-    "seletor elegante; #status com área visível e legível. "
-    "Mantenha o Canvas funcional sem bloqueio de pointer. "
-    "No celular use @media(max-width:600px) para quebrar o layout e "
-    "permitir rolagem vertical; NÃO use overflow:hidden em body ou main. "
-    "Inclua :focus-visible e @media(prefers-reduced-motion:reduce). "
-    "Sem fontes remotas, URLs, import, imagens externas ou scripts. "
-    "Crie um CSS de aparência 2026 limpa, original e consistente."
+    "/no_think\nVocê é Luna, autora do jogo original Luna: Constelação Perdida. "
+    "Reescreva o SEU styles.css do ZERO com CSS CURTO, seguro, bonito, simples e RESPONSIVO. "
+    "Responda SOMENTE CSS, sem markdown, sem HTML, sem explicação. "
+    "HTML fixo: body > main > h1, p#status, select#hero, button#start, canvas#game (960x540). "
+    "FALHA ANTERIOR: select#hero e button#start tinham position:absolute com "
+    "top:50%, left:50%, ficando UM SOBRE O OUTRO e impossibilitando clicar. "
+    "NOVA REGRA: NÃO use position:absolute, position:fixed, transform:translate "
+    "nos controles ou canvas. Use main{display:flex; flex-direction:column; "
+    "align-items:center; gap:14px;} e body{overflow:auto;min-height:100vh;}. "
+    "Canvas: posição normal, width:100%, max-width:960px, height:auto; "
+    "acima o título, status, select e botão cada um na própria linha. "
+    "Design: cores noturnas índigo e violeta com accent dourado, "
+    "fundo radial-gradient, tipografia system-ui, cartões e bordas leves, "
+    "botões elegantes. Use seletor explícito #start e #hero. "
+    "Obrigatório usar: body, main, canvas, #start, #hero, #status, "
+    ":focus-visible e @media (max-width:600px). "
+    "Permita rolagem mobile, bom contraste, sem sobreposição. "
+    "CRÍTICO: NÃO USE absolutamente nenhum url(, @import, @font-face, "
+    "https, http, imagem, SVG, data URI, resource externo, script ou font. "
+    "Todo estilo deve ser CSS puro com gradientes e cores hexadecimais. "
+    "Máximo 110 linhas CSS."
 )
 REQ=("body","main","canvas","#start","#hero","#status",":focus-visible","@media")
 BANNED=re.compile(r"@import\b|url\s*\(|https?://|javascript:|expression\s*\(|"
@@ -93,12 +87,13 @@ def main()->int:
         for i in range(args.attempts):
             reply=engine.core_backend.generate(GenerationRequest(
                 prompt=TASK+("\nERRO ANTERIOR: "+feedback+". Reescreva o CSS completo." if feedback else ""),
-                max_tokens=1050,temperature=0.15))
+                max_tokens=900,temperature=0.15))
             if reply.get("return_code")!=0:
                 feedback="native_inference_failed"
                 report["attempts"].append({"attempt":i+1,"real":False,"reason":feedback})
                 continue
             answer=clean_answer(str(reply.get("stdout") or ""))
+            (OUT/("model-css-attempt-"+str(i+1)+".txt")).write_bytes(answer.encode("utf-8"))
             ok,reason,css=validate_css(answer)
             report["attempts"].append({"attempt":i+1,"real":bool(answer),"accepted":ok,
                                         "reason":reason,"characters":len(answer)})
