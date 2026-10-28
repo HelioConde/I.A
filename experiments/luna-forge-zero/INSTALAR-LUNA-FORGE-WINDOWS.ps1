@@ -87,11 +87,12 @@ if ($TrainGithub) {
     $Data = Join-Path $Here "external_data"
     $Candidate = Join-Path $Data ("candidate-" + (Get-Date -Format "yyyyMMdd-HHmmss-fff"))
     Run-Checked -Executable $Python -Arguments @((Join-Path $Here "grandchase_reference_gate.py"),"audit")
+    Run-Checked -Executable $Python -Arguments @((Join-Path $Here "original_lua_lessons.py"),"verify")
     if (-not (Test-Path -LiteralPath (Join-Path $Data "manifest.json"))) {
         Run-Checked -Executable $Python -Arguments @((Join-Path $Here "github_corpus.py"),"collect","--out",$Data)
     }
     Run-Checked -Executable $Python -Arguments @((Join-Path $Here "github_corpus.py"),"verify","--out",$Data)
-    Run-Checked -Executable $Python -Arguments @((Join-Path $Here "train_github.py"),"--data",$Data,"--curriculum",(Join-Path $Here "action_platform_curriculum.json"),"--out",$Candidate,"--steps","180","--batch","12","--threads","4")
+    Run-Checked -Executable $Python -Arguments @((Join-Path $Here "train_github.py"),"--data",$Data,"--curriculum",(Join-Path $Here "action_platform_curriculum.json"),"--out",$Candidate,"--steps","180","--batch","12","--threads","4","--lua-lessons")
     Run-Checked -Executable $Python -Arguments @((Join-Path $Here "evaluate_github_codegen.py"),"--checkpoint",$Candidate,"--out",(Join-Path $Candidate "syntax_report.json"))
     Write-Host "Novo checkpoint experimental: $Candidate" -ForegroundColor Green
 }
