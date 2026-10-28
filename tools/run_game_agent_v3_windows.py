@@ -54,7 +54,7 @@ def main() -> int:
                                    errors="replace",timeout=900,check=False)
                 if run.returncode:
                     raise RuntimeError("ORNITH_NATIVE_RUNTIME_FAILED")
-                output=extract_llama_cli_source(run.stdout or "")
+                output=extract_llama_cli_source(run.stdout or "",prompt)
                 return {"answer":output,"model_generated":bool(output),
                         "finish_reason":None}
         else:
