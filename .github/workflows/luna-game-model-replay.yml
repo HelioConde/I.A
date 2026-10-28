@@ -1,0 +1,131 @@
+name: Luna Original — Replay Unchanged Qwen and Ornith Generated Games
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-gguf-replay-*"
+    paths:
+      - ".github/lab-requests/gguf-replay-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/luna_cli_answer_parser.py"
+      - "tools/replay_luna_game_models.py"
+      - "tests/test_luna_cli_answer_parser.py"
+      - ".github/workflows/luna-game-model-replay.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: luna-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parser-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test model output isolation without tampering
+        run: |
+          python -m compileall -q tools/luna_cli_answer_parser.py tools/replay_luna_game_models.py
+          python -m unittest discover -s tests -p "test_luna_cli_answer_parser.py" -v
+          python -m unittest discover -s tests -p "test_luna_ornith_model.py" -v
+
+  replay-and-browser:
+    needs: parser-regression
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-gguf-replay-')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 21
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ornith-1.5-9b, qwen3-4b]
+        attempt: [1,2]
+    env:
+      LUNA_GAMEDEV_MODEL_URL: http://127.0.0.1:4813
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Restore exact model raw outputs from run 40653494692
+        uses: actions/download-artifact@v4
+        with:
+          name: luna-game-model-${{ matrix.model }}-40653494692
+          run-id: 40653494692
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+      - name: Recover original model-generated JavaScript only
+        id: replay
+        shell: bash
+        run: |
+          out="results/replayed/${{ matrix.model }}/attempt-${{ matrix.attempt }}"
+          set +e
+          python tools/replay_luna_game_models.py \
+            --artifact-dir "results/game_models/${{ matrix.model }}" \
+            --label "${{ matrix.model }}" --attempt "${{ matrix.attempt }}" --out "$out"
+          code=$?
+          set -e
+          if [[ "$code" == "0" ]]; then
+            echo "candidate=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$code" == "1" ]]; then
+            echo "candidate=false" >> "$GITHUB_OUTPUT"
+            echo "Original model attempt failed static validation; see artifact for details." >> "$GITHUB_STEP_SUMMARY"
+          else
+            exit "$code"
+          fi
+      - name: Create evaluator HTML harness (not model authored)
+        if: steps.replay.outputs.candidate == 'true'
+        shell: bash
+        run: |
+          folder="results/replayed/${{ matrix.model }}/attempt-${{ matrix.attempt }}"
+          cat > "$folder/index.html" <<'HTML'
+          <!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Original GGUF candidate</title></head>
+          <body style="margin:0;background:#0e1425;color:white;overflow-x:hidden">
+          <canvas id="game" width="800" height="480" style="width:100%;max-width:800px;height:auto"></canvas>
+          <script src="game.js" defer></script></body></html>
+          HTML
+      - name: Install browser
+        if: steps.replay.outputs.candidate == 'true'
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve original model's JS on localhost only
+        if: steps.replay.outputs.candidate == 'true'
+        shell: bash
+        run: |
+          python -m http.server 4813 --bind 127.0.0.1 --directory "results/replayed/${{ matrix.model }}/attempt-${{ matrix.attempt }}" > /tmp/luna-replay.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4813/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-replay.log
+          exit 1
+      - name: Actual model game movement, jump, attack and responsive browser checks
+        if: steps.replay.outputs.candidate == 'true'
+        working-directory: site-tests
+        run: npx playwright test --config playwright.model-gamedev.config.cjs
+      - name: Retain real model outputs, hashes, screenshot, browser errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-gguf-replay-${{ matrix.model }}-${{ matrix.attempt }}-${{ github.run_id }}
+          path: |
+            results/replayed/${{ matrix.model }}/attempt-${{ matrix.attempt }}/
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
