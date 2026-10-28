@@ -39,7 +39,7 @@ jobs:
           python -m unittest discover -s tests -p "test_luna_combat_range.py" -v
 
   real-qwen:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-classes-')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-range-')) }}
     needs: contract
     runs-on: windows-latest
     timeout-minutes: 55
@@ -83,7 +83,7 @@ jobs:
           retention-days: 30
 
   stage-review-only:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-classes-')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-range-')) }}
     needs: real-qwen
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -124,7 +124,7 @@ jobs:
           echo "Review source staged, NOT deployed to GitHub Pages."
 
   game-browser-qa:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-classes-')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-range-')) }}
     needs: stage-review-only
     runs-on: ubuntu-latest
     timeout-minutes: 23
