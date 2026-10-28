@@ -13,8 +13,8 @@ document.addEventListener('keydown',(e)=>{
 """
 EXAMPLE=[
  "let lastRightTap = 0, lastLeftTap = 0;",
- "const t = performance.now(); player.vx = !e.repeat && t-lastRightTap<=260 ? 14 : 5; if(!e.repeat)lastRightTap=t;",
- "const t = performance.now(); player.vx = !e.repeat && t-lastLeftTap<=260 ? -14 : -5; if(!e.repeat)lastLeftTap=t;"
+ "const t = performance.now(); player.vx = !e.repeat && lastRightTap > 0 && t-lastRightTap<=260 ? 14 : 5; if(!e.repeat)lastRightTap=t;",
+ "const t = performance.now(); player.vx = !e.repeat && lastLeftTap > 0 && t-lastLeftTap<=260 ? -14 : -5; if(!e.repeat)lastLeftTap=t;"
 ]
 
 class DashTests(unittest.TestCase):
