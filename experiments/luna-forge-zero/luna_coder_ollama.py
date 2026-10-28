@@ -78,7 +78,7 @@ def chat(model: str, messages: list[dict]) -> str:
 
 def extract_code(raw: str) -> str:
     text=re.sub(r"<think>.*?</think>","",raw,flags=re.DOTALL|re.IGNORECASE).strip()
-    blocks=re.findall(r"\x60{3}(?:javascript|js)?\s*\n(.*?)\x60{3}",text,flags=re.DOTALL|re.IGNORECASE)
+    blocks=re.findall(r"(?:\x60{3}|~{3})(?:javascript|js)?\s*\n(.*?)(?:\x60{3}|~{3})",text,flags=re.DOTALL|re.IGNORECASE)
     if blocks:
         text=max(blocks,key=len).strip()
     return text.strip()
