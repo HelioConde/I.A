@@ -114,3 +114,29 @@ test("mobile: interface readable and no sideways overflow",async({page},info)=>{
   expect(x).toBeLessThanOrEqual(2);
   await info.attach("luna-original-mobile",{body:await page.screenshot({fullPage:true}),contentType:"image/png"});
 });
+
+
+test("visual usability: class selector and Start must not overlap each other or the canvas",async({page},info)=>{
+  for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const hero=page.locator("#hero"),start=page.locator("#start"),canvas=page.locator("#game");
+    await expect(hero).toBeVisible();
+    await expect(start).toBeVisible();
+    await expect(canvas).toBeVisible();
+    const rects=await Promise.all([hero,start,canvas].map(locator=>locator.boundingBox()));
+    expect(rects.every(Boolean)).toBe(true);
+    const overlap=(a,b)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*
+                          Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
+    expect(overlap(rects[0],rects[1]),"The hero select and Start button must be distinct clickable areas").toBe(0);
+    expect(overlap(rects[0],rects[2]),"The game canvas must not cover the class selector").toBe(0);
+    expect(overlap(rects[1],rects[2]),"The game canvas must not cover the Start button").toBe(0);
+    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(2);
+    await hero.click();
+    await hero.selectOption("ranged");
+    await start.click();
+    await expect.poll(async()=>(await snap(page))?.mode).not.toBe("menu");
+    await info.attach("luna-css-"+viewport.width,{body:await page.screenshot({fullPage:true}),contentType:"image/png"});
+  }
+});
