@@ -46,6 +46,14 @@ O jogo da Luna será testável em `https://helioconde.github.io/I.A/luna-created
 - O job seguinte foi corretamente bloqueado por ausência do jogo reparado; nenhum arquivo do ChatGPT substituiu a saída do modelo.
 - Nova estratégia: [`repair_luna_original_targeted.py`](../tools/repair_luna_original_targeted.py) divide o problema em cinco patches pequenos que devem ser todos produzidos pela inferência real do Qwen e compilar individualmente; um jogo incompleto não será publicado como aprovado.
 
+## Progressão comprovada em 28/10/2026 — Qwen corrigindo seu próprio jogo
+
+- [Correções Qwen reais, run 40646692498](https://github.com/HelioConde/I.A/actions/runs/40646692498): cinco patches de autoria do modelo (teclas, combate, ondas e vitória) aprovados em sintaxe. O navegador reprovou pulo e alvo indefinido; 2/4 testes.
+- [Reparo de teclado e seleção do primeiro inimigo vivo, run 40647732624](https://github.com/HelioConde/I.A/actions/runs/40647732624): mais dois patches **realmente produzidos pelo Qwen**, com SHA preservado. O navegador aprovou 4/5 testes; falhou somente a ausência de diferença de HP entre as três classes. Fonte revisável: [branch da Luna](https://github.com/HelioConde/I.A/tree/luna/refined-review-40647732624/site/luna-created).
+- [Classes com HP diferentes + perseguição dos inimigos, run 40648093762](https://github.com/HelioConde/I.A/actions/runs/40648093762): o Qwen gerou mais dois patches; **5/5 testes Chromium passaram**, inclusive movimentação, salto, ataque, três ondas, chefe, vitória e reinício. Fonte em [branch de revisão](https://github.com/HelioConde/I.A/tree/luna/classes-review-40648093762/site/luna-created). Ainda NÃO publicada.
+- **Limitações de qualidade descobertas após os 5/5:** ataque das classes tinha alcances de 1/3/0 pixels, impraticáveis para humanos, e CSS original sobrepunha seletor e botão. Foram solicitadas correções adicionais **ao próprio Qwen**, com validações de range e teste visual real. Aprovação funcional não equivale a aprovação de UX nem de qualidade visual.
+- Próxima etapa obrigatória: mesclar **somente arquivos de jogo escritos pelo Qwen** (JavaScript corrigido e CSS original melhorado), testar a combinação completa em Chromium e, após aprovação, publicar em `/I.A/luna-created/` no GitHub Pages.
+
 ## Estado atual e próximos passos
 
 A infraestrutura de geração, registro de autoria e teste está implementada, mas **o resultado do modelo será registrado somente depois da execução real**. Se a geração ou os testes falharem, atualizar este documento com execução identificada e causas, mantendo a meta aberta.
