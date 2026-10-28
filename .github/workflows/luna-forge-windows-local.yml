@@ -8,6 +8,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/preview_local_candidate.py"
+      - "tests/test_luna_candidate_preview.py"
       - "experiments/luna-forge-zero/inventory_local_data.py"
       - "experiments/luna-forge-zero/analyze_local_lua.py"
       - "experiments/luna-forge-zero/profile_local_lua.py"
@@ -21,6 +23,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/preview_local_candidate.py"
+      - "tests/test_luna_candidate_preview.py"
       - "experiments/luna-forge-zero/inventory_local_data.py"
       - "experiments/luna-forge-zero/analyze_local_lua.py"
       - "experiments/luna-forge-zero/profile_local_lua.py"
@@ -70,6 +74,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_lua_structure_profile.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify locally trained candidate selection safeguards
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_candidate_preview.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise installer without starting training
         shell: cmd
