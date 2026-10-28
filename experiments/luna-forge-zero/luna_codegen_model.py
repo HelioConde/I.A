@@ -63,14 +63,23 @@ class LunaMiniCoder(nn.Module):
     def generate(self, prompt: str, chars: int = 200, temperature: float = 0.75):
         self.eval()
         ids = torch.tensor([[ord(c) if ord(c) < 128 else ord("?") for c in prompt]], dtype=torch.long)
+        if not 0 <= temperature <= 3:
+            raise ValueError("Temperature must be 0 (greedy) or within (0, 3]")
+        if not 1 <= chars <= 2048:
+            raise ValueError("Output budget must be 1..2048 characters")
         for _ in range(chars):
             logits, _ = self(ids[:, -self.cfg.block:])
-            logits = logits[:, -1, :] / temperature
+            logits = logits[:, -1, :]
             logits[:, 0:9] = -1e5
-            probs = torch.softmax(logits, dim=-1)
-            nxt = torch.multinomial(probs, num_samples=1)
+            if temperature == 0:
+                # Reproducible diagnostic, without stochastic token sampling.
+                nxt = torch.argmax(logits, dim=-1, keepdim=True)
+            else:
+                probs = torch.softmax(logits / temperature, dim=-1)
+                nxt = torch.multinomial(probs, num_samples=1)
             ids = torch.cat((ids, nxt), dim=1)
             text = "".join(chr(i) for i in ids[0].tolist())
-            if "\nFIM" in text[len(prompt):]:
+            continuation = text[len(prompt):]
+            if "\nFIM" in continuation or "\nEND\n" in continuation:
                 break
         return "".join(chr(i) for i in ids[0].tolist())
