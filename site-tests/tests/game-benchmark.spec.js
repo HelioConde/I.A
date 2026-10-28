@@ -230,3 +230,21 @@ test("player feedback: mobile layout fits viewport and form remains usable", asy
     body: await page.screenshot({fullPage:true}), contentType:"image/png",
   });
 });
+
+
+test("outperform baseline: releasing mobile controls has no uncaught ReferenceError", async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  const errors=[];
+  page.on("pageerror",error=>errors.push(error.message));
+  await begin(page,"melee");
+  const move=page.getByRole("button",{name:"Mover para direita"});
+  await expect(move).toBeVisible();
+  await move.dispatchEvent("pointerdown",{pointerId:37,pointerType:"touch"});
+  await page.waitForTimeout(150);
+  const running=await snapshot(page);
+  await move.dispatchEvent("pointerup",{pointerId:37,pointerType:"touch"});
+  await page.waitForTimeout(130);
+  const released=await snapshot(page);
+  expect(released.player.x).toBeGreaterThan(running.player.x-4);
+  expect(errors).toEqual([]);
+});
