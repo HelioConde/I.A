@@ -1,0 +1,171 @@
+name: Luna Original — Qwen Character Classes and Enemy AI
+on:
+  push:
+    branches:
+      - "lab/luna-classes-*"
+    paths:
+      - ".github/lab-requests/luna-classes-*.md"
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/repair_luna_game_class_ai.py"
+      - "tests/test_luna_game_class_ai.py"
+      - ".github/workflows/luna-class-ai-game.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: luna-classes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify source patch contract and genuine inference requirements
+        run: |
+          python -m compileall -q tools/repair_luna_game_class_ai.py
+          python -m unittest discover -s tests -p "test_luna_game_class_ai.py" -v
+
+  real-qwen:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-classes-')) }}
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-refine-raw-40647732624
+          run-id: 40647732624
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: results/luna-original-refined
+      - name: Install official hash-verified local model and CPU llama.cpp
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Let Qwen add authentic gameplay differentiation and prevent disappearing enemies
+        shell: pwsh
+        run: |
+          python tools/repair_luna_game_class_ai.py --retries 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Model failed the second-pass criteria, preserving INCOMPLETE report."
+            exit 0
+          }
+          exit $rc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luna-classes-raw-${{ github.run_id }}
+          path: results/luna-original-class-ai/
+          if-no-files-found: warn
+          retention-days: 30
+
+  stage-review-only:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-classes-')) }}
+    needs: real-qwen
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-classes-raw-${{ github.run_id }}
+          path: results/luna-original-class-ai
+      - name: Require authentic Qwen outputs and verify all three file hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          base=pathlib.Path('results/luna-original-class-ai')
+          r=json.loads((base/'provenance.json').read_text(encoding='utf-8'))
+          assert r['status']=='STATIC_REFINED_CANDIDATE',"Incomplete model game, no preview branch."
+          assert r['assistant_gameplay_code_used'] is False
+          assert r['patches_accepted']==2
+          for name in ('index.html','styles.css','game.js'):
+            assert hashlib.sha256((base/name).read_bytes()).hexdigest()==r['provenance_sha256'][name],name
+          print('Two genuine third-pass Qwen patches verified.')
+          PY
+          node --check results/luna-original-class-ai/game.js
+      - name: Stage authentic model source on private-to-main review branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/classes-review-${{ github.run_id }}"
+          mkdir -p site/luna-created
+          cp results/luna-original-class-ai/{index.html,styles.css,game.js,provenance.json} site/luna-created/
+          git add site/luna-created/
+          git -c user.name="Luna Qwen3-4B Verified Source" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): independent Qwen game with model-authored browser defect patches"
+          git push origin "luna/classes-review-${{ github.run_id }}"
+          echo "Review source staged, NOT deployed to GitHub Pages."
+
+  game-browser-qa:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-classes-')) }}
+    needs: stage-review-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-classes-raw-${{ github.run_id }}
+          path: results/luna-original-class-ai
+      - name: Run real Qwen game on loopback only
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory results/luna-original-class-ai > /tmp/luna-refined.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-refined.log
+          exit 1
+      - name: Install Chromium in disposable runner
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Play entire model-authored game to the final boss and victory
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luna-classes-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30

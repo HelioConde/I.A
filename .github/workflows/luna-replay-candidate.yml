@@ -1,0 +1,116 @@
+name: Luna Original — Replay Real Qwen Candidate in Browser
+# This does NOT generate new code. It checks the precise artifact generated
+# by actual Qwen inference in run 40636116071.
+on:
+  push:
+    branches:
+      - "lab/luna-replay-*"
+    paths:
+      - ".github/lab-requests/luna-replay-*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-and-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-original-raw-40636116071
+          run-id: 40636116071
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: results/luna-original-candidate
+      - name: Verify actual model provenance, normalize only Windows line endings
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path("results/luna-original-candidate")
+          report=json.loads((p/"provenance.json").read_text(encoding="utf-8"))
+          assert report["generation_complete"] is True
+          for name in ("index.html","styles.css","game.js"):
+              file=p/name
+              data=file.read_bytes()
+              normalized=data.replace(b"\r\n",b"\n")
+              assert hashlib.sha256(normalized).hexdigest()==report["provenance_sha256"][name],name
+              assert next(x for x in report['requests'] if x['file']==name)['accepted'] is True
+              file.write_bytes(normalized)
+              print("Verified genuine Qwen artifact",name,len(normalized))
+          report["transfer_normalization"]="CRLF to LF only, original Qwen source hashes match"
+          report["browser_test_executed"]=False
+          report["browser_test_passed"]=False
+          report["review_required"]=True
+          (p/"provenance.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+          PY
+          node --check results/luna-original-candidate/game.js
+      - name: Stage model authored files in review branch, never publish to Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/generated-review-40636116071"
+          mkdir -p site/luna-created
+          cp results/luna-original-candidate/{index.html,styles.css,game.js,provenance.json} site/luna-created/
+          git add site/luna-created/
+          git -c user.name="Qwen3-4B GameDev source" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): original Qwen game assets, not yet gameplay-verified"
+          git push origin "luna/generated-review-40636116071"
+          echo "Raw model-authored files staged in isolated review branch."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luna-original-normalized-${{ github.run_id }}
+          path: results/luna-original-candidate/
+          retention-days: 30
+
+  gameplay:
+    needs: audit-and-stage
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-original-normalized-${{ github.run_id }}
+          path: results/luna-original-candidate
+      - name: Install Chromium in the disposable test runner
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve Qwen-authored game only on localhost
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory results/luna-original-candidate > /tmp/luna-original-http.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-original-http.log
+          exit 1
+      - name: "Real end-to-end Chromium gameplay: menu through boss and victory"
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - name: Save screenshots and trace, especially on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-original-replay-qa-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30

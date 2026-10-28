@@ -1,0 +1,181 @@
+name: Luna Original — Generate Entire Game with Real Qwen
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-complete-*"
+    paths:
+      - ".github/lab-requests/luna-complete-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/generate_luna_original_game.py"
+      - "tests/test_luna_original_game.py"
+      - "site-tests/tests/luna-original.spec.js"
+      - "site-tests/playwright.luna-original.config.cjs"
+      - ".github/workflows/luna-complete-game.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-complete-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Prove generator has no canned game files and that strict rejection works
+        run: |
+          python -m compileall -q tools/generate_luna_original_game.py
+          python -m unittest discover -s tests -p "test_luna_original_game.py" -v
+          node --check site-tests/tests/luna-original.spec.js
+
+  qwen-author:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-complete-')) }}
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install official pinned 4B model and CPU runtime with verified digests
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Real Qwen authors HTML, CSS and full independent gameplay, no assistant fallback
+        shell: pwsh
+        run: |
+          python tools/generate_luna_original_game.py --model-file Qwen3-4B-Q4_K_M.gguf --retries 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "MODEL FAILED OR INCOMPLETE: honest negative result, do not present as completed."
+            exit 0
+          }
+          exit $rc
+      - name: Upload authentic model source and provenance for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-original-raw-${{ github.run_id }}
+          path: results/luna-original-candidate/
+          if-no-files-found: warn
+          retention-days: 30
+
+  browser-qa:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-complete-')) }}
+    needs: qwen-author
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-original-raw-${{ github.run_id }}
+          path: results/luna-original-candidate
+      - name: Gate - verify all game source came from the real Qwen model
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('results/luna-original-candidate')
+          report=json.loads((p/'provenance.json').read_text(encoding='utf-8'))
+          assert report.get('generation_complete') is True, "Luna did not generate a complete static candidate"
+          for name in ('index.html','styles.css','game.js'):
+              data=(p/name).read_bytes()
+              assert hashlib.sha256(data).hexdigest()==report['provenance_sha256'][name], name
+              assert next(x for x in report['requests'] if x['file']==name)['accepted'] is True
+          print('Verified 3/3 genuine Qwen source files, hash correct; now real browser QA')
+          PY
+          node --check results/luna-original-candidate/game.js
+      - name: Install headless Chromium for gameplay test
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve isolated Qwen-produced game on localhost
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory results/luna-original-candidate > /tmp/luna-original-http.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -f -s http://127.0.0.1:4811/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-original-http.log
+          exit 1
+      - name: Play actual Qwen game from selection to boss/victory without bypassing engine
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - name: Upload real gameplay trace and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-original-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  staged-candidate:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-complete-')) }}
+    needs: browser-qa
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-original-raw-${{ github.run_id }}
+          path: results/luna-original-candidate
+      - name: Stage independently authored candidate in a review branch, not main/Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/generated-complete-${{ github.run_id }}"
+          mkdir -p site/luna-created
+          cp results/luna-original-candidate/index.html site/luna-created/index.html
+          cp results/luna-original-candidate/styles.css site/luna-created/styles.css
+          cp results/luna-original-candidate/game.js site/luna-created/game.js
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('results/luna-original-candidate/provenance.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          d['gameplay_verified']=True
+          d['visual_verified']=False
+          d['review_required']=True
+          d['browser_run_id']="${{ github.run_id }}"
+          pathlib.Path('site/luna-created/provenance.json').write_text(json.dumps(d,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          PY
+          git add site/luna-created/
+          git -c user.name="Luna Qwen GameDev (verified model source)" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): three Qwen-authored files passed real browser QA"
+          git push origin "luna/generated-complete-${{ github.run_id }}"
+          echo "Candidate ready for HUMAN REVIEW: luna/generated-complete-${{ github.run_id }}"

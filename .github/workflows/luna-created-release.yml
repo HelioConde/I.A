@@ -1,0 +1,80 @@
+name: Luna Original — Full Game Provenance and Playable Release QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/luna-created/**"
+  push:
+    branches: [main]
+    paths:
+      - "site/luna-created/**"
+
+permissions:
+  contents: read
+concurrency:
+  group: luna-original-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run source provenance security regressions
+        run: python -m unittest discover -s tests -p "test_luna_published_source.py" -v
+      - name: Require exact authentic Qwen HTML CSS JS file hashes and identity
+        run: |
+          python tools/check_luna_published_source.py
+          node --check site/luna-created/game.js
+          grep -q 'src="game.js"' site/luna-created/index.html
+          grep -q 'href="styles.css"' site/luna-created/index.html
+
+  real-browser:
+    needs: source-proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Serve genuine published candidate without API or database
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory site/luna-created > /tmp/luna-release.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-release.log
+          exit 1
+      - name: Install real Chromium with pinned Playwright
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Verify playable game, hero choices, mobile clickability, boss and victory
+        working-directory: site-tests
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - name: Save proof of real interaction and mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-public-game-proof-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30

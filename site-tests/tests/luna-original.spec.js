@@ -1,0 +1,142 @@
+const {test,expect}=require("@playwright/test");
+async function snap(page){
+  return page.evaluate(()=>window.__LUNA_ORIGINAL_QA__?.snapshot?.()||null);
+}
+async function begin(page,archetype="melee"){
+  await page.goto("/");
+  await expect(page.locator("#game")).toBeVisible();
+  await page.locator("#hero").selectOption(archetype);
+  await page.locator("#start").click();
+  await expect.poll(async()=>(await snap(page))?.mode).not.toBe("menu");
+  const state=await snap(page);
+  expect(state?.player).toBeTruthy();
+  expect(Number.isFinite(state.player.x)).toBe(true);
+  expect(Number.isFinite(state.player.y)).toBe(true);
+  expect(Array.isArray(state.enemies)).toBe(true);
+  return state;
+}
+test("entire game is rendered with three selectable classes",async({page},info)=>{
+  const errors=[];page.on("pageerror",e=>errors.push(e.message));
+  await page.goto("/");
+  await expect(page.locator("#start")).toBeVisible();
+  for(const hero of ["melee","ranged","magic"]){
+    await expect(page.locator("#hero option[value='"+hero+"']")).toHaveCount(1);
+  }
+  await info.attach("luna-original-menu",{body:await page.screenshot(),contentType:"image/png"});
+  expect(errors).toEqual([]);
+});
+test("actual keyboard movement, jump, combat, and no console errors",async({page},info)=>{
+  const errors=[];page.on("pageerror",e=>errors.push(e.message));
+  const first=await begin(page,"melee");
+  await page.keyboard.down("ArrowRight");
+  await page.waitForTimeout(350);
+  await page.keyboard.up("ArrowRight");
+  const advanced=await snap(page);
+  expect(advanced.player.x).toBeGreaterThan(first.player.x+3);
+  const y=advanced.player.y;
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(100);
+  const afterJump=await snap(page);
+  expect(afterJump.player.y).toBeLessThan(y-2);
+  expect(afterJump.mode).toBe("game");
+  let damaged=false;
+  const startWave=afterJump.wave;
+  for(let step=0;step<75;step++){
+    const state=await snap(page);
+    if(state.wave>startWave){damaged=true;break}
+    const target=state.enemies.find(x=>x.hp>0);
+    if(!target){await page.waitForTimeout(80);continue}
+    const dx=target.x-state.player.x;
+    if(dx>75){
+      await page.keyboard.down("ArrowRight");await page.waitForTimeout(95);
+      await page.keyboard.up("ArrowRight");
+    }else if(dx< -20){
+      await page.keyboard.down("ArrowLeft");await page.waitForTimeout(90);
+      await page.keyboard.up("ArrowLeft");
+    }
+    const beforeHp=target.hp;
+    await page.keyboard.press("KeyZ");
+    await page.waitForTimeout(100);
+    const after=await snap(page);
+    if(after.wave>state.wave || after.enemies.some(e=>e.hp<beforeHp) ||
+       (after.enemies.length<state.enemies.length)){damaged=true;break}
+  }
+  expect(damaged,"An actual enemy must take damage or be defeated by real attacks").toBe(true);
+  await info.attach("luna-original-combat",{body:await page.screenshot(),contentType:"image/png"});
+  expect(errors).toEqual([]);
+});
+
+test("all three chosen classes have functional, distinct gameplay stats",async({page})=>{
+  const hp=[];
+  for(const cls of ["melee","ranged","magic"]){
+    const state=await begin(page,cls);
+    hp.push(state.player.hp);
+  }
+  expect(new Set(hp).size,"At least two classes must have different real HP stats").toBeGreaterThanOrEqual(2);
+});
+
+test("end-to-end: player can defeat three waves, boss, achieve victory and restart",async({page},info)=>{
+  test.setTimeout(135000);
+  const errors=[];page.on("pageerror",e=>errors.push(e.message));
+  await begin(page,"melee");
+  let winning=false;
+  for(let i=0;i<260;i++){
+    const state=await snap(page);
+    if(state.mode==="victory"){winning=true;break}
+    if(state.mode==="defeat")throw new Error("Qwen-generated game killed the player before victory");
+    const p=state.player;
+    const target=state.enemies.find(e=>e.hp>0);
+    if(target){
+      const distance=target.x-p.x;
+      if(distance>75){await page.keyboard.down("ArrowRight");await page.waitForTimeout(70);await page.keyboard.up("ArrowRight")}
+      else if(distance< -50){await page.keyboard.down("ArrowLeft");await page.waitForTimeout(70);await page.keyboard.up("ArrowLeft")}
+      await page.keyboard.press("KeyZ");
+    }else{
+      await page.keyboard.press("KeyZ");
+    }
+    await page.waitForTimeout(120);
+  }
+  expect(winning).toBe(true);
+  const state=await snap(page);
+  expect(state.wave).toBeGreaterThanOrEqual(3);
+  await info.attach("luna-original-victory",{body:await page.screenshot(),contentType:"image/png"});
+  await page.locator("#start").click();
+  const restarted=await snap(page);
+  expect(restarted.mode).not.toBe("victory");
+  expect(errors).toEqual([]);
+});
+test("mobile: interface readable and no sideways overflow",async({page},info)=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto("/");
+  await expect(page.locator("#game")).toBeVisible();
+  await expect(page.locator("#start")).toBeVisible();
+  const x=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+  expect(x).toBeLessThanOrEqual(2);
+  await info.attach("luna-original-mobile",{body:await page.screenshot({fullPage:true}),contentType:"image/png"});
+});
+
+
+test("visual usability: class selector and Start must not overlap each other or the canvas",async({page},info)=>{
+  for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const hero=page.locator("#hero"),start=page.locator("#start"),canvas=page.locator("#game");
+    await expect(hero).toBeVisible();
+    await expect(start).toBeVisible();
+    await expect(canvas).toBeVisible();
+    const rects=await Promise.all([hero,start,canvas].map(locator=>locator.boundingBox()));
+    expect(rects.every(Boolean)).toBe(true);
+    const overlap=(a,b)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*
+                          Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
+    expect(overlap(rects[0],rects[1]),"The hero select and Start button must be distinct clickable areas").toBe(0);
+    expect(overlap(rects[0],rects[2]),"The game canvas must not cover the class selector").toBe(0);
+    expect(overlap(rects[1],rects[2]),"The game canvas must not cover the Start button").toBe(0);
+    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(2);
+    await hero.click();
+    await hero.selectOption("ranged");
+    await start.click();
+    await expect.poll(async()=>(await snap(page))?.mode).not.toBe("menu");
+    await info.attach("luna-css-"+viewport.width,{body:await page.screenshot({fullPage:true}),contentType:"image/png"});
+  }
+});

@@ -1,0 +1,148 @@
+name: Luna Original — Qwen Repairs Its Own Game
+on:
+  push:
+    branches:
+      - "lab/luna-repair-*"
+    paths:
+      - ".github/lab-requests/luna-repair-*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: luna-repair-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  qwen-repair:
+    runs-on: windows-latest
+    timeout-minutes: 78
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-original-raw-40636116071
+          run-id: 40636116071
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: results/luna-original-candidate
+      - name: Install hash-pinned Qwen3 4B and CPU llama.cpp
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Qwen3-4B rewrites its own game after real Playwright movement/win defects
+        shell: pwsh
+        run: |
+          python tools/repair_luna_original_game.py --retries 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Honest incomplete repair. Never substitute assistant-authored game code."
+            exit 0
+          }
+          exit $rc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luna-game-repair-${{ github.run_id }}
+          path: results/luna-original-repair/
+          if-no-files-found: warn
+          retention-days: 30
+
+  stage-repair:
+    needs: qwen-repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-game-repair-${{ github.run_id }}
+          path: results/luna-original-repair
+      - name: Verify all three files are genuinely Qwen-authored with exact hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path("results/luna-original-repair")
+          x=json.loads((p/"provenance.json").read_text(encoding="utf-8"))
+          assert x["status"]=="STATIC_REPAIR_CANDIDATE"
+          assert x["source_model_verified"] is True
+          assert x["assistant_gameplay_code_used"] is False
+          for name in ("index.html","styles.css","game.js"):
+              assert hashlib.sha256((p/name).read_bytes()).hexdigest()==x["provenance_sha256"][name],name
+          print("Qwen original HTML/CSS and Qwen rewritten JS verified.")
+          PY
+          node --check results/luna-original-repair/game.js
+      - name: Stage game under isolated branch only, not public GitHub Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/generated-repair-${{ github.run_id }}"
+          mkdir -p site/luna-created
+          cp results/luna-original-repair/{index.html,styles.css,game.js,provenance.json} site/luna-created/
+          git add site/luna-created/
+          git -c user.name="Luna Qwen3-4B verified source" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): second all-Qwen game revision, gameplay QA pending"
+          git push origin "luna/generated-repair-${{ github.run_id }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luna-game-repair-checked-${{ github.run_id }}
+          path: results/luna-original-repair/
+          retention-days: 30
+
+  browser-test:
+    needs: stage-repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-game-repair-checked-${{ github.run_id }}
+          path: results/luna-original-repair
+      - name: Launch isolated actual model-generated game
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory results/luna-original-repair > /tmp/luna-qa.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-qa.log
+          exit 1
+      - name: Install real Chromium
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Require real movement, jump, combat, 3-wave boss victory and restart
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: luna-repair-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30

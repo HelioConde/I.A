@@ -1,0 +1,181 @@
+name: Luna GameDev — Real Qwen Small-Patch Repair
+on:
+  push:
+    branches:
+      - "lab/luna-targeted-*"
+    paths:
+      - ".github/lab-requests/luna-targeted-*.md"
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/repair_luna_original_targeted.py"
+      - "tests/test_luna_targeted_repair.py"
+      - ".github/workflows/luna-targeted-patches.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: luna-targeted-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run model-only patch orchestration tests
+        run: |
+          python -m compileall -q tools/repair_luna_original_targeted.py
+          python -m unittest discover -s tests -p "test_luna_targeted_repair.py" -v
+
+  native-qwen:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-targeted-')) }}
+    needs: regression
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-original-raw-40636116071
+          run-id: 40636116071
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: results/luna-original-candidate
+      - name: Install verified llama.cpp CPU and Qwen3-4B GGUF
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Ask real Qwen to write five targeted patches of its own game
+        shell: pwsh
+        run: |
+          python tools/repair_luna_original_targeted.py --attempts 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Qwen could not produce all game patches; preserving negative report."
+            exit 0
+          }
+          exit $rc
+      - name: Save model responses, patch provenance, and entire original candidate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-targeted-raw-${{ github.run_id }}
+          path: results/luna-original-targeted/
+          if-no-files-found: warn
+          retention-days: 30
+
+  browser:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-targeted-')) }}
+    needs: native-qwen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-targeted-raw-${{ github.run_id }}
+          path: results/luna-original-targeted
+      - name: Check SHA hashes and actual real-model provenance before any execution
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,json
+          base=pathlib.Path('results/luna-original-targeted')
+          report=json.loads((base/'provenance.json').read_text(encoding='utf-8'))
+          assert report['status']=='STATIC_PATCHED_CANDIDATE','The model failed to generate 5 valid patches'
+          assert report['patches_accepted']==5
+          assert report['assistant_gameplay_code_used'] is False
+          for name in ('index.html','styles.css','game.js'):
+              assert hashlib.sha256((base/name).read_bytes()).hexdigest()==report['provenance_sha256'][name],name
+          print('Validated 3 genuine Qwen files including 5 model-authored patches.')
+          PY
+          node --check results/luna-original-targeted/game.js
+      - name: Install headless Chromium in disposable runner
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve candidate on loopback only
+        shell: bash
+        run: |
+          python -m http.server 4811 --bind 127.0.0.1 --directory results/luna-original-targeted > /tmp/luna-targeted-http.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4811/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/luna-targeted-http.log
+          exit 1
+      - name: Prove movement, jumping, fighting, 3 waves, boss and restart with real keyboard
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4811
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - name: Retain game screenshots, trace and failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-targeted-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  stage-for-review:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-targeted-')) }}
+    needs: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-targeted-raw-${{ github.run_id }}
+          path: results/luna-original-targeted
+      - name: Stage only browser-approved genuine Qwen source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c "luna/targeted-complete-${{ github.run_id }}"
+          mkdir -p site/luna-created
+          cp results/luna-original-targeted/{index.html,styles.css,game.js} site/luna-created/
+          python - <<'PY'
+          import json,pathlib
+          src=pathlib.Path('results/luna-original-targeted/provenance.json')
+          obj=json.loads(src.read_text(encoding='utf-8'))
+          obj.update({'browser_test_executed':True,'browser_test_passed':True,
+                      'visual_verified':False,'human_review_required':True})
+          pathlib.Path('site/luna-created/provenance.json').write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          git add site/luna-created
+          git -c user.name="Luna Qwen3-4B Verified GameDev" -c user.email="actions@users.noreply.github.com" commit -m "candidate(luna): entirely Qwen-generated full game passed actual browser QA"
+          git push origin "luna/targeted-complete-${{ github.run_id }}"
+          echo "Review branch created. Public Pages not modified until separate approval."
