@@ -55,16 +55,16 @@ def assess_horizontal_movement(code: str) -> dict:
     # computed but never used to update velocity, and an unsolicited RAF loop.
     # They are only STATIC signals and can produce false positives.
     assigned_acceleration=bool(re.search(
-        r"\\b(?:accelerationX|accelX)\\b\\s*=",s,re.I))
+        r"\b(?:accelerationX|accelX)\b\s*=",s,re.I))
     velocity_accel_use=bool(re.search(
-        r"\\b(?:velocityX|vx|speedX)\\b\\s*(?:\\+\\=|\\-\\=|=)[^;\\n]*"
-        r"\\b(?:accelerationX|accelX|acceleration|accel|axis|direction|inputX)\\b",s,re.I))
+        r"\b(?:velocityX|vx|speedX)\b\s*(?:\+\=|\-\=|=)[^;\n]*"
+        r"\b(?:accelerationX|accelX|acceleration|accel|axis|direction|inputX)\b",s,re.I))
     unused_acceleration=assigned_acceleration and not velocity_accel_use
     unwanted_loop=bool(re.search(
-        r"\\b(?:requestAnimationFrame|setInterval|setTimeout|gameLoop)\\s*\\(",s,re.I))
-    unwanted_log=bool(re.search(r"\\bconsole\\s*\\.\\s*log\\s*\\(",s,re.I))
+        r"\b(?:requestAnimationFrame|setInterval|setTimeout|gameLoop)\s*\(",s,re.I))
+    unwanted_log=bool(re.search(r"\bconsole\s*\.\s*log\s*\(",s,re.I))
     frame_multiplier=bool(re.search(
-        r"\\b(?:velocityX|vx|speedX)\\b\\s*\\*=\\s*\\(?\\s*1\\s*-\\s*(?:friction|drag|damping)\\s*\\)?",s,re.I))
+        r"\b(?:velocityX|vx|speedX)\b\s*\*=\s*\(?\s*1\s*-\s*(?:friction|drag|damping)\s*\)?",s,re.I))
     # Recording blockers separately prevents a five-indicator rubric from
     # describing extra loops or unused acceleration as acceptable gameplay.
     blocking_issues=[]
