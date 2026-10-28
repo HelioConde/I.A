@@ -1,0 +1,52 @@
+{
+  "status": "STATIC_REFINED_CANDIDATE",
+  "created_utc": "2026-10-28T07:05:15.416838+00:00",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
+  "original_run": 40636116071,
+  "input_run": 40646692498,
+  "gameplay_verified": false,
+  "assistant_gameplay_code_used": false,
+  "benchmark": "Luna Genuine Model Self-Repair Patches v3",
+  "source_run": 40636116071,
+  "source_sha256": "7968e0d94d503abf75752d1cd4428a6cf773fadaf48a6f01ef6d06d41e09e442",
+  "tasks": [
+    {
+      "task": "prevent_space_default",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 175,
+          "candidate_excerpt": "document.addEventListener('keydown', (e) => {\n  if (e.code === 'Space' || e.code === 'ArrowLeft' || e.code === 'ArrowRight' || e.code === 'KeyZ') {\n    e.preventDefault();\n  }"
+        }
+      ]
+    },
+    {
+      "task": "nearest_enemy_target",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 51,
+          "candidate_excerpt": "attackTarget = enemies.find(e => e.hp > 0) || null;"
+        }
+      ]
+    }
+  ],
+  "patches_accepted": 2,
+  "required_patches": 2,
+  "model_only_patch_content": true,
+  "new_patch_count": 2,
+  "total_model_patches": 7,
+  "provenance_sha256": {
+    "index.html": "717e312fa0a7fc3c86da9433ff114a1189c82854a7d5db9755823ff6d69ee7a0",
+    "styles.css": "f8c3999cef0aa1b202bce4b6dfdeaf9f4216a82be3d99d0b2ac11a79d9ad8e6d",
+    "game.js": "4ffd218ba711a426273804f9bcd5f1a5c7c51088c3a068e6b2158ecbd03c2a33"
+  }
+}
