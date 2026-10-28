@@ -1,0 +1,122 @@
+name: Luna Action Lab — Regression and Real Qwen
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "smoke = fast synthetic tests, extended = broad synthetic tests on Linux/Windows, real-qwen = opt-in real CPU inference"
+        required: true
+        type: choice
+        default: smoke
+        options:
+          - smoke
+          - extended
+          - real-qwen
+  push:
+    branches:
+      - main
+      - "feat/luna-action-lab-*"
+      - "lab/luna-*"
+    paths:
+      - ".github/workflows/action-lab.yml"
+      - ".github/lab-requests/**"
+      - "tools/action_lab.py"
+      - "tests/**"
+      - "src/brain_ssd/**"
+      - "chat/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/action-lab.yml"
+      - ".github/lab-requests/**"
+      - "tools/action_lab.py"
+      - "tests/**"
+      - "src/brain_ssd/**"
+      - "chat/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-action-lab-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-linux:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.suite != 'real-qwen' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      LAB_SUITE: ${{ github.event_name == 'workflow_dispatch' && inputs.suite == 'extended' && 'extended' || 'smoke' }}
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check syntax and browser script
+        run: |
+          python -m compileall -q tools/action_lab.py src/brain_ssd/chat
+          node --check chat/app.js
+      - name: Run reproducible Brain-SSD checks
+        run: python tools/action_lab.py --suite "$LAB_SUITE" --report results/action_lab/report-linux.json
+      - name: Upload synthetic metrics (no user conversations)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-action-lab-synthetic-linux
+          path: results/action_lab/report-linux.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  synthetic-windows:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.suite == 'extended' }}
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Windows compatibility smoke, no GGUF
+        shell: pwsh
+        run: python tools/action_lab.py --suite smoke --report results/action_lab/report-windows.json
+      - name: Upload Windows synthetic metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-action-lab-synthetic-windows
+          path: results/action_lab/report-windows.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  real-qwen-windows:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.suite == 'real-qwen' }}
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned Qwen 0.6B and CPU llama.cpp (hash verified)
+        shell: pwsh
+        run: python tools/install_windows_chat.py --all
+      - name: Preflight CPU runtime and model
+        shell: pwsh
+        run: python tools/doctor_chat.py --profile economia --probe
+      - name: Validate genuine Qwen CPU response, not a static greeting
+        shell: pwsh
+        run: python tools/validate_chat_windows.py --profile economia
+      - name: Upload sanitized real inference metadata (no answers)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-action-lab-real-qwen-windows
+          path: results/chat_validation/latest-local-windows.json
+          if-no-files-found: warn
+          retention-days: 7
