@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
-from benchmark_luna_game_models import PROMPT,clean,syntax_valid,command
+from benchmark_luna_game_models import PROMPT,clean,syntax_valid,command,extract_llama_cli_source
 from install_ornith_game_model import MODEL_SHA256,MODEL_REVISION,MODEL_FILE,MODEL_URL
 GOOD="""const canvas=document.getElementById('game');const ctx=canvas.getContext('2d');
 const player={x:80,y:392,hp:100},enemies=[{x:410,hp:3}],mode='game';
@@ -25,6 +25,15 @@ class ModelTests(unittest.TestCase):
     with self.assertRaises(ValueError):
       clean("<think>incomplete"+GOOD)
     self.assertFalse(syntax_valid(GOOD+"\nconst broken={"))
+  def test_real_llama_cpp_interactive_output_is_not_javascript(self):
+    raw=("\nLoading model...\n\naa\nbuild : b1-abcd\n\n> Você é Luna ... (truncated)\n"
+         +GOOD+"\n\n[ Prompt: 22.8 t/s | Generation: 8.3 t/s ]\n\n> \n\nExiting...\n")
+    self.assertEqual(extract_llama_cli_source(raw),GOOD)
+    self.assertEqual(clean(raw),GOOD+"\n")
+    with self.assertRaisesRegex(ValueError,"cli_output_delimiter_not_found"):
+      clean("Loading model...banner with no prompt delimiter")
+    self.assertNotIn("Prompt:",clean(raw))
+
   def test_cli(self):
     args=command(Path("/tmp/llama-cli"),Path("/tmp/model.gguf"),PROMPT,900)
     self.assertIn("--no-warmup",args)
