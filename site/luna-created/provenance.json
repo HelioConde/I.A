@@ -1,0 +1,67 @@
+{
+  "status": "STATIC_REFINED_CANDIDATE",
+  "created_utc": "2026-10-28T07:20:01.907441+00:00",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
+  "original_run": 40636116071,
+  "input_run": 40648093762,
+  "gameplay_verified": false,
+  "assistant_gameplay_code_used": false,
+  "benchmark": "Luna Genuine Model Self-Repair Patches v3",
+  "source_run": 40636116071,
+  "source_sha256": "88f7f344fa7df215b845e71019ae0a4bf77d93605cdedb752d22a6d0c84fd825",
+  "tasks": [
+    {
+      "task": "repair_range_melee",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 18,
+          "candidate_excerpt": "attackRange = 100;"
+        }
+      ]
+    },
+    {
+      "task": "repair_range_ranged",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 18,
+          "candidate_excerpt": "attackRange = 180;"
+        }
+      ]
+    },
+    {
+      "task": "repair_range_magic",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 18,
+          "candidate_excerpt": "attackRange = 167;"
+        }
+      ]
+    }
+  ],
+  "patches_accepted": 3,
+  "required_patches": 3,
+  "model_only_patch_content": true,
+  "new_patch_count": 3,
+  "total_model_patches": 12,
+  "patch_stage": "class_combat_range_balance",
+  "provenance_sha256": {
+    "index.html": "717e312fa0a7fc3c86da9433ff114a1189c82854a7d5db9755823ff6d69ee7a0",
+    "styles.css": "f8c3999cef0aa1b202bce4b6dfdeaf9f4216a82be3d99d0b2ac11a79d9ad8e6d",
+    "game.js": "bb213ddb4d6a476f5b1b0259b560f2c2f24a42e5aefa94effee555d49e081007"
+  }
+}
