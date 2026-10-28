@@ -9,6 +9,8 @@ on:
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
       - "experiments/luna-forge-zero/inventory_local_data.py"
+      - "experiments/luna-forge-zero/analyze_local_lua.py"
+      - "tests/test_luna_local_lua_audit.py"
       - "tests/test_luna_local_inventory.py"
       - ".github/workflows/luna-forge-windows-local.yml"
   pull_request:
@@ -18,6 +20,8 @@ on:
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
       - "experiments/luna-forge-zero/inventory_local_data.py"
+      - "experiments/luna-forge-zero/analyze_local_lua.py"
+      - "tests/test_luna_local_lua_audit.py"
       - "tests/test_luna_local_inventory.py"
       - ".github/workflows/luna-forge-windows-local.yml"
   workflow_dispatch:
@@ -52,6 +56,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_local_inventory.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test privacy-preserving Lua format audit
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_lua_audit.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise installer without starting training
         shell: cmd
