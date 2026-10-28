@@ -19,7 +19,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate parser and authenticity checks without model downloads
+        run: |
+          python -m compileall -q tools/replay_luna_attack_patches.py
+          python -m unittest discover -s tests -p "test_luna_cli_answer_parser.py" -v
+          python -m unittest discover -s tests -p "test_luna_attack_model_patch.py" -v
+
   source-and-browser:
+    needs: contract
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-attack-replay-')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 24
     strategy:
