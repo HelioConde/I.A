@@ -40,6 +40,12 @@ O jogo da Luna será testável em `https://helioconde.github.io/I.A/luna-created
 
 **Nenhuma versão pública final da Luna foi aprovada nesta primeira avaliação.** A meta exige testes verdes e revisão humana antes de publicação.
 
+## Segunda tentativa — reescrita integral recusada
+
+- [Autorreparo real do Qwen3-4B, run 40637251344](https://github.com/HelioConde/I.A/actions/runs/40637251344): o runtime retornou erro nas **duas solicitações** de gerar novamente todo o `game.js`; não houve nova versão válida. Estado honesto: `INCOMPLETE`.
+- O job seguinte foi corretamente bloqueado por ausência do jogo reparado; nenhum arquivo do ChatGPT substituiu a saída do modelo.
+- Nova estratégia: [`repair_luna_original_targeted.py`](../tools/repair_luna_original_targeted.py) divide o problema em cinco patches pequenos que devem ser todos produzidos pela inferência real do Qwen e compilar individualmente; um jogo incompleto não será publicado como aprovado.
+
 ## Estado atual e próximos passos
 
 A infraestrutura de geração, registro de autoria e teste está implementada, mas **o resultado do modelo será registrado somente depois da execução real**. Se a geração ou os testes falharem, atualizar este documento com execução identificada e causas, mantendo a meta aberta.
