@@ -55,6 +55,18 @@ Depois, o modo GameDev pode selecionar o GGUF correto, **somente se o modelo e o
 
 No caminho Ornith, o script usa o CLI atualizado e separa automaticamente cabeçalho/prompt/estatísticas dos bytes gerados; no fallback Qwen3-4B preserva a inferência já validada. Não alterar os modelos do chat comum.
 
+### Preparação em um único comando
+
+No Windows, basta entrar na pasta do projeto e executar:
+
+    py tools/setup_luna_gamedev_v4.py --confirm-download
+
+O script checa espaço livre, obtém o llama.cpp b11946 e o GGUF Ornith Q4 por SHA oficial, sem sobrescrever modelos existentes. Sem a flag, é apenas simulação. Para executar um desafio de programação após instalar:
+
+    py tools/run_game_agent_v3_windows.py --model-file auto --attempts 2 --save-draft
+
+**A instalação não foi executada diretamente no seu Windows por esta conversa**; os arquivos e a rotina foram colocados no GitHub e testados em runners do GitHub Actions.
+
 ## Benchmark comparativo de código de jogo
 
 Workflow: [Luna GameDev — Ornith 9B vs Qwen 4B Real Coding Trial](../.github/workflows/luna-ornith-game-benchmark.yml). Usa o **mesmo prompt** e critérios nos dois modelos GGUF reais:
