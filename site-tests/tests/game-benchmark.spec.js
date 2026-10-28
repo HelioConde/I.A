@@ -95,9 +95,10 @@ test("UX: render responsive menus without JS errors or page overflow", async ({ 
 
 
 test("real mission: fight creatures, traverse three regions and defeat the boss", async ({page}, testInfo) => {
-  test.setTimeout(90000);
-  await begin(page, "melee");
-  await testInfo.attach("real-gameplay", {body: await page.screenshot(), contentType:"image/png"});
+  test.setTimeout(180000);
+  for (const archetype of ["melee","ranged","magic"]) {
+  await begin(page, archetype);
+  await testInfo.attach("real-gameplay-"+archetype, {body: await page.screenshot(), contentType:"image/png"});
   for (let room=1; room<=3; room++) {
     const started=Date.now();
     let actions=0;
@@ -140,10 +141,11 @@ test("real mission: fight creatures, traverse three regions and defeat the boss"
       expect(after.enemies).toHaveLength(0);
       expect(after.score).toBeGreaterThan(0);
       await expect(page.getByText("O vale foi salvo")).toBeVisible();
-      await testInfo.attach("real-victory", {body: await page.screenshot(),contentType:"image/png"});
+      await testInfo.attach("real-victory-"+archetype, {body: await page.screenshot(),contentType:"image/png"});
       await page.getByRole("button",{name:/Jogar novamente/}).click();
       await expect.poll(async ()=>(await snapshot(page))?.stage).toBe(1);
       await expect.poll(async ()=>(await snapshot(page))?.mode).toBe("dungeon");
     }
+  }
   }
 });
