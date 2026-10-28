@@ -11,6 +11,7 @@ on:
       - "experiments/luna-forge-zero/train_private_lua.py"
       - "experiments/luna-forge-zero/preview_private_lua.py"
       - "tests/test_luna_private_lua_training.py"
+      - "tests/test_luna_private_lua_training_runtime.py"
       - "experiments/luna-forge-zero/luna_coder_ollama.py"
       - "experiments/luna-forge-zero/luna_core_qa.py"
       - "tests/test_luna_core_qa.py"
@@ -33,6 +34,7 @@ on:
       - "experiments/luna-forge-zero/train_private_lua.py"
       - "experiments/luna-forge-zero/preview_private_lua.py"
       - "tests/test_luna_private_lua_training.py"
+      - "tests/test_luna_private_lua_training_runtime.py"
       - "experiments/luna-forge-zero/luna_coder_ollama.py"
       - "experiments/luna-forge-zero/luna_core_qa.py"
       - "tests/test_luna_core_qa.py"
@@ -113,6 +115,12 @@ jobs:
         shell: cmd
         run: |
           call experiments\luna-forge-zero\INSTALAR-LUNA-FORGE.cmd -SkipInitialTraining
+      - name: Train synthetic Lua MiniCoder on actual CPU (no private game data)
+        shell: pwsh
+        run: |
+          $py = "experiments/luna-forge-zero/.venv/Scripts/python.exe"
+          & $py -m unittest discover -s tests -p test_luna_private_lua_training_runtime.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Check Brain-SSD pages and model status
         shell: pwsh
         run: |
