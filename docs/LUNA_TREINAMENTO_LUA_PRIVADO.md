@@ -220,3 +220,40 @@ $py=Join-Path $lab ".venv\Scripts\python.exe"
 ~~~
 
 Alternativa: opcao 15 do menu. A MiniCoder continua um modelo pequeno, de apenas 116480 parametros e janela de 128 caracteres. Estruturas lexicais nao comprovam sintaxe Lua valida nem gameplay. As tarefas sem resposta servem apenas para acompanhar a qualidade das amostras ao longo do tempo; nao substituem benchmark funcional. O treino futuro deve usar somente codigo original ou licenciado.
+
+
+## Resultado real de codigo gerado pela MiniCoder V0: 0/3 (28/10/2026)
+
+O usuario executou o benchmark das 3 tarefas originais nao treinadas com o checkpoint local-candidate-20261028-163736-598275, SHA256 7fe42029097858e599be160f60f3fa5212dc24037c767b23242872eafa5fa3fb:
+- boss_attack_phases: texto incoerente, sem function, end ou return;
+- enemy_line_of_sight: texto incoerente, sem assinatura de funcao;
+- one_way_platform: texto incoerente, sem assinatura de funcao;
+- function_signature_heuristic_count 0/3;
+- Lua syntax e gameplay NOT_TESTED; nenhuma prova de codigo valido; modelo nao promovido.
+
+A causa provavel e uma combinacao: **apenas ~116 mil parametros e 128 caracteres de contexto**, apenas 180 passos de treino misturando codigos JS/Godot/Lua e poucos exemplos originais Lua. O teste nao mede uma taxa de sucesso real de jogos; ele demonstra apenas que os 3 resultados nao continham estrutura minima de funcao Lua.
+
+### Luna Lua V2 - experimento de aprendizagem do ZERO com codigo original
+
+O novo train_original_lua_v2.py usa somente as **6 funcoes Lua originais** de original_lua_gameplay.lua, ja presentes no repositorio. Nao le Elsword nem arquivos comerciais. Ele usa a classe LunaMiniCoder com nova configuracao, janela de 256 caracteres, largura 128, 4 camadas, 4 cabecas e inicializacao aleatoria. Treina 24 exemplos (6 mecanicas x 4 formulacoes), com perda aplicada somente a continuacao de codigo, em vez de gastar a maioria dos passos prevendo o texto dos prompts. Tambem alterna janelas alinhadas ao inicio da tarefa e segmentos internos das funcoes.
+
+- O treino gera pesos NOVOS, em external_data/lua-v2-... ignorado pelo git, e nunca altera o checkpoint V0;
+- O codigo e somente original Luna; modelos pretreinados Qwen/Ollama nao entram;
+- A metrica de treino e previsao de caracteres em exemplos vistos: ela **nao prova generalizacao**;
+- O benchmark_original_lua_v2.py repete os 3 desafios originais holdout, sem respostas no treino, mede apenas padroes lexicais, NUNCA executa o codigo gerado;
+- O experimento pode continuar produzindo texto incoerente. Com so seis referencias, risco forte de memorizacao; e necessario corpus original maior e testes de sintaxe/funcionalidade para evoluir.
+
+No Windows, atualizar a branch e usar menu **16** para iniciar 600 passos ou **17** para avaliar V2 depois do treino. Via PowerShell:
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+if ($LASTEXITCODE -ne 0) { throw "Falha no git pull" }
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\train_original_lua_v2.py" --steps 600 --batch 4 --threads 4
+if ($LASTEXITCODE -ne 0) { throw "Falha ao treinar a Luna V2" }
+& $py "$lab\benchmark_original_lua_v2.py"
+~~~
+
+A avaliacao so deve ser interpretada comparativamente com a baseline V0 do usuario, de 0/3 assinaturas detectadas. O modelo V2 nao substitui a Luna atual automaticamente e nao pretende recriar um jogo comercial.
