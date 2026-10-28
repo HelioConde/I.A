@@ -7,6 +7,10 @@ on:
     paths:
       - "experiments/luna-forge-zero/github_corpus.py"
       - "experiments/luna-forge-zero/train_github.py"
+      - "experiments/luna-forge-zero/action_platform_curriculum.json"
+      - "experiments/luna-forge-zero/grandchase_research_catalog.json"
+      - "experiments/luna-forge-zero/grandchase_reference_gate.py"
+      - "tests/test_luna_grandchase_references.py"
       - "experiments/luna-forge-zero/evaluate_github_codegen.py"
       - "experiments/luna-forge-zero/luna_codegen_model.py"
       - "tests/test_luna_github_corpus.py"
@@ -27,6 +31,10 @@ jobs:
           python-version: "3.12"
       - name: Offline license and provenance tests
         run: python -m unittest discover -s tests -p test_luna_github_corpus.py -v
+      - name: Verify Grand Chase reference policy and original lessons
+        run: |
+          python -m unittest discover -s tests -p test_luna_grandchase_references.py -v
+          python experiments/luna-forge-zero/grandchase_reference_gate.py audit
       - name: Download only pinned MIT-licensed code (no asset files)
         run: |
           cd experiments/luna-forge-zero
@@ -37,7 +45,7 @@ jobs:
       - name: Train tiny MiniCoder from random weights on external game code
         run: |
           cd experiments/luna-forge-zero
-          python train_github.py --data external_data --out external_data/model_candidate --steps 180 --batch 12 --threads 2
+          python train_github.py --data external_data --out external_data/model_candidate --curriculum action_platform_curriculum.json --steps 180 --batch 12 --threads 2
       - name: Evaluate candidate JS syntax without running game code
         run: |
           cd experiments/luna-forge-zero
@@ -50,6 +58,8 @@ jobs:
           r=json.loads((d/'report.json').read_text())
           assert hashlib.sha256((d/'weights.pt').read_bytes()).hexdigest()==r['weights_sha256']
           assert not r['promotion_allowed']
+          assert r['grandchase_raw_repositories_in_training']==0
+          assert r['original_curriculum_examples']==8
           assert len(r['origin_repositories'])>=3
           assert len(r['heldout_repositories'])>=1
           print('Source checkpoints and heldout verified:',r['holdout_next_char_loss_before'],r['holdout_next_char_loss_after'])
