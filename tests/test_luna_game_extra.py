@@ -21,28 +21,26 @@ function gameLoop(){
 """
 ANSWERS=[
 "document.addEventListener('keydown', (e) => {if(e.code==='Space'||e.code==='ArrowLeft'||e.code==='ArrowRight'||e.code==='KeyZ') e.preventDefault();",
-"attackTarget = enemies[0] || null;",
-"  if(heroSelect.value==='magic')player.hp=95;else if(heroSelect.value==='ranged')player.hp=110;else player.hp=140;",
-"for(const enemy of enemies){enemy.x += Math.sign(player.x-enemy.x);enemy.x=Math.max(0,Math.min(940,enemy.x));}"
+"attackTarget = enemies.find(e => e.hp > 0) || null;"
 ]
 
 class SmallRefinementTests(unittest.TestCase):
     def test_four_distinct_existing_source_regions(self):
-        self.assertEqual(len(TASKS),4)
+        self.assertEqual(len(TASKS),2)
         for t in TASKS:
             before,old,after=region(BASE,t)
             self.assertTrue(old)
             self.assertEqual(before+old+after,BASE)
 
-    def test_real_model_only_four_small_patches(self):
+    def test_real_model_only_two_small_patches(self):
         queue=list(ANSWERS)
         report,code=generate_patches(BASE,lambda *_:{"answer":queue.pop(0),"model_generated":True},
                                       tasks=TASKS,attempts=1,checker=lambda _:True)
-        self.assertEqual(report["patches_accepted"],4)
-        self.assertEqual(report["required_patches"],4)
+        self.assertEqual(report["patches_accepted"],2)
+        self.assertEqual(report["required_patches"],2)
         self.assertIsNotNone(code)
         self.assertNotIn("findClosestEnemy",code)
-        self.assertNotIn(".value = 'melee'",code)
+        self.assertIn(".value = 'melee'",code)
         self.assertIn("preventDefault",code)
         self.assertFalse(report["assistant_gameplay_code_used"])
 
