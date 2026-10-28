@@ -138,7 +138,7 @@ def main()->int:
         if args.model_file!=MODEL_FILENAME or not verified_file(model_path,sha256=MODEL_SHA256):
             raise ValueError("Model must be authentic pinned Qwen3-4B.")
         provenance=json.loads((ORIGINAL/"provenance.json").read_text(encoding="utf-8"))
-        source_bytes=(ORIGINAL/"game.js").read_bytes()
+        source_bytes=(ORIGINAL/"game.js").read_bytes().replace(b"\r\n",b"\n")
         if digest(source_bytes)!=provenance["files"]["game.js"]["sha256"]:
             raise ValueError("Original independently authored game source mismatch.")
         from brain_ssd.chat.runtime import LocalChatRuntime
@@ -162,6 +162,7 @@ def main()->int:
         return 1
     except Exception as exc:
         result["error_type"]=type(exc).__name__
+        result["error_reason"]=str(exc)[:180]
         return 2
     finally:
         if engine is not None:engine.close()
