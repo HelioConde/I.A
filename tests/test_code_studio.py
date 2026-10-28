@@ -137,5 +137,59 @@ class CodeStudioTests(unittest.TestCase):
             make_prompt(brief, "not-a-stage")
 
 
+    def test_game_dev_engine_contracts_and_stage_prompt(self):
+        from brain_ssd.chat.game_dev import GAME_ENGINES, engine_profile, engine_prompt
+        from tools.code_studio import make_prompt
+        brief = json.loads((ROOT / "benchmarks/arcade_s1/brief.json").read_text(encoding="utf-8"))
+        self.assertEqual(set(GAME_ENGINES), {"web2d", "godot4"})
+        web = make_prompt(brief, "s1-movement", engine="web2d")
+        godot = make_prompt(brief, "s1-movement", engine="godot4")
+        self.assertIn("Canvas", web)
+        self.assertIn("Godot 4", godot)
+        self.assertIn("CharacterBody2D", godot)
+        self.assertIn("saltar", godot)
+        self.assertNotEqual(web, godot)
+        self.assertEqual(engine_profile("godot4")["entrypoint"], "project.godot")
+        self.assertIn("não", engine_prompt("godot4").casefold())
+        with self.assertRaises(ValueError):
+            engine_profile("unity")
+
+    def test_godot_proposal_requires_scene_header_and_human_approval(self):
+        from brain_ssd.chat.code_studio import review_proposal
+        data = example([
+            {"path": "project.godot", "content": 'config_version=5\n'},
+            {"path": "scenes/arena.tscn", "content": '[gd_scene format=3]\n[node name="Arena" type="Node2D"]\n'},
+            {"path": "scripts/player.gd", "content": "extends CharacterBody2D\n"},
+        ])
+        self.assertEqual(review_proposal(data)["status"], "READY_FOR_HUMAN_REVIEW")
+        self.assertIn("Godot 4", review_proposal(data)["files"][1]["suggestions"][0])
+        bad = example([{"path": "scenes/arena.tscn", "content": "[node name='no_header']"}])
+        self.assertEqual(review_proposal(bad)["status"], "BLOCKED")
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaises(PermissionError):
+                apply_new_files(data, Path(root))
+
+    def test_game_plan_never_claims_generated_gameplay_or_test_results(self):
+        from brain_ssd.chat.game_dev import build_game_plan
+        brief = json.loads((ROOT / "benchmarks/arcade_s1/brief.json").read_text(encoding="utf-8"))
+        plan = build_game_plan(brief, "web2d")
+        self.assertEqual(plan["project"], "Luna Arcade S1")
+        self.assertEqual(plan["status"], "PLANNED_NOT_BUILT")
+        self.assertEqual(plan["engine"], "web2d")
+        self.assertIsNone(plan["score"])
+        self.assertFalse(plan["tests_executed"])
+        self.assertFalse(plan["gameplay_verified"])
+        self.assertEqual(len(plan["stages"]), len(brief["stages"]))
+        self.assertTrue(all(stage["status"] == "NOT_STARTED" and not stage["evidence"] for stage in plan["stages"]))
+        self.assertTrue(all(gate["status"] == "NOT_TESTED" for gate in plan["release_gates"]))
+        self.assertEqual(build_game_plan(brief, "godot4")["engine"], "godot4")
+        with self.assertRaises(ValueError):
+            build_game_plan({"benchmark_version": 1, "stages": []}, "web2d")
+        corrupt = dict(brief)
+        corrupt["scoring"] = {"gameplay": 101}
+        with self.assertRaises(ValueError):
+            build_game_plan(corrupt, "web2d")
+
+
 if __name__ == "__main__":
     unittest.main()
