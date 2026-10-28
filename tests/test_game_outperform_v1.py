@@ -19,10 +19,11 @@ SOURCE="(()=>{'use strict';const code='ArrowRight';"+BUGGY_LINE+"})();"
 
 
 class OutperformTests(unittest.TestCase):
-    def test_real_reference_has_known_bug_initially(self):
+    def test_reference_contains_exact_model_authored_patch_after_review(self):
         reference=(ROOT/"site"/"arcade"/"game.js").read_text(encoding="utf-8")
-        self.assertEqual(reference.count(BUGGY_LINE),1)
-        self.assertIn("touchDown=false",reference)
+        self.assertEqual(reference.count(BUGGY_LINE),0)
+        self.assertEqual(reference.count(GOOD),1)
+        self.assertNotIn("touchDown=false",reference)
 
     def test_bounded_task_contains_real_input_and_requires_unchanged_input_cleanup(self):
         self.assertIn(BUGGY_LINE,TASK)
