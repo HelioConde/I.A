@@ -66,7 +66,7 @@ def main():
                 code(prompt)
         elif option=="4":
             confirm=input("Confirmar treinamento com MIT + Lua original (sem Grand Chase)? Digite SIM: ").strip()
-            if confirm=="SIM": train_external()
+            if confirm.upper()=="SIM": train_external()
             else: print("Cancelado.")
         elif option=="5":
             default_folder=Path.home()/"Documents"/"grand chase files"
