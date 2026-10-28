@@ -39,8 +39,29 @@ def sha(path:Path)->str:
             h.update(chunk)
     return h.hexdigest()
 
+def extract_llama_cli_source(raw:str)->str:
+    """Strip llama.cpp interactive UI, prompt echo and perf footer.
+
+    Recent llama-cli emits a banner, a shortened copy of our prompt and
+    performance statistics even with --simple-io. Those bytes are NOT model
+    output, and feeding them to node creates false syntax failures.
+    Do not change actual model code or repair it during extraction.
+    """
+    marker=re.search(r"\n> [^\n]*\.\.\. \(truncated\)\s*\n",raw)
+    if marker:
+        text=raw[marker.end():]
+    elif "Loading model..." in raw:
+        raise ValueError("cli_output_delimiter_not_found")
+    else:
+        return raw.strip()
+    perf=re.search(r"\n\[ Prompt:\s*[\d.]+ t/s\s*\|\s*Generation:",text)
+    if perf:
+        text=text[:perf.start()]
+    return text.strip()
+
+
 def clean(raw:str)->str:
-    text=raw.strip()
+    text=extract_llama_cli_source(raw)
     text=re.sub(r"^<think>.*?</think>\s*","",text,flags=re.I|re.S)
     if "<think>" in text or "</think>" in text:
         raise ValueError("incomplete_reasoning")
