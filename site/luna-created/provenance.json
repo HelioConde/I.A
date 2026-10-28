@@ -1,0 +1,53 @@
+{
+  "status": "STATIC_REFINED_CANDIDATE",
+  "created_utc": "2026-10-28T07:08:51.291824+00:00",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
+  "original_run": 40636116071,
+  "input_run": 40647732624,
+  "gameplay_verified": false,
+  "assistant_gameplay_code_used": false,
+  "benchmark": "Luna Genuine Model Self-Repair Patches v3",
+  "source_run": 40636116071,
+  "source_sha256": "4ffd218ba711a426273804f9bcd5f1a5c7c51088c3a068e6b2158ecbd03c2a33",
+  "tasks": [
+    {
+      "task": "respect_selected_class",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 248,
+          "candidate_excerpt": "const heroType = heroSelect.value;\nif (heroType === 'melee') {\n  player.hp = 100;\n  attackRange = 1;\n} else if (heroType === 'ranged') {\n  player.hp = 80;\n  attackRange = 3;\n} else if (heroType === 'magic') {\n  player.hp = 120;\n  attackRange = 0;\n}"
+        }
+      ]
+    },
+    {
+      "task": "keep_enemies_in_arena",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "model_generated": true,
+          "accepted": true,
+          "reason": "static_patch_candidate",
+          "answer_chars": 230,
+          "candidate_excerpt": "// Enemy movement\n    for (let i = 0; i < enemies.length; i++) {\n      const enemy = enemies[i];\n      enemy.x += Math.sign(player.x - enemy.x) * 1;\n      if (enemy.x < 0) enemy.x = 0;\n      if (enemy.x > 940) enemy.x = 940;\n    }"
+        }
+      ]
+    }
+  ],
+  "patches_accepted": 2,
+  "required_patches": 2,
+  "model_only_patch_content": true,
+  "new_patch_count": 2,
+  "total_model_patches": 9,
+  "patch_stage": "classes_and_enemy_behavior",
+  "provenance_sha256": {
+    "index.html": "717e312fa0a7fc3c86da9433ff114a1189c82854a7d5db9755823ff6d69ee7a0",
+    "styles.css": "f8c3999cef0aa1b202bce4b6dfdeaf9f4216a82be3d99d0b2ac11a79d9ad8e6d",
+    "game.js": "88f7f344fa7df215b845e71019ae0a4bf77d93605cdedb752d22a6d0c84fd825"
+  }
+}
