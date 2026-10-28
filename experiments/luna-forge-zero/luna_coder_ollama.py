@@ -114,12 +114,30 @@ def generate(task: str, model: str=DEFAULT_MODEL, repair: bool=True) -> dict:
         raise LocalModelError(
             f"Model {model} missing in Ollama. Run: ollama pull {model}. Installed: {available[:8]}"
         )
+    movement_task=core_review(task,"")["task_type"]=="horizontal_movement"
+    movement_contract=(
+        "\nREQUIRED game-movement contract: return exactly ONE pure function "
+        "named moveHorizontal(character, axis, deltaTime, options). "
+        "axis is signed input -1/0/1 (left/idle/right); deltaTime is seconds. "
+        "character has numeric positionX and velocityX. options contains "
+        "acceleration (px/s^2), friction (px/s^2), maxSpeed (px/s). "
+        "Modify velocityX using signed input and acceleration * deltaTime; "
+        "when axis is zero, approach velocityX toward zero by friction * "
+        "deltaTime without reversing its sign; clamp velocityX between "
+        "-maxSpeed and +maxSpeed; update positionX += velocityX * deltaTime. "
+        "Return character. No time-step multiplication on an acceleration "
+        "PROPERTY without using it to change velocity. "
+        "NO requestAnimationFrame, gameLoop, updateCharacter, sample usage, "
+        "console.log, globals or other top-level statements. "
+        "DO NOT create your own render loop. Use only requested function."
+    ) if movement_task else ""
     messages=[
         {"role":"system","content":SYSTEM},
         {"role":"user","content":(
             "Task: "+task.strip()+
             "\nLanguage: JavaScript ES2020. Return complete implementation, "
             "not continuation. No external imports. Close every bracket."
+            + movement_contract
         )},
     ]
     initial=extract_code(chat(model,messages))
@@ -148,16 +166,18 @@ def generate(task: str, model: str=DEFAULT_MODEL, repair: bool=True) -> dict:
         attempts=2
     elif repair and checked["status"]=="pass" and quality["task_type"]=="horizontal_movement":
         issues=quality["rubric"].get("issues_to_review",[])
-        if issues:
+        blockers=quality["rubric"].get("blocking_issues",[])
+        if issues or blockers:
             messages.extend([
                 {"role":"assistant","content":initial[:9000]},
                 {"role":"user","content":(
                     "Luna Core found missing movement requirements (these are "
                     "STATIC indicators, not proof of behavior):\n"+
-                    "\n".join("- "+item for item in issues)+
-                    "\nRevise the full function: accept signed left/right input, "
-                    "handle neutral input and delta-time-scaled deceleration, "
-                    "clamp negative and positive max speed. Return ONLY complete JavaScript."
+                    "\n".join("- "+item for item in issues+blockers)+
+                    "\nRevise exactly ONE pure function moveHorizontal(character, axis, deltaTime, options). "
+                    "Ensure acceleration alters velocityX, deltaTime-scaled friction stops without sign reversal, "
+                    "signed left/right input, and symmetric max speed. "
+                    "No animation loop, examples, console, or globals. Return ONLY complete JavaScript."
                 )},
             ])
             candidate=extract_code(chat(model,messages))
@@ -169,7 +189,10 @@ def generate(task: str, model: str=DEFAULT_MODEL, repair: bool=True) -> dict:
             # parsing OR does not increase the count of expected indicators.
             before=quality["rubric"]["indicators_detected"]
             after=next_quality["rubric"]["indicators_detected"]
-            if next_syntax["status"]=="pass" and after>before:
+            before_block=quality["rubric"].get("blocking_issue_count",0)
+            after_block=next_quality["rubric"].get("blocking_issue_count",0)
+            is_better=(after_block<before_block and after>=before-1) or (after_block==before_block and after>before)
+            if next_syntax["status"]=="pass" and is_better:
                 code,checked,quality=candidate,next_syntax,next_quality
     return {
         "backend":"ollama-local-pretrained-coder","model":model,"task":task.strip(),
