@@ -32,7 +32,7 @@ Artifacts são retidos por 14 dias no modo sintético e por 7 dias no Qwen real.
 
 O conector GitHub usado nesta conversa permite criar branches, commits, PRs e ler execuções/relatórios, mas não disponibiliza um comando de `workflow_dispatch`. Por isso o assistente pode acionar uma verificação **smoke** criando uma branch nova `lab/luna-<identificador>` baseada na `main` e um arquivo marcador inofensivo em `.github/lab-requests/<identificador>.md`. O `push` dessa branch ativa o workflow; o assistente então lê o status e os artefatos da execução. Isso não exige modificar o código de produção nem inserir secrets.
 
-Os modos `extended` e `real-qwen` podem ser selecionados pelo botão **Run workflow** na página Actions. Não executar download de GGUF em `push` ou `pull_request`: `real-qwen` é sempre opt-in manual.
+Para um teste ampliado solicitado no chat, a branch pode ter o prefixo `lab/luna-extended-` e o mesmo arquivo marcador. O workflow executa então `extended` no Linux e a validação `smoke` no Windows; ambos produzem relatórios. Os modos `extended` e `real-qwen` também podem ser selecionados pelo botão **Run workflow** na página Actions. Não executar download de GGUF em `push` ou `pull_request`: `real-qwen` é sempre opt-in manual.
 
 ## Política de segurança e limites
 
