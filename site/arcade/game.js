@@ -109,7 +109,7 @@
   document.querySelectorAll("[data-key]").forEach(b=>{
     const code=b.dataset.key;
     const start=e=>{e.preventDefault();if(s.mode!=="dungeon")return;if(code==="Space")jump();else if(code==="KeyZ")attack();else if(code==="KeyX")special();else keys.add(code)};
-    const end=e=>{e.preventDefault();keys.delete(code);touchDown=false};
+    const end=e=>{e.preventDefault();keys.delete(code)};
     b.addEventListener("pointerdown",start);b.addEventListener("pointerup",end);b.addEventListener("pointercancel",end);b.addEventListener("pointerleave",end);
   });
   function jump(){const p=s.player;if(s.mode!=="dungeon"||!p.grounded)return;p.vy=-690;p.grounded=false;p.y-=2;burst(p.x+18,p.y+p.h,"#c7eafa",7,90)}
