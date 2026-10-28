@@ -48,3 +48,15 @@ The GitHub Actions pipeline runs audits, code-only collection and training separ
 The previous external-source-only MiniCoder checkpoint reached holdout next-char loss ~3.376, but **0/5** of its generated JavaScript snippets passed syntax parsing. A better next-character loss does *not* mean it learned to code games. The next experiment adds our original combat curriculum and repeats syntax checks against an entirely independent holdout repository, with separate gameplay testing needed later. Compare actual runs and SHA reports before drawing conclusions.
 
 User-supplied repositories are a reference catalog; only original lessons plus vetted MIT gaming examples are actual training input. The model has not been taught how to implement any proprietary Grand Chase protocol or decrypt client assets. The goal remains a **new original action-platform game** with playable mechanics and editable files.
+
+
+## First measured combat-curriculum training run
+
+- [GitHub Actions successful run 40697580090](https://github.com/HelioConde/I.A/actions/runs/40697580090).
+- [Checkpoint + provenance + syntax artifact 12820600764](https://github.com/HelioConde/I.A/actions/runs/40697580090/artifacts/12820600764).
+- Both source/curriculum audit suites passed (5/5 + 5/5 tests).
+- External MIT corpus unchanged: 19 training files, 6 files from a separate holdout repository.
+- Eight original action-platform lessons included in training, four unanswered holdout lessons omitted from training.
+- MiniCoder random initialization, 180 CPU update steps. Next-character holdout loss 35.61765 -> 3.303632. Earlier external-only experiment after 180 steps: 3.376007; improvement approximately 2.14% relative on that single evaluation.
+- Generated JavaScript code syntax: **0/5**, unchanged. No gameplay tested. Result remains **NOT PROMOTED**.
+- Report asserts: grandchase_raw_repositories_in_training=0, original_curriculum_examples=8.
