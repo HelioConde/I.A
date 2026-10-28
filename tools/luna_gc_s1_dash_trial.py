@@ -39,16 +39,16 @@ TASKS=[
   "por instruções JS que usem performance.now() para detectar dois apertos ArrowRight "
   "em até 260ms. Se a tecla NÃO estiver em repetição (e.repeat), marque último toque "
   "lastRightTap. É OBRIGATÓRIO usar a expressão !e.repeat no teste de duplo toque. O primeiro toque (lastRightTap=0) NÃO pode disparar dash: exija lastRightTap>0. Em duplo toque, player.vx deve ser 14; caso contrário 5. "
-  "Não mude y, x, HP, inimigos nem outras teclas. "
+  "CRÍTICO: atualize lastRightTap DEPOIS de calcular player.vx (não antes). Use exatamente if (!e.repeat) lastRightTap = now; após o if/else. Use condição lastRightTap > 0 para que o primeiro toque não dispare dash. Não mude y, x, HP, inimigos nem outras teclas. "
   "Retorne SOMENTE código JS substituto, 1 a 4 instruções, sem chaves de if externo.",
-  "required":("lastRightTap","performance.now","e.repeat","player.vx"),"limit":190},
+  "required":("lastRightTap","performance.now","e.repeat","player.vx"),"limit":240},
  {"name":"left_dash","marker":LEFT_MARKER,"kind":"replace",
   "prompt":"Você é Luna, programadora. O jogador já tem input ArrowLeft e globais lastLeftTap/lastRightTap. "
   "Substitua APENAS player.vx = -5; por JS com performance.now() e e.repeat: "
   "OBRIGATÓRIO ter !e.repeat no código para ignorar tecla repetida, e lastLeftTap>0 para ignorar primeiro toque. Se tocar ArrowLeft duas vezes em até 260ms, usar player.vx=-14, "
   "senão -5. Atualize lastLeftTap apenas quando e.repeat for falso. "
-  "Retorne SOMENTE 1-4 instruções JS, sem função, sem if externo, sem explicação.",
-  "required":("lastLeftTap","performance.now","e.repeat","player.vx"),"limit":190},
+  "CRÍTICO: faça a decisão de velocidade ANTES de atualizar lastLeftTap, e use if (!e.repeat) lastLeftTap = now; no final. Use comparação lastLeftTap > 0 para impedir dash no primeiro toque. Retorne SOMENTE JS, sem função, sem explicação.",
+  "required":("lastLeftTap","performance.now","e.repeat","player.vx"),"limit":240},
 ]
 
 def digest(data:bytes)->str:
@@ -72,6 +72,17 @@ def valid_piece(raw:str,task:dict[str,Any])->tuple[bool,str,str]:
     else:
         if "return" in piece or "function " in piece or "=> " in piece or "last" not in piece:
             return False,"invalid_key_handler",""
+        tap="lastRightTap" if task["name"]=="right_dash" else "lastLeftTap"
+        # Do not accept a dash on the first tap (timestamp starts at zero).
+        if not re.search(r"\\b"+tap+r"\\s*>\\s*0\\b",piece):
+            return False,"first_tap_must_not_dash:require_"+tap+"_greater_than_zero",""
+        # A tap must be recorded *after* determining speed. Otherwise the delta is zero.
+        assignments=list(re.finditer(r"\\b"+tap+r"\\s*=",piece))
+        speed=re.search(r"player\\.vx\\s*=",piece)
+        if not assignments or speed is None or assignments[0].start() < speed.start():
+            return False,"tap_timestamp_must_update_after_speed_decision",""
+        if not re.search(r"if\\s*\\(\\s*!e\\.repeat\\s*\\)",piece):
+            return False,"repeat_guard_required_for_timestamp_update",""
     return True,"candidate",piece
 
 def patch(source:str,task:dict[str,Any],piece:str)->str:
