@@ -18,7 +18,7 @@
 
 - [Playwright original 6/6](https://github.com/HelioConde/I.A/actions/runs/40625929055): seleção das três classes, movimento, pulo, dano, pausa e screenshots responsivos.
 - [Missão completa 7/7](https://github.com/HelioConde/I.A/actions/runs/40626152153): teclado, inimigos, três regiões, chefe, vitória e reinício com espadachim.
-- A suíte foi ampliada para exigir vitória com três classes; **consultar o último workflow antes de declarar aprovação**.
+- [Última bateria real 8/8](https://github.com/HelioConde/I.A/actions/runs/40627043718): vitória com **as três classes** em três regiões e chefe, controle touch mobile que movimenta e ataca e screenshots responsivos.
 
 O jogo usa assets originais e não reproduz sprites, músicas, nomes comerciais ou código do Grand Chase.
 
