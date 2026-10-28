@@ -8,6 +8,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/benchmark_original_lua.py"
+      - "tests/test_luna_benchmark_original_lua.py"
       - "experiments/luna-forge-zero/train_private_lua.py"
       - "experiments/luna-forge-zero/audit_excluded_lua_metadata.py"
       - "experiments/luna-forge-zero/audit_elsword_lua_headers.py"
@@ -37,6 +39,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/benchmark_original_lua.py"
+      - "tests/test_luna_benchmark_original_lua.py"
       - "experiments/luna-forge-zero/train_private_lua.py"
       - "experiments/luna-forge-zero/audit_excluded_lua_metadata.py"
       - "experiments/luna-forge-zero/audit_elsword_lua_headers.py"
@@ -122,6 +126,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_local_scope_review.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test original Lua heldout MiniCoder benchmark semantics
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_benchmark_original_lua.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Test Elsword Lua format audit without training
         shell: pwsh
