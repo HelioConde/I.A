@@ -25,7 +25,7 @@ function Find-Python {
     if (Get-Command py -ErrorAction SilentlyContinue) {
         foreach ($v in @("3.12", "3.11", "3.13", "3.10")) {
             try {
-                & py "-$v" -c "import sys; assert sys.version_info[:2] == tuple(map(int, '$v'.split('.')))" 2>$null
+                & py "-$v" -c 'import sys; assert sys.version_info.major == 3' 2>$null
                 if ($LASTEXITCODE -eq 0) { return @{ Cmd="py"; Args=@("-$v") } }
             } catch {}
         }
@@ -56,7 +56,7 @@ if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) {
 Write-Host "Instalando PyTorch CPU e psutil na .venv..." -ForegroundColor Cyan
 Run-Checked -Executable $Python -Arguments @("-m","pip","install","--disable-pip-version-check","--index-url","https://download.pytorch.org/whl/cpu","torch>=2.1,<3")
 Run-Checked -Executable $Python -Arguments @("-m","pip","install","--disable-pip-version-check","psutil")
-Run-Checked -Executable $Python -Arguments @("-c",'import torch, psutil; print("torch",torch.__version__, "CUDA disponivel:", torch.cuda.is_available())')
+Run-Checked -Executable $Python -Arguments @("-c",'import torch, psutil; print(torch.__version__); print(torch.cuda.is_available())')
 
 if (-not $SkipInitialTraining) {
     $planner = Join-Path $Checkpoints "luna-forge-zero-v0"
