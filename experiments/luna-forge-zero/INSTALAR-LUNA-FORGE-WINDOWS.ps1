@@ -55,7 +55,7 @@ if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) {
 }
 Write-Host "Instalando PyTorch CPU e psutil na .venv..." -ForegroundColor Cyan
 Run-Checked -Executable $Python -Arguments @("-m","pip","install","--disable-pip-version-check","--index-url","https://download.pytorch.org/whl/cpu","torch>=2.1,<3")
-Run-Checked -Executable $Python -Arguments @("-m","pip","install","--disable-pip-version-check","psutil")
+Run-Checked -Executable $Python -Arguments @("-m","pip","install","--disable-pip-version-check","psutil","numpy>=1.26,<3")
 Run-Checked -Executable $Python -Arguments @("-c",'import torch, psutil; print(torch.__version__); print(torch.cuda.is_available())')
 
 if (-not $SkipInitialTraining) {
