@@ -1,0 +1,72 @@
+{
+  "benchmark": "Luna Original Complete Game Attempt v1",
+  "author": "Qwen3-4B-Q4_K_M.gguf (raw native inference)",
+  "game": "Luna: Constelação Perdida",
+  "required_files": [
+    "index.html",
+    "styles.css",
+    "game.js"
+  ],
+  "accepted_files": [
+    "index.html",
+    "styles.css",
+    "game.js"
+  ],
+  "provenance_sha256": {
+    "index.html": "717e312fa0a7fc3c86da9433ff114a1189c82854a7d5db9755823ff6d69ee7a0",
+    "styles.css": "f8c3999cef0aa1b202bce4b6dfdeaf9f4216a82be3d99d0b2ac11a79d9ad8e6d",
+    "game.js": "1401bfa1e766f552b78e72782cac864612ef49a25de48cd6fd7fdb8d3486949e"
+  },
+  "requests": [
+    {
+      "file": "index.html",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "real_model": true,
+          "accepted": true,
+          "reason": "static_candidate",
+          "characters": 640
+        }
+      ]
+    },
+    {
+      "file": "styles.css",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "real_model": true,
+          "accepted": true,
+          "reason": "static_candidate",
+          "characters": 1728
+        }
+      ]
+    },
+    {
+      "file": "game.js",
+      "accepted": true,
+      "attempts": [
+        {
+          "attempt": 1,
+          "real_model": true,
+          "accepted": true,
+          "reason": "static_candidate",
+          "characters": 5088
+        }
+      ]
+    }
+  ],
+  "generation_complete": true,
+  "status": "STATIC_CANDIDATE",
+  "gameplay_verified": false,
+  "visual_verified": false,
+  "deployed": false,
+  "reference_code_copied": false,
+  "note": "All output files originate only from Qwen. Browser playtesting and human review are mandatory before describing this as a complete playable game.",
+  "transfer_normalization": "CRLF to LF only, original Qwen source hashes match",
+  "browser_test_executed": false,
+  "browser_test_passed": false,
+  "review_required": true
+}
