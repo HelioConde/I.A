@@ -9,26 +9,45 @@ agent.INPUT_STATUS="STATIC_REFINED_CANDIDATE"
 agent.INPUT_PATCHES_REQUIRED=2
 agent.PRIOR_PATCHES=9
 agent.PATCH_STAGE="class_combat_range_balance"
-agent.TASKS=[{
-  "id":"repair_attack_ranges",
-  "start":"const heroType = heroSelect.value;",
-  "end":"\n  gameLoop();",
-  "goal":"Você é Luna corrigindo uma falha de balanceamento grave no seu próprio jogo. "
-         "Os três personagens já têm HP diferente, mas você atribuiu attackRange "
-         "1, 3 e 0 — alcance em pixels minúsculo, quase impossível para o jogador atacar. "
-         "Reescreva SOMENTE o bloco de seleção da classe, começando por "
-         "const heroType = heroSelect.value; . Faça um if/else para "
-         "'melee', 'ranged', 'magic'. Preserve HP distintos por classe e "
-         "atribua explicitamente attackRange com valores em PIXELS: "
-         "para melee ENTRE 90 e 130, para ranged ENTRE 140 e 230, "
-         "para magic ENTRE 130 e 220. Use três instruções "
-         "separadas de attackRange = NUMERO; com números maiores que 80. "
-         "NÃO modifique heroSelect.value, wave, enemies ou gameLoop. "
-         "Não inclua o gameLoop(), já está no arquivo após este bloco. "
-         "Responda APENAS JavaScript do bloco corrigido.",
-  "requires":("heroSelect","player.hp","attackRange","melee","ranged","magic"),
-  "max_tokens":400
-}]
+agent.TASKS=[
+  {
+    "id":"repair_range_melee",
+    "start":"attackRange = 1;",
+    "end":None,
+    "allow_statement":True,
+    "goal":"Você é Luna, autor do game.js. O espadachim tem attackRange = 1; "
+           "um alcance de 1 pixel, impossível de usar. Retorne APENAS UMA instrução "
+           "JavaScript completa, começando com attackRange =, atribuindo "
+           "um NUMERO INTEIRO entre 90 e 130 pixels para o melee. "
+           "Não escreva if, else, bloco, JSON, markdown nem texto.",
+    "requires":("attackRange",),
+    "max_tokens":70,
+  },
+  {
+    "id":"repair_range_ranged",
+    "start":"attackRange = 3;",
+    "end":None,
+    "allow_statement":True,
+    "goal":"Você é Luna, autor do game.js. A arqueira tem attackRange = 3; "
+           "um alcance inútil. Retorne APENAS UMA instrução JS completa, "
+           "começando com attackRange = e atribuindo NUMERO INTEIRO "
+           "entre 140 e 230 pixels para ranged. Não escreva outros trechos.",
+    "requires":("attackRange",),
+    "max_tokens":70,
+  },
+  {
+    "id":"repair_range_magic",
+    "start":"attackRange = 0;",
+    "end":None,
+    "allow_statement":True,
+    "goal":"Você é Luna, autor do game.js. O mago tem attackRange = 0; "
+           "seus feitiços não alcançam ninguém. Retorne APENAS UMA instrução "
+           "JavaScript completa começando com attackRange = e com NUMERO "
+           "INTEIRO entre 130 e 220 pixels. Nada de blocos ou explicações.",
+    "requires":("attackRange",),
+    "max_tokens":70,
+  }
+]
 
 if __name__=="__main__":
     raise SystemExit(agent.main())
