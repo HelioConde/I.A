@@ -1,0 +1,77 @@
+name: Luna GameDev v3 — Qwen3 4B Native JavaScript
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-game-raw-v3-*"
+    paths:
+      - ".github/lab-requests/game-raw-v3-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brain_ssd/chat/game_agent_v3.py"
+      - "tools/run_game_agent_v3_windows.py"
+      - "tests/test_game_agent_v3.py"
+      - ".github/workflows/game-agent-v3.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-game-v3-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Static negative and positive tests, no GGUF
+        run: |
+          python -m compileall -q src/brain_ssd/chat/game_agent_v3.py tools/run_game_agent_v3_windows.py
+          PYTHONPATH=src python -m unittest discover -s tests -p "test_game_agent_v3.py" -v
+
+  native-4b:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-game-raw-v3-')) }}
+    needs: contract-tests
+    runs-on: windows-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned Qwen3-4B and CPU llama.cpp
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Generate native raw JS game code, verify syntax, never execute
+        shell: pwsh
+        run: |
+          python tools/run_game_agent_v3_windows.py --save-draft --attempts 2
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Model failed predefined v3 native JS criteria. Preserving valid negative result."
+            exit 0
+          }
+          exit $rc
+      - name: Upload sanitized report and reviewed synthetic JS draft if valid
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-game-v3-${{ github.run_id }}
+          path: |
+            results/game_agent/qwen-raw-js-v3.json
+            results/game_agent/draft-s1-movement-v3.js
+          if-no-files-found: warn
+          retention-days: 14
