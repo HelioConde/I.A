@@ -55,6 +55,7 @@ def main():
         print("10 - Treinar Luna MiniCoder com Lua local autorizado (experimental/privado)")
         print("11 - Testar MiniCoder treinado com Lua privado (sem executar codigo)")
         print("12 - Contar Lua nas pastas excluidas (SOMENTE metadados, sem treino)")
+        print("13 - Revisar subpastas de cliente/jogo LOCALMENTE (metadados, sem treino)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -155,6 +156,14 @@ def main():
             print("Contando extensoes em diretorios protegidos SEM abrir arquivos.")
             print("O resultado mostra somente totais, nao nomes, caminhos ou codigo.")
             run(HERE/"audit_excluded_lua_metadata.py",source)
+        elif option=="13":
+            root=Path.home()/"Documents"/"grand chase files"
+            supplied=input(f"Pasta para revisar localmente [{root}]: ").strip().strip('"')
+            if supplied:
+                root=Path(supplied)
+            print("Mostrando caminhos APENAS neste terminal para sua revisao de procedencia/licenca.")
+            print("Nenhum codigo sera lido, executado, exportado ou treinado.")
+            run(HERE/"review_local_lua_scopes.py","--source",root)
         else:
             print("Opcao invalida.")
 
