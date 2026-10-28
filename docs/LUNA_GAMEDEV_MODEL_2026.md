@@ -71,3 +71,25 @@ Os códigos gerados pelo modelo só viram jogos publicados após revisão e test
 ## Gate para alterar o padrão
 
 O default do script específico §run_game_agent_v3_windows.py§ é §auto§: Ornith é escolhido apenas se instalado e validado por hash; caso contrário Qwen3-4B. A preferência não implica que o novo modelo já seja superior em jogos. Nenhum modelo de chat comum foi substituído. Quando o Ornith demonstrar geração real e jogo testado com vantagem sobre Qwen3-4B, ativar seu perfil GameDev, mantendo Qwen como fallback e sem alterar chat comum nem dados locais. A publicação de um jogo superior também exige QA visual e avaliação do usuário.
+
+
+## Resultado medido do primeiro desafio completo (28/10/2026)
+
+[Run real 40653494692](https://github.com/HelioConde/I.A/actions/runs/40653494692): **ambos INCOMPLETE** apesar de execução de inferência nativa e verificações SHA dos GGUF.
+
+| Modelo | Tentativa 1 | Tentativa 2 | Jogabilidade |
+|---|---|---|---|
+| Ornith-1.5-9B | unsafe_code | javascript_syntax_error | Não iniciada: saída inválida |
+| Qwen3-4B | javascript_syntax_error | javascript_syntax_error | Não iniciada: saída inválida |
+
+Ornith não ganhou nem perdeu a comparação em gameplay, porque **nenhum candidato compilou**. O Qwen4B já criou um jogo completo antes, por múltiplas tarefas e reparos menores; não comparar esse resultado com uma geração única.
+
+## Benchmark incremental mais próximo de trabalho real
+
+[Workflow Luna GameDev — Actual Game Bug Repair](../.github/workflows/luna-attack-model-comparison.yml) e [PR #20](https://github.com/HelioConde/I.A/pull/20).
+
+Os dois modelos recebem o MESMO bloco real de `site/luna-created/game.js`. Bug observado no código: `attackTarget.hp -= 10` ocorre **todo quadro**, enquanto isAttacking permanece verdadeiro, então um KeyZ pode zerar HP do inimigo em um único ataque. A IA deve gerar apenas a substituição do bloco e preservar o resto do jogo. O avaliador rejeita saída sem impedir acertos repetidos e exige Node syntax.
+
+O Chromium de teste valida que o primeiro KeyZ tira **exatamente 10 HP**, roda novamente os seis testes completos de jogo e registra screenshots. O bloco aceito é escrito pela inferência real do respectivo modelo, sem reatribuir código do ChatGPT como modelo. Não atualiza jogo público automaticamente.
+
+**Modelo GameDev local:** o mecanismo `auto` prefere Ornith apenas quando instalado e com hash íntegro. Isso é uma opção experimental, **não uma alegação de que já venceu em qualidade**. Se o novo GGUF não abrir no runtime Windows, atualizar o llama.cpp usado pelo GameDev separadamente; não mexer no Core de pesquisa.
