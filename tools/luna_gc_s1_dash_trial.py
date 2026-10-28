@@ -38,14 +38,14 @@ TASKS=[
   "lastRightTap e lastLeftTap. Substitua APENAS a instrução player.vx = 5; "
   "por instruções JS que usem performance.now() para detectar dois apertos ArrowRight "
   "em até 260ms. Se a tecla NÃO estiver em repetição (e.repeat), marque último toque "
-  "lastRightTap. Em duplo toque, player.vx deve ser 14; caso contrário 5. "
+  "lastRightTap. É OBRIGATÓRIO usar a expressão !e.repeat no teste de duplo toque. O primeiro toque (lastRightTap=0) NÃO pode disparar dash: exija lastRightTap>0. Em duplo toque, player.vx deve ser 14; caso contrário 5. "
   "Não mude y, x, HP, inimigos nem outras teclas. "
   "Retorne SOMENTE código JS substituto, 1 a 4 instruções, sem chaves de if externo.",
   "required":("lastRightTap","performance.now","e.repeat","player.vx"),"limit":190},
  {"name":"left_dash","marker":LEFT_MARKER,"kind":"replace",
   "prompt":"Você é Luna, programadora. O jogador já tem input ArrowLeft e globais lastLeftTap/lastRightTap. "
   "Substitua APENAS player.vx = -5; por JS com performance.now() e e.repeat: "
-  "se o jogador tocar ArrowLeft duas vezes em até 260ms, usar player.vx=-14, "
+  "OBRIGATÓRIO ter !e.repeat no código para ignorar tecla repetida, e lastLeftTap>0 para ignorar primeiro toque. Se tocar ArrowLeft duas vezes em até 260ms, usar player.vx=-14, "
   "senão -5. Atualize lastLeftTap apenas quando e.repeat for falso. "
   "Retorne SOMENTE 1-4 instruções JS, sem função, sem if externo, sem explicação.",
   "required":("lastLeftTap","performance.now","e.repeat","player.vx"),"limit":190},
@@ -63,8 +63,9 @@ def valid_piece(raw:str,task:dict[str,Any])->tuple[bool,str,str]:
     if fenced:piece=fenced.group(1).strip()
     if not 12<=len(piece)<=650 or "\x00" in piece or BLOCKED.search(piece):
         return False,"unsafe_or_invalid_size",""
-    if any(token not in piece for token in task["required"]):
-        return False,"missing_dash_terms",""
+    missing=[token for token in task["required"] if token not in piece]
+    if missing:
+        return False,"missing_dash_terms:"+",".join(missing),""
     if task["name"]=="dash_state":
         if "lastRightTap" not in piece or "lastLeftTap" not in piece or "let " not in piece:
             return False,"missing_state",""
