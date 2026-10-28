@@ -23,8 +23,8 @@ GOAL = (
     "Escreva código conciso e funcional; não afirme que rodou testes."
 )
 CHECKS = ("canvas", "getContext", "player", "ArrowLeft", "ArrowRight", "Space", "requestAnimationFrame")
-BLOCKED = re.compile(r"\b(?:eval|Function|fetch|importScripts|WebSocket|XMLHttpRequest|Worker|SharedWorker)\b|"
-                     r"\bimport\s*\(|\brequire\s*\(|\blocalStorage\b|\bindexedDB\b", re.I)
+BLOCKED = re.compile(r"\b(?:eval|Function|fetch|importScripts|WebSocket|XMLHttpRequest|Worker|SharedWorker)\s*\(|"
+                     r"\bimport\s*\(|\brequire\s*\(|\blocalStorage\b|\bindexedDB\b")
 
 
 def strip_code_wrapper(raw: str) -> str:
