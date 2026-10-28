@@ -56,6 +56,7 @@ def main():
         print("11 - Testar MiniCoder treinado com Lua privado (sem executar codigo)")
         print("12 - Contar Lua nas pastas excluidas (SOMENTE metadados, sem treino)")
         print("13 - Revisar subpastas de cliente/jogo LOCALMENTE (metadados, sem treino)")
+        print("14 - Verificar formatos de Lua na pasta Elsword (4 KiB por arquivo, sem treino)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -164,6 +165,14 @@ def main():
             print("Mostrando caminhos APENAS neste terminal para sua revisao de procedencia/licenca.")
             print("Nenhum codigo sera lido, executado, exportado ou treinado.")
             run(HERE/"review_local_lua_scopes.py","--source",root)
+        elif option=="14":
+            root=Path.home()/"Documents"/"grand chase files"/"Elsword"
+            supplied=input(f"Diretorio Elsword para auditoria [{root}]: ").strip().strip('"')
+            if supplied:
+                root=Path(supplied)
+            print("Somente assinaturas dos primeiros 4 KiB por Lua; nenhum arquivo salvo ou enviado.")
+            print("Pastas de backup, contas, credenciais e anti-cheat permanecem excluidas.")
+            run(HERE/"audit_elsword_lua_headers.py","--source",root)
         else:
             print("Opcao invalida.")
 
