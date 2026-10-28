@@ -1,0 +1,53 @@
+name: Luna GameDev — Modern Windows CPU Runtime Validation
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-ornith-runtime-*"
+    paths:
+      - ".github/lab-requests/ornith-runtime-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/install_ornith_game_runtime.py"
+      - "tools/luna_game_model_selector.py"
+      - "tools/run_game_agent_v3_windows.py"
+      - "tests/test_ornith_runtime_install.py"
+      - "tests/test_luna_game_model_selector.py"
+      - ".github/workflows/luna-ornith-windows-runtime.yml"
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Verify model+runtime installers are safe and independent
+        run: |
+          python -m compileall -q tools/install_ornith_game_runtime.py tools/luna_game_model_selector.py tools/run_game_agent_v3_windows.py
+          python -m unittest discover -s tests -p "test_ornith_runtime_install.py" -v
+          python -m unittest discover -s tests -p "test_luna_game_model_selector.py" -v
+
+  windows-runtime:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-ornith-runtime-')) }}
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Install separately SHA256 verified official b11946 Windows llama.cpp CPU executable
+        shell: pwsh
+        run: |
+          python tools/install_ornith_game_runtime.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Prove native runtime starts on Windows
+        shell: pwsh
+        run: |
+          & "third_party/llama.cpp/ornith-gamedev-win-cpu-x64/llama-cli.exe" --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Host "Modern CPU llama.cpp CLI starts successfully; model inference requires separate GGUF installation."
