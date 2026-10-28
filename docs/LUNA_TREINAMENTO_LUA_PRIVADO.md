@@ -133,3 +133,31 @@ $py=Join-Path $lab ".venv\Scripts\python.exe"
 ~~~
 
 A auditoria nao indica permissao para treinar, nao altera os filtros nem os checkpoints. Compartilhe apenas o relatorio agregado. Nao mova scripts para contornar exclusoes; selecione apenas material cuja utilizacao para treinamento foi autorizada.
+
+
+## Auditoria local final: 5880 scripts em apenas 2 raizes de cliente/jogo
+
+O relatorio local fornecido pelo usuario em 28/10/2026 confirmou exatamente 5902 arquivos Lua:
+- permitted: 22 arquivos Lua, 83.418 bytes em metadados;
+- game_or_client_excluded: **5880 arquivos Lua**, 873.318.829 bytes, 147 subdiretorios percorridos;
+- sensitive_or_backup_excluded: 0, repository_metadata_excluded: 0;
+- 2 diretorios-raiz excluidos pela categoria game_or_client;
+- nenhum conteudo lido, nenhuma transferencia, erro ou treinamento.
+
+A diferenca entre os arquivos inventariados e os poucos aprovados esta explicada pela selecao deliberadamente restritiva. Os 5.880 scripts **nao se tornaram automaticamente um corpus licenciado** e podem incluir bytecode/dados privados.
+
+### Opcao 13 — identificar raizes no computador, sem publicar nomes
+
+Para permitir revisao humana da origem dos scripts, a opcao 13 chama review_local_lua_scopes.py. Somente no terminal local, mostra o caminho completo de cada raiz game_client e anti_cheat, com contagem de arquivos Lua e soma dos tamanhos **por metadados**. Nao abre arquivos, nem treina ou autoriza automaticamente seu uso. A arvore anti_cheat/HShield permanece excluida.
+
+~~~powershell
+$repo="$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+$lab=Join-Path $repo "experiments\luna-forge-zero"
+$py=Join-Path $lab ".venv\Scripts\python.exe"
+& $py "$lab\review_local_lua_scopes.py" --source "$env:USERPROFILE\Documents\grand chase files"
+~~~
+
+Nao envie caminhos de instalacoes, nomes de usuarios ou arquivos privados; e suficiente informar a **categoria e a contagem**. A partir da revisao dos direitos, use exclusivamente uma subpasta sobre a qual haja autorizacao real para treinamento; nao remova controles que bloqueiam backups, credenciais, executaveis ou codigo anti-cheat.
+
+O uso posterior de uma subpasta como fonte do treinador exige confirmar permissao e passar pelo dry-run novamente. Nao encaminhar ao GitHub nem publicar checkpoints de scripts comerciais.
