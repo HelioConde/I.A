@@ -21,6 +21,10 @@ from repair_luna_original_targeted import generate_patches
 INPUT=ROOT/"results"/"luna-original-targeted"
 OUTPUT=ROOT/"results"/"luna-original-refined"
 INPUT_RUN=40646692498
+INPUT_STATUS="STATIC_PATCHED_CANDIDATE"
+INPUT_PATCHES_REQUIRED=5
+PRIOR_PATCHES=5
+PATCH_STAGE="keyboard_and_target"
 
 TASKS=[
   {
@@ -73,7 +77,7 @@ def main()->int:
     engine=None
     try:
         old=json.loads((INPUT/"provenance.json").read_text(encoding="utf-8"))
-        assert old["status"]=="STATIC_PATCHED_CANDIDATE" and old["patches_accepted"]==5
+        assert old["status"]==INPUT_STATUS and old["patches_accepted"]==INPUT_PATCHES_REQUIRED
         for name in ("index.html","styles.css","game.js"):
             raw=(INPUT/name).read_bytes().replace(b"\r\n",b"\n")
             assert digest(raw)==old["provenance_sha256"][name],name
@@ -94,7 +98,8 @@ def main()->int:
         report.update(result)
         report["model"]=args.model_file
         report["new_patch_count"]=len(TASKS)
-        report["total_model_patches"]=5+report["patches_accepted"]
+        report["total_model_patches"]=PRIOR_PATCHES+report["patches_accepted"]
+        report["patch_stage"]=PATCH_STAGE
         if code is None:
             report["status"]="INCOMPLETE"
             return 1
