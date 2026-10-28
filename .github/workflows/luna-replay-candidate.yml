@@ -99,7 +99,7 @@ jobs:
           done
           cat /tmp/luna-original-http.log
           exit 1
-      - name: Real end-to-end Chromium gameplay: menu through boss and victory
+      - name: "Real end-to-end Chromium gameplay: menu through boss and victory"
         working-directory: site-tests
         env:
           LUNA_ORIGINAL_URL: http://127.0.0.1:4811
