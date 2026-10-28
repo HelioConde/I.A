@@ -112,3 +112,7 @@ O próximo alvo de capacidade é criar um **jogo original de ação em plataform
 - [Etapas e QA do Code Studio](docs/LUNA_CODE_STUDIO.md)
 - [Benchmark de aceitação](benchmarks/arcade_s1/brief.json)
 - [Testes Playwright para jogo candidato](site-tests/tests/game-benchmark.spec.js)
+
+## Luna Arcade S1 — versão jogável de referência
+
+O protótipo original de ação/plataforma 2D está em [`site/arcade/`](site/arcade/), acessível em [**Jogar Luna Arcade S1**](https://helioconde.github.io/I.A/arcade/) após publicação da `main`: três classes, combate, três regiões e um chefe. O [workflow Arcade Playable Game QA](.github/workflows/arcade-qa.yml) usa Chromium real para validar controles, salto, dano, pausa e vitória. **Este código foi produzido pelo assistente, não gerado pela Luna/Qwen.** A capacidade autônoma da Luna é medida separadamente pelo [GameDev Real Coding Benchmark](.github/workflows/game-coding-benchmark.yml): um pequeno desafio com inferência real, revisão estática e sem executar código de modelo não confiável. Não afirmar que o benchmark mede a criação de um jogo completo.

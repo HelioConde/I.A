@@ -1,0 +1,76 @@
+name: Luna GameDev — Qwen Real Coding Benchmark
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-game-code-*"
+    paths:
+      - ".github/lab-requests/game-code-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brain_ssd/chat/game_coding_trial.py"
+      - "tools/evaluate_game_coding_windows.py"
+      - "tests/test_game_coding_trial.py"
+      - ".github/workflows/game-coding-benchmark.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-game-code-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check test script syntax and scoring with synthetic fixtures
+        run: |
+          python -m compileall -q tools/evaluate_game_coding_windows.py src/brain_ssd/chat/game_coding_trial.py
+          PYTHONPATH=src python -m unittest discover -s tests -p "test_game_coding_trial.py" -v
+
+  actual-local-model:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-game-code-')) }}
+    needs: benchmark-contract
+    runs-on: windows-latest
+    timeout-minutes: 40
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download pinned Qwen3 0.6B GGUF and CPU llama.cpp (hashes verified)
+        shell: pwsh
+        run: python tools/install_windows_chat.py --all
+      - name: Preflight actual CPU model
+        shell: pwsh
+        run: python tools/doctor_chat.py --profile economia --probe
+      - name: Run real model coding attempt (no code execution or workspace writes)
+        shell: pwsh
+        run: |
+          python tools/evaluate_game_coding_windows.py --trials 2 --profile economia
+          $rc = $LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Benchmark finished: model could not produce an accepted file. This is a valid negative result."
+            exit 0
+          }
+          exit $rc
+      - name: Upload sanitized coding ability metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-qwen-game-code-${{ github.run_id }}
+          path: results/game_agent/latest.json
+          if-no-files-found: warn
+          retention-days: 14

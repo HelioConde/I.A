@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101629">
+  <meta name="description" content="Luna Arcade S1: aventura de ação em plataformas com três classes e arte original, jogável no navegador.">
+  <title>Luna Arcade S1 · O Vale das Estrelas</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./game.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="../" aria-label="Voltar para Luna"><span class="mark">✦</span><span>LUNA <strong>ARCADE</strong><small>SEASON 01 · DEMO</small></span></a>
+      <nav class="toplinks" aria-label="Links"><span class="live-indicator"><span></span> JOGÁVEL NO NAVEGADOR</span><a href="../">Sobre a Luna</a></nav>
+    </header>
+    <main>
+      <section class="intro">
+        <div class="eyebrow">AÇÃO EM PLATAFORMAS <span> / </span> FANTASIA ORIGINAL</div>
+        <h1>O Vale das <em>Estrelas</em><span class="title-spark">✦</span></h1>
+        <p>Três heróis. Um vale esquecido. Uma aventura para escrever do seu jeito.</p>
+      </section>
+      <div class="game-frame" id="game-frame">
+        <div class="frame-top"><span class="chapter"><span class="chapter-dot"></span> AVENTURA 01 <b>·</b> FLORESTA CELESTIAL</span><span class="frame-bits">LUNA ENGINE / CANVAS 2D <b>◦</b> 60 FPS TARGET</span></div>
+        <div class="viewport" id="viewport">
+          <canvas id="game" width="1200" height="675" aria-label="Arena de ação em plataformas; use as setas, espaço, Z e X" tabindex="0"></canvas>
+          <div id="menu" class="menu screen">
+            <div class="menu-head"><span class="pill">✧ CAPÍTULO I</span><h2>O chamado do <em>vale</em></h2><p>Escolha seu herói e explore um mundo de magia, criaturas e mistérios.</p></div>
+            <div class="class-grid" role="group" aria-label="Selecionar personagem">
+              <button type="button" class="class-card active" data-testid="character-melee" data-class="melee" aria-pressed="true"><span class="class-icon knight">⚔</span><span class="class-type">01 / VANGUARDA</span><strong>Kael</strong><span class="class-role">Espadachim</span><span class="class-description">Combos de espada, golpes rápidos e resistência.</span><span class="class-tag">CORPO A CORPO</span></button>
+              <button type="button" class="class-card" data-testid="character-ranged" data-class="ranged" aria-pressed="false"><span class="class-icon ranger">➶</span><span class="class-type">02 / PRECISÃO</span><strong>Lyra</strong><span class="class-role">Arqueira</span><span class="class-description">Flechas encantadas e domínio da distância.</span><span class="class-tag">LONGO ALCANCE</span></button>
+              <button type="button" class="class-card" data-testid="character-magic" data-class="magic" aria-pressed="false"><span class="class-icon mage">✧</span><span class="class-type">03 / ARCANO</span><strong>Orin</strong><span class="class-role">Mago</span><span class="class-description">Orbes arcanos e magia de área poderosa.</span><span class="class-tag">FEITIÇARIA</span></button>
+            </div>
+            <div class="menu-bottom"><div class="menu-tip"><span>✦</span><span>Sem downloads, sem cadastro.<br>Arte e mecânicas originais.</span></div><button type="button" id="start-game" data-testid="start-game" class="primary-btn">Iniciar aventura <span>→</span></button></div>
+          </div>
+          <div id="hud" class="hud" hidden>
+            <div class="hud-left"><div class="hero-avatar" id="avatar">⚔</div><div class="hero-meter"><div class="hero-heading"><strong id="hero-name">Kael</strong><small id="hero-class">ESPADACHIM</small></div><div class="meter hp"><span id="hp-fill"></span></div><div class="meter mp"><span id="mp-fill"></span></div></div></div>
+            <div class="hud-mid"><span class="stage-caption">REGIÃO</span><strong id="stage-label">01 · CLAREIRA</strong><span id="enemy-count" class="enemy-count">CRIAÇÕES: 2</span></div>
+            <div class="hud-right"><span>✦ <strong id="score">0000</strong></span><button id="pause-btn" class="hud-button" aria-label="Pausar">Ⅱ</button></div>
+          </div>
+          <div id="stage-banner" class="stage-banner" hidden><span id="banner-small">REGIÃO DESCOBERTA</span><strong id="banner-title">Clareira dos Ecos</strong></div>
+          <button type="button" id="next-room" class="next-room" data-testid="next-room" hidden>Portal aberto · Próxima região <span>→</span></button>
+          <div id="pause-screen" class="overlay screen" hidden><div class="overlay-panel"><span class="pill">INTERVALO</span><h2>A aventura <em>espera</em></h2><p>Respire, ajuste seu plano e volte ao vale.</p><button id="resume-game" class="primary-btn">Continuar <span>→</span></button><button class="outline-btn back-menu">Voltar ao menu</button></div></div>
+          <div id="end-screen" class="overlay screen" hidden><div class="overlay-panel"><span id="end-badge" class="pill">AVENTURA CONCLUÍDA</span><h2 id="end-title">O vale foi <em>salvo</em></h2><p id="end-copy">O Guardião da Aurora foi derrotado.</p><div class="end-stats"><span>PONTUAÇÃO</span><strong id="final-score">0000</strong></div><button id="retry-game" class="primary-btn">Jogar novamente <span>↻</span></button><button class="outline-btn back-menu">Escolher outro herói</button></div></div>
+          <div id="touch" class="touch-controls" hidden><div class="touch-move"><button data-key="ArrowLeft" aria-label="Mover para esquerda">◀</button><button data-key="ArrowRight" aria-label="Mover para direita">▶</button></div><div class="touch-actions"><button data-key="Space" aria-label="Pular">↑</button><button data-key="KeyZ" aria-label="Atacar">⚔</button><button data-key="KeyX" aria-label="Habilidade especial">✦</button></div></div>
+        </div>
+        <div class="frame-bottom"><div class="control-guide"><span><kbd>←</kbd><kbd>→</kbd> Mover</span><span><kbd>ESPAÇO</kbd> Pular</span><span><kbd>Z</kbd> Ataque</span><span><kbd>X</kbd> Especial</span><span><kbd>SHIFT</kbd> Investida</span><span><kbd>ESC</kbd> Pausar</span></div><span class="version">ALPHA 0.1.0</span></div>
+      </div>
+      <section class="below">
+        <div><span class="eyebrow">UM PROJETO DA LUNA</span><h2>Uma aventura, <em>infinitas versões.</em></h2><p>Este protótipo é um laboratório jogável para testar física, classes, combates e qualidade de código. A meta é que a Luna aprenda a construir, testar e melhorar seus próprios jogos.</p></div>
+        <div class="features"><span><b>03</b><small>CLASSES JOGÁVEIS</small></span><span><b>03</b><small>ÁREAS DE MISSÃO</small></span><span><b>01</b><small>CHEFE FINAL</small></span></div>
+      </section>
+    </main>
+    <footer>✦ LUNA ARCADE S1 <span>Jogo original · Criado para o laboratório Brain-SSD</span></footer>
+  </div>
+</body>
+</html>
