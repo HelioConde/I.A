@@ -43,7 +43,8 @@ class TestLunaForgeBrainSSD(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             db=Path(temp)/"feedback.sqlite3"
             self.assertEqual(bridge.add_feedback(db,"luna","Pulo","código inacabado"),1)
-            with sqlite3.connect(db) as connection:
+            from contextlib import closing
+            with closing(sqlite3.connect(db)) as connection:
                 value=connection.execute("SELECT approved FROM feedback").fetchone()[0]
             self.assertEqual(value,0)
 
