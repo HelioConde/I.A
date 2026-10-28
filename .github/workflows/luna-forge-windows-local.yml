@@ -10,6 +10,8 @@ on:
       - "experiments/luna-forge-zero/luna_local.py"
       - "experiments/luna-forge-zero/train_private_lua.py"
       - "experiments/luna-forge-zero/audit_excluded_lua_metadata.py"
+      - "experiments/luna-forge-zero/review_local_lua_scopes.py"
+      - "tests/test_luna_local_scope_review.py"
       - "tests/test_luna_excluded_lua_metadata.py"
       - "experiments/luna-forge-zero/preview_private_lua.py"
       - "tests/test_luna_private_lua_training.py"
@@ -35,6 +37,8 @@ on:
       - "experiments/luna-forge-zero/luna_local.py"
       - "experiments/luna-forge-zero/train_private_lua.py"
       - "experiments/luna-forge-zero/audit_excluded_lua_metadata.py"
+      - "experiments/luna-forge-zero/review_local_lua_scopes.py"
+      - "tests/test_luna_local_scope_review.py"
       - "tests/test_luna_excluded_lua_metadata.py"
       - "experiments/luna-forge-zero/preview_private_lua.py"
       - "tests/test_luna_private_lua_training.py"
@@ -109,6 +113,11 @@ jobs:
         shell: pwsh
         run: |
           python -m unittest discover -s tests -p test_luna_local_ollama.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test local client Lua scope review without opening data
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_scope_review.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Test metadata-only audit of excluded Lua trees
         shell: pwsh
