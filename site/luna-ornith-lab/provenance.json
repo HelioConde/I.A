@@ -1,0 +1,48 @@
+{
+  "status": "STATIC_REPAIR",
+  "source_run": 40659377921,
+  "patches": [
+    {
+      "task": "finite_physics_velocity",
+      "accepted": true,
+      "trials": [
+        {
+          "attempt": 1,
+          "accepted": true,
+          "reason": "MODEL_PATCH_CANDIDATE",
+          "raw_sha256": "97b8182f7accfbadf9fdeb087d5c83b2bb86ccab26335aede24a752b5b372049",
+          "model_piece": "player = { x: 80, y: 392, w: 28, h: 28, hp: 3, vy: 0, onGround: true };"
+        }
+      ]
+    },
+    {
+      "task": "physical_keyboard_codes",
+      "accepted": true,
+      "trials": [
+        {
+          "attempt": 1,
+          "accepted": false,
+          "reason": "missing_contract",
+          "raw_sha256": "5c31a26419fb6302b426d23668be87199783339917826baf46def8c81e61e7a4",
+          "model_piece": null
+        },
+        {
+          "attempt": 2,
+          "accepted": true,
+          "reason": "MODEL_PATCH_CANDIDATE",
+          "raw_sha256": "f524d81871a15510b08a67f4fa40a762542ed3776ff39e1373a60780c9db3bc2",
+          "model_piece": "const k = e.code;"
+        }
+      ]
+    }
+  ],
+  "patch_count": 2,
+  "gameplay_verified": false,
+  "assistant_gameplay_code_used": false,
+  "source_sha256": "167fd01f0c3aa62c94add0d37b5824735bbd5639657296179fccca2481966011",
+  "repaired_sha256": "e6e8f5536d6b633e9b69f9e06b7abc6210ad77dd5e1bef1371b16404ca85e7de",
+  "model": "ornith-1.5-9b",
+  "model_sha256": "70c112196e0b7023803c9762752e46d29e612a92c83f995bc3ba1ceb07e8fab6",
+  "original_inference": 40653494692,
+  "original_browser_replay": 40659377921
+}
