@@ -108,6 +108,17 @@ class LocalCoderTests(unittest.TestCase):
             self.assertFalse(result["active_luna_weights_modified"])
             self.assertEqual(chat.call_count,2)
 
+    def test_can_select_already_installed_qwen35_without_changing_default(self):
+        self.assertEqual(backend.DEFAULT_MODEL,"qwen2.5-coder:3b")
+        self.assertIn("qwen3.5:4b",backend.MODELS)
+        with mock.patch.object(backend,"installed_models",return_value=["qwen3.5:4b"]), \
+             mock.patch.object(backend,"chat",return_value="function jump(player){return player;}") as coder, \
+             mock.patch.object(backend,"syntax_check",return_value={"status":"pass","reason":"node --check"}):
+            result=backend.generate("Crie um pulo",model="qwen3.5:4b")
+            self.assertEqual(result["model"],"qwen3.5:4b")
+            self.assertFalse(result["generated_code_executed"])
+            coder.assert_called_once()
+
     def test_reject_large_or_unsupported_input(self):
         with self.assertRaises(ValueError):
             backend.generate("a"*2001)
