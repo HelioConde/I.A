@@ -1,0 +1,65 @@
+name: Luna Intelligence Lab — Real Qwen Evaluation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/intelligence-lab.yml"
+      - "tools/evaluate_luna_intelligence.py"
+  push:
+    branches:
+      - "lab/luna-intelligence-*"
+    paths:
+      - ".github/lab-requests/intelligence-*.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-intelligence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evaluator-self-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check evaluation code compiles
+        run: python -m compileall -q tools/evaluate_luna_intelligence.py
+      - name: Verify scoring rules with positive and negative fixtures
+        run: python tools/evaluate_luna_intelligence.py --self-test
+
+  real-qwen-abilities:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-intelligence-')) }}
+    needs: evaluator-self-check
+    runs-on: windows-latest
+    timeout-minutes: 40
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download pinned GGUF + official CPU llama.cpp; verify hashes
+        shell: pwsh
+        run: python tools/install_windows_chat.py --all
+      - name: Verify Qwen model and runtime startup
+        shell: pwsh
+        run: python tools/doctor_chat.py --profile economia --probe
+      - name: Evaluate REAL Qwen responses from Luna's ChatEngine
+        shell: pwsh
+        run: python tools/evaluate_luna_intelligence.py --profile economia --report results/chat_validation/intelligence.json
+      - name: Publish reproducible synthetic questions and outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-real-qwen-intelligence-report
+          path: results/chat_validation/intelligence.json
+          if-no-files-found: warn
+          retention-days: 14
