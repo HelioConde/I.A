@@ -48,6 +48,16 @@ O teste grava relatório em `results/game_agent/v2-latest.json`. O relatório n�
 
 **Limites atuais:** o backend nativo ainda usa CLI por solicitação no perfil Equilibrado; carregar o modelo várias vezes custa CPU e tempo. O resultado não prova originalidade plena, segurança de execução, jogabilidade ou ganho de RAM por SSD. A rubrica estática não é substituto de Playwright.
 
+## Primeira medição real v2 (2026-10-28)
+
+- [Execução Qwen 0.6B no Windows](https://github.com/HelioConde/I.A/actions/runs/40627615482) — jobs de infraestrutura e contrato concluídos com sucesso.
+- **Resultado do modelo: INCOMPLETE**. Duas tentativas reais de gerar `index.html`; as duas produziram propostas que falharam nos requisitos de `viewport` e `lang=`.
+- Sem um `index.html` aprovado, a ferramenta deliberadamente não avançou para o segundo arquivo `styles.css`; nenhum arquivo foi escrito no jogo nem executado.
+- Esta é uma **linha de base negativa válida**. O fato de o workflow ter status verde comprova execução/relatório, não competência de programação da Luna.
+- O artifact `luna-game-agent-v2-40627615482` contém métricas sanitizadas.
+
+A próxima comparação deve usar um modelo maior já existente localmente, com o mesmo protocolo e sem reajustar o teste depois de conhecer os resultados.
+
 ## Próxima evolução para atingir a meta
 
 1. Gerar o projeto de jogo com contexto dos arquivos aceitos e contratos de módulo, não só HTML/CSS.
