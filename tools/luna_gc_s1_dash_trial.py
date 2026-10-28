@@ -74,14 +74,14 @@ def valid_piece(raw:str,task:dict[str,Any])->tuple[bool,str,str]:
             return False,"invalid_key_handler",""
         tap="lastRightTap" if task["name"]=="right_dash" else "lastLeftTap"
         # Do not accept a dash on the first tap (timestamp starts at zero).
-        if not re.search(r"\\b"+tap+r"\\s*>\\s*0\\b",piece):
+        if not re.search(r"\b"+tap+r"\s*>\s*0\b",piece):
             return False,"first_tap_must_not_dash:require_"+tap+"_greater_than_zero",""
         # A tap must be recorded *after* determining speed. Otherwise the delta is zero.
-        assignments=list(re.finditer(r"\\b"+tap+r"\\s*=",piece))
-        speed=re.search(r"player\\.vx\\s*=",piece)
+        assignments=list(re.finditer(r"\b"+tap+r"\s*=",piece))
+        speed=re.search(r"player\.vx\s*=",piece)
         if not assignments or speed is None or assignments[0].start() < speed.start():
             return False,"tap_timestamp_must_update_after_speed_decision",""
-        if not re.search(r"if\\s*\\(\\s*!e\\.repeat\\s*\\)",piece):
+        if not re.search(r"if\s*\(\s*!e\.repeat\s*\)",piece):
             return False,"repeat_guard_required_for_timestamp_update",""
     return True,"candidate",piece
 
