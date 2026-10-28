@@ -1,0 +1,148 @@
+name: Luna GC-style S1.1 — Ornith9B True Model Dash
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-gc-ornith-*"
+    paths:
+      - ".github/lab-requests/luna-gc-ornith-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/luna_gc_s1_dash_ornith.py"
+      - ".github/workflows/luna-gc-ornith-dash.yml"
+permissions:
+  contents: read
+concurrency:
+  group: luna-gc-ornith-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - name: Verify source integrity gates and no fake game fallback
+        run: |
+          python -m compileall -q tools/luna_gc_s1_dash_trial.py tools/luna_gc_s1_dash_ornith.py
+          python -m unittest discover -s tests -p "test_luna_gc_dash_trial.py" -v
+          node --check site-tests/tests/luna-gc-dash.spec.js
+
+  ornith-model:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-gc-ornith-')) }}
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      CI: "true"
+      PYTHONUNBUFFERED: "1"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Build pinned new CPU llama.cpp supporting Qwen3.5 model architecture
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+          ./llama-build/bin/llama-cli --version
+      - name: Download exact official Ornith Q4 GGUF and verify published SHA-256
+        run: python tools/install_ornith_game_model.py --confirm-download --allow-linux-ci
+      - name: Real Ornith writes the same three GC-style dash patches
+        shell: bash
+        run: |
+          set +e
+          python tools/luna_gc_s1_dash_ornith.py --runtime llama-build/bin/llama-cli --attempts 2
+          rc=$?
+          set -e
+          if [[ $rc -eq 1 ]]; then
+            echo "Ornith failed native patch contract; preserve INCOMPLETE, do not invent game code." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          exit "$rc"
+      - name: Save model-generated snippets and audit SHA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-gc-ornith-raw-${{ github.run_id }}
+          path: results/luna-gc-s1-dash-ornith/
+          if-no-files-found: warn
+          retention-days: 30
+
+  browser:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-gc-ornith-')) }}
+    needs: ornith-model
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-gc-ornith-raw-${{ github.run_id }}
+          path: results/luna-gc-s1-dash-ornith
+      - name: Fail closed until all three authentic Ornith snippets satisfy source and SHA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('results/luna-gc-s1-dash-ornith')
+          r=json.loads((p/'provenance.json').read_text(encoding='utf-8'))
+          assert r['status']=='STATIC_CANDIDATE'
+          assert r['assistant_gameplay_code_used'] is False
+          assert len(r['attempts'])==3 and all(t['accepted'] for t in r['attempts'])
+          assert r['dash_patch_author']=='Luna Ornith-1.5-9B'
+          assert hashlib.sha256((p/'game.js').read_bytes()).hexdigest()==r['output_sha256']
+          PY
+          node --check results/luna-gc-s1-dash-ornith/game.js
+      - name: Install real Chromium
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve only isolated model candidate
+        shell: bash
+        run: |
+          python -m http.server 4815 --bind 127.0.0.1 --directory results/luna-gc-s1-dash-ornith > /tmp/ornith-dash.log 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4815/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/ornith-dash.log
+          exit 1
+      - name: Preserve original six Luna game behavior tests
+        working-directory: site-tests
+        env:
+          LUNA_ORIGINAL_URL: http://127.0.0.1:4815
+        run: npx playwright test --config playwright.luna-original.config.cjs
+      - name: Verify genuine double-tap dash and key-repeat behavior
+        working-directory: site-tests
+        env:
+          LUNA_GC_DASH_URL: http://127.0.0.1:4815
+        run: npx playwright test --config playwright.luna-gc-dash.config.cjs
+      - name: Save failed screenshots and traces or successful proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-gc-ornith-browser-${{ github.run_id }}
+          path: |
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
