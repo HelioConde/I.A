@@ -8,6 +8,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/inventory_local_data.py"
+      - "tests/test_luna_local_inventory.py"
       - ".github/workflows/luna-forge-windows-local.yml"
   pull_request:
     paths:
@@ -15,6 +17,8 @@ on:
       - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
       - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/inventory_local_data.py"
+      - "tests/test_luna_local_inventory.py"
       - ".github/workflows/luna-forge-windows-local.yml"
   workflow_dispatch:
 
@@ -43,6 +47,11 @@ jobs:
         shell: pwsh
         run: |
           python -m py_compile experiments/luna-forge-zero/luna_local.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test metadata-only local data inventory
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_inventory.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise installer without starting training
         shell: cmd
