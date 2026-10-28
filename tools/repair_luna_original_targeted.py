@@ -142,6 +142,10 @@ def sanitize_model_piece(raw: str, task: dict[str, Any]) -> tuple[bool, str, str
     missing = [word for word in task["requires"] if word not in text]
     if missing:
         return False, "missing_contract:" + ",".join(missing), ""
+    if task["id"] == "nearest_enemy_target" and (
+        ".alive" in text or "findClosestEnemy" in text or len(text) > 150
+    ):
+        return False, "unsafe_or_nonsensical_target_selection", ""
     if task["end"] is None and ("\n" in text or "{" in text or (";" in text and not task.get("allow_statement"))):
         return False, "expression_not_single", ""
     if task["id"] == "wave_progression" and ("mode =" in text or "mode=" in text):
