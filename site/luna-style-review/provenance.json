@@ -1,0 +1,24 @@
+{
+  "status": "STATIC_CSS_CANDIDATE",
+  "source_run": 40647732624,
+  "model": "Qwen3-4B-Q4_K_M.gguf",
+  "created_utc": "2026-10-28T07:22:39.495607+00:00",
+  "gameplay_verified": false,
+  "visual_verified": false,
+  "assistant_css_code_used": false,
+  "attempts": [
+    {
+      "attempt": 1,
+      "real": true,
+      "accepted": true,
+      "reason": "static_css_candidate",
+      "characters": 1211
+    }
+  ],
+  "model_authored_styles": true,
+  "provenance_sha256": {
+    "index.html": "717e312fa0a7fc3c86da9433ff114a1189c82854a7d5db9755823ff6d69ee7a0",
+    "styles.css": "eea97499070e777b2bb580636254ea1337c0ff5f624343dcd05f654f250cefa0",
+    "game.js": "4ffd218ba711a426273804f9bcd5f1a5c7c51088c3a068e6b2158ecbd03c2a33"
+  }
+}
