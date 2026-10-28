@@ -11,6 +11,9 @@ on:
       - "experiments/luna-forge-zero/benchmark_original_lua.py"
       - "experiments/luna-forge-zero/train_original_lua_v2.py"
       - "experiments/luna-forge-zero/benchmark_original_lua_v2.py"
+      - "experiments/luna-forge-zero/luna_lua_syntax.py"
+      - "tests/test_luna_lua_syntax.py"
+      - "experiments/luna-forge-zero/luna_codegen_model.py"
       - "tests/test_luna_original_lua_v2.py"
       - "tests/test_luna_benchmark_original_lua.py"
       - "experiments/luna-forge-zero/train_private_lua.py"
@@ -45,6 +48,9 @@ on:
       - "experiments/luna-forge-zero/benchmark_original_lua.py"
       - "experiments/luna-forge-zero/train_original_lua_v2.py"
       - "experiments/luna-forge-zero/benchmark_original_lua_v2.py"
+      - "experiments/luna-forge-zero/luna_lua_syntax.py"
+      - "tests/test_luna_lua_syntax.py"
+      - "experiments/luna-forge-zero/luna_codegen_model.py"
       - "tests/test_luna_original_lua_v2.py"
       - "tests/test_luna_benchmark_original_lua.py"
       - "experiments/luna-forge-zero/train_private_lua.py"
@@ -162,6 +168,12 @@ jobs:
         run: |
           $py = "experiments/luna-forge-zero/.venv/Scripts/python.exe"
           & $py -m unittest discover -s tests -p test_luna_private_lua_training_runtime.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify deterministic decoding and parse-only Lua checks
+        shell: pwsh
+        run: |
+          $py = "experiments/luna-forge-zero/.venv/Scripts/python.exe"
+          & $py -m unittest discover -s tests -p test_luna_lua_syntax.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Test scratch Lua V2 local CPU training and heldout probe
         shell: pwsh
