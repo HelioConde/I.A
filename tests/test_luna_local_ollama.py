@@ -64,6 +64,48 @@ class LocalCoderTests(unittest.TestCase):
             self.assertEqual(result["attempts"],1)
             chat.assert_called_once()
 
+    def test_core_flags_syntactically_valid_but_incomplete_movement(self):
+        flawed=(
+          "function moveHorizontal(player, dt, acceleration, friction, maxSpeed){"
+          "player.velocityX *= friction;"
+          "player.velocityX += acceleration * dt;"
+          "player.velocityX = Math.min(maxSpeed, player.velocityX);"
+          "player.positionX += player.velocityX * dt;}"
+        )
+        with mock.patch.object(backend,"installed_models",return_value=["qwen2.5-coder:3b"]), \
+             mock.patch.object(backend,"chat",return_value=flawed) as chat:
+            result=backend.generate("movimento horizontal com atrito",repair=False)
+            self.assertEqual(result["syntax"]["status"],"pass")
+            self.assertEqual(result["core_quality_review"]["rubric"]["indicators_detected"],1)
+            self.assertFalse(result["behavior_verified"])
+            chat.assert_called_once()
+
+    def test_teacher_suggests_one_semantic_revision_without_running_game(self):
+        flawed=(
+            "function moveHorizontal(player, dt, acceleration, friction, maxSpeed){"
+            "player.velocityX *= friction;player.velocityX += acceleration*dt;"
+            "player.velocityX=Math.min(maxSpeed,player.velocityX);"
+            "player.positionX += player.velocityX * dt;}"
+        )
+        revised=(
+            "function moveHorizontal(player,axis,dt,maxSpeed,friction){"
+            "if(axis===0){player.vx = Math.max(0,player.vx-friction*dt);}"
+            "else{player.vx+=axis*maxSpeed*dt;}"
+            "player.vx=Math.max(-maxSpeed,Math.min(maxSpeed,player.vx));"
+            "player.x += player.vx*dt;return player;}"
+        )
+        with mock.patch.object(backend,"installed_models",return_value=["qwen2.5-coder:3b"]), \
+             mock.patch.object(backend,"chat",side_effect=[flawed,revised]) as chat:
+            result=backend.generate("horizontal movement")
+            self.assertEqual(result["revision_reason"],"mechanic_heuristics")
+            self.assertEqual(result["attempts"],2)
+            self.assertEqual(result["syntax"]["status"],"pass")
+            self.assertGreater(result["core_quality_review"]["rubric"]["indicators_detected"],1)
+            self.assertFalse(result["generated_code_executed"])
+            self.assertFalse(result["behavior_verified"])
+            self.assertFalse(result["active_luna_weights_modified"])
+            self.assertEqual(chat.call_count,2)
+
     def test_reject_large_or_unsupported_input(self):
         with self.assertRaises(ValueError):
             backend.generate("a"*2001)
