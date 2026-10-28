@@ -45,11 +45,12 @@ def main():
         print("\n=== LUNA FORGE LOCAL / Brain-SSD ===")
         print("1 - Verificar os modelos")
         print("2 - Planejar um jogo (Planner)")
-        print("3 - Testar MiniCoder (experimental)")
+        print("3 - Testar MiniCoder inicial (sem pesos do candidato)")
         print("4 - Treinar candidato (MIT + exemplos Lua/JS originais; opt-in)")
         print("5 - Inventariar pasta local (somente metadados; sem treinar)")
         print("6 - Analisar formatos dos arquivos Lua (somente amostra, sem treinar)")
         print("7 - Resumir estruturas do Lua (funcoes/condicoes/lacos, sem treinar)")
+        print("8 - Testar ultimo candidato treinado (somente visualizar codigo)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -101,6 +102,11 @@ def main():
                 print("Somente contagens agregadas, ate 64 KiB por Lua. Nenhum codigo salvo ou treinado.")
                 rc=run(HERE/"profile_local_lua.py",folder,"--out",destination)
                 if rc==0: print("Relatorio local:",destination)
+        elif option=="8":
+            print("O candidato NÃO substitui a Luna. O codigo gerado nao sera executado.")
+            task=input("Qual funcao JavaScript original a GameCoder deve tentar criar? ").strip()
+            if task:
+                run(HERE/"preview_local_candidate.py","generate","--task",task,"--chars","180")
         else:
             print("Opcao invalida.")
 
