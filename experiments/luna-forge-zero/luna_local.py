@@ -60,6 +60,7 @@ def main():
         print("15 - Medir geracao Lua da Luna propria em 3 tarefas originais nao treinadas")
         print("16 - TREINAR Luna Lua V2 do zero (somente 6 mecanicas originais)")
         print("17 - Comparar Luna Lua V2 em 3 tarefas novas (sem executar codigo)")
+        print("18 - Diagnosticar Luna V2 (greedy, memoria de treino, sintaxe luac opcional)")
         print("0 - Sair")
         option=input("Opcao: ").strip()
         if option=="0":
@@ -194,6 +195,12 @@ def main():
             print("Testa ultimos pesos V2 locais nos 3 desafios originais SEM respostas.")
             print("Nao verifica sintaxe nem gameplay e nunca executa o codigo produzido.")
             run(HERE/"benchmark_original_lua_v2.py")
+        elif option=="18":
+            print("Diagnostico V2: gera codigo com escolha deterministica e compara tarefa treinada vs nao treinada.")
+            print("Tenta verificar SINTAXE via luac -p (sem executar). Sem luac, reporta indisponivel.")
+            print("Nao altera pesos, nao le Elsword nem executa o codigo gerado.")
+            run(HERE/"benchmark_original_lua_v2.py",
+                "--decode","greedy","--calibrate","--syntax","--chars","240")
         else:
             print("Opcao invalida.")
 
