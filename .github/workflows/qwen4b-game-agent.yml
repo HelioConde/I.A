@@ -1,0 +1,73 @@
+name: Luna GameDev — Qwen3 4B Comparison
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-game-4b-*"
+    paths:
+      - ".github/lab-requests/game-4b-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/install_game_coder_model.py"
+      - "tests/test_game_coder_model_install.py"
+      - ".github/workflows/qwen4b-game-agent.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-game-4b-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pins-and-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate SHA-256 pin policy without downloading a model
+        run: |
+          python -m compileall -q tools/install_game_coder_model.py
+          PYTHONPATH=src python -m unittest discover -s tests -p "test_game_coder_model_install.py" -v
+          python tools/install_game_coder_model.py
+
+  actual-4b-cpu:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-game-4b-')) }}
+    needs: pins-and-integrity
+    runs-on: windows-latest
+    timeout-minutes: 65
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned official CPU llama.cpp only
+        shell: pwsh
+        run: python tools/install_windows_chat.py --runtime
+      - name: Download 2.5 GB official 4B GGUF, verify exact revision/size/hash
+        shell: pwsh
+        run: python tools/install_game_coder_model.py --confirm-download
+      - name: Attempt same s0 game HTML+CSS task using real 4B model
+        shell: pwsh
+        run: |
+          python tools/run_game_agent_v2_windows.py --stage s0-plan --model-file Qwen3-4B-Q4_K_M.gguf --profile equilibrado --attempts 2 --report results/game_agent/qwen3-4b.json
+          $rc=$LASTEXITCODE
+          if ($rc -eq 1) {
+            Write-Host "Qwen3-4B did not satisfy the predefined coding benchmark; preserving valid negative result."
+            exit 0
+          }
+          exit $rc
+      - name: Publish sanitized comparison metadata, never generated code
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-game-coder-4b-${{ github.run_id }}
+          path: results/game_agent/qwen3-4b.json
+          if-no-files-found: warn
+          retention-days: 14
