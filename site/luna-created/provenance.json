@@ -1,0 +1,35 @@
+{
+  "project": "Luna: Constelação Perdida",
+  "release": "0.1.0-luna",
+  "description": "Independent Qwen-generated browser game. Integration, QA and deployment infrastructure by ChatGPT, never authored game HTML/CSS/JS.",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
+  "game_code_author": "Luna Qwen3-4B",
+  "assistant_gameplay_code_used": false,
+  "source_original_run": 40636116071,
+  "source_runs": [
+    40636116071,
+    40646692498,
+    40647732624,
+    40648093762,
+    40649304923,
+    40649603911
+  ],
+  "gameplay_proof_run": 40649304923,
+  "visual_clickability_proof_run": 40649603911,
+  "files": {
+    "index.html": {
+      "source_run": 40636116071,
+      "sha256": "717e312fa0a7fc3c86da9433ff114a1189c82854a7d5db9755823ff6d69ee7a0"
+    },
+    "game.js": {
+      "source_run": 40649304923,
+      "sha256": "bb213ddb4d6a476f5b1b0259b560f2c2f24a42e5aefa94effee555d49e081007"
+    },
+    "styles.css": {
+      "source_run": 40649603911,
+      "sha256": "eea97499070e777b2bb580636254ea1337c0ff5f624343dcd05f654f250cefa0"
+    }
+  },
+  "human_review_required": true,
+  "visual_quality_note": "Playable original Qwen candidate, not yet independently assessed as visually superior to the ChatGPT reference."
+}
