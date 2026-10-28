@@ -19,7 +19,7 @@ from luna_core_qa import review as core_review
 HOST="127.0.0.1"
 PORT=11434
 DEFAULT_MODEL="qwen2.5-coder:3b"
-MODELS=("qwen2.5-coder:3b","qwen2.5-coder:7b","qwen3:4b")
+MODELS=("qwen2.5-coder:3b","qwen2.5-coder:7b","qwen3:4b","qwen3.5:4b")
 SYSTEM=(
     "You are Luna GameCoder, a programmer of ORIGINAL browser game mechanics. "
     "Write complete syntactically valid standalone JavaScript ES2020 functions. "
