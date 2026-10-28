@@ -111,9 +111,9 @@ def region(code: str, task: dict[str, Any]) -> tuple[str, str, str]:
     end = task["end"]
     if task["id"] == "victory_gate":
         indices = [m.start() for m in re.finditer(re.escape(start), code)]
-        if len(indices) != 2:
-            raise ValueError("victory_markers_not_unique")
-        pos = indices[1]
+        if len(indices) != 1:
+            raise ValueError("final_victory_marker_not_unique")
+        pos = indices[0]
     else:
         if code.count(start) != 1:
             raise ValueError("source_marker_not_unique:" + task["id"])
