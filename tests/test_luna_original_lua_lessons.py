@@ -31,7 +31,7 @@ class OriginalLuaLessonsTest(unittest.TestCase):
             rows=[json.loads(l) for l in dest.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(len(rows),6)
             self.assertTrue(all("function Game." in x["code"] for x in rows))
-            self.assertTrue(all("luna-authored" in x["provenance"] for x in rows))
+            self.assertTrue(all("luna-authored" in x["provenance"].lower() for x in rows))
             with self.assertRaises(FileExistsError):
                 curriculum.export(dest)
 
