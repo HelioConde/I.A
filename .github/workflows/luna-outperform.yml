@@ -1,0 +1,73 @@
+name: Luna Outperform — Real Qwen Reference Bug Fix
+on:
+  workflow_dispatch:
+  push:
+    branches: 
+      - "lab/luna-outperform-*"
+    paths:
+      - ".github/lab-requests/outperform-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brain_ssd/chat/game_outperform_v1.py"
+      - "tools/run_game_outperform_windows.py"
+      - "tests/test_game_outperform_v1.py"
+      - ".github/workflows/luna-outperform.yml"
+permissions:
+  contents: read
+concurrency:
+  group: luna-outperform-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate strict one-line model patch safety and traceability
+        run: |
+          python -m compileall -q src/brain_ssd/chat/game_outperform_v1.py tools/run_game_outperform_windows.py
+          PYTHONPATH=src python -m unittest discover -s tests -p "test_game_outperform_v1.py" -v
+
+  real-qwen-4b:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/lab/luna-outperform-')) }}
+    needs: offline-contract
+    runs-on: windows-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install official pinned local CPU runtime and Qwen3-4B model
+        shell: pwsh
+        run: |
+          python tools/install_windows_chat.py --runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/install_game_coder_model.py --confirm-download
+          exit $LASTEXITCODE
+      - name: Ask actual model for reference-game fix; do not apply or execute
+        shell: pwsh
+        run: |
+          python tools/run_game_outperform_windows.py --attempts 2
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -eq 1) {
+            Write-Host "Model did not produce an accepted fix; preserving negative result."
+            exit 0
+          }
+          exit $exitCode
+      - name: Save authentic model attribution and negative/positive evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-outperform-qwen-${{ github.run_id }}
+          path: results/game_agent/outperform-touch-v1.json
+          if-no-files-found: warn
+          retention-days: 14
