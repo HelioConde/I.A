@@ -1,0 +1,166 @@
+name: Luna GameDev — Ornith 9B vs Qwen 4B Real Coding Trial
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-ornith-*"
+    paths:
+      - ".github/lab-requests/ornith-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/install_ornith_game_model.py"
+      - "tools/benchmark_luna_game_models.py"
+      - "tools/luna_game_model_selector.py"
+      - "tools/run_game_agent_v3_windows.py"
+      - "tests/test_luna_ornith_model.py"
+      - "tests/test_luna_game_model_selector.py"
+      - "site-tests/tests/model-gamedev.spec.js"
+      - "site-tests/playwright.model-gamedev.config.cjs"
+      - ".github/workflows/luna-ornith-game-benchmark.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luna-ornith-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test SHA pin, safety, syntax, and cross-model test contract
+        run: |
+          python -m compileall -q tools/install_ornith_game_model.py tools/benchmark_luna_game_models.py
+          python -m unittest discover -s tests -p "test_luna_ornith_model.py" -v
+          python -m unittest discover -s tests -p "test_luna_game_model_selector.py" -v
+          python tools/install_ornith_game_model.py
+          node --check site-tests/tests/model-gamedev.spec.js
+
+  native-browser:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-ornith-')) }}
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ornith-1.5-9b, qwen3-4b]
+    env:
+      PYTHONUNBUFFERED: "1"
+      CI: "true"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+      LUNA_GAMEDEV_MODEL_URL: http://127.0.0.1:4813
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Checkout pinned recent llama.cpp supporting Qwen3.5 architecture
+        uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Build llama.cpp CPU CLI in ephemeral runner
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+          ./llama-build/bin/llama-cli --version
+          free -h
+          df -h .
+      - name: Download selected pinned GGUF (never into repository)
+        shell: bash
+        run: |
+          if [[ "${{ matrix.model }}" == "ornith-1.5-9b" ]]; then
+            python tools/install_ornith_game_model.py --confirm-download --allow-linux-ci
+          else
+            python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install;print(install())"
+          fi
+      - name: Ask real model for full original JS game with identical game brief
+        id: generate
+        shell: bash
+        run: |
+          if [[ "${{ matrix.model }}" == "ornith-1.5-9b" ]]; then
+            model=models/Ornith-1.5-9B-Q4_K_M.gguf
+          else
+            model=models/Qwen3-4B-Q4_K_M.gguf
+          fi
+          mkdir -p "results/game_models/${{ matrix.model }}"
+          set +e
+          python tools/benchmark_luna_game_models.py \
+            --model "$model" \
+            --runtime llama-build/bin/llama-cli \
+            --label "${{ matrix.model }}" \
+            --out "results/game_models/${{ matrix.model }}" \
+            --attempts 2
+          code=$?
+          set -e
+          if [[ $code -eq 0 ]]; then
+            echo "accepted=true" >> "$GITHUB_OUTPUT"
+          elif [[ $code -eq 1 ]]; then
+            echo "accepted=false" >> "$GITHUB_OUTPUT"
+            echo "Model did not produce valid JS. Honest INCOMPLETE; browser job skipped." >> "$GITHUB_STEP_SUMMARY"
+          else
+            exit "$code"
+          fi
+      - name: Write explicit HTML test-only harness, not model game code
+        if: steps.generate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          cat > "results/game_models/${{ matrix.model }}/index.html" <<'HTML'
+          <!doctype html>
+          <html lang="pt-BR"><head><meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Luna real-model browser QA</title></head>
+          <body style="margin:0;background:#0e1425;color:white;overflow-x:hidden">
+          <main><canvas id="game" width="800" height="480"
+          style="width:100%;max-width:800px;height:auto"></canvas></main>
+          <script src="game.js" defer></script></body></html>
+          HTML
+      - name: Install Chromium and Playwright to execute model's actual game code
+        if: steps.generate.outputs.accepted == 'true'
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Serve only local candidate, no publishing or automatic merging
+        if: steps.generate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          python -m http.server 4813 --bind 127.0.0.1 --directory "results/game_models/${{ matrix.model }}" > /tmp/luna-model-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4813/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/luna-model-server.log
+          exit 1
+      - name: Real browser playtest (movement, grounded jump, true combat)
+        if: steps.generate.outputs.accepted == 'true'
+        working-directory: site-tests
+        run: npx playwright test --config playwright.model-gamedev.config.cjs
+      - name: Preserve true model source, hash, failures, browser trace, screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-game-model-${{ matrix.model }}-${{ github.run_id }}
+          path: |
+            results/game_models/${{ matrix.model }}/
+            site-tests/test-results/
+            site-tests/playwright-report/
+          if-no-files-found: warn
+          retention-days: 30
