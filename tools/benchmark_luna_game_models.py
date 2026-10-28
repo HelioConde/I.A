@@ -39,7 +39,7 @@ def sha(path:Path)->str:
             h.update(chunk)
     return h.hexdigest()
 
-def extract_llama_cli_source(raw:str)->str:
+def extract_llama_cli_source(raw:str,prompt:str|None=None)->str:
     """Strip llama.cpp interactive UI, prompt echo and perf footer.
 
     Recent llama-cli emits a banner, a shortened copy of our prompt and
@@ -51,7 +51,11 @@ def extract_llama_cli_source(raw:str)->str:
     if marker:
         text=raw[marker.end():]
     elif "Loading model..." in raw:
-        raise ValueError("cli_output_delimiter_not_found")
+        # Short prompts are displayed in full, without "(truncated)".
+        full_echo="\n> "+prompt+"\n" if prompt is not None else ""
+        if not full_echo or full_echo not in raw:
+            raise ValueError("cli_output_delimiter_not_found")
+        text=raw.split(full_echo,1)[1]
     else:
         return raw.strip()
     perf=re.search(r"\n\[ Prompt:\s*[\d.]+ t/s\s*\|\s*Generation:",text)
