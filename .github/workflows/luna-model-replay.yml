@@ -1,0 +1,114 @@
+name: Luna GameDev — Replay Original 9B vs 4B Browser Results
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "lab/luna-model-replay-*"
+    paths:
+      - ".github/lab-requests/model-replay-*.md"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/replay_luna_model_benchmark.py"
+      - "tests/test_luna_model_replay.py"
+      - "tools/benchmark_luna_game_models.py"
+      - ".github/workflows/luna-model-replay.yml"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: luna-real-model-replay-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: 
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify original model output extraction, SHA and no model-authored replacement
+        run: |
+          python -m unittest discover -s tests -p "test_luna_ornith_model.py" -v
+          python -m unittest discover -s tests -p "test_luna_model_replay.py" -v
+
+  replay-original-model-outputs:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref,'refs/heads/lab/luna-model-replay-')) }}
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [ornith-1.5-9b, qwen3-4b]
+    env:
+      LUNA_GAMEDEV_MODEL_URL: http://127.0.0.1:4813
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-game-model-${{ matrix.model }}-40653494692
+          run-id: 40653494692
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: archived-model/
+      - name: Convert archived llama.cpp UI output to actual model bytes, no regeneration
+        run: |
+          python tools/replay_luna_model_benchmark.py \
+            --raw-dir "archived-model/results/game_models/${{ matrix.model }}" \
+            --out "results/model_replay/${{ matrix.model }}" --label "${{ matrix.model }}"
+      - name: Install browser once for replayed model files
+        working-directory: site-tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Test each actual model attempt in Chromium; keep negative findings
+        shell: bash
+        run: |
+          set -euo pipefail
+          accepted=0
+          for attempt in 1 2; do
+            candidate="results/model_replay/${{ matrix.model }}/attempt-$attempt"
+            if [ ! -f "$candidate/game.js" ]; then
+              echo "Attempt $attempt rejected before browser for genuine source/format reason." >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            echo "Serving model's ORIGINAL attempt $attempt from $candidate" >> "$GITHUB_STEP_SUMMARY"
+            python -m http.server 4813 --bind 127.0.0.1 --directory "$candidate" >/tmp/model-http-$attempt.log 2>&1 &
+            pid=$!
+            sleep 2
+            mkdir -p "results/model_replay/${{ matrix.model }}/browser-$attempt"
+            set +e
+            (cd site-tests && npx playwright test --config playwright.model-gamedev.config.cjs --reporter=list) \
+              >"results/model_replay/${{ matrix.model }}/browser-$attempt/playwright.txt" 2>&1
+            code=$?
+            set -e
+            kill "$pid" || true
+            wait "$pid" 2>/dev/null || true
+            echo "Attempt $attempt browser exit: $code" >> "$GITHUB_STEP_SUMMARY"
+            echo "$code" >"results/model_replay/${{ matrix.model }}/browser-$attempt/exit_code.txt"
+            cat "results/model_replay/${{ matrix.model }}/browser-$attempt/playwright.txt"
+            if [ "$code" -eq 0 ]; then accepted=$((accepted+1)); fi
+          done
+          echo "Passed full browser attempts: $accepted/2" >> "$GITHUB_STEP_SUMMARY"
+          echo "$accepted" >"results/model_replay/${{ matrix.model }}/browser_pass_count.txt"
+      - name: Persist genuine sources, browser transcripts and replay audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-model-replay-${{ matrix.model }}-${{ github.run_id }}
+          path: results/model_replay/${{ matrix.model }}/
+          if-no-files-found: warn
+          retention-days: 30
