@@ -52,6 +52,22 @@ Workflow: [Luna GameDev — Ornith 9B vs Qwen 4B Real Coding Trial](../.github/w
 
 A infraestrutura/testes foram feitos pelo ChatGPT. O arquivo `game.js` do desafio será **100% saída do modelo**. O HTML de teste é suporte explicitamente atribuído ao avaliador.
 
+## Integração opcional com Luna GameDev local
+
+O comando de desafio GameDev agora usa `auto`, **somente quando o GGUF estiver instalado e SHA-256 verificado**. Com Ornith9B presente, escolhe Ornith; caso contrário, volta ao Qwen3-4B se estiver íntegro. O chat comum, o backend de pesquisa e a autoria do jogo já publicado **não são alterados**:
+
+    py tools/run_game_agent_v3_windows.py --model-file auto --attempts 2 --save-draft
+
+Para testar explicitamente o modelo antigo:
+
+    py tools/run_game_agent_v3_windows.py --model-file qwen3-4b --attempts 2
+
+Para forçar o novo (requer instalação local e runtime compatível com Qwen3.5):
+
+    py tools/run_game_agent_v3_windows.py --model-file ornith-1.5-9b --attempts 2
+
+Os códigos gerados pelo modelo só viram jogos publicados após revisão e testes reais. O modo `auto` não baixa arquivos, não altera perfil de chat e não muda as versões existentes.
+
 ## Gate para alterar o padrão
 
-Nenhum modelo default foi substituído antes do benchmark. Quando o Ornith demonstrar geração real e jogo testado com vantagem sobre Qwen3-4B, ativar seu perfil GameDev, mantendo Qwen como fallback e sem alterar chat comum nem dados locais. A publicação de um jogo superior também exige QA visual e avaliação do usuário.
+O default do script específico §run_game_agent_v3_windows.py§ é §auto§: Ornith é escolhido apenas se instalado e validado por hash; caso contrário Qwen3-4B. A preferência não implica que o novo modelo já seja superior em jogos. Nenhum modelo de chat comum foi substituído. Quando o Ornith demonstrar geração real e jogo testado com vantagem sobre Qwen3-4B, ativar seu perfil GameDev, mantendo Qwen como fallback e sem alterar chat comum nem dados locais. A publicação de um jogo superior também exige QA visual e avaliação do usuário.
