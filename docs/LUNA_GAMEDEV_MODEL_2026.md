@@ -99,3 +99,12 @@ Os dois modelos recebem o MESMO bloco real de `site/luna-created/game.js`. Bug o
 O Chromium de teste valida que o primeiro KeyZ tira **exatamente 10 HP**, roda novamente os seis testes completos de jogo e registra screenshots. O bloco aceito é escrito pela inferência real do respectivo modelo, sem reatribuir código do ChatGPT como modelo. Não atualiza jogo público automaticamente.
 
 **Modelo GameDev local:** o mecanismo `auto` prefere Ornith apenas quando instalado e com hash íntegro. Isso é uma opção experimental, **não uma alegação de que já venceu em qualidade**. Se o novo GGUF não abrir no runtime Windows, atualizar o llama.cpp usado pelo GameDev separadamente; não mexer no Core de pesquisa.
+
+
+## Evidência corrigida da comparação — 28/10/2026
+
+- [Replay de 4 arquivos reais de código](https://github.com/HelioConde/I.A/actions/runs/40657552587): **Ornith tentativa 2: 2/4 testes browser**, **Qwen tentativa 1: 1/4**. Outras duas tentativas não cumpriram o contrato de código do jogo. Não é vitória suficiente de nenhum modelo. O Ornith teve melhor pontuação nessa amostra, mas falhou em pulo e dano.
+- [Replay dos 6 patches reais de combate](https://github.com/HelioConde/I.A/actions/runs/40658035574): após limpar corretamente o prompt ecoado, 5 das 6 tentativas produziram patch JavaScript aceitável; uma do Ornith não garantia um único acerto. Quatro dessas tentativas passaram no teste **KeyZ = exatamente 10 HP**, porém **todas falharam em pelo menos uma parte da suíte original de jogo completo**. Não há patch autorizado para produção.
+- **Regressão encontrada:** ao corrigir o dano exagerado por quadro, a variável `attackDuration = 50` mantém o personagem em animação de ataque por muitos quadros, e o jogador perde HP antes de conseguir derrotar três ondas. A próxima correção deve equilibrar duração/cadência sem reintroduzir dano por frame.
+
+**Conclusão:** Ornith-1.5-9B permanece **modelo GameDev experimental**, preferido automaticamente só se GGUF estiver íntegro e runtime compatível. Qwen3-4B continua como fallback. A meta de um jogo superior ainda exige arquitetura incremental, QA de arte, animações e revisão humana. Não comparar porcentagens SWE-bench com sucesso em jogos e não publicar patches que reprovam o navegador.
