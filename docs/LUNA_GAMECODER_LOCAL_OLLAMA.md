@@ -91,3 +91,31 @@ A opcao 9 agora executa o seguinte processo, sem modificar o MiniCoder:
 6. exibir `core_quality_review` com pendencias e `behavior_verified: false`.
 
 Proximo objetivo: um runner **realmente isolado** para testes comportamentais e validacao humana de jogos gerados, sem executar codigo arbitrario diretamente no PC do usuario. A Luna Core ainda nao deve promover pesos de candidatos do zero baseada nessa heuristica.
+
+
+## Regressao real 2: gera JS valido, mas adiciona loop incorreto
+
+Em 28/10/2026, a segunda execucao local do `qwen2.5-coder:3b` gerou JS sintaticamente valido e a Luna Core classificou **2/5 indicadores** apos a revisao. A funcao melhorou o limite simetrico, mas:
+- nao recebe entrada esquerda/direita;
+- atribui `accelerationX = acceleration * deltaTime`, mas nao aplica essa aceleracao a `velocityX`;
+- utiliza `velocityX *= (1 - friction)`, friccao aplicada por quadro, dependente do FPS;
+- nao controla o estado neutro;
+- cria `gameLoop` e chama `requestAnimationFrame(gameLoop)` sem solicitacao. Este callback recebe **DOMHighResTimeStamp em milissegundos**, nao deltaTime em segundos. Por isso a posicao pode disparar se o timestamp for usado como `deltaTime`.
+
+### Correcao de processo
+
+- O prompt de movimento agora exige **somente uma funcao pura** `moveHorizontal(character, axis, deltaTime, options)`, com entrada assinada -1/0/+1, tempo em segundos, aceleracao/s e atrito escalados por deltaTime e clamp simetrico;
+- o verificador Core adiciona `blocking_issues`: aceleracao nunca aplicada a velocidade, multiplicador de atrito por quadro, uso indevido de `requestAnimationFrame`/loop e console.log extra;
+- um reparo proposto pelo modelo e escolhido quando reduz bloqueios sem perder substancialmente indicadores, ou melhora indicadores sem adicionar bloqueios;
+- nao ha execucao de codigo gerado. `indicators_detected=5` e `blocking_issue_count=0` ainda **nao sao prova de correção funcional**; testes de gameplay nao foram executados;
+- o menu 9 permite optar por `qwen3.5:4b`, que o usuario ja informou estar instalado, para **comparar resultados**; o padrao continua `qwen2.5-coder:3b`. Nao existe transferencia de conhecimento entre os pesos do Qwen e do MiniCoder.
+
+### Teste local apos atualizacao
+
+```powershell
+$repo = "$env:USERPROFILE\Documents\Luna-Forge-Local"
+git -C $repo pull --ff-only
+& "$repo\experiments\luna-forge-zero\ABRIR-LUNA-FORGE.cmd"
+```
+
+Escolha `9`, confirme o modelo padrao com **Enter** ou escolha `2` para `qwen3.5:4b`. Repita exatamente o pedido de movimento para uma comparacao humana justa. Nenhuma alteracao de sistema ou treinamento adicional sera feita.
