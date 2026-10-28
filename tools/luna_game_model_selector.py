@@ -12,6 +12,7 @@ from install_windows_chat import verified_file
 
 PREFERRED=("ornith-1.5-9b",ORNITH_FILE,ORNITH_SHA)
 FALLBACK=("qwen3-4b",QWEN_FILE,QWEN_SHA)
+MODERN_ORNITH_RUNTIME=Path("third_party/llama.cpp/ornith-gamedev-win-cpu-x64/llama-cli.exe")
 
 def choose_game_coder(root:Path,requested:str="auto")->tuple[str,str]:
     """Returns (model label, GGUF filename); no download or automatic promotion."""
@@ -29,5 +30,9 @@ def choose_game_coder(root:Path,requested:str="auto")->tuple[str,str]:
             continue
         if not verified_file(target,sha256=digest):
             raise ValueError("Invalid model SHA256: "+filename)
+        if name=="ornith-1.5-9b" and not (root/MODERN_ORNITH_RUNTIME).is_file():
+            if requested=="auto":
+                continue
+            raise FileNotFoundError("Ornith installed but modern llama.cpp missing. Run install_ornith_game_runtime.py --confirm-download")
         return name,filename
     raise FileNotFoundError("Nenhum modelo GameDev íntegro. Execute o instalador GGUF desejado.")
