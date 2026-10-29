@@ -15,6 +15,14 @@ REFERENCE = """function updateGame(state,input,dt) {
 
 
 class ArcadeBuilderTests(unittest.TestCase):
+    def test_game_completion_has_extended_token_budget(self):
+        with patch.object(builder, "local_json",
+                          return_value={"message": {"content": REFERENCE}}) as call:
+            result = builder.arcade_chat(builder.DEFAULT_MODEL, [])
+        self.assertEqual(result, REFERENCE)
+        self.assertEqual(call.call_args.args[:2], ("POST", "/api/chat"))
+        self.assertEqual(call.call_args.args[2]["options"]["num_predict"], 1400)
+
     def test_filter_accepts_pure_function(self):
         self.assertTrue(builder.validate_candidate(REFERENCE)[0])
 

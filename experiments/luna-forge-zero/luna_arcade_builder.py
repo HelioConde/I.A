@@ -15,7 +15,7 @@ import shutil
 from uuid import uuid4
 
 from luna_coder_ollama import (
-    DEFAULT_MODEL, MODELS, LocalModelError, chat, extract_code,
+    DEFAULT_MODEL, MODELS, LocalModelError, local_json, extract_code,
     installed_models, syntax_check,
 )
 
@@ -63,6 +63,26 @@ FORBIDDEN = re.compile(
 )
 
 
+
+def arcade_chat(model: str, messages: list[dict]) -> str:
+    """Allow longer gameplay completions without changing the existing coder."""
+    if model not in MODELS:
+        raise ValueError("Unapproved local model")
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "keep_alive": "5m",
+        "options": {"temperature": 0.15, "num_ctx": 4096, "num_predict": 1400},
+    }
+    result = local_json("POST", "/api/chat", payload, timeout=300)
+    message = result.get("message", {})
+    response = message.get("content") if isinstance(message, dict) else None
+    if not isinstance(response, str):
+        raise LocalModelError("Ollama returned no gameplay source")
+    return response
+
+
 def validate_candidate(source: str) -> tuple[bool, str]:
     if not isinstance(source, str) or len(source.encode("utf-8")) > MAX_JS:
         return False, "Source exceeds 16 KiB"
@@ -78,7 +98,7 @@ def validate_candidate(source: str) -> tuple[bool, str]:
 
 
 def build(task: str, model: str = DEFAULT_MODEL, *, root: Path | None = None,
-          request=chat) -> dict:
+          request=arcade_chat) -> dict:
     task = task.strip()
     if not 1 <= len(task) <= MAX_TASK:
         raise ValueError("Task must contain 1..900 characters")
