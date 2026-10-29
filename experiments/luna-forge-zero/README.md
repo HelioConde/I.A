@@ -118,3 +118,9 @@ reservado). Nenhum caso funcional gerado pelo modelo foi executado porque não
 havia saída de teste sintaticamente válida e Docker não estava disponível. Não
 há promoção ou alegação de capacidade; comparação e hashes estão em
 `MINICODER_V3_RESULTS.json`.
+### Luna Arcade Lab — referencia jogavel e geracao via Ollama
+
+O subdiretorio luna-arcade-sandbox/ contem uma demo 2D feita manualmente. Use
+luna_arcade_builder.py para gerar uma tentativa de mecanica com Ollama local,
+checar sintaxe e salvar em pasta separada para revisao. Essa saida nao e
+atribuida aos pesos da MiniCoder V3. Instrucoes: LUNA_ARCADE_LAB.md.

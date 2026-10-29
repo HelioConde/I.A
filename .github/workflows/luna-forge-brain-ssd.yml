@@ -53,3 +53,7 @@ jobs:
           test_brain_ssd_bridge
           test_gameplay_contracts
           test_minicoder_v3
+          test_luna_arcade_builder
+      - run: node --check luna-arcade-sandbox/engine.js
+      - run: node --check luna-arcade-sandbox/gameplay.js
+      - run: node luna-arcade-sandbox/test_reference_gameplay.cjs
