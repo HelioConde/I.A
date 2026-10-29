@@ -100,3 +100,21 @@ aqui e registradas em `GAMECODER_BASELINE_2026-10-29.json`. Nenhum checkpoint
 V0/V2 está presente nesta cópia do workspace. Portanto não foi treinado/promovido
 modelo, criado protótipo alegadamente gerado pela Luna, nem afirmada capacidade
 de gerar jogos.
+
+### MiniCoder V3 — completação supervisionada experimental
+
+V3 agora tem arquitetura, tokenizer, currículo original e treinador isolados,
+com supervisão apenas na completação de código e contexto de 512 tokens.
+Treino/validação/teste são separados por projeto e família de mecânicas; soluções
+de teste não são armazenadas no currículo. Os relatórios permanecem candidatos
+não promovidos. Consulte `MINICODER_V3.md`; os contratos de gameplay continuam
+syntax-only por padrão e execução de candidatos é opt-in em Docker offline.
+
+O experimento inicial de 400 passos reduziu a perda de treino de 23,396 para
+1,204, mas a perda de validação subiu de 22,998 para 4,382. No benchmark original
+inalterado, V3 obteve 0/5 em sintaxe. O probe de 3.000 passos memorizou melhor os exemplos vistos,
+mas perdeu generalização (perda de validação 10,898, sintaxe 0/2 no teste
+reservado). Nenhum caso funcional gerado pelo modelo foi executado porque não
+havia saída de teste sintaticamente válida e Docker não estava disponível. Não
+há promoção ou alegação de capacidade; comparação e hashes estão em
+`MINICODER_V3_RESULTS.json`.

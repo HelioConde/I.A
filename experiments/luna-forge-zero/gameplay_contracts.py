@@ -150,7 +150,12 @@ def docker_behavior(candidate: str, task: dict) -> dict:
             return {"status": "INVALID_SANDBOX_RESULT"}
 
 
-def evaluate(checkpoint: Path, *, chars: int = 360, behavior: bool = False) -> dict:
+def evaluate(
+    checkpoint: Path,
+    *,
+    chars: int = 360,
+    behavior: bool = False,
+) -> dict:
     """Evaluate own MiniCoder checkpoint. No training, no imported game code."""
     if not 1 <= chars <= 960:
         raise ValueError("chars must be 1..960")
@@ -165,28 +170,96 @@ def evaluate(checkpoint: Path, *, chars: int = 360, behavior: bool = False) -> d
             h.update(chunk)
     if h.hexdigest() != report.get("weights_sha256"):
         raise ValueError("Checkpoint SHA256 mismatch")
-    from luna_codegen_model import Config, LunaMiniCoder
     import torch
-    model = LunaMiniCoder(Config(**report["config"]))
-    model.load_state_dict(torch.load(weights, map_location="cpu", weights_only=True, mmap=True), assign=True)
-    model.eval()
     scores = []
-    for task in TASKS:
-        prompt = prompt_for(task)
-        raw = model.generate(prompt, chars=chars, temperature=0, deterministic=True)
-        code = candidate_from_output(task, raw)
-        syntax = syntax_check(code)
-        outcome = docker_behavior(code, task) if behavior and syntax == "PASS" else {
-            "status": "SKIPPED_SYNTAX_FAILURE" if behavior else "NOT_TESTED"}
-        scores.append({"id": task["id"], "generated_sha256": hashlib.sha256(code.encode()).hexdigest(),
-                       "generated_characters": len(code), "syntax": syntax, "behavior": outcome})
-    return {"schema": "luna-gameplay-contracts-v1", "model": "MiniCoder scratch",
+    is_v3 = report.get("model_type") == "luna_minicoder_v3_sft"
+    if is_v3:
+        from luna_minicoder_v3 import LunaMiniCoderV3, V3Config, make_prompt
+        from train_minicoder_v3 import load_curriculum
+
+        model = LunaMiniCoderV3(V3Config(**report["config"]))
+        model.load_state_dict(
+            torch.load(weights, map_location="cpu", weights_only=True, mmap=True),
+            assign=True,
+        )
+        curriculum_path = Path(__file__).resolve().parent / "minicoder_v3_curriculum.json"
+        document, groups = load_curriculum(curriculum_path)
+        curriculum_digest = hashlib.sha256(
+            curriculum_path.read_bytes()
+        ).hexdigest()
+        if curriculum_digest != report.get("curriculum_sha256"):
+            raise ValueError("V3 curriculum SHA-256 mismatch")
+        seen_ids = set(document["seen_diagnostic_ids"])
+        evaluation_tasks = [
+            (task, "seen_diagnostic")
+            for task in groups["train"]
+            if task["id"] in seen_ids
+        ] + [(task, "test") for task in groups["test"]]
+        for task, split in evaluation_tasks:
+            prompt = make_prompt(task)
+            code, terminated = model.generate(prompt, max_new_tokens=chars)
+            code = code.strip()
+            syntax = syntax_check(code)
+            outcome = docker_behavior(code, task) if behavior and syntax == "PASS" else {
+                "status": "SKIPPED_SYNTAX_FAILURE" if behavior else "NOT_TESTED"}
+            scores.append({
+                "id": task["id"],
+                "split": split,
+                "generated_sha256": hashlib.sha256(code.encode()).hexdigest(),
+                "generated_characters": len(code),
+                "terminated_with_eos": terminated,
+                "syntax": syntax,
+                "behavior": outcome,
+            })
+        model_name = "MiniCoder V3 supervised completion"
+        reserved_test_count = len(groups["test"])
+        seen_diagnostic_count = len(seen_ids)
+    else:
+        from luna_codegen_model import Config, LunaMiniCoder
+        model = LunaMiniCoder(Config(**report["config"]))
+        model.load_state_dict(
+            torch.load(weights, map_location="cpu", weights_only=True, mmap=True),
+            assign=True,
+        )
+        model.eval()
+        for task in TASKS:
+            prompt = prompt_for(task)
+            raw = model.generate(prompt, chars=chars, temperature=0, deterministic=True)
+            code = candidate_from_output(task, raw)
+            syntax = syntax_check(code)
+            outcome = docker_behavior(code, task) if behavior and syntax == "PASS" else {
+                "status": "SKIPPED_SYNTAX_FAILURE" if behavior else "NOT_TESTED"}
+            scores.append({"id": task["id"], "split": "legacy_benchmark",
+                           "generated_sha256": hashlib.sha256(code.encode()).hexdigest(),
+                           "generated_characters": len(code), "syntax": syntax, "behavior": outcome})
+        model_name = "MiniCoder scratch"
+        reserved_test_count = len(scores)
+        seen_diagnostic_count = 0
+    hashes = [row["generated_sha256"] for row in scores]
+    return {"schema": "luna-gameplay-contracts-v1", "model": model_name,
             "checkpoint_sha256": h.hexdigest(), "deterministic": True,
             "generated_code_executed_on_host": False,
             "behavior_enabled": behavior,
             "behavior_passed": sum(row["behavior"]["status"] == "PASS" for row in scores),
             "syntax_passed": sum(row["syntax"] == "PASS" for row in scores),
-            "tasks": len(TASKS), "results": scores,
+            "reserved_test_tasks": reserved_test_count,
+            "reserved_test_syntax_passed": sum(
+                row["syntax"] == "PASS" and row["split"] == "test" for row in scores
+            ),
+            "reserved_test_behavior_passed": sum(
+                row["behavior"]["status"] == "PASS" and row["split"] == "test" for row in scores
+            ),
+            "seen_diagnostic_tasks": seen_diagnostic_count,
+            "seen_diagnostic_syntax_passed": sum(
+                row["syntax"] == "PASS" and row["split"] == "seen_diagnostic" for row in scores
+            ),
+            "seen_diagnostic_behavior_passed": sum(
+                row["behavior"]["status"] == "PASS" and row["split"] == "seen_diagnostic"
+                for row in scores
+            ),
+            "repeated_outputs": len(hashes) - len(set(hashes)),
+            "termination_passed": sum(row.get("terminated_with_eos", False) for row in scores),
+            "tasks": len(scores), "results": scores,
             "warning": "Only generated candidates count; authored fixture tests do not prove model skill."}
 
 

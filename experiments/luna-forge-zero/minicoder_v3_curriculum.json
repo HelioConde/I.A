@@ -1,0 +1,229 @@
+{
+  "schema": "luna-minicoder-v3-curriculum-v1",
+  "provenance": "Original generic JavaScript mechanics authored for Luna MiniCoder V3. No external, commercial, KOM, Elsword, or Grand Chase code.",
+  "splits": {
+    "train": {
+      "project": "luna-original-platform-basics",
+      "families": [
+        "horizontal_movement",
+        "jump_input",
+        "gravity_step",
+        "axis_aligned_collision",
+        "health_damage",
+        "bounded_patrol",
+        "proximity_collectible",
+        "countdown_timer",
+        "state_transition"
+      ]
+    },
+    "validation": {
+      "project": "luna-original-mechanism-validation",
+      "families": [
+        "spring_response",
+        "moving_platform_interpolation"
+      ]
+    },
+    "test": {
+      "project": "luna-original-mechanism-test",
+      "families": [
+        "periodic_hazard",
+        "sensor_aggro"
+      ]
+    }
+  },
+  "seen_diagnostic_ids": [
+    "move_horizontal",
+    "jump_if_grounded",
+    "apply_gravity_step"
+  ],
+  "tasks": [
+    {
+      "id": "move_horizontal",
+      "split": "train",
+      "family": "horizontal_movement",
+      "project": "luna-original-platform-basics",
+      "objective": "Move a platform character horizontally using clamped input, speed, and delta time.",
+      "function_name": "moveHorizontal",
+      "parameters": "player, axis, speed, dt",
+      "solution": "function moveHorizontal(player, axis, speed, dt) {\n  const input = Math.max(-1, Math.min(1, axis));\n  player.x += input * speed * dt;\n  return player.x;\n}",
+      "cases": [
+        {"args": [{"x": 2}, 1, 100, 0.5], "expected": 52},
+        {"args": [{"x": 10}, -2, 20, 0.25], "expected": 5},
+        {"args": [{"x": 4}, 0, 40, 1], "expected": 4}
+      ]
+    },
+    {
+      "id": "jump_if_grounded",
+      "split": "train",
+      "family": "jump_input",
+      "project": "luna-original-platform-basics",
+      "objective": "Apply an upward jump impulse only when jump is pressed while grounded.",
+      "function_name": "jumpVelocity",
+      "parameters": "vy, grounded, pressed, impulse",
+      "solution": "function jumpVelocity(vy, grounded, pressed, impulse) {\n  if (grounded && pressed) return -Math.abs(impulse);\n  return vy;\n}",
+      "cases": [
+        {"args": [3, true, true, 12], "expected": -12},
+        {"args": [3, false, true, 12], "expected": 3},
+        {"args": [3, true, false, 12], "expected": 3}
+      ]
+    },
+    {
+      "id": "apply_gravity_step",
+      "split": "train",
+      "family": "gravity_step",
+      "project": "luna-original-platform-basics",
+      "objective": "Advance vertical velocity and position by gravity for one delta-time step.",
+      "function_name": "gravityStep",
+      "parameters": "body, gravity, dt",
+      "solution": "function gravityStep(body, gravity, dt) {\n  body.vy += gravity * dt;\n  body.y += body.vy * dt;\n  return body;\n}",
+      "cases": [
+        {"args": [{"y": 2, "vy": 0}, 10, 0.5], "expected": {"y": 4.5, "vy": 5}},
+        {"args": [{"y": 1, "vy": -2}, 4, 0.5], "expected": {"y": 0.5, "vy": 0}}
+      ]
+    },
+    {
+      "id": "aabb_overlap",
+      "split": "train",
+      "family": "axis_aligned_collision",
+      "project": "luna-original-platform-basics",
+      "objective": "Return whether two positive-area axis-aligned rectangles overlap; edge contact is not overlap.",
+      "function_name": "rectanglesOverlap",
+      "parameters": "a, b",
+      "solution": "function rectanglesOverlap(a, b) {\n  return a.x < b.x + b.w && a.x + a.w > b.x &&\n    a.y < b.y + b.h && a.y + a.h > b.y;\n}",
+      "cases": [
+        {"args": [{"x": 0, "y": 0, "w": 4, "h": 4}, {"x": 3, "y": 3, "w": 3, "h": 3}], "expected": true},
+        {"args": [{"x": 0, "y": 0, "w": 4, "h": 4}, {"x": 4, "y": 0, "w": 2, "h": 2}], "expected": false}
+      ]
+    },
+    {
+      "id": "clamp_damage",
+      "split": "train",
+      "family": "health_damage",
+      "project": "luna-original-platform-basics",
+      "objective": "Subtract non-negative damage and keep hit points between zero and maximum health.",
+      "function_name": "applyDamage",
+      "parameters": "hp, damage, maxHp",
+      "solution": "function applyDamage(hp, damage, maxHp) {\n  const safeMax = Math.max(0, maxHp);\n  return Math.max(0, Math.min(safeMax, hp - Math.max(0, damage)));\n}",
+      "cases": [
+        {"args": [75, 20, 100], "expected": 55},
+        {"args": [12, 99, 100], "expected": 0},
+        {"args": [120, -5, 100], "expected": 100}
+      ]
+    },
+    {
+      "id": "bounded_patrol",
+      "split": "train",
+      "family": "bounded_patrol",
+      "project": "luna-original-platform-basics",
+      "objective": "Move an enemy within horizontal bounds and reverse direction at a reached bound.",
+      "function_name": "patrolStep",
+      "parameters": "x, direction, speed, dt, minX, maxX",
+      "solution": "function patrolStep(x, direction, speed, dt, minX, maxX) {\n  const next = x + direction * speed * dt;\n  if (next <= minX) return { x: minX, direction: 1 };\n  if (next >= maxX) return { x: maxX, direction: -1 };\n  return { x: next, direction };\n}",
+      "cases": [
+        {"args": [9, 1, 4, 1, 0, 10], "expected": {"x": 10, "direction": -1}},
+        {"args": [5, -1, 2, 1, 0, 10], "expected": {"x": 3, "direction": -1}}
+      ]
+    },
+    {
+      "id": "collect_nearby",
+      "split": "train",
+      "family": "proximity_collectible",
+      "project": "luna-original-platform-basics",
+      "objective": "Mark a collectible as taken once the player is within the inclusive pickup radius.",
+      "function_name": "collectNearby",
+      "parameters": "player, item, radius",
+      "solution": "function collectNearby(player, item, radius) {\n  const dx = player.x - item.x;\n  const dy = player.y - item.y;\n  if (dx * dx + dy * dy > radius * radius) return false;\n  item.taken = true;\n  return true;\n}",
+      "cases": [
+        {"args": [{"x": 0, "y": 0}, {"x": 3, "y": 4, "taken": false}, 5], "expected": true},
+        {"args": [{"x": 0, "y": 0}, {"x": 6, "y": 0, "taken": false}, 5], "expected": false}
+      ]
+    },
+    {
+      "id": "advance_timer",
+      "split": "train",
+      "family": "countdown_timer",
+      "project": "luna-original-platform-basics",
+      "objective": "Decrease a countdown by delta time without allowing it to become negative.",
+      "function_name": "advanceTimer",
+      "parameters": "remaining, dt",
+      "solution": "function advanceTimer(remaining, dt) {\n  return Math.max(0, remaining - Math.max(0, dt));\n}",
+      "cases": [
+        {"args": [2, 0.5], "expected": 1.5},
+        {"args": [0.2, 1], "expected": 0}
+      ]
+    },
+    {
+      "id": "transition_state",
+      "split": "train",
+      "family": "state_transition",
+      "project": "luna-original-platform-basics",
+      "objective": "Advance an actor from idle to windup on a start event, and from windup to active when its timer expires.",
+      "function_name": "transitionState",
+      "parameters": "state, startPressed, elapsed, windupDuration",
+      "solution": "function transitionState(state, startPressed, elapsed, windupDuration) {\n  if (state === \"idle\" && startPressed) return \"windup\";\n  if (state === \"windup\" && elapsed >= windupDuration) return \"active\";\n  return state;\n}",
+      "cases": [
+        {"args": ["idle", true, 0, 0.2], "expected": "windup"},
+        {"args": ["windup", false, 0.3, 0.2], "expected": "active"},
+        {"args": ["active", true, 0, 1], "expected": "active"}
+      ]
+    },
+    {
+      "id": "spring_response",
+      "split": "validation",
+      "family": "spring_response",
+      "project": "luna-original-mechanism-validation",
+      "objective": "Launch a body upward only on contact with a spring while descending.",
+      "function_name": "springResponse",
+      "parameters": "vy, touchingSpring, launchSpeed",
+      "solution": "function springResponse(vy, touchingSpring, launchSpeed) {\n  if (touchingSpring && vy >= 0) return -Math.abs(launchSpeed);\n  return vy;\n}",
+      "cases": [
+        {"args": [3, true, 20], "expected": -20},
+        {"args": [-3, true, 20], "expected": -3}
+      ]
+    },
+    {
+      "id": "moving_platform_lerp",
+      "split": "validation",
+      "family": "moving_platform_interpolation",
+      "project": "luna-original-mechanism-validation",
+      "objective": "Move a platform toward its target by at most speed times delta time without overshooting.",
+      "function_name": "movePlatformToward",
+      "parameters": "position, target, speed, dt",
+      "solution": "function movePlatformToward(position, target, speed, dt) {\n  const step = Math.max(0, speed * dt);\n  const difference = target - position;\n  if (Math.abs(difference) <= step) return target;\n  return position + Math.sign(difference) * step;\n}",
+      "cases": [
+        {"args": [0, 10, 4, 1], "expected": 4},
+        {"args": [9, 10, 4, 1], "expected": 10}
+      ]
+    },
+    {
+      "id": "periodic_hazard",
+      "split": "test",
+      "family": "periodic_hazard",
+      "project": "luna-original-mechanism-test",
+      "objective": "Report whether a repeating hazard is active during its configured active portion.",
+      "function_name": "isHazardActive",
+      "parameters": "time, period, activeDuration",
+      "solution": null,
+      "cases": [
+        {"args": [0.2, 2, 0.5], "expected": true},
+        {"args": [0.8, 2, 0.5], "expected": false},
+        {"args": [2.2, 2, 0.5], "expected": true}
+      ]
+    },
+    {
+      "id": "sensor_aggro",
+      "split": "test",
+      "family": "sensor_aggro",
+      "project": "luna-original-mechanism-test",
+      "objective": "Choose chase when a player is inside the sensor radius, otherwise choose return when away from home, or idle at home.",
+      "function_name": "chooseAggroState",
+      "parameters": "enemyX, playerX, sensorRadius, homeX",
+      "solution": null,
+      "cases": [
+        {"args": [0, 3, 5, 0], "expected": "chase"},
+        {"args": [0, 8, 5, 0], "expected": "idle"},
+        {"args": [4, 12, 5, 0], "expected": "return"}
+      ]
+    }
+  ]
+}

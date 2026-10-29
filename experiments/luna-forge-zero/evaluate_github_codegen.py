@@ -28,14 +28,24 @@ def evaluate(checkpoint: Path) -> dict:
     weights=checkpoint/"weights.pt"
     if hashlib.sha256(weights.read_bytes()).hexdigest()!=report["weights_sha256"]:
         raise ValueError("Checkpoint integrity error")
-    model=LunaMiniCoder(Config(**report["config"]))
+    is_v3=report.get("model_type")=="luna_minicoder_v3_sft"
+    if is_v3:
+        from luna_minicoder_v3 import LunaMiniCoderV3,V3Config
+        model=LunaMiniCoderV3(V3Config(**report["config"]))
+    else:
+        model=LunaMiniCoder(Config(**report["config"]))
     model.load_state_dict(torch.load(weights,map_location="cpu",weights_only=True,mmap=True),assign=True)
     model.eval()
     node=shutil.which("node")
     results=[]
     for index,prompt in enumerate(PROMPTS):
-        raw=model.generate(prompt,chars=190,temperature=.6,deterministic=True)
-        code=raw[len(prompt):].split("\nFIM")[0].strip()
+        if is_v3:
+            continuation,terminated=model.generate(prompt,max_new_tokens=190)
+            code=continuation.strip()
+        else:
+            raw=model.generate(prompt,chars=190,temperature=.6,deterministic=True)
+            code=raw[len(prompt):].split("\nFIM")[0].strip()
+            terminated="\nFIM" in raw
         parse="unverified" if node is None else "fail"
         if node and len(code)>=8:
             with tempfile.TemporaryDirectory(prefix="luna_code_eval_") as temporary:
@@ -47,10 +57,17 @@ def evaluate(checkpoint: Path) -> dict:
         results.append({"id":index,"prompt":prompt,"generated_len":len(code),
                         "output_sha256":hashlib.sha256(code.encode()).hexdigest(),
                         "syntax_only":parse,
+                        "terminated":bool(terminated),
                         "behavior":"NOT_TESTED"})
     return {"checkpoint_sha256":report["weights_sha256"],
+            "model_type":report.get("model_type","legacy_minicoder"),
+            "training_loss":report.get("train_completion_loss_after",
+                                       report.get("history",[])[-1].get("train_loss")
+                                       if report.get("history") else None),
             "model_code_samples":len(results),
             "syntax_pass":sum(s["syntax_only"]=="pass" for s in results),
+            "repeated_outputs":len(results)-len({item["output_sha256"] for item in results}),
+            "termination_pass":sum(s["terminated"] for s in results),
             "results":results,
             "disclaimer":"Syntax is not functionality. No code was executed, no gameplay claim."}
 

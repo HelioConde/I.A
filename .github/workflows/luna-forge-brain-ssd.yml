@@ -52,3 +52,4 @@ jobs:
           test_evaluate_github_codegen
           test_brain_ssd_bridge
           test_gameplay_contracts
+          test_minicoder_v3
