@@ -55,7 +55,7 @@ TASK_CONTRACT = (
 )
 # Defense in depth only, not a guarantee that arbitrary JS is safe.
 FORBIDDEN = re.compile(
-    r"\b(?:fetch|require|import|eval|Function|XMLHttpRequest|WebSocket|"
+    r"\b(?:fetch|require|import|eval|XMLHttpRequest|WebSocket|"
     r"Worker|SharedWorker|document|window|navigator|location|localStorage|"
     r"sessionStorage|globalThis|process|setTimeout|setInterval|alert|"
     r"prompt|confirm|postMessage)\b|__proto__|\bprototype\b|\bconstructor\b",
@@ -70,7 +70,7 @@ def validate_candidate(source: str) -> tuple[bool, str]:
         return False, "Expected one global function updateGame"
     if len(re.findall(r"\bfunction\s+updateGame\s*\(", source)) != 1:
         return False, "Duplicate updateGame definitions"
-    if FORBIDDEN.search(source):
+    if FORBIDDEN.search(source) or re.search(r"\bFunction\s*\(", source):
         return False, "Forbidden browser/network/dynamic-execution identifier"
     if re.search(r"\bwhile\s*\(|\bfor\s*\(\s*;\s*;\s*\)", source):
         return False, "Unbounded loops require manual redesign"
