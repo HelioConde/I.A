@@ -1,0 +1,20 @@
+{
+  "baseline_id": "luna-minicoder-v2-user-confirmed-2026-10-29",
+  "evidence_source": "user-provided evaluation summary",
+  "recomputed_by_agent": false,
+  "model": "Luna MiniCoder V2",
+  "training_loss": {
+    "initial": 72.9614,
+    "final": 0.96618
+  },
+  "unseen_tasks": {
+    "count": 3,
+    "recognizable_functions_generated": 0,
+    "description": "generated code incoherent on three unseen tasks"
+  },
+  "interpretation": "Lower training loss did not establish generalization or functional game-code generation.",
+  "checkpoint_available_in_this_workspace": false,
+  "promotion_status": "not_promoted",
+  "outputs_executed": false,
+  "commercial_kom_data_used": false
+}

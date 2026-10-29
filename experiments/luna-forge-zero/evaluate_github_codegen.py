@@ -34,8 +34,7 @@ def evaluate(checkpoint: Path) -> dict:
     node=shutil.which("node")
     results=[]
     for index,prompt in enumerate(PROMPTS):
-        torch.manual_seed(900+index)
-        raw=model.generate(prompt,chars=190,temperature=.6)
+        raw=model.generate(prompt,chars=190,temperature=.6,deterministic=True)
         code=raw[len(prompt):].split("\nFIM")[0].strip()
         parse="unverified" if node is None else "fail"
         if node and len(code)>=8:

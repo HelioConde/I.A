@@ -125,7 +125,16 @@ def _load(folder, max_mib):
     return torch.load(checkpoint,map_location="cpu",weights_only=True,mmap=True),report
 
 
-def infer(request, checkpoints, knowledge=None, mode="auto", max_mib=64, max_chars=160, seed=4):
+def infer(
+    request,
+    checkpoints,
+    knowledge=None,
+    mode="auto",
+    max_mib=64,
+    max_chars=160,
+    seed=4,
+    deterministic=False,
+):
     """Load only the selected model; no generated code is executed."""
     import torch
     torch.set_num_threads(min(torch.get_num_threads(),4))
@@ -149,8 +158,14 @@ def infer(request, checkpoints, knowledge=None, mode="auto", max_mib=64, max_cha
             model=LunaMiniCoder(Config(**report["config"]))
             model.load_state_dict(state,assign=True)
             model.eval()
-            torch.manual_seed(seed)
-            result={"raw_generated_text":model.generate(request,chars=min(512,max(1,max_chars)),temperature=.6),
+            if not deterministic:
+                torch.manual_seed(seed)
+            result={"raw_generated_text":model.generate(
+                        request,
+                        chars=min(512,max(1,max_chars)),
+                        temperature=.6,
+                        deterministic=deterministic,
+                    ),
                     "warning":"Experimental output, not syntax/behavior-verified and never executed here"}
         weights=sum(p.numel()*p.element_size() for p in model.parameters())
         del model,state
@@ -190,6 +205,8 @@ def main():
     p.add_argument("--output",default="")
     p.add_argument("--max-mib",type=int,default=64)
     p.add_argument("--max-chars",type=int,default=160)
+    p.add_argument("--deterministic",action="store_true",
+                   help="Use greedy decoding for reproducible code output")
     a=p.parse_args()
     if a.action=="status":
         result={"experimental":True,"weights_present":{name:(a.checkpoints/name/"weights.pt").is_file()
@@ -201,7 +218,8 @@ def main():
     elif a.action=="feedback":
         result={"feedback_id":add_feedback(a.db,a.model_name,a.request,a.output),"status":"pending_review"}
     else:
-        result=infer(a.request,a.checkpoints,a.skills,mode=a.action,max_mib=a.max_mib,max_chars=a.max_chars)
+        result=infer(a.request,a.checkpoints,a.skills,mode=a.action,max_mib=a.max_mib,
+                     max_chars=a.max_chars,deterministic=a.deterministic)
     print(json.dumps(result,ensure_ascii=False,indent=2))
 
 if __name__=="__main__":

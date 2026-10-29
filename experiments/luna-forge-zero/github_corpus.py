@@ -98,7 +98,9 @@ def collect(out: Path, fetch=retrieve) -> dict:
                          "repository":source["repo"], "commit":source["commit"],
                          "path":path, "license":source["license"], "split":source["split"],
                          "category":source["category"],
-                         "sha256":sha256(payload), "source_url":raw_url(source["repo"], source["commit"], path),
+                         "sha256":sha256(payload),
+                         "normalized_sha256":sha256(text.encode("utf-8")),
+                         "source_url":raw_url(source["repo"], source["commit"], path),
                          "code":text})
     if not rows or not any(r["split"]=="holdout" for r in rows):
         raise ValueError("Both split groups required")
@@ -122,24 +124,62 @@ def collect(out: Path, fetch=retrieve) -> dict:
 def verify(out: Path) -> dict:
     out=Path(out)
     manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
-    if sha256((out/"corpus.jsonl").read_bytes()) != manifest["corpus_sha256"]:
+    corpus_bytes = (out/"corpus.jsonl").read_bytes()
+    if sha256(corpus_bytes) != manifest["corpus_sha256"]:
         raise ValueError("Dataset checksum mismatch")
+    notices_path = out / "LICENSE_NOTICES.json"
+    notices_bytes = notices_path.read_bytes()
+    if sha256(notices_bytes) != manifest["licenses_sha256"]:
+        raise ValueError("License notice checksum mismatch")
+    notices = json.loads(notices_bytes)
     sources = {s["repo"]:s for s in SOURCES}
-    rows = [json.loads(line) for line in (out/"corpus.jsonl").read_text(encoding="utf-8").splitlines()]
+    rows = [json.loads(line) for line in corpus_bytes.decode("utf-8").splitlines()]
     expected = {(s["repo"], p) for s in SOURCES for p in s["files"]}
     if {(r["repository"],r["path"]) for r in rows} != expected or len(rows) != len(expected):
         raise ValueError("Dataset file list mismatch")
+    notice_by_repo = {notice["repo"]: notice for notice in notices}
+    if len(notice_by_repo) != len(SOURCES) or set(notice_by_repo) != set(sources):
+        raise ValueError("License notice repository list mismatch")
+    for repo, source in sources.items():
+        notice = notice_by_repo[repo]
+        if (
+            notice.get("commit") != source["commit"]
+            or notice.get("license") != source["license"]
+            or notice.get("license_source") != source["evidence"]
+            or source["evidence_phrase"].casefold()
+            not in notice.get("license_text", "").casefold()
+        ):
+            raise ValueError("License evidence mismatch for " + repo)
     for row in rows:
         spec=sources[row["repository"]]
-        if row["commit"]!=spec["commit"] or row["split"]!=spec["split"] or row["license"]!="MIT":
+        if (
+            row["commit"] != spec["commit"]
+            or row["split"] != spec["split"]
+            or row["license"] != spec["license"]
+            or row["category"] != spec["category"]
+            or row["source_url"] != raw_url(row["repository"], row["commit"], row["path"])
+        ):
             raise ValueError("Source provenance mismatch")
-        # Origin SHA is based on original response bytes; text may normalize CRLF.
         if not row["code"].strip() or "\0" in row["code"]:
             raise ValueError("Invalid source code")
-    if manifest["train_files"]!=sum(r["split"]=="train" for r in rows):
-        raise ValueError("Split count mismatch")
+        if "normalized_sha256" in row and sha256(row["code"].encode("utf-8")) != row["normalized_sha256"]:
+            raise ValueError("Normalized source checksum mismatch")
+        if not re.fullmatch(r"[a-f0-9]{64}", row["sha256"]):
+            raise ValueError("Invalid source checksum")
+    train_files = sum(r["split"] == "train" for r in rows)
+    holdout_files = sum(r["split"] == "holdout" for r in rows)
+    train_repos = sorted({r["repository"] for r in rows if r["split"] == "train"})
+    holdout_repos = sorted({r["repository"] for r in rows if r["split"] == "holdout"})
+    if (
+        manifest["train_files"] != train_files
+        or manifest["holdout_files"] != holdout_files
+        or manifest["train_repositories"] != train_repos
+        or manifest["holdout_repositories"] != holdout_repos
+        or set(train_repos) & set(holdout_repos)
+    ):
+        raise ValueError("Split manifest mismatch")
     return {"verified":True,"files":len(rows),"repos":len(sources),
-            "train":manifest["train_files"],"holdout":manifest["holdout_files"]}
+            "train":train_files,"holdout":holdout_files}
 
 def main():
     cli=argparse.ArgumentParser()
