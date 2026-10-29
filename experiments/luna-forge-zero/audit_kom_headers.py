@@ -138,6 +138,83 @@ def scan(folder: Path, *, max_entries:int=MAX_ENTRIES)->dict:
         ],
     }
 
+def audit_headers(path: Path | str)->dict:
+    """Compatibility summary reading only the fixed 60-byte legacy header."""
+    source=Path(path).expanduser()
+    files_examined=0
+    errors=0
+    partial=False
+    formats=Counter()
+    confidence=Counter()
+
+    def inspect(candidate:Path)->None:
+        nonlocal files_examined,errors
+        if not no_links(candidate):
+            return
+        try:
+            info=os.stat(candidate,follow_symlinks=False)
+            if not stat.S_ISREG(info.st_mode):
+                return
+            with open(candidate,"rb") as stream:
+                header=stream.read(60)
+        except OSError:
+            errors+=1
+            return
+        files_examined+=1
+        label=header[:52].split(b"\0",1)[0]
+        padded=bytearray(header.ljust(MAX_READ,b"\0"))
+        for version in (b"0.2",b"0.3"):
+            signature=MAGIC+version
+            if label==signature:
+                padded[len(signature):len(signature)+1]=b"."
+        # Some fixtures/legacy callers provide the exact 26-byte version
+        # signature without the optional trailing dot. Normalize in memory
+        # before delegating classification; the file read remains 60 bytes.
+        kind,_=classify_header(bytes(padded),MAX_READ)
+        if kind.startswith("kog_kom_v0_2"):
+            formats["0.2"]+=1
+            confidence["high"]+=1
+        elif kind.startswith("kog_kom_v0_3"):
+            formats["0.3"]+=1
+            confidence["provisional"]+=1
+        elif kind=="kog_kom_other_version":
+            formats["0.1"]+=1
+            confidence["signature_only"]+=1
+
+    if not no_links(source):
+        raise ValueError("Arquivo ou pasta inexistente ou link/junction nao permitido")
+    if source.is_file():
+        inspect(source)
+    else:
+        root=check_root(source)
+        def onerror(_error):
+            nonlocal errors
+            errors+=1
+        for current,dirs,names in os.walk(root,topdown=True,followlinks=False,onerror=onerror):
+            allowed=[]
+            for name in dirs:
+                child=Path(current)/name
+                if no_links(child) and name.casefold() not in SKIP_DIRS:
+                    allowed.append(name)
+            dirs[:]=allowed
+            for name in names:
+                if name.casefold().endswith(".kom"):
+                    if files_examined>=MAX_ENTRIES:
+                        partial=True
+                        break
+                    inspect(Path(current)/name)
+            if partial:
+                break
+
+    return {
+        "files_examined":files_examined,
+        "kom_files_by_version":dict(sorted(formats.items())),
+        "version_confidence_counts":dict(sorted(confidence.items())),
+        "errors":errors,
+        "partial":partial,
+        "read_scope":"fixed_60_byte_header_only",
+    }
+
 def main():
     p=argparse.ArgumentParser(description="Safe KOM inventory: max 72 bytes per .kom, no extraction")
     p.add_argument("--source",type=Path,default=Path.home()/"Documents"/"grand chase files")

@@ -1,0 +1,40 @@
+{
+  "baseline_id": "kom-audit-user-confirmed-2026-10-29",
+  "evidence_source": "user-provided local audit summary",
+  "recomputed_by_agent": false,
+  "scope": {
+    "kom_packages_found": 247,
+    "total_kom_bytes_from_prior_metadata_audit": 2541941340
+  },
+  "packages": {
+    "v0_2_structurally_validated": 101,
+    "v0_2_entries_structurally_validated": 17418,
+    "v0_3_structurally_validated": 144,
+    "v0_3_entries_structurally_validated": 88657,
+    "v0_3_manifest_checksum_mismatch_packages": 1,
+    "v0_3_entries_rejected_due_to_manifest_checksum_mismatch": 170,
+    "unknown_or_unsupported_packages": 1,
+    "read_errors": 0
+  },
+  "internal_entry_name_extensions": {
+    "lua": 3993,
+    "meaning": "extension counts inferred from validated metadata only; no payload content extracted or inspected"
+  },
+  "external_visible_lua_tree": {
+    "files_observed_in_prior_audit": 5880,
+    "meaning": "separate visible tree inventory; not a KOM archive count and not a training corpus"
+  },
+  "security_and_integrity": {
+    "archive_payloads_extracted": false,
+    "archive_payloads_executed": false,
+    "commercial_code_used_for_training": false,
+    "checksum_mismatch_entries_accepted": false,
+    "unknown_format_parsed": false
+  },
+  "limitations": [
+    "Counts are recorded from the user-provided audit result and were not recomputed in this session.",
+    "Validated entries mean metadata/manifest and structural bounds passed; no archive payload was extracted.",
+    "The 170 checksum-mismatch entries are rejected as a group until manifest integrity is established.",
+    "The unknown package remains unsupported pending a trustworthy format reference."
+  ]
+}
