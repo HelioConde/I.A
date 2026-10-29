@@ -51,3 +51,4 @@ jobs:
           test_github_corpus
           test_evaluate_github_codegen
           test_brain_ssd_bridge
+          test_gameplay_contracts
