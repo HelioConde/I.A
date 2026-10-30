@@ -4,7 +4,10 @@ on:
   push:
     branches: [feature/luna-gamedev-knowledge-v1]
     paths:
-      - "benchmarks/luna_arcade_s1/**"
+      - "benchmarks/luna_arcade_s1/prompt_m1.txt"
+      - "benchmarks/luna_arcade_s1/mission.json"
+      - "benchmarks/luna_arcade_s1/lua_mechanics_contract.json"
+      - "benchmarks/luna_arcade_s1/qa/**"
       - "tools/benchmark_luna_game_models.py"
       - "tools/prepare_luna_arcade_prompt.py"
       - "knowledge/game_dev/**"
@@ -15,11 +18,17 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "benchmarks/luna_arcade_s1/**"
+      - "benchmarks/luna_arcade_s1/prompt_m1.txt"
+      - "benchmarks/luna_arcade_s1/mission.json"
+      - "benchmarks/luna_arcade_s1/qa/**"
       - "tools/benchmark_luna_game_models.py"
       - "tools/prepare_luna_arcade_prompt.py"
       - ".github/workflows/luna-arcade-s1-model.yml"
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
   contents: read
