@@ -20,21 +20,21 @@ PROMPT=ROOT/"benchmarks/luna_arcade_s1/prompt_visual_skin.txt"
 
 def clean_skin(raw: str) -> str:
     text=raw.strip()
-    text=re.sub(r"^<think>.*?</think>\\s*","",text,flags=re.I|re.S)
-    text=re.sub(r"(?:\\[end of text\\]|</s>|<\\|im_end\\|>)\\s*$","",text).strip()
-    match=re.fullmatch(r"```(?:javascript|js)?\\s*\\n(.*?)\\n```",text,re.I|re.S)
+    text=re.sub(r"^<think>.*?</think>\s*","",text,flags=re.I|re.S)
+    text=re.sub(r"(?:\[end of text\]|</s>|<\|im_end\|>)\s*$","",text).strip()
+    match=re.fullmatch(r"```(?:javascript|js)?\s*\n(.*?)\n```",text,re.I|re.S)
     if match: text=match.group(1).strip()
     if not 350<=len(text)<=20000:raise ValueError("invalid_skin_size")
-    if DANGEROUS.search(text) or re.search(r"<script|document\\.|\\b(?:window\\.location|XMLHttpRequest)\\b",text,re.I):
+    if DANGEROUS.search(text) or re.search(r"<script|document\.|\b(?:window\.location|XMLHttpRequest)\b",text,re.I):
         raise ValueError("unsafe_visual_source")
-    if not re.search(r"window\\.LunaSkin\\s*=",text):
+    if not re.search(r"window\.LunaSkin\s*=",text):
         raise ValueError("missing_LunaSkin_assignment")
-    if not re.search(r"\\bdraw\\s*\\(\\s*ctx\\s*,\\s*state\\s*,\\s*time\\s*\\)",text):
+    if not re.search(r"\bdraw\s*\(\s*ctx\s*,\s*state\s*,\s*time\s*\)",text):
         raise ValueError("missing_draw_contract")
-    if not re.search(r"ctx\\.(?:fillRect|arc|fill|stroke)\\s*\\(",text):
+    if not re.search(r"ctx\.(?:fillRect|arc|fill|stroke)\s*\(",text):
         raise ValueError("missing_canvas_drawing")
     if not syntax_valid(text):raise ValueError("javascript_syntax_error")
-    return text+"\\n"
+    return text+"\n"
 
 def generate(runtime:Path,model:Path,out:Path,attempts:int=2)->dict:
     if not runtime.is_file() or not model.is_file():
@@ -47,7 +47,7 @@ def generate(runtime:Path,model:Path,out:Path,attempts:int=2)->dict:
             "assistant_visual_code_used":False,"model_visual_verified":False,"attempts":[]}
     feedback=""
     for i in range(1,attempts+1):
-        full=prompt+("\\nCorreção da tentativa anterior: "+feedback+
+        full=prompt+("\nCorreção da tentativa anterior: "+feedback+
                      ". Reescreva APENAS o módulo completo." if feedback else "")
         began=time.monotonic()
         try:
@@ -69,7 +69,7 @@ def generate(runtime:Path,model:Path,out:Path,attempts:int=2)->dict:
             "status":feedback,"seconds":round(time.monotonic()-began,1)})
         if report["status"]=="STATIC_VISUAL_CANDIDATE":break
     (out/"visual-provenance.json").write_text(
-        json.dumps(report,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+        json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     return report
 
 def main()->int:
