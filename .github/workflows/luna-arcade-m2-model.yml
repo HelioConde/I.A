@@ -60,7 +60,14 @@ jobs:
       - name: Use learned Luna Core router to select game skills
         run: |
           python tools/prepare_luna_arcade_prompt.py --output results/luna_arcade_m2/prepared_prompt.txt --report results/luna_arcade_m2/router_provenance.json
-          cp benchmarks/luna_arcade_s1/prompt_m2.txt results/luna_arcade_m2/prepared_prompt.txt
+          python - <<'PY'
+          from pathlib import Path
+          dest=Path('results/luna_arcade_m2/prepared_prompt.txt')
+          original=dest.read_text(encoding='utf-8')
+          skills=original.split('Skills selecionadas pelo roteador treinado',1)
+          mission=Path('benchmarks/luna_arcade_s1/prompt_m2.txt').read_text(encoding='utf-8')
+          dest.write_text(mission + ('\nSkills selecionadas pelo roteador treinado'+skills[1] if len(skills)>1 else ''), encoding='utf-8')
+          PY
       - name: Generate M2 combat + visual code using real Luna GameCoder model
         id: model
         shell: bash
@@ -89,7 +96,7 @@ jobs:
           cd site-tests
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
-          node check-luna-arcade-m1.cjs
+          LUNA_M1_REPORT=../results/luna_arcade_m2/browser-evidence.json node check-luna-arcade-m1.cjs
           code=$?
           echo "Chromium diagnostic exit code: $code"
           exit "$code"
