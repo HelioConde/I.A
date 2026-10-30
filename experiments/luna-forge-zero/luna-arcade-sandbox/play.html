@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' http://127.0.0.1:8765; style-src 'self' http://127.0.0.1:8765; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <title>Luna Star Trail — Arena</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="gameplay.js" defer></script>
+  <script src="engine.js" defer></script>
+</head>
+<body class="play">
+  <div class="play-wrap">
+    <div class="hud"><span class="hud-name">✦ STAR TRAIL</span><span id="hud-stars">ESTRELAS 0/3</span><span id="hud-health">❤ ❤ ❤</span><button type="button" id="restart" title="Recomeçar jogo">↻ REINICIAR</button></div>
+    <canvas id="game" width="960" height="540" aria-label="Jogo de plataformas em canvas com controles de teclado e toque">Seu navegador não suporta Canvas.</canvas>
+    <p id="game-status" class="status" role="status" aria-live="polite">Colete as estrelas e alcance o portal!</p>
+    <div class="touch-controls" aria-label="Controles para tela sensível ao toque"><button type="button" data-input="left" aria-label="Mover para a esquerda">◀</button><button type="button" data-input="right" aria-label="Mover para a direita">▶</button><button type="button" data-input="jump" class="jump" aria-label="Pular">PULAR ↟</button></div>
+  </div>
+</body>
+</html>

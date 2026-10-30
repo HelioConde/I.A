@@ -1,0 +1,61 @@
+name: Luna Forge Zero - Brain SSD storage and isolation
+
+on:
+  push:
+    branches:
+      - feature/luna-forge-zero
+    paths:
+      - "experiments/luna-forge-zero/**"
+      - "tests/test_luna_forge_brain_ssd.py"
+      - ".github/workflows/luna-forge-brain-ssd.yml"
+  pull_request:
+    paths:
+      - "experiments/luna-forge-zero/**"
+      - "tests/test_luna_forge_brain_ssd.py"
+      - ".github/workflows/luna-forge-brain-ssd.yml"
+  workflow_dispatch:
+
+jobs:
+  linux-storage-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -p test_luna_forge_brain_ssd.py -v
+  windows-storage-contract:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -p test_luna_forge_brain_ssd.py -v
+  windows-kom-gamecoder-regressions:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: experiments/luna-forge-zero
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt
+      - run: >-
+          python -m unittest -v
+          test_audit_kom_index
+          test_audit_baseline
+          test_luna_codegen_model
+          test_github_corpus
+          test_evaluate_github_codegen
+          test_brain_ssd_bridge
+          test_gameplay_contracts
+          test_minicoder_v3
+          test_luna_arcade_builder
+          test_source_review
+          test_source_review_batch2
+      - run: node --check luna-arcade-sandbox/engine.js
+      - run: node --check luna-arcade-sandbox/gameplay.js
+      - run: node luna-arcade-sandbox/test_reference_gameplay.cjs

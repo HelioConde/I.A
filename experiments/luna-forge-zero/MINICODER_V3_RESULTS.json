@@ -1,0 +1,93 @@
+{
+  "schema": "luna-minicoder-v3-results-v1",
+  "candidate_status": "not_promoted",
+  "previous_candidate_user_report": {
+    "parameters": 116480,
+    "context_characters": 128,
+    "original_benchmark_syntax": "0/5",
+    "two_prompt_format_success": "0/10",
+    "identical_continuation_hashes": "7/10",
+    "training_loss": [72.9614, 0.96618],
+    "checkpoint_sha256": null,
+    "source": "user-provided report; checkpoint not present or loaded; loss objective is not directly comparable to V3 SFT completion loss"
+  },
+  "v3_selected_checkpoint": {
+    "path": "checkpoints/luna-minicoder-v3-validation-selected",
+    "sha256": "396f167ac9a56bc945fcc00daed0912783a4fcf58a64b0de63e9029ecb98a001",
+    "parameters": 33312,
+    "context": 512,
+    "training_steps": 400,
+    "selected_validation_step": 200,
+    "train_completion_loss": {
+      "before": 23.396135,
+      "selected": 2.652029,
+      "last_step": 1.204201
+    },
+    "validation_completion_loss": {
+      "before": 22.998114,
+      "selected": 3.244906,
+      "last_step": 4.382402
+    },
+    "exact_original_five_prompt_benchmark": {
+      "syntax_pass": "0/5",
+      "repeated_outputs": "0/5",
+      "eos_termination": "0/5"
+    },
+    "seen_training_diagnostics": {
+      "tasks": 3,
+      "syntax_pass": "0/3",
+      "functional_cases_executed": 0,
+      "eos_termination": "0/3"
+    },
+    "unseen_test_families": {
+      "tasks": 2,
+      "families": ["periodic_hazard", "sensor_aggro"],
+      "syntax_pass": "0/2",
+      "functional_cases_executed": 0,
+      "eos_termination": "0/2"
+    }
+  },
+  "extended_training_probe": {
+    "path": "checkpoints/luna-minicoder-v3-3000-step-probe",
+    "sha256": "0761261f8e950b6349a21a9551451d68b7704f240644eca038ad318414da2d84",
+    "steps": 3000,
+    "train_completion_loss": 0.000615,
+    "validation_completion_loss": 10.897835,
+    "seen_training_syntax_pass": "3/3",
+    "seen_training_functional_cases_executed": 0,
+    "unseen_test_syntax_pass": "0/2",
+    "unseen_test_functional_cases_executed": 0,
+    "original_five_prompt_syntax_pass": "0/5",
+    "original_five_prompt_eos_termination": "3/5",
+    "interpretation": "Severe overfitting. Docker was unavailable; generated candidates were not executed."
+  },
+  "initial_400_step_final_checkpoint": {
+    "path": "checkpoints/luna-minicoder-v3-candidate",
+    "sha256": "37d79032cd78899b3badcf9413f57884637f0ec73e6d76880b99596f019a85b4",
+    "train_completion_loss": 1.204201,
+    "validation_completion_loss": 4.382402,
+    "original_five_prompt_syntax_pass": "0/5",
+    "unseen_test_syntax_pass": "0/2",
+    "unseen_test_eos_termination": "2/2",
+    "functional_cases_executed": 0
+  },
+  "functional_test_safety": {
+    "default_mode": "syntax only",
+    "generated_output_executed_on_host": false,
+    "docker_available_during_run": false,
+    "handwritten_fixture_passes_count_as_model_score": false
+  },
+  "data_provenance": {
+    "curriculum": "original generic JavaScript authored for Luna",
+    "external_corpus_collected_or_used": false,
+    "commercial_kom_or_game_client_code_used": false,
+    "previous_checkpoints_loaded_or_modified": false
+  },
+  "conclusion": "The short-term target was not met. V3 learned the training distribution according to loss, but the selected checkpoint generated no syntax-valid benchmark or unseen-task function. The extended probe overfit. Do not promote.",
+  "next_steps": [
+    "Improve tokenizer and structured completion format; investigate exact-match and validation behavior before increasing training.",
+    "Expand original curriculum with more diverse but safe train/validation examples while keeping reserved families/project isolated.",
+    "Repeat functional scoring only when syntax-valid model output exists and Docker is available.",
+    "Compare against V2 only after a user-selected, compatible local checkpoint is available; preserve its hash and exact prompts."
+  ]
+}

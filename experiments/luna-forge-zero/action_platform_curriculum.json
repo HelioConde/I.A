@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-28",
+  "title": "Original action-platform curriculum for Luna Teacher Core",
+  "provenance": "New original code written for Luna; generic mechanics only. No copyrighted Grand Chase client code, assets, characters, proprietary animation or network protocol are included.",
+  "no_external_code": true,
+  "trained_on_this_dataset": false,
+  "usage": "Trainer may ingest only split=train after verification; split=holdout must remain unseen and be evaluated on independently implemented tests.",
+  "tasks": [
+    {
+      "id": "platform_acceleration",
+      "split": "train",
+      "language": "javascript",
+      "objective": "Implementar aceleracao e atrito na movimentacao horizontal",
+      "criteria": [
+        "frame_rate_independent",
+        "max_speed",
+        "symmetric_input"
+      ],
+      "reference_solution": "function moveHorizontal(p, axis, dt) {\n  const speed = 260;\n  const accel = 1450;\n  const target = Math.max(-1, Math.min(1, axis)) * speed;\n  const diff = Math.max(-accel * dt, Math.min(accel * dt, target - p.vx));\n  p.vx += diff;\n  p.x += p.vx * dt;\n  if (Math.abs(p.vx) > 0.1) p.facing = Math.sign(p.vx);\n  return p;\n}"
+    },
+    {
+      "id": "jump_and_gravity",
+      "split": "train",
+      "language": "javascript",
+      "objective": "Implementar salto, gravidade e aterrissagem em plataforma",
+      "criteria": [
+        "grounded_check",
+        "gravity",
+        "landing"
+      ],
+      "reference_solution": "function jumpAndGravity(p, jump, dt, floorY) {\n  if (jump && p.grounded) {\n    p.vy = -620;\n    p.grounded = false;\n  }\n  p.vy = Math.min(980, p.vy + 1700 * dt);\n  p.y += p.vy * dt;\n  if (p.y >= floorY && p.vy >= 0) {\n    p.y = floorY;\n    p.vy = 0;\n    p.grounded = true;\n  }\n  return p;\n}"
+    },
+    {
+      "id": "combo_timing",
+      "split": "train",
+      "language": "javascript",
+      "objective": "Construir um sistema original de ate tres ataques com janela de combo",
+      "criteria": [
+        "input_window",
+        "reset",
+        "max_chain"
+      ],
+      "reference_solution": "function advanceCombo(state, attackPressed, now) {\n  if (now > state.windowEnd) state.chain = 0;\n  if (attackPressed && now >= state.nextReady) {\n    state.chain = Math.min(3, state.chain + 1);\n    state.nextReady = now + 0.2;\n    state.windowEnd = now + 0.7;\n    return state.chain;\n  }\n  return 0;\n}"
+    },
+    {
+      "id": "damage_knockback",
+      "split": "train",
+      "language": "javascript",
+      "objective": "Aplicar dano, invulnerabilidade curta e recuo no personagem",
+      "criteria": [
+        "hp_clamp",
+        "invulnerability",
+        "knockback"
+      ],
+      "reference_solution": "function applyHit(target, amount, direction, now) {\n  if (target.hp <= 0 || now < target.invulnerableUntil) return false;\n  target.hp = Math.max(0, target.hp - Math.max(0, amount));\n  target.vx = Math.sign(direction || 1) * 280;\n  target.vy = -160;\n  target.invulnerableUntil = now + 0.35;\n  return true;\n}"
+    },
+    {
+      "id": "aabb_hitbox",
+      "split": "train",
+      "language": "javascript",
+      "objective": "Detectar contato de hitboxes retangulares em combate 2D",
+      "criteria": [
+        "overlap",
+        "edge_contact",
+        "symmetry"
+      ],
+      "reference_solution": "function hitboxesOverlap(a, b) {\n  return a.x < b.x + b.w && a.x + a.w > b.x &&\n         a.y < b.y + b.h && a.y + a.h > b.y;\n}"
+    },
+    {
+      "id": "enemy_patrol",
+      "split": "train",
+      "language": "javascript",
+      "objective": "Patrulha de inimigo com retorno nos limites da plataforma",
+      "criteria": [
+        "bounce",
+        "speed",
+        "no_teleport"
+      ],
+      "reference_solution": "function patrolEnemy(enemy, left, right, dt) {\n  if (enemy.x >= right) enemy.direction = -1;\n  if (enemy.x <= left) enemy.direction = 1;\n  enemy.x = Math.max(left, Math.min(right, enemy.x + enemy.direction * 68 * dt));\n  return enemy;\n}"
+    },
+    {
+      "id": "godot_movement",
+      "split": "train",
+      "language": "gdscript",
+      "objective": "Movimentar personagem original de plataforma Godot 4",
+      "criteria": [
+        "input",
+        "gravity",
+        "move_and_slide"
+      ],
+      "reference_solution": "extends CharacterBody2D\nconst SPEED = 240.0\nconst JUMP = -480.0\nfunc _physics_process(delta: float) -> void:\n    velocity.y += 1200.0 * delta\n    velocity.x = Input.get_axis(\"ui_left\", \"ui_right\") * SPEED\n    if is_on_floor() and Input.is_action_just_pressed(\"ui_accept\"):\n        velocity.y = JUMP\n    move_and_slide()"
+    },
+    {
+      "id": "godot_patrol",
+      "split": "train",
+      "language": "gdscript",
+      "objective": "Criar inimigo basico com patrulha e retorno Godot 4",
+      "criteria": [
+        "bounds",
+        "gravity",
+        "move_and_slide"
+      ],
+      "reference_solution": "extends CharacterBody2D\n@export var left_bound = 100.0\n@export var right_bound = 400.0\nvar direction = 1.0\nfunc _physics_process(delta: float) -> void:\n    if global_position.x >= right_bound:\n        direction = -1.0\n    if global_position.x <= left_bound:\n        direction = 1.0\n    velocity.x = direction * 70.0\n    velocity.y += 1200.0 * delta\n    move_and_slide()"
+    },
+    {
+      "id": "ledge_recovery",
+      "split": "holdout",
+      "language": "javascript",
+      "objective": "Implementar deteccao de borda e recuperacao de movimento",
+      "criteria": [
+        "recover",
+        "edge_distance",
+        "dt"
+      ],
+      "reference_solution": null
+    },
+    {
+      "id": "boss_phase_switch",
+      "split": "holdout",
+      "language": "javascript",
+      "objective": "Criar chefe original que alterna padroes por HP",
+      "criteria": [
+        "hp_thresholds",
+        "state_machine",
+        "cooldown"
+      ],
+      "reference_solution": null
+    },
+    {
+      "id": "slime_pursuit",
+      "split": "holdout",
+      "language": "gdscript",
+      "objective": "Implementar inimigo com distancia de percepcao e retorno ao ponto inicial",
+      "criteria": [
+        "sensing",
+        "return_to_origin",
+        "movement"
+      ],
+      "reference_solution": null
+    },
+    {
+      "id": "platform_drop",
+      "split": "holdout",
+      "language": "javascript",
+      "objective": "Criar plataforma de atravessamento com queda por comando",
+      "criteria": [
+        "one_way_collision",
+        "jump_through",
+        "fall_through"
+      ],
+      "reference_solution": null
+    }
+  ]
+}

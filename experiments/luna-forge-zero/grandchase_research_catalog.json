@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-28",
+  "purpose": "Research audit for generic game-development curriculum; NOT a raw-code training allowlist",
+  "training_enabled": false,
+  "restrictions": [
+    "Do not ingest any third-party Grand Chase assets, models, textures, audio, archives, executables, DLLs or extracted/decompiled commercial game data.",
+    "Unlicensed source code must not enter training data.",
+    "MIT-licensed utilities are not presumed to license commercial game content, third-party submodules or extracted results.",
+    "Do not run downloaded executables, game clients, servers, protocol tools or decompilers.",
+    "Inspiration may cover generic platform-action systems; avoid direct copying of brand, characters, animations, maps, original code or other protected expression."
+  ],
+  "repositories": [
+    {
+      "repository": "Divv10/GcResourcesApp",
+      "url": "https://github.com/Divv10/GcResourcesApp",
+      "commit": "f3bee7ecd0e94add31f71dfcc4b799172bff0e9c",
+      "license": "MIT",
+      "category": "resources_tool",
+      "note": "C#/WPF resource management. MIT applies to original application code; potentially reusable for general tooling, not game mechanics.",
+      "disposition": "optional_code_after_review",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "SkelletonX/GrandChaseIV",
+      "url": "https://github.com/SkelletonX/GrandChaseIV",
+      "commit": "add799c80c0eb6636e6a0f1ed2fd3f1532cc74c0",
+      "license": "unspecified",
+      "category": "server_emulator",
+      "note": "C# center/game server implementation; no top-level reuse license identified.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "grandchaseproject/GrandChase-Playtest",
+      "url": "https://github.com/grandchaseproject/GrandChase-Playtest",
+      "commit": "4f69c46c17132a0c7da100e2b5b772c7d4f093ef",
+      "license": "unspecified",
+      "category": "proprietary_client_archive",
+      "note": "Commercial client EXE/DLLs, music, models and textures; not an open-source gameplay dataset.",
+      "disposition": "excluded",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "rocverde/GrandChaseSeasonV",
+      "url": "https://github.com/rocverde/GrandChaseSeasonV",
+      "commit": "f9f32c46d7e494216b8c01dd113bc32776489f79",
+      "license": "unspecified",
+      "category": "server_emulator",
+      "note": "Java emulator with SQL and bundled binaries, no top-level license identified.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "Diqxy1/grandchase",
+      "url": "https://github.com/Diqxy1/grandchase",
+      "commit": "f7f8ac58b28a8992615beb4cc280229581212ddd",
+      "license": "unspecified",
+      "category": "client_server_code",
+      "note": "C++ client/server tree, potential proprietary/third-party material; no top-level license identified.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "rockerudon/grandchase_toolkit",
+      "url": "https://github.com/rockerudon/grandchase_toolkit",
+      "commit": "99abf89aa27e5f72ab994cf833220cdfd1ada97c",
+      "license": "MIT",
+      "category": "extraction_tooling",
+      "note": "MIT tool code; contains decompiler and captured-key/crypto workflows, not a game development model dataset.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "rage123450/GrandChasePacketDecoder",
+      "url": "https://github.com/rage123450/GrandChasePacketDecoder",
+      "commit": "90cce432c7e2f50692ce36c72bafa0411b2329f9",
+      "license": "unspecified",
+      "category": "protocol_decoder",
+      "note": "Packet decoder with no top-level reuse license identified; unrelated to game mechanics.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "Raitou/GrandChaseSeasonEternal",
+      "url": "https://github.com/Raitou/GrandChaseSeasonEternal",
+      "commit": "1729b697db74a4d295902835c311504ef4269490",
+      "license": "unspecified",
+      "category": "server_emulator",
+      "note": "Partial Java emulator source; README notes legal restrictions on distributing private servers in South Korea.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    },
+    {
+      "repository": "AngelsOnlineDev/grandchase-kom-extractor",
+      "url": "https://github.com/AngelsOnlineDev/grandchase-kom-extractor",
+      "commit": "2c09ea436389fa6b94df3ad5590e4c032148b0bc",
+      "license": "MIT-with-third-party-notices",
+      "category": "extraction_tooling",
+      "note": "MIT wrapper with third-party components and crypto/key data. No extracted game content permitted.",
+      "disposition": "metadata_only",
+      "include_raw_code_in_training": false
+    }
+  ]
+}

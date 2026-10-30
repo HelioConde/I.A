@@ -1,0 +1,282 @@
+{
+  "schema": "luna-gamecoder-source-review-batch2-v1",
+  "reviewed_on": "2026-10-30",
+  "scope": "Additional GitHub game/engine/AI-project links supplied by user; metadata + selected LICENSE texts + representative directories",
+  "status": "METADATA_CURATED_NO_CODE_COLLECTED_NO_TRAINING",
+  "previous_review": "LUNA_GAMECODER_SOURCE_REVIEW.json",
+  "new_model_checkpoint": false,
+  "training_runs_started": 0,
+  "policy": {
+    "allowed_corpus_types": [
+      "approved_code_only_mit_gd_js_ts_tsx"
+    ],
+    "currently_imported_projects": 0,
+    "license_claim": "Project-level metadata insufficient for asset rights or third-party bundled code.",
+    "holdout": "Never train, tune prompts, run feedback repairs or select model on heldout projects.",
+    "no_binary_assets": true,
+    "no_external_demo_archives": true,
+    "no_auto_execute_third_party_source": true,
+    "third_party_notices_must_be_retained": true,
+    "existing_collector_remains_unchanged": true
+  },
+  "pin_verified_license_sources": [
+    {
+      "repo": "leigest519/OpenGame",
+      "commit": "c9bea37786af524bf3bbe802f2b67d23816fa5c0",
+      "license": "Apache-2.0",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "a3421c4979c1e9ada52329c162bf81ac34f91d01",
+      "role": "agent_architecture",
+      "status": "research_only",
+      "notes": "Agentic end-to-end web game generation; examine orchestration and evaluation, not generated demo ZIPs/IP assets.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "Donchitos/Claude-Code-Game-Studios",
+      "commit": "05ad7c8a5b8aa2aa86bbd3439ae7cf7295cac418",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "416f2e526e4764be3ed582f391debc631f32ae72",
+      "role": "agent_architecture",
+      "status": "research_only",
+      "notes": "Multi-agent game studio, roles, QA rubric, workflows; adapt ideas, not Claude-specific internals.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "ovidiuch/flatris",
+      "commit": "c01772a90af5149124aa2ba6099a6e658d344137",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "559407f404bccd51f6ec4ed0c92db208a202df86",
+      "role": "web_game",
+      "status": "code_candidate_pending_file_audit",
+      "notes": "JS state, reducer, input and multiplayer architecture; source only.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "craftyjs/Crafty",
+      "commit": "f3982baa51af24d4e8a14a3194fd3f0e92a2dcba",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "422aaa7c62b12a7346b579acdda1dc4b5a47d741",
+      "role": "engine_js",
+      "status": "code_candidate_pending_file_audit",
+      "notes": "Game engine movement, collision and input; library APIs are not standalone gameplay tasks.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "yenchenlin/DeepLearningFlappyBird",
+      "commit": "5a08d405b68facb784c7dc06ae0f6ad341c2a5a3",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "de70e8ec36f294ddd8837e6cc38b922c102f9d86",
+      "role": "game_ai",
+      "status": "reference_only",
+      "notes": "DQN learns gameplay policy by rewards; does not train a code-generating LLM.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "EllanJiang/GameFramework",
+      "commit": "d0c010b05167c58e92350449d04864a91ca13fd2",
+      "license": "MIT",
+      "license_evidence": "LICENSE.md",
+      "license_blob_sha": "384b88260bdfde55fdd39d87520cb027294da893",
+      "role": "engine_csharp",
+      "status": "reference_only",
+      "notes": "FSM, resource loading, events, object pools, UI and network architecture; different language.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "kunjgit/GameZone",
+      "commit": "ac4ce207868a6dfef11073435234311d91dfac99",
+      "license": "Apache-2.0",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "29f81d812f3e768fa89638d1f72920dbfd1413a8",
+      "role": "web_games_collection",
+      "status": "file_by_file_audit_required",
+      "notes": "Large multi-contributor web game collection; check provenance and per-game sublicenses.",
+      "allowed_for_training_now": false
+    },
+    {
+      "repo": "CharlesPikachu/Games",
+      "commit": "07767df6d181b9eae89ce0a8b883d19afb450cc1",
+      "license": "Apache-2.0",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "81a2a90ff3c02e24e551a63e4376d6f81f8a82f5",
+      "role": "python_games_collection",
+      "status": "file_by_file_audit_required",
+      "notes": "Python mini-games; code only, inspect third-party dependencies and asset notices.",
+      "allowed_for_training_now": false
+    }
+  ],
+  "metadata_triage": [
+    {
+      "repo": "channingbreeze/games",
+      "spdx": "MIT",
+      "note": "GitHub metadata indicates MIT but no root LICENSE was present in directory listing; bundled third-party games require individual review."
+    },
+    {
+      "repo": "codecombat/codecombat",
+      "spdx": "MIT",
+      "note": "Large mixed-content education/game platform. Metadata license is not enough to authorize embedded content."
+    },
+    {
+      "repo": "godotengine/godot",
+      "spdx": "MIT",
+      "note": "Engine source rather than targeted game mechanics. Existing godot-demo-projects corpus is a better targeted source."
+    },
+    {
+      "repo": "momentum-mod/game",
+      "spdx": "NOASSERTION",
+      "note": "Source movement mod using an engine; complex/possibly mixed rights, reject automatic import."
+    },
+    {
+      "repo": "MonoGame/MonoGame",
+      "spdx": "NOASSERTION",
+      "note": "Engine/framework with multiple licenses; no direct gameplay corpus."
+    },
+    {
+      "repo": "serenity-valley/game",
+      "spdx": null,
+      "note": "No license identified via repo metadata."
+    },
+    {
+      "repo": "renshan/game",
+      "spdx": null,
+      "note": "No license identified via repo metadata."
+    },
+    {
+      "repo": "pacampbell/Game",
+      "spdx": null,
+      "note": "No license identified via repo metadata."
+    },
+    {
+      "repo": "gameplay3d/gameplay",
+      "spdx": null,
+      "note": "No license identified via repo metadata."
+    },
+    {
+      "repo": "leereilly/games",
+      "spdx": null,
+      "note": "Game links index, not game code."
+    },
+    {
+      "repo": "bobeff/open-source-games",
+      "spdx": "CC0-1.0",
+      "note": "Game index/reference directory, not ingestable game implementation."
+    },
+    {
+      "repo": "grantjenks/free-python-games",
+      "spdx": "NOASSERTION",
+      "note": "Custom/uncertain license from GitHub metadata: review license file before any reuse."
+    },
+    {
+      "repo": "libgdx/libgdx",
+      "spdx": "Apache-2.0",
+      "note": "Java engine framework, not targeted JavaScript code corpus."
+    },
+    {
+      "repo": "UnityTechnologies/open-project-1",
+      "spdx": "Apache-2.0",
+      "note": "Unity full game with large assets; no asset or code import into MiniCoder."
+    },
+    {
+      "repo": "OpenFrontIO/OpenFrontIO",
+      "spdx": "AGPL-3.0",
+      "note": "Full RTS multiplayer game; separate copyleft and no automatic imports."
+    },
+    {
+      "repo": "FunkinCrew/Funkin",
+      "spdx": "NOASSERTION",
+      "note": "Potential heterogeneous source/asset licensing; no ingestion."
+    },
+    {
+      "repo": "luanti-org/minetest_game",
+      "spdx": "NOASSERTION",
+      "note": "Lua game with mixed licenses; separate explicit review."
+    },
+    {
+      "repo": "flame-engine/flame",
+      "spdx": "MIT",
+      "note": "Flutter/Dart engine, useful conceptual reading, not current code training."
+    },
+    {
+      "repo": "coding-horror/basic-computer-games",
+      "spdx": "Unlicense",
+      "note": "Many language ports; audit individual file and content provenance."
+    },
+    {
+      "repo": "NetHack/NetHack",
+      "spdx": null,
+      "note": "Historical custom licensing; do not assume public-domain or MIT."
+    },
+    {
+      "repo": "tomlooman/EpicSurvivalGame",
+      "spdx": "MIT",
+      "note": "Unreal C++, large game sample; separate scope and assets."
+    }
+  ],
+  "other_provided_links_not_approved_for_training": [
+    "gonet2/game",
+    "ValveSoftware/GameNetworkingSockets",
+    "urho3d/urho3d",
+    "cloudwu/skynet",
+    "DigitalExtinction/Game",
+    "DrFlower/TowerDefense-GameFramework-Demo",
+    "danielyxie/bitburner",
+    "cabaletta/baritone",
+    "flutter/games",
+    "lettier/3d-game-shaders-for-beginners",
+    "luanti-org/luanti",
+    "blockly-games/blockly-games",
+    "mozilla/BrowserQuest",
+    "marblexu/PythonPlantsVsZombies",
+    "GameHackingBook/GameHackingCode",
+    "DruidMech/GameplayAbilitySystem_Aura",
+    "wanghao221/moyu",
+    "OneLoneCoder/olcPixelGameEngine",
+    "gonglei007/GameDevMind",
+    "Kavex/GameDev-Resources",
+    "miloyip/game-programmer",
+    "utkarshdalal/GameNative",
+    "rwv/chinese-dos-games",
+    "sheelendraSingh/GAME",
+    "ketoo/NoahGameFrame",
+    "jynew/jynew",
+    "AtomicGameEngine/AtomicGameEngine",
+    "rolling-scopes-school/guessing-game",
+    "openvpi/GAME",
+    "sideeffects/GameDevelopmentToolset",
+    "mdqinc/SDL_GameControllerDB",
+    "Plants-vs-Zombies-MODDED/game",
+    "openfrontio/OpenFrontIO"
+  ],
+  "recommendations": [
+    {
+      "priority": 1,
+      "repo": "leigest519/OpenGame",
+      "use": "Architectural research: task planning, game generation, preview, feedback and evaluation; adapt legally and independently, do not import generated IP demos."
+    },
+    {
+      "priority": 2,
+      "repo": "Donchitos/Claude-Code-Game-Studios",
+      "use": "Architectural research: distinct coder/reviewer/tester roles, QA rubric and workflow state machines; avoid requiring proprietary cloud agents."
+    },
+    {
+      "priority": 3,
+      "repo": "ovidiuch/flatris",
+      "use": "MIT code-only JS state/logic candidate for future curated training after file-level review; keep unseen families reserved."
+    },
+    {
+      "priority": 4,
+      "repo": "craftyjs/Crafty",
+      "use": "MIT code-only JS physics/collision/input candidate for future curated training after file-level review; protect domain splits."
+    },
+    {
+      "priority": 5,
+      "repo": "yenchenlin/DeepLearningFlappyBird",
+      "use": "Reference for gameplay RL/testing (different task than training code-generation model)."
+    }
+  ],
+  "next_gate": "Review each chosen source file and its third-party attribution, then explicitly add pins to a separate versioned training corpus; never auto-promote weights."
+}

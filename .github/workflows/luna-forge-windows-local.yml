@@ -1,0 +1,201 @@
+name: Luna Forge - Windows local installer smoke
+
+on:
+  push:
+    branches: [feature/luna-forge-zero]
+    paths:
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE-WINDOWS.ps1"
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/benchmark_original_lua.py"
+      - "experiments/luna-forge-zero/train_original_lua_v2.py"
+      - "experiments/luna-forge-zero/benchmark_original_lua_v2.py"
+      - "experiments/luna-forge-zero/luna_lua_syntax.py"
+      - "experiments/luna-forge-zero/audit_kom_headers.py"
+      - "tests/test_luna_kom_headers.py"
+      - "tests/test_luna_lua_syntax.py"
+      - "experiments/luna-forge-zero/luna_codegen_model.py"
+      - "tests/test_luna_original_lua_v2.py"
+      - "tests/test_luna_benchmark_original_lua.py"
+      - "experiments/luna-forge-zero/train_private_lua.py"
+      - "experiments/luna-forge-zero/audit_excluded_lua_metadata.py"
+      - "experiments/luna-forge-zero/audit_elsword_lua_headers.py"
+      - "tests/test_luna_elsword_lua_headers.py"
+      - "experiments/luna-forge-zero/review_local_lua_scopes.py"
+      - "tests/test_luna_local_scope_review.py"
+      - "tests/test_luna_excluded_lua_metadata.py"
+      - "experiments/luna-forge-zero/preview_private_lua.py"
+      - "tests/test_luna_private_lua_training.py"
+      - "tests/test_luna_private_lua_training_runtime.py"
+      - "experiments/luna-forge-zero/luna_coder_ollama.py"
+      - "experiments/luna-forge-zero/luna_core_qa.py"
+      - "tests/test_luna_core_qa.py"
+      - "tests/test_luna_local_ollama.py"
+      - "experiments/luna-forge-zero/preview_local_candidate.py"
+      - "tests/test_luna_candidate_preview.py"
+      - "experiments/luna-forge-zero/inventory_local_data.py"
+      - "experiments/luna-forge-zero/analyze_local_lua.py"
+      - "experiments/luna-forge-zero/profile_local_lua.py"
+      - "tests/test_luna_lua_structure_profile.py"
+      - "tests/test_luna_local_lua_audit.py"
+      - "tests/test_luna_local_inventory.py"
+      - ".github/workflows/luna-forge-windows-local.yml"
+  pull_request:
+    paths:
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE-WINDOWS.ps1"
+      - "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/ABRIR-LUNA-FORGE.cmd"
+      - "experiments/luna-forge-zero/luna_local.py"
+      - "experiments/luna-forge-zero/benchmark_original_lua.py"
+      - "experiments/luna-forge-zero/train_original_lua_v2.py"
+      - "experiments/luna-forge-zero/benchmark_original_lua_v2.py"
+      - "experiments/luna-forge-zero/luna_lua_syntax.py"
+      - "experiments/luna-forge-zero/audit_kom_headers.py"
+      - "tests/test_luna_kom_headers.py"
+      - "tests/test_luna_lua_syntax.py"
+      - "experiments/luna-forge-zero/luna_codegen_model.py"
+      - "tests/test_luna_original_lua_v2.py"
+      - "tests/test_luna_benchmark_original_lua.py"
+      - "experiments/luna-forge-zero/train_private_lua.py"
+      - "experiments/luna-forge-zero/audit_excluded_lua_metadata.py"
+      - "experiments/luna-forge-zero/audit_elsword_lua_headers.py"
+      - "tests/test_luna_elsword_lua_headers.py"
+      - "experiments/luna-forge-zero/review_local_lua_scopes.py"
+      - "tests/test_luna_local_scope_review.py"
+      - "tests/test_luna_excluded_lua_metadata.py"
+      - "experiments/luna-forge-zero/preview_private_lua.py"
+      - "tests/test_luna_private_lua_training.py"
+      - "tests/test_luna_private_lua_training_runtime.py"
+      - "experiments/luna-forge-zero/luna_coder_ollama.py"
+      - "experiments/luna-forge-zero/luna_core_qa.py"
+      - "tests/test_luna_core_qa.py"
+      - "tests/test_luna_local_ollama.py"
+      - "experiments/luna-forge-zero/preview_local_candidate.py"
+      - "tests/test_luna_candidate_preview.py"
+      - "experiments/luna-forge-zero/inventory_local_data.py"
+      - "experiments/luna-forge-zero/analyze_local_lua.py"
+      - "experiments/luna-forge-zero/profile_local_lua.py"
+      - "tests/test_luna_lua_structure_profile.py"
+      - "tests/test_luna_local_lua_audit.py"
+      - "tests/test_luna_local_inventory.py"
+      - ".github/workflows/luna-forge-windows-local.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Parse local install PowerShell
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          $file = "experiments/luna-forge-zero/INSTALAR-LUNA-FORGE-WINDOWS.ps1"
+          [System.Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) { $errors | Out-String | Write-Error; exit 1 }
+          Write-Host "PowerShell syntax OK"
+      - name: Validate standalone menu Python
+        shell: pwsh
+        run: |
+          python -m py_compile experiments/luna-forge-zero/luna_local.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test metadata-only local data inventory
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_inventory.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test privacy-preserving Lua format audit
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_lua_audit.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test aggregate Lua structural profile
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_lua_structure_profile.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify locally trained candidate selection safeguards
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_candidate_preview.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify Luna Core static movement quality signals
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_core_qa.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test offline local Ollama GameCoder and JS syntax validation
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_ollama.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test local client Lua scope review without opening data
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_local_scope_review.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test original Lua heldout MiniCoder benchmark semantics
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_benchmark_original_lua.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test Elsword Lua format audit without training
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_elsword_lua_headers.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test metadata-only audit of excluded Lua trees
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_excluded_lua_metadata.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test offline Lua dataset security and no-upload guarantees
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_private_lua_training.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Exercise installer without starting training
+        shell: cmd
+        run: |
+          call experiments\luna-forge-zero\INSTALAR-LUNA-FORGE.cmd -SkipInitialTraining
+      - name: Train synthetic Lua MiniCoder on actual CPU (no private game data)
+        shell: pwsh
+        run: |
+          $py = "experiments/luna-forge-zero/.venv/Scripts/python.exe"
+          & $py -m unittest discover -s tests -p test_luna_private_lua_training_runtime.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test bounded KOM archive header audit without extraction
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_luna_kom_headers.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify deterministic decoding and parse-only Lua checks
+        shell: pwsh
+        run: |
+          $py = "experiments/luna-forge-zero/.venv/Scripts/python.exe"
+          & $py -m unittest discover -s tests -p test_luna_lua_syntax.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test scratch Lua V2 local CPU training and heldout probe
+        shell: pwsh
+        run: |
+          $py = "experiments/luna-forge-zero/.venv/Scripts/python.exe"
+          & $py -m unittest discover -s tests -p test_luna_original_lua_v2.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Check Brain-SSD pages and model status
+        shell: pwsh
+        run: |
+          $base = "experiments/luna-forge-zero"
+          $py = "$base/.venv/Scripts/python.exe"
+          & $py "$base/brain_ssd_bridge.py" status
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path "$base/knowledge_pages/manifest.json")) { throw "Knowledge pages missing" }
+          Write-Host "Windows installer smoke PASS"

@@ -1,0 +1,84 @@
+{
+  "schema": "luna-minicoder-v3-comparison-v1",
+  "created": "2026-10-29",
+  "candidate_status": "not_promoted",
+  "candidate_checkpoint_path": "checkpoints/luna-minicoder-v3-candidate",
+  "candidate_checkpoint_sha256": "37d79032cd78899b3badcf9413f57884637f0ec73e6d76880b99596f019a85b4",
+  "candidate_config": {
+    "vocab": 130,
+    "block": 512,
+    "width": 32,
+    "heads": 4,
+    "layers": 1,
+    "parameters": 33312,
+    "seed": 20261029,
+    "steps": 400
+  },
+  "previous_candidate_user_report": {
+    "parameters": 116480,
+    "context_characters": 128,
+    "javascript_syntax_pass": "0/5",
+    "two_prompt_format_success": "0/10",
+    "identical_continuation_hashes": "7/10",
+    "training_loss": {
+      "initial": 72.9614,
+      "final": 0.96618,
+      "source": "earlier user-provided V2 metric; objective differs from V3 completion loss and is not directly comparable"
+    },
+    "checkpoint_hash": null,
+    "locally_remeasured": false
+  },
+  "candidate_completion_loss": {
+    "train_before": 23.396135,
+    "train_after": 1.204201,
+    "seen_subset_before": 23.149025,
+    "seen_subset_after": 1.163014,
+    "validation_before": 22.998114,
+    "validation_after": 4.382402,
+    "interpretation": "Training loss improved while validation loss worsened late in training; evidence of overfitting, not generalization."
+  },
+  "unchanged_five_prompt_benchmark": {
+    "prompt_source": "evaluate_github_codegen.PROMPTS, unchanged",
+    "previous_candidate_syntax_pass": "0/5, user-provided diagnostic",
+    "v3_syntax_pass": "0/5, locally measured",
+    "previous_candidate_identical_continuation_hashes": "7/10 across two formats, user-provided diagnostic",
+    "v3_repeated_outputs": "0/5",
+    "v3_eos_terminations": "0/5",
+    "v3_generated_output_hashes": [
+      "355a29507b034b8bf86be45f4dd07ad738639b43c9e58565978b19186b9b24cf",
+      "4013b1f516527ee17b892e864fdd116537cbbd41e2fad10744ae90db3226eea3",
+      "4f6320c5f54104a3c6e83d7bafaa35d43ca3939f2b78d78fc2a186198cbeff3a",
+      "c368c2eb4d4fc5a4ca322f47c16c2badf89518f93f3d9deb6862ef4cddade0f0",
+      "c773a694e90230f079d35f05b3ab2138250ac430bea71be9a1a8bf3a4be7fa13"
+    ],
+    "note": "The prior checkpoint was not present or loaded; its metrics are user-reported and no prior-checkpoint hash was available."
+  },
+  "reserved_gameplay_families": {
+    "tasks": 2,
+    "families": [
+      "periodic_hazard",
+      "sensor_aggro"
+    ],
+    "syntax_pass": "0/2",
+    "eos_termination": "2/2",
+    "repeated_outputs": 0,
+    "functional_pass_count": 0,
+    "functional_cases_executed": 0,
+    "functional_execution": "not attempted because no candidate passed syntax; Docker was not available in this environment",
+    "generated_code_saved": false,
+    "score_source": "only outputs generated from the V3 checkpoint; no human reference implementation counted"
+  },
+  "provenance": {
+    "data": "original generic Luna-authored JavaScript curriculum",
+    "external_corpus_used": false,
+    "kom_or_commercial_code_used": false,
+    "v0_or_v2_weights_loaded": false,
+    "checkpoint_promoted": false
+  },
+  "remaining_gates": [
+    "Obtain syntax-valid output on reserved tasks.",
+    "Run functional tests only in isolated offline Docker.",
+    "Investigate late validation-loss increase and improve generalization before increasing scale.",
+    "Compare against the previous model only after an authorized local checkpoint and its architecture are selected."
+  ]
+}
