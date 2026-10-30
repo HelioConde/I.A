@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "description": "Catalog of Luna GameDev skill contracts; implementations are future work. No Claude Code runtime required.",
+  "skills": [
+    {
+      "id": "gdd",
+      "input": "game_idea",
+      "output": "one_page_game_brief",
+      "checks": [
+        "core_loop",
+        "scope",
+        "engine"
+      ]
+    },
+    {
+      "id": "backlog",
+      "input": "game_brief",
+      "output": "ordered_tasks",
+      "checks": [
+        "dependencies",
+        "acceptance_criteria"
+      ]
+    },
+    {
+      "id": "fsm",
+      "input": "states_and_transitions",
+      "output": "engine_specific_implementation",
+      "checks": [
+        "reachable_states",
+        "transition_tests"
+      ]
+    },
+    {
+      "id": "event_bus",
+      "input": "events_and_subscribers",
+      "output": "decoupled_implementation",
+      "checks": [
+        "unsubscribe",
+        "event_contracts"
+      ]
+    },
+    {
+      "id": "engine_conversion",
+      "input": "source_code_and_target_engine",
+      "output": "translated_logic",
+      "checks": [
+        "semantic_parity"
+      ]
+    },
+    {
+      "id": "debug",
+      "input": "stack_trace_and_project_context",
+      "output": "root_cause_and_patch",
+      "checks": [
+        "reproduction",
+        "regression_test"
+      ]
+    },
+    {
+      "id": "performance",
+      "input": "profile_and_code",
+      "output": "measured_optimization",
+      "checks": [
+        "before_after_metrics"
+      ]
+    },
+    {
+      "id": "shader",
+      "input": "effect_spec",
+      "output": "shader_code",
+      "checks": [
+        "target_engine_compile"
+      ]
+    },
+    {
+      "id": "asset_prompt",
+      "input": "art_bible_and_asset_spec",
+      "output": "consistent_asset_prompt",
+      "checks": [
+        "dimensions",
+        "style_consistency"
+      ]
+    }
+  ]
+}
