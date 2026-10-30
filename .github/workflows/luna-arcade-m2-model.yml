@@ -19,7 +19,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -28,8 +28,37 @@ jobs:
   mission-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    outputs:
+      model_needed: ${{ steps.change.outputs.model_needed }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+      - name: Run real M2 model only when latest commit changes combat generation
+        id: change
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "model_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only HEAD~1 HEAD > /tmp/luna-m2-changed.txt
+          cat /tmp/luna-m2-changed.txt
+          if grep -Eq '^(benchmarks/luna_arcade_s1/prompt_m2\.txt|benchmarks/luna_arcade_s1/m2_combat_visual\.json|tools/prepare_luna_arcade_prompt\.py|tools/benchmark_luna_game_models\.py|site-tests/check-luna-arcade-m2\.cjs|\.github/workflows/luna-arcade-m2-model\.yml)      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_luna_arcade_s1_mission.py tests/test_prepare_luna_arcade_prompt.py tests/test_lua_mechanics_contract.py tests/test_luna_arcade_m2_contract.py -q
+      - run: python -m compileall -q tools/benchmark_luna_game_models.py
+      - run: node --check site-tests/check-luna-arcade-m1.cjs
+      - run: node --check site-tests/check-luna-arcade-m2.cjs
+
+ /tmp/luna-m2-changed.txt; then
+            echo "model_needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "model_needed=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -40,7 +69,7 @@ jobs:
       - run: node --check site-tests/check-luna-arcade-m2.cjs
 
   model-generate:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/luna-gamedev-knowledge-v1') || (github.event_name == 'push' && github.ref == 'refs/heads/feature/luna-gamedev-knowledge-v1') }}
+    if: ${{ needs.mission-contract.outputs.model_needed == 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
     needs: mission-contract
     runs-on: ubuntu-latest
     timeout-minutes: 95
