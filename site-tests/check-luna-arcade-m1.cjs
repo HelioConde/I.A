@@ -30,6 +30,13 @@ const path = require('node:path');
   await page.keyboard.press('ArrowUp');await page.waitForTimeout(100);
   const jumped=await qa();
   report.checks.push({name:'jump_changes_y',ok:!!(jumped?.player&&moved?.player&&jumped.player.y<moved.player.y-1)});
+  // Probe down input without pretending that a floor-only snapshot proves one-way platform logic.
+  const beforeDown=await qa();
+  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(180); await page.keyboard.up('ArrowDown');
+  const afterDown=await qa();
+  report.checks.push({name:'down_input_does_not_crash',ok:!!beforeDown?.player&&!!afterDown?.player&&report.errors.length===0});
+  // A genuine platform drop-through requires a deterministic platform setup, not available yet.
+  report.unverified=['one_way_platform_drop','three_hit_combo','facing_hitbox','visual_quality'];
   await page.keyboard.press('KeyZ');await page.waitForTimeout(150);
   report.checks.push({name:'no_runtime_errors',ok:report.errors.length===0});
   await page.screenshot({path:path.join(path.dirname(out),'gameplay.png')});
