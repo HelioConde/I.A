@@ -1,0 +1,43 @@
+name: Luna GameDev Skill Router Training
+
+on:
+  push:
+    branches: [feature/luna-gamedev-knowledge-v1]
+    paths:
+      - "knowledge/game_dev/**"
+      - "tools/train_skill_router.py"
+      - "tests/test_train_skill_router.py"
+      - ".github/workflows/luna-skill-training.yml"
+  pull_request:
+    paths:
+      - "knowledge/game_dev/**"
+      - "tools/train_skill_router.py"
+      - "tests/test_train_skill_router.py"
+      - ".github/workflows/luna-skill-training.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - name: Validate catalog
+        run: python tools/validate_game_knowledge.py
+      - name: Unit tests
+        run: python -m pytest tests/test_game_knowledge.py tests/test_game_knowledge_retrieval.py tests/test_train_skill_router.py -q
+      - name: Train skill router and evaluate separate test split
+        run: python tools/train_skill_router.py --output-dir results/game_knowledge_training
+      - name: Upload learned parameters and evaluation
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-skill-router-trained
+          path: results/game_knowledge_training/
+          retention-days: 30

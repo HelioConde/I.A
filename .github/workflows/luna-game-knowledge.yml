@@ -1,0 +1,32 @@
+name: Luna GameDev Knowledge Catalog
+
+on:
+  pull_request:
+    paths:
+      - "knowledge/game_dev/**"
+      - "src/brain_ssd/game_knowledge.py"
+      - "tools/query_game_knowledge.py"
+      - "tools/validate_game_knowledge.py"
+      - "tests/test_game_knowledge*.py"
+      - ".github/workflows/luna-game-knowledge.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Validate manifest
+        run: python tools/validate_game_knowledge.py
+      - name: Run catalog tests
+        run: python -m pytest tests/test_game_knowledge.py tests/test_game_knowledge_retrieval.py -q
+      - name: Smoke test safe retrieval
+        run: python tools/query_game_knowledge.py "gdscript platformer"

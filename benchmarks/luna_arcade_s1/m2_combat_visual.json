@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "mission": "Luna Arcade S1 — M2 combat and visual",
+  "authorship": "Evaluation criteria authored by assistant; only output from verified Qwen GGUF runtime is Luna code",
+  "controls": {
+    "KeyZ": "basic combo",
+    "KeyX": "special skill",
+    "ArrowLeft": "face left",
+    "ArrowRight": "face right"
+  },
+  "acceptance": [
+    {
+      "id": "three_hit_combo",
+      "description": "Three successive attacks form recognizable phases with individual timing; hold KeyZ must not deal damage every animation frame.",
+      "evidence": "changes in combo state and enemy HP after three controlled key presses"
+    },
+    {
+      "id": "facing_hitbox",
+      "description": "Attack only enemies in front of the player and within hitbox reach.",
+      "evidence": "damage contrast for enemies in front versus behind"
+    },
+    {
+      "id": "hit_reaction",
+      "description": "Damage creates a visible impact response and short enemy knockback.",
+      "evidence": "combat screenshot and enemy position changes"
+    },
+    {
+      "id": "original_visuals",
+      "description": "Original player and opponent silhouettes, background depth, readable HUD and attack animations; not colored rectangles against black background.",
+      "evidence": "screenshots requiring human review"
+    },
+    {
+      "id": "regression",
+      "description": "Movement, jump, and one-way drop retain their previously validated behavior.",
+      "evidence": "Chromium input tests with QA telemetry"
+    }
+  ],
+  "constraints": [
+    "No third-party proprietary assets or code",
+    "No fabricated screenshot or model outputs",
+    "Do not replace model-authored source with assistant-authored gameplay",
+    "Failure of visual review never represented as success"
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "provenance": "Original benchmark contracts authored for Luna; not copied from third-party source code.",
+  "tasks": [
+    {
+      "id": "movement",
+      "skill": "fsm",
+      "language": "javascript",
+      "instruction": "Implement a pure function step(state,input,dt) with horizontal motion and gravity; return a new state, avoid mutation.",
+      "required_exports": [
+        "step"
+      ],
+      "cases": [
+        {
+          "state": {
+            "x": 0,
+            "y": 0,
+            "vx": 0,
+            "vy": 0
+          },
+          "input": {
+            "right": true
+          },
+          "dt": 1,
+          "expected": {
+            "x": 5,
+            "y": 10,
+            "vx": 5,
+            "vy": 10
+          }
+        },
+        {
+          "state": {
+            "x": 3,
+            "y": 2,
+            "vx": 0,
+            "vy": 0
+          },
+          "input": {
+            "left": true
+          },
+          "dt": 0.5,
+          "expected": {
+            "x": 0.5,
+            "y": 4.5,
+            "vx": -5,
+            "vy": 5
+          }
+        }
+      ],
+      "contract": {
+        "speed": 5,
+        "gravity": 10
+      }
+    },
+    {
+      "id": "platform_collision",
+      "skill": "debug",
+      "language": "javascript",
+      "instruction": "Implement resolveLanding(previous,current,platform) that returns corrected character state when crossing the platform top while falling; otherwise return current.",
+      "required_exports": [
+        "resolveLanding"
+      ],
+      "cases": [
+        {
+          "previous": {
+            "x": 10,
+            "y": 4,
+            "vy": 8,
+            "width": 4,
+            "height": 6
+          },
+          "current": {
+            "x": 10,
+            "y": 10,
+            "vy": 8,
+            "width": 4,
+            "height": 6
+          },
+          "platform": {
+            "x": 8,
+            "y": 14,
+            "width": 20,
+            "height": 2
+          },
+          "expected": {
+            "x": 10,
+            "y": 8,
+            "vy": 0,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "previous": {
+            "x": 50,
+            "y": 4,
+            "vy": 8,
+            "width": 4,
+            "height": 6
+          },
+          "current": {
+            "x": 50,
+            "y": 10,
+            "vy": 8,
+            "width": 4,
+            "height": 6
+          },
+          "platform": {
+            "x": 8,
+            "y": 14,
+            "width": 20,
+            "height": 2
+          },
+          "expected": {
+            "x": 50,
+            "y": 10,
+            "vy": 8,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ]
+    },
+    {
+      "id": "event_bus",
+      "skill": "event_bus",
+      "language": "javascript",
+      "instruction": "Implement createEventBus() returning on(event,fn), off(event,fn), emit(event,payload). Subscribers must receive payload in registration order.",
+      "required_exports": [
+        "createEventBus"
+      ],
+      "scenario": "subscription"
+    }
+  ]
+}

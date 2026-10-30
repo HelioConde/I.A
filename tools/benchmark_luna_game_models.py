@@ -52,7 +52,8 @@ def clean(raw:str)->str:
     if match:text=match.group(1).strip()
     if not 250<=len(text)<=30000:raise ValueError("unexpected_output_size")
     if DANGEROUS.search(text) or "<script" in text.lower():raise ValueError("unsafe_code")
-    if any(token not in text for token in REQUIRED):raise ValueError("missing_game_contract")
+    missing=[token for token in REQUIRED if token not in text]
+    if missing:raise ValueError("missing_game_contract:"+",".join(missing))
     return text+"\n"
 
 def syntax_valid(code:str)->bool:
@@ -65,30 +66,33 @@ def syntax_valid(code:str)->bool:
         except (OSError,subprocess.TimeoutExpired):
             return False
 
-def command(runtime:Path,model:Path,prompt:str,tokens:int=2600)->list[str]:
+def command(runtime:Path,model:Path,prompt:str,tokens:int=2600,context:int=4096)->list[str]:
     return [str(runtime),"-m",str(model),"-p",prompt,
-            "-n",str(tokens),"-c","4096","-t","4",
+            "-n",str(tokens),"-c",str(context),"-t","4",
             "--temp","0.6","--top-p","0.95","--top-k","20",
             "--no-display-prompt","--simple-io","--no-warmup",
             "--reasoning","off","--jinja"]
 
-def generate(runtime:Path,model:Path,out:Path,label:str,attempts:int=2)->dict:
+def generate(runtime:Path,model:Path,out:Path,label:str,attempts:int=2,prompt_override:str|None=None,max_tokens:int=2600,context:int=4096)->dict:
     if not runtime.is_file() or not model.is_file():
         raise FileNotFoundError("Runtime/quantized GGUF missing")
     if attempts not in (1,2,3):raise ValueError("invalid_attempts")
+    if not 512<=max_tokens<=4096 or not 4096<=context<=8192:raise ValueError("invalid_generation_limits")
     out.mkdir(parents=True,exist_ok=True)
+    active_prompt=prompt_override if prompt_override is not None else PROMPT
     report={"benchmark":"Luna native GameDev v4","model":label,"model_file":model.name,
             "model_sha256":sha(model),
-            "prompt_sha256":hashlib.sha256(PROMPT.encode("utf-8")).hexdigest(),
+            "prompt_sha256":hashlib.sha256(active_prompt.encode("utf-8")).hexdigest(),
             "source_author":"real local GGUF model","assistant_gameplay_code_used":False,
+            "max_tokens":max_tokens,"context":context,
             "gameplay_verified":False,"accepted_source":False,"attempts":[]}
     feedback=""
     for attempt in range(1,attempts+1):
-        prompt=PROMPT+("\nNa tentativa anterior: "+feedback+
+        prompt=active_prompt+("\nNa tentativa anterior: "+feedback+
                       ". Reescreva o arquivo JS inteiro e válido." if feedback else "")
         started=time.monotonic()
         try:
-            proc=subprocess.run(command(runtime,model,prompt),capture_output=True,text=True,
+            proc=subprocess.run(command(runtime,model,prompt,tokens=max_tokens,context=context),capture_output=True,text=True,
                                 encoding="utf-8",errors="replace",timeout=1200)
             raw=proc.stdout or ""
             (out/("attempt-"+str(attempt)+".raw.txt")).write_text(raw,encoding="utf-8")
@@ -119,8 +123,12 @@ def main()->int:
     p.add_argument("--out",type=Path,required=True)
     p.add_argument("--label",choices=("ornith-1.5-9b","qwen3-4b"),required=True)
     p.add_argument("--attempts",type=int,choices=(1,2,3),default=2)
+    p.add_argument("--prompt-file",type=Path,default=None,help="Optional original challenge prompt; default keeps legacy benchmark unchanged")
+    p.add_argument("--max-tokens",type=int,default=2600)
+    p.add_argument("--context",type=int,default=4096)
     args=p.parse_args()
-    report=generate(args.runtime,args.model,args.out,args.label,args.attempts)
+    custom=args.prompt_file.read_text(encoding="utf-8") if args.prompt_file else None
+    report=generate(args.runtime,args.model,args.out,args.label,args.attempts,prompt_override=custom,max_tokens=args.max_tokens,context=args.context)
     print(json.dumps(report,ensure_ascii=False,indent=2),flush=True)
     return 0 if report["accepted_source"] else 1
 

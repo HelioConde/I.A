@@ -1,0 +1,142 @@
+name: Luna Arcade S1 - Real GameCoder M2
+
+on:
+  push:
+    branches: [feature/luna-gamedev-knowledge-v1]
+    paths:
+      - "benchmarks/luna_arcade_s1/prompt_m2.txt"
+      - "benchmarks/luna_arcade_s1/m2_combat_visual.json"
+      - ".github/workflows/luna-arcade-m2-model.yml"
+      - "site-tests/check-luna-arcade-m2.cjs"
+      - "tools/prepare_luna_arcade_prompt.py"
+      - "tools/benchmark_luna_game_models.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "benchmarks/luna_arcade_s1/prompt_m2.txt"
+      - ".github/workflows/luna-arcade-m2-model.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  mission-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      model_needed: ${{ steps.change.outputs.model_needed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+      - name: Run real M2 model only when latest commit changes combat generation
+        id: change
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "model_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only HEAD~1 HEAD > /tmp/luna-m2-changed.txt
+          cat /tmp/luna-m2-changed.txt
+          if grep -Eq '^(benchmarks/luna_arcade_s1/prompt_m2\.txt|benchmarks/luna_arcade_s1/m2_combat_visual\.json|tools/prepare_luna_arcade_prompt\.py|tools/benchmark_luna_game_models\.py|site-tests/check-luna-arcade-m2\.cjs|\.github/workflows/luna-arcade-m2-model\.yml)      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_luna_arcade_s1_mission.py tests/test_prepare_luna_arcade_prompt.py tests/test_lua_mechanics_contract.py tests/test_luna_arcade_m2_contract.py -q
+      - run: python -m compileall -q tools/benchmark_luna_game_models.py
+      - run: node --check site-tests/check-luna-arcade-m1.cjs
+      - run: node --check site-tests/check-luna-arcade-m2.cjs
+
+ /tmp/luna-m2-changed.txt; then
+            echo "model_needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "model_needed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_luna_arcade_s1_mission.py tests/test_prepare_luna_arcade_prompt.py tests/test_lua_mechanics_contract.py tests/test_luna_arcade_m2_contract.py -q
+      - run: python -m compileall -q tools/benchmark_luna_game_models.py
+      - run: node --check site-tests/check-luna-arcade-m1.cjs
+      - run: node --check site-tests/check-luna-arcade-m2.cjs
+
+  model-generate:
+    if: ${{ needs.mission-contract.outputs.model_needed == 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
+    needs: mission-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      PYTHONUNBUFFERED: "1"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check out fixed llama.cpp source
+        uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Build GGUF inference runtime on CPU
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+      - name: Download fixed, hash-verified Qwen3-4B GGUF
+        run: |
+          python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install; print(install())"
+      - name: Use trained Luna Core to select M2 combat and visual skills
+        run: |
+          python tools/prepare_luna_arcade_prompt.py --stage m2 --output results/luna_arcade_m2/prepared_prompt.txt --report results/luna_arcade_m2/router_provenance.json
+      - name: Generate M2 combat + visual code using real Luna GameCoder model
+        id: model
+        shell: bash
+        run: |
+          mkdir -p results/luna_arcade_m2
+          set +e
+          python tools/benchmark_luna_game_models.py \
+            --model models/Qwen3-4B-Q4_K_M.gguf \
+            --runtime llama-build/bin/llama-cli \
+            --label qwen3-4b --attempts 2 --max-tokens 3800 --context 8192 \
+            --prompt-file results/luna_arcade_m2/prepared_prompt.txt \
+            --out results/luna_arcade_m2
+          rc=$?
+          set -e
+          echo "generator_exit=$rc" >> "$GITHUB_OUTPUT"
+          echo "Luna model candidate generation exit code: $rc"
+          exit "$rc"
+      - name: Check real model M1 controls in Chromium
+        if: steps.model.outputs.generator_exit == '0'
+        shell: bash
+        run: |
+          set +e
+          cp benchmarks/luna_arcade_s1/qa/index.html results/luna_arcade_m2/index.html
+          cp results/luna_arcade_m2/game.js results/luna_arcade_m2/game.js
+          python -m http.server 4817 --bind 127.0.0.1 --directory results/luna_arcade_m2 >/tmp/luna-m1.log 2>&1 &
+          cd site-tests
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          LUNA_M1_REPORT=../results/luna_arcade_m2/browser-evidence.json node check-luna-arcade-m1.cjs
+          m1=$?
+          node check-luna-arcade-m2.cjs
+          m2=$?
+          echo "Browser controls result: $m1; combat result: $m2"
+          if [[ $m1 -ne 0 || $m2 -ne 0 ]]; then exit 1; fi
+      - name: Upload genuine M2 model output and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-arcade-s1-m2-qwen4b
+          path: results/luna_arcade_m2/
+          if-no-files-found: warn
+          retention-days: 30

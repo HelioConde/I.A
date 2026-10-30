@@ -1,0 +1,726 @@
+{
+  "schema_version": 1,
+  "provenance": "Original authored task descriptions inspired by declared game development skills and repo domains, not excerpts or training on third-party code. Tests fixed after this version.",
+  "examples": [
+    {
+      "skill": "gdd",
+      "text": "crie um documento de design para um rpg 2d",
+      "split": "train"
+    },
+    {
+      "skill": "gdd",
+      "text": "planeje a historia e o loop principal do jogo",
+      "split": "train"
+    },
+    {
+      "skill": "gdd",
+      "text": "defina mecanicas e escopo de um novo game",
+      "split": "train"
+    },
+    {
+      "skill": "gdd",
+      "text": "escreva um gdd com objetivo e progressao",
+      "split": "test"
+    },
+    {
+      "skill": "backlog",
+      "text": "divida o inventario em tarefas pequenas",
+      "split": "train"
+    },
+    {
+      "skill": "backlog",
+      "text": "crie backlog ordenado com criterios de aceite",
+      "split": "train"
+    },
+    {
+      "skill": "backlog",
+      "text": "separe a implementacao em historias de desenvolvimento",
+      "split": "train"
+    },
+    {
+      "skill": "backlog",
+      "text": "organize dependencias do sprint",
+      "split": "test"
+    },
+    {
+      "skill": "fsm",
+      "text": "implemente maquina de estados idle walk jump",
+      "split": "train"
+    },
+    {
+      "skill": "fsm",
+      "text": "transicoes de estados para inimigo patrulhar atacar",
+      "split": "train"
+    },
+    {
+      "skill": "fsm",
+      "text": "controle fsm de personagem com animacoes",
+      "split": "train"
+    },
+    {
+      "skill": "fsm",
+      "text": "crie state machine para movimento e combate",
+      "split": "test"
+    },
+    {
+      "skill": "event_bus",
+      "text": "crie um barramento de eventos desacoplado",
+      "split": "train"
+    },
+    {
+      "skill": "event_bus",
+      "text": "avisar hud quando inimigo morrer",
+      "split": "train"
+    },
+    {
+      "skill": "event_bus",
+      "text": "publique eventos de inventario para outros sistemas",
+      "split": "train"
+    },
+    {
+      "skill": "event_bus",
+      "text": "implemente subscribe unsubscribe para sinais",
+      "split": "test"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "converta gdscript godot para unity csharp",
+      "split": "train"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "traduza codigo de phaser para godot",
+      "split": "train"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "adapte mecanica entre motores de jogo",
+      "split": "train"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "migre logica de unity para javascript canvas",
+      "split": "test"
+    },
+    {
+      "skill": "debug",
+      "text": "analise stack trace do erro null reference",
+      "split": "train"
+    },
+    {
+      "skill": "debug",
+      "text": "corrija crash de jogo em execucao",
+      "split": "train"
+    },
+    {
+      "skill": "debug",
+      "text": "encontre causa de excecao no codigo",
+      "split": "train"
+    },
+    {
+      "skill": "debug",
+      "text": "investigue logs e reproduza falha",
+      "split": "test"
+    },
+    {
+      "skill": "performance",
+      "text": "otimize fps e reduza garbage collection",
+      "split": "train"
+    },
+    {
+      "skill": "performance",
+      "text": "analise gargalo no update por frame",
+      "split": "train"
+    },
+    {
+      "skill": "performance",
+      "text": "corrija uso excessivo de memoria",
+      "split": "train"
+    },
+    {
+      "skill": "performance",
+      "text": "melhore desempenho do loop de renderizacao",
+      "split": "test"
+    },
+    {
+      "skill": "shader",
+      "text": "escreva shader glsl de agua",
+      "split": "train"
+    },
+    {
+      "skill": "shader",
+      "text": "crie efeito dissolve em hlsl",
+      "split": "train"
+    },
+    {
+      "skill": "shader",
+      "text": "converta shader graph para codigo",
+      "split": "train"
+    },
+    {
+      "skill": "shader",
+      "text": "implemente contorno visual com shader",
+      "split": "test"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "gere prompt para sprite pixel art",
+      "split": "train"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "padronize prompt de textura seamless",
+      "split": "train"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "descreva concept art consistente",
+      "split": "train"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "crie prompt de asset baseado na art bible",
+      "split": "test"
+    },
+    {
+      "skill": "gdd",
+      "text": "esboce um documento de game design com ciclo de jogo e objetivos",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "organize o conceito de um platformer Godot em um plano criativo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "planejamento de fases personagens historia e regras",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "estabeleça a visão do jogo antes de programar",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "documente a progressão de um rpg em alto nível",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "descreva as mecânicas principais e escopo de uma demo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "prepare um brief de design de jogo web",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "crie um documento gdd enxuto para prototipo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "quebre a funcionalidade de combate em tarefas implementaveis",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "monte um sprint de correções e prioridades do jogo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "faça lista de atividades para criar tres fases",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "planeje epicos historias e critérios de aceitação",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "divida o trabalho de programação em passos sequenciais",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "organize o quadro de pendencias do projeto",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "defina ordem de implementação do inventário",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "backlog",
+      "text": "liste tarefas dependentes para entrega de um prototipo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "modele estados correr saltar cair atacar",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "programar troca de animacao idle walk hit death",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "implemente estados da IA de patrulha perseguicao fuga",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "crie transicoes condicionais do personagem Godot",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "separe a logica de movimento com state machine",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "controle estados de jogador e inimigos em plataforma",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "codifique state pattern para ataques e esquiva",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "fsm",
+      "text": "implementar FSM para boss com fases distintas",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "emita sinal de morte do inimigo para interface",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "desacople HUD e sistema de vida com mensagens",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "publique notificacao quando coletar moeda",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "crie evento de mudanca de cena com listeners",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "ligue inventario e interface por event emitter",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "implemente eventos globais e assinantes",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "propague evento de quest completada para UI",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "event_bus",
+      "text": "adicione barramento de mensagens para missões",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "porte controlador de personagem do CraftyJS para Phaser",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "traduza a mesma colisao de Python PGZero para GDScript",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "transforme codigo de Unity em Godot",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "migre a mecanica de salto entre engines",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "converta comportamento C++ para javascript jogo web",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "adapte codigo Godot para C sharp",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "reescreva script de Phaser em Canvas puro",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "traduza algoritmo de movimentacao entre motores",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "diagnostique erro no console do navegador",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "resolva exceção null reference ao iniciar fase",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "investigue porque a cena do Godot trava",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "identifique a linha do stacktrace que falhou",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "reproduza bug de colisão e corrija regressão",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "explique por que aparece undefined no log",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "corrija falha ao importar sprite e apresentar crash",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "debug",
+      "text": "analise log de execução e sugira patch mínimo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "reduza lag durante o movimento de inimigos",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "melhore taxa de quadros do jogo",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "investigue quedas de FPS na renderização",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "otimize chamadas repetidas no process Godot",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "reduza garbage collection causada por alocacoes",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "localize gargalo de CPU no game loop",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "faça profiling de física e draw calls",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "performance",
+      "text": "evite criar objetos a cada frame para ganhar performance",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "escreva efeito de outline com GLSL",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "gere fragment shader de agua estilizada",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "crie shader de dissolucao para personagem",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "desenvolva efeito HLSL de brilho de arma",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "converta shader para Godot shading language",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "faça vertex shader de onda em vegetação",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "desenhe contorno pixelado usando fragment shader",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "shader",
+      "text": "crie shader de transicao para portal",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "formule prompt de pixel art para slime de agua",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "escreva prompt consistente para animacao de personagem",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "prepare descricao para gerar spritesheet 4 direcoes",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "crie instrucoes de textura de grama seamless",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "descreva arte conceitual de cenário cozy fantasy",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "gerar prompts de itens de inventario em pixel art",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "padronize prompts de sprites com mesma paleta",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "faça especificação textual para imagem de boss",
+      "split": "train",
+      "origin": "original_skill_and_repository_inspired_task"
+    },
+    {
+      "skill": "gdd",
+      "text": "quero um game design document das regras da minha aventura",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "gdd",
+      "text": "planejar objetivo e loop de progresso para o novo jogo",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "backlog",
+      "text": "quais tarefas preciso implementar primeiro para construir o sistema de loja",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "backlog",
+      "text": "dividir uma funcionalidade grande em pequenas etapas de trabalho",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "fsm",
+      "text": "estados de queda corrida e salto com transições bem definidas",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "fsm",
+      "text": "máquina de estados da inteligência artificial dos adversários",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "event_bus",
+      "text": "enviar mensagem para a hud quando um item for coletado",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "event_bus",
+      "text": "event emitter que avisa vários sistemas sem ligação direta",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "levar o código da Godot para uma engine web javascript",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "como portar a física de um jogo Python para Unity",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "debug",
+      "text": "o console mostra erro e o jogo para de carregar",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "debug",
+      "text": "interpretar stack trace e encontrar a causa de um crash",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "performance",
+      "text": "encontrar causa das travadas e melhorar fps",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "performance",
+      "text": "o jogo consome muita memória durante o loop de atualização",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "shader",
+      "text": "programar um shader para agua com distorção",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "shader",
+      "text": "preciso de um efeito GLSL de dissolver o sprite",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "prompt para gerar sprite sheet de personagem em pixel art",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "texto para produzir texturas consistentes com a direção de arte",
+      "split": "test",
+      "origin": "new_independent_prompt"
+    }
+  ]
+}

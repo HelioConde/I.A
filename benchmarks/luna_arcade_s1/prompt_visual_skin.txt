@@ -1,0 +1,20 @@
+Você é LUNA GameCoder (modelo Qwen3-4B). Crie SOMENTE um módulo ORIGINAL de DESENHO para melhorar seu jogo Luna: Constelação Perdida. Responda apenas código JavaScript válido, sem markdown ou explicação, criando exatamente:
+window.LunaSkin = { draw(ctx, state, time) { /* todo o desenho */ } };
+
+O canvas já existe: ctx é um CanvasRenderingContext2D de 960x540. O código principal (movimento, combate e input) NÃO será alterado. NÃO crie outro canvas, NÃO use document, import, require, eval, Function, fetch, imagens remotas nem URLs.
+
+ESTADO REAL recebido:
+state={mode:'menu'|'game'|'victory'|'defeat',hero:'melee'|'ranged'|'magic',wave:0,player:{x:100,y:400,hp:100},enemies:[]}.
+Durante o MENU e na VITÓRIA, enemies pode ser array VAZIO. NUNCA use state.enemies[0].x sem verificar se existe; desenhe inimigos com for(const enemy of (state.enemies||[])) e use (enemy.y??420), porque o jogo atual pode fornecer apenas x e hp! O player está sempre disponível no estado. Ao desenhar, nunca mude state, não altere objetos do jogo.
+
+BUG CONCRETO DA TENTATIVA ANTERIOR (run 41045744843): erro de navegador "Cannot read properties of undefined (reading 'x')" ao chamar ctx.arc(enemy.x,enemy.y,...), pois state.enemies[0] era undefined na tela de menu. CORRIJA. O navegador precisa renderizar menu com zero inimigos, gameplay com inimigos e vitória com zero inimigos SEM EXCEÇÕES.
+
+VISUAL ORIGINAL, inspirado na qualidade de um action-platformer clássico, mas NÃO copie arte, sprites, personagens, nomes, mapas, UI ou música de Grand Chase. Faça no máximo 130 linhas úteis de JS:
+- Céu de fantasia com gradiente REAL usando const sky=ctx.createLinearGradient(0,0,0,540); sky.addColorStop(...); ctx.fillStyle=sky. NUNCA use fillStyle='linear-gradient(...)' pois é CSS inválido em Canvas.
+- 3 planos distintos: céu estrelado, montanhas azuladas distantes, ruínas e árvores em silhueta, solo texturizado em y=440.
+- Herói de corpo inteiro e armadura ou roupa de fantasia com cabeça/cabelo, ombros, braços, pernas, botas e espada/cajado/arco conforme state.hero; use formas e cores variadas, não apenas um círculo ou um retângulo. Desenhe em torno de state.player.x e state.player.y usando ctx.save/translate/restore.
+- Para cada inimigo existente, criatura original com corpo, olhos, chifres e brilho; use enemy.x e enemy.y??420.
+- Partículas animadas com Math.sin(time/...), movimento suave; barras de HP e onda legíveis.
+- Cores coerentes índigo, ciano, azul esmeralda e dourado; bom contraste.
+
+Não gere 100 variáveis inúteis, não gere HTML nem controles. Código curto e FUNCIONAL que também desenhe algo visível em estado de menu com enemies vazios. Só window.LunaSkin.draw(ctx,state,time).

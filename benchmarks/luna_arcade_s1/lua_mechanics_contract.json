@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "reference": "Lua action platformer mechanics study; original neutral specs, no copied Grand Chase code",
+  "status": "evaluation_contract_only",
+  "mechanics": [
+    {
+      "id": "one_way_drop",
+      "inputs": [
+        "ArrowDown"
+      ],
+      "setup": "player standing on a one-way platform above floor",
+      "expected": "Player drops below platform top within 600ms; lands on floor; never falls through solid ground."
+    },
+    {
+      "id": "ground_jump",
+      "inputs": [
+        "ArrowUp",
+        "Space"
+      ],
+      "setup": "player on solid floor",
+      "expected": "Player y decreases after jump and later returns to floor without tunneling."
+    },
+    {
+      "id": "combo_timing",
+      "inputs": [
+        "KeyZ",
+        "KeyZ",
+        "KeyZ"
+      ],
+      "setup": "player near enemy with enough HP",
+      "expected": "Up to three distinct attack phases; cooldown prevents continuous frame-by-frame damage."
+    },
+    {
+      "id": "facing_and_hitbox",
+      "inputs": [
+        "ArrowLeft",
+        "KeyZ"
+      ],
+      "setup": "enemy behind player and enemy in front",
+      "expected": "Only enemy in facing-direction hit region takes damage."
+    },
+    {
+      "id": "platform_jump_and_drop",
+      "inputs": [
+        "ArrowUp",
+        "ArrowDown"
+      ],
+      "setup": "player on raised one-way platform",
+      "expected": "Jump ascends; down drops only after returning to platform. Floor remains solid."
+    }
+  ]
+}

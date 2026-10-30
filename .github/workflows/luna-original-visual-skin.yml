@@ -1,0 +1,198 @@
+name: Luna Original - Real Qwen Visual Skin
+on:
+  push:
+    branches: [feature/luna-gamedev-knowledge-v1]
+    paths:
+      - "benchmarks/luna_arcade_s1/prompt_visual_skin.txt"
+      - "tools/generate_luna_visual_skin.py"
+      - "tools/luna_visual_browser_feedback.py"
+      - "tests/test_luna_visual_skin.py"
+      - "tests/test_luna_visual_browser_feedback.py"
+      - "site-tests/luna-visual-overlay-bridge.js"
+      - "site-tests/check-luna-visual-skin.cjs"
+      - ".github/workflows/luna-original-visual-skin.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "benchmarks/luna_arcade_s1/prompt_visual_skin.txt"
+      - "tools/generate_luna_visual_skin.py"
+      - "tools/luna_visual_browser_feedback.py"
+      - "tests/test_luna_visual_skin.py"
+      - "tests/test_luna_visual_browser_feedback.py"
+      - "site-tests/luna-visual-overlay-bridge.js"
+      - "site-tests/check-luna-visual-skin.cjs"
+      - ".github/workflows/luna-original-visual-skin.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      model_needed: ${{ steps.change.outputs.model_needed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+      - name: Check whether this latest commit actually changes visual generation
+        id: change
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "model_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only HEAD~1 HEAD > /tmp/luna-visual-changed.txt
+          cat /tmp/luna-visual-changed.txt
+          if grep -Eq '^(benchmarks/luna_arcade_s1/prompt_visual_skin\.txt|tools/generate_luna_visual_skin\.py|tools/luna_visual_browser_feedback\.py|tests/test_luna_visual_skin\.py|tests/test_luna_visual_browser_feedback\.py|site-tests/luna-visual-overlay-bridge\.js|site-tests/check-luna-visual-skin\.cjs|\.github/workflows/luna-original-visual-skin\.yml)$' /tmp/luna-visual-changed.txt; then
+            echo "model_needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "model_needed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_luna_visual_skin.py tests/test_luna_visual_browser_feedback.py -q
+      - run: python -m compileall -q tools/generate_luna_visual_skin.py tools/luna_visual_browser_feedback.py
+      - run: node --check site-tests/luna-visual-overlay-bridge.js
+      - run: node --check site-tests/check-luna-visual-skin.cjs
+
+  model-visual:
+    if: ${{ needs.contract.outputs.model_needed == 'true' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      PYTHONUNBUFFERED: "1"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Checkout fixed CPU llama.cpp source
+        uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Build runtime
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+      - name: Download official Qwen3-4B verified GGUF
+        run: |
+          python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install;print(install())"
+      - name: Real Luna GameCoder authors an original visual module
+        id: generate
+        shell: bash
+        run: |
+          set +e
+          python tools/generate_luna_visual_skin.py --model models/Qwen3-4B-Q4_K_M.gguf --runtime llama-build/bin/llama-cli --out results/luna_visual_skin --attempts 2
+          rc=$?
+          set -e
+          if [[ $rc -eq 0 ]]; then echo "accepted=true" >> "$GITHUB_OUTPUT"; else echo "accepted=false" >> "$GITHUB_OUTPUT"; fi
+          exit "$rc"
+      - name: Build local review preview from the unchanged original Luna game
+        if: steps.generate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          cp site/luna-created/{game.js,styles.css,provenance.json} results/luna_visual_skin/
+          cp site-tests/luna-visual-overlay-bridge.js results/luna_visual_skin/overlay-bridge.js
+          python - <<'PY'
+          from pathlib import Path
+          src=Path('site/luna-created/index.html').read_text(encoding='utf-8')
+          marker='</body>'
+          assert src.count(marker)==1
+          scripts='<script src="visual.js" defer></script><script src="overlay-bridge.js" defer></script>'
+          Path('results/luna_visual_skin/index.html').write_text(src.replace(marker,scripts+'\n'+marker),encoding='utf-8')
+          PY
+      - name: Check visual module and original gameplay in real Chromium
+        if: steps.generate.outputs.accepted == 'true'
+        id: first_qa
+        shell: bash
+        run: |
+          python -m http.server 4819 --bind 127.0.0.1 --directory results/luna_visual_skin >/tmp/luna-visual.log 2>&1 &
+          cd site-tests
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          set +e
+          node check-luna-visual-skin.cjs
+          rc=$?
+          set -e
+          if [[ $rc -eq 0 ]]; then echo "passed=true" >> "$GITHUB_OUTPUT"; else echo "passed=false" >> "$GITHUB_OUTPUT"; fi
+          exit 0
+      - name: Preserve first attempt and prepare trustworthy Chromium feedback
+        if: steps.first_qa.outputs.passed == 'false'
+        shell: bash
+        run: |
+          mkdir -p results/luna_visual_skin/first-attempt
+          for file in visual.js visual-provenance.json browser-evidence.json menu.png gameplay.png; do
+            if [[ -f results/luna_visual_skin/"$file" ]]; then cp results/luna_visual_skin/"$file" results/luna_visual_skin/first-attempt/; fi
+          done
+          python tools/luna_visual_browser_feedback.py --evidence results/luna_visual_skin/browser-evidence.json --provenance results/luna_visual_skin/visual-provenance.json --source results/luna_visual_skin/visual.js --out results/luna_visual_skin/browser-feedback.txt
+      - name: Real Luna GameCoder self-repairs its own visual JavaScript
+        if: steps.first_qa.outputs.passed == 'false'
+        id: repair
+        shell: bash
+        run: |
+          set +e
+          python tools/generate_luna_visual_skin.py --model models/Qwen3-4B-Q4_K_M.gguf --runtime llama-build/bin/llama-cli --feedback-file results/luna_visual_skin/browser-feedback.txt --out results/luna_visual_skin/repaired --attempts 1
+          rc=$?
+          set -e
+          if [[ $rc -eq 0 ]]; then
+            cp results/luna_visual_skin/repaired/visual.js results/luna_visual_skin/visual.js
+            cp results/luna_visual_skin/repaired/visual-provenance.json results/luna_visual_skin/visual-provenance.json
+            echo "accepted=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "accepted=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+      - name: Retest genuinely repaired Qwen visuals in Chromium
+        if: steps.repair.outputs.accepted == 'true'
+        id: repaired_qa
+        shell: bash
+        run: |
+          cd site-tests
+          set +e
+          node check-luna-visual-skin.cjs
+          rc=$?
+          set -e
+          if [[ $rc -eq 0 ]]; then echo "passed=true" >> "$GITHUB_OUTPUT"; else echo "passed=false" >> "$GITHUB_OUTPUT"; fi
+          exit 0
+      - name: Require real playable visual preview, not only static JavaScript
+        if: steps.generate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          if [[ "${{ steps.first_qa.outputs.passed }}" == "true" || "${{ steps.repaired_qa.outputs.passed }}" == "true" ]]; then
+            echo "Authentic model visual and original gameplay passed Chromium. Screenshots still require human review."
+            exit 0
+          fi
+          echo "::error::Qwen visual generation or repaired visual did not pass Chromium."
+          exit 1
+      - name: Archive exact model source, its repair history and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-original-real-visual-skin
+          path: results/luna_visual_skin/
+          if-no-files-found: warn
+          retention-days: 30
