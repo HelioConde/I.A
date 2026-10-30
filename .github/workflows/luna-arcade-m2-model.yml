@@ -7,6 +7,7 @@ on:
       - "benchmarks/luna_arcade_s1/prompt_m2.txt"
       - "benchmarks/luna_arcade_s1/m2_combat_visual.json"
       - ".github/workflows/luna-arcade-m2-model.yml"
+      - "site-tests/check-luna-arcade-m2.cjs"
   pull_request:
     branches: [main]
     paths:
@@ -89,9 +90,11 @@ jobs:
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
           LUNA_M1_REPORT=../results/luna_arcade_m2/browser-evidence.json node check-luna-arcade-m1.cjs
-          code=$?
-          echo "Chromium diagnostic exit code: $code"
-          exit "$code"
+          m1=$?
+          node check-luna-arcade-m2.cjs
+          m2=$?
+          echo "Browser controls result: $m1; combat result: $m2"
+          if [[ $m1 -ne 0 || $m2 -ne 0 ]]; then exit 1; fi
       - name: Upload genuine M2 model output and provenance
         if: always()
         uses: actions/upload-artifact@v4
