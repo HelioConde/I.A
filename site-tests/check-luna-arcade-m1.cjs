@@ -18,6 +18,7 @@ const path = require('node:path');
    return route.abort();
   });
   await page.goto('http://127.0.0.1:4817/',{waitUntil:'load',timeout:15000});
+  if(await page.locator('#start').count()) await page.locator('#start').click();
   await page.waitForTimeout(1200);
   report.checks.push({name:'canvas_visible',ok:await page.locator('canvas#game').isVisible()});
   const qa=()=>page.evaluate(()=>typeof window.__LUNA_GAMEDEV_QA__?.snapshot==='function'?window.__LUNA_GAMEDEV_QA__.snapshot():null);
