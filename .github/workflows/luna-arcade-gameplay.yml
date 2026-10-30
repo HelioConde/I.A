@@ -1,0 +1,71 @@
+name: Luna Arcade - generated gameplay comparison
+
+on:
+  push:
+    branches:
+      - feature/luna-forge-zero
+    paths:
+      - "experiments/luna-forge-zero/luna-arcade-sandbox/**"
+      - ".github/workflows/luna-arcade-gameplay.yml"
+  pull_request:
+    paths:
+      - "experiments/luna-forge-zero/luna-arcade-sandbox/**"
+      - ".github/workflows/luna-arcade-gameplay.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-and-reviewed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    defaults:
+      run:
+        working-directory: experiments/luna-forge-zero/luna-arcade-sandbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check original generated JS syntax without executing it
+        run: node --check gameplay.qwen25-original.js
+      - name: Check reviewed JS syntax without executing it
+        run: node --check gameplay.reviewed.js
+      - name: Check isolated test harness syntax
+        run: node --check test_generated_comparison.cjs
+      - name: Test HUMAN-reviewed gameplay only (9 independent cases)
+        run: LUNA_REVIEWED_ONLY=1 node test_generated_comparison.cjs
+      - name: Test authored game reference (6 cases)
+        run: node test_reference_gameplay.cjs
+
+  generated-behavior-in-offline-docker:
+    needs: syntax-and-reviewed
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: experiments/luna-forge-zero/luna-arcade-sandbox
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull standard Node container before offline execution
+        run: docker pull node:22-alpine
+      - name: Compare original Qwen output vs human revision in locked-down Docker
+        shell: bash
+        run: |
+          docker run --rm --pull=never --network=none --read-only \
+            --cap-drop=ALL --security-opt=no-new-privileges \
+            --pids-limit=64 --memory=256m --cpus=1 --user=65534:65534 \
+            --tmpfs /tmp:rw,nosuid,noexec,size=16m \
+            --mount "type=bind,source=$PWD,target=/work,readonly" \
+            --workdir=/work --entrypoint=node node:22-alpine \
+            /work/test_generated_comparison.cjs \
+            | tee "$RUNNER_TEMP/luna-arcade-comparison.json"
+      - name: Publish comparison report (no source code or private data)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-arcade-gameplay-comparison
+          path: ${{ runner.temp }}/luna-arcade-comparison.json
+          if-no-files-found: ignore
+          retention-days: 14
