@@ -35,8 +35,34 @@ const path = require('node:path');
   await page.keyboard.down('ArrowDown'); await page.waitForTimeout(180); await page.keyboard.up('ArrowDown');
   const afterDown=await qa();
   report.checks.push({name:'down_input_does_not_crash',ok:!!beforeDown?.player&&!!afterDown?.player&&report.errors.length===0});
-  // A genuine platform drop-through requires a deterministic platform setup, not available yet.
-  report.unverified=['one_way_platform_drop','three_hit_combo','facing_hitbox','visual_quality'];
+  // Inspect model-authored observable platform state without mutating player or game state.
+  const observable=await qa();
+  const platformData=Array.isArray(observable?.platforms)?observable.platforms:[];
+  const hasOneWay=platformData.some(p=>p?.oneWay===true&&Number.isFinite(p.x)&&Number.isFinite(p.y));
+  report.checks.push({name:'one_way_platform_observable',ok:hasOneWay});
+  report.platforms_observed=platformData.length;
+  // Only run a true drop test when model gameplay puts us on a raised one-way platform.
+  // Avoid fabricating success by teleporting the character via the test harness.
+  let landed=false;
+  for(let attempt=0;attempt<3&&!landed;attempt++){
+    const current=await qa();
+    if(current?.player?.onPlatform!==null&&current?.player?.onPlatform!==undefined&&current?.player?.grounded===true){
+      const i=current.player.onPlatform;
+      if(platformData[i]?.oneWay)landed=true;
+    }
+    if(!landed){
+      await page.keyboard.press('ArrowUp');
+      await page.waitForTimeout(950);
+    }
+  }
+  if(landed){
+    const before=await qa();
+    await page.keyboard.down('ArrowDown');await page.waitForTimeout(450);await page.keyboard.up('ArrowDown');
+    const after=await qa();
+    report.checks.push({name:'one_way_drop_real',ok:!!after?.player&&after.player.y>before.player.y+5});
+  }else{
+    report.unverified=['one_way_drop_real_no_reachable_platform','three_hit_combo','facing_hitbox','visual_quality'];
+  }
   await page.keyboard.press('KeyZ');await page.waitForTimeout(150);
   report.checks.push({name:'no_runtime_errors',ok:report.errors.length===0});
   await page.screenshot({path:path.join(path.dirname(out),'gameplay.png')});
