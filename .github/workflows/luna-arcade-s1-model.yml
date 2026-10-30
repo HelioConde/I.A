@@ -10,6 +10,13 @@ on:
       - "knowledge/game_dev/**"
       - "tests/test_luna_arcade_s1_mission.py"
       - ".github/workflows/luna-arcade-s1-model.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "benchmarks/luna_arcade_s1/**"
+      - "tools/benchmark_luna_game_models.py"
+      - "tools/prepare_luna_arcade_prompt.py"
+      - ".github/workflows/luna-arcade-s1-model.yml"
   workflow_dispatch:
 
 permissions:
@@ -29,6 +36,7 @@ jobs:
       - run: python -m compileall -q tools/benchmark_luna_game_models.py
 
   model-generate:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/luna-gamedev-knowledge-v1') || (github.event_name == 'push' && github.ref == 'refs/heads/feature/luna-gamedev-knowledge-v1') }}
     needs: mission-contract
     runs-on: ubuntu-latest
     timeout-minutes: 95
