@@ -45,6 +45,7 @@ jobs:
       - run: python -m pip install pytest
       - run: python -m pytest tests/test_luna_arcade_s1_mission.py tests/test_prepare_luna_arcade_prompt.py tests/test_lua_mechanics_contract.py tests/test_luna_arcade_m2_contract.py -q
       - run: python -m compileall -q tools/benchmark_luna_game_models.py
+      - run: node --check site-tests/check-luna-arcade-m1.cjs
 
   model-generate:
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/luna-gamedev-knowledge-v1') || (github.event_name == 'push' && github.ref == 'refs/heads/feature/luna-gamedev-knowledge-v1') }}
