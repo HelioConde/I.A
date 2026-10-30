@@ -22,6 +22,23 @@ const path = require('node:path');
     await page.waitForTimeout(700);
     const overlay=page.locator('#luna-skin-overlay');
     report.checks.push({name:'model_visual_module',ok:await page.evaluate(()=>typeof window.LunaSkin?.draw==='function')});
+    // Test model's visual function with zero enemies in both menu and victory.
+    // These are separate off-screen canvases; the real game state is never modified.
+    for(const mode of ['menu','victory']) {
+      const probe=await page.evaluate((mode)=>{
+        const ctx=document.createElement('canvas').getContext('2d');
+        ctx.canvas.width=960;ctx.canvas.height=540;
+        try {
+          window.LunaSkin.draw(ctx,{
+            mode, hero:'melee', wave:0, player:{x:100,y:400,hp:100},enemies:[]
+          },1000);
+          const pixel=ctx.getImageData(10,10,1,1).data;
+          return {ok:true,pixel:Array.from(pixel)};
+        } catch(error){return {ok:false,error:String(error)};}
+      },mode);
+      report.checks.push({name:'empty_enemies_'+mode,ok:probe.ok});
+      if(!probe.ok)report.errors.push(mode+': '+probe.error);
+    }
     report.checks.push({name:'visual_overlay_present',ok:await overlay.count()===1});
     report.checks.push({name:'overlay_rendering',ok:await overlay.getAttribute('data-visual-status')==='rendering'});
     const visual=await page.evaluate(()=>{
