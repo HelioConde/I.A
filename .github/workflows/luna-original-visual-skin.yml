@@ -9,21 +9,12 @@ on:
       - "site-tests/luna-visual-overlay-bridge.js"
       - "site-tests/check-luna-visual-skin.cjs"
       - ".github/workflows/luna-original-visual-skin.yml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "benchmarks/luna_arcade_s1/prompt_visual_skin.txt"
-      - "tools/generate_luna_visual_skin.py"
-      - "tests/test_luna_visual_skin.py"
-      - "site-tests/luna-visual-overlay-bridge.js"
-      - "site-tests/check-luna-visual-skin.cjs"
-      - ".github/workflows/luna-original-visual-skin.yml"
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   contract:
     runs-on: ubuntu-latest
