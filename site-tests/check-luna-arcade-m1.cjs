@@ -50,17 +50,37 @@ const path = require('node:path');
   // Only run a true drop test when model gameplay puts us on a raised one-way platform.
   // Avoid fabricating success by teleporting the character via the test harness.
   let landed=false;
-  for(let attempt=0;attempt<3&&!landed;attempt++){
-    const current=await qa();
-    if(current?.player?.onPlatform!==null&&current?.player?.onPlatform!==undefined&&current?.player?.grounded===true){
-      const i=current.player.onPlatform;
-      if(platformData[i]?.oneWay)landed=true;
+  const platformTargets=platformData.map((p,i)=>({...p,index:i})).filter(p=>p.oneWay&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.width)).sort((a,b)=>a.y-b.y);
+  const trace=[];
+  for(const target of platformTargets.slice(0,3)){
+    for(let attempt=0;attempt<3&&!landed;attempt++){
+      let current=await qa();
+      if(!current?.player)break;
+      const targetX=target.x+Math.min(target.width/2,30);
+      // Navigate horizontally by keyboard, never mutate model-owned player data.
+      const direction=targetX>current.player.x+9?'ArrowRight':targetX<current.player.x-9?'ArrowLeft':null;
+      if(direction){
+        await page.keyboard.down(direction);
+        for(let n=0;n<24;n++){
+          await page.waitForTimeout(35);
+          current=await qa();
+          if(!current?.player||Math.abs(targetX-current.player.x)<14)break;
+        }
+        await page.keyboard.up(direction);
+      }
+      await page.keyboard.down('ArrowUp');
+      await page.waitForTimeout(110);
+      await page.keyboard.up('ArrowUp');
+      for(let n=0;n<32;n++){
+        await page.waitForTimeout(45);
+        const state=await qa();
+        trace.push({y:state?.player?.y,onPlatform:state?.player?.onPlatform,grounded:state?.player?.grounded});
+        if(state?.player?.grounded===true&&state.player.onPlatform===target.index){landed=true;break;}
+      }
     }
-    if(!landed){
-      await page.keyboard.press('ArrowUp');
-      await page.waitForTimeout(950);
-    }
+    if(landed)break;
   }
+  report.platform_reach_trace=trace.slice(-30);
   if(landed){
     report.checks.push({name:'one_way_platform_reachable',ok:true});
     const before=await qa();
