@@ -1,0 +1,22 @@
+name: Luna GameCoder Curriculum Validation
+on:
+  pull_request:
+    paths:
+      - "benchmarks/gamecoder_curriculum/**"
+      - "tools/evaluate_gamecoder_curriculum.py"
+      - "tests/test_gamecoder_curriculum.py"
+      - ".github/workflows/luna-gamecoder-curriculum.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python tools/evaluate_gamecoder_curriculum.py --list
+      - run: python -m pytest tests/test_gamecoder_curriculum.py -q
