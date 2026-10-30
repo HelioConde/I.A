@@ -24,6 +24,13 @@ const path = require('node:path');
   const qa=()=>page.evaluate(()=>typeof window.__LUNA_GAMEDEV_QA__?.snapshot==='function'?window.__LUNA_GAMEDEV_QA__.snapshot():null);
   const initial=await qa();
   report.checks.push({name:'snapshot_exists',ok:!!initial?.player});
+  // Regression: real model once let y exceed 3,000 while the solid floor was at y=440.
+  const y0=initial?.player?.y;
+  await page.waitForTimeout(650);
+  const settled=await qa();
+  report.floor_trace={initial_y:y0,after650ms_y:settled?.player?.y};
+  report.checks.push({name:'solid_floor_contains_player',ok:!!settled?.player&&Number.isFinite(settled.player.y)&&settled.player.y>=0&&settled.player.y<=440});
+  report.checks.push({name:'no_infinite_fall',ok:!!settled?.player&&Number.isFinite(y0)&&Math.abs(settled.player.y-y0)<85});
   await page.keyboard.down('ArrowRight');await page.waitForTimeout(450);await page.keyboard.up('ArrowRight');
   const moved=await qa();
   report.checks.push({name:'move_right',ok:!!(moved?.player&&initial?.player&&moved.player.x>initial.player.x+1)});
@@ -50,7 +57,7 @@ const path = require('node:path');
   // Only run a true drop test when model gameplay puts us on a raised one-way platform.
   // Avoid fabricating success by teleporting the character via the test harness.
   let landed=false;
-  const platformTargets=platformData.map((p,i)=>({...p,index:i})).filter(p=>p.oneWay&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.width)).sort((a,b)=>a.y-b.y);
+  const platformTargets=platformData.map((p,i)=>({...p,index:i})).filter(p=>p.oneWay&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.width)).sort((a,b)=>b.y-a.y);
   const trace=[];
   for(const target of platformTargets.slice(0,3)){
     for(let attempt=0;attempt<3&&!landed;attempt++){
