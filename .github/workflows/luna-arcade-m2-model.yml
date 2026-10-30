@@ -57,17 +57,9 @@ jobs:
       - name: Download fixed, hash-verified Qwen3-4B GGUF
         run: |
           python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install; print(install())"
-      - name: Use learned Luna Core router to select game skills
+      - name: Use trained Luna Core to select M2 combat and visual skills
         run: |
-          python tools/prepare_luna_arcade_prompt.py --output results/luna_arcade_m2/prepared_prompt.txt --report results/luna_arcade_m2/router_provenance.json
-          python - <<'PY'
-          from pathlib import Path
-          dest=Path('results/luna_arcade_m2/prepared_prompt.txt')
-          original=dest.read_text(encoding='utf-8')
-          skills=original.split('Skills selecionadas pelo roteador treinado',1)
-          mission=Path('benchmarks/luna_arcade_s1/prompt_m2.txt').read_text(encoding='utf-8')
-          dest.write_text(mission + ('\nSkills selecionadas pelo roteador treinado'+skills[1] if len(skills)>1 else ''), encoding='utf-8')
-          PY
+          python tools/prepare_luna_arcade_prompt.py --stage m2 --output results/luna_arcade_m2/prepared_prompt.txt --report results/luna_arcade_m2/router_provenance.json
       - name: Generate M2 combat + visual code using real Luna GameCoder model
         id: model
         shell: bash
@@ -84,8 +76,8 @@ jobs:
           set -e
           echo "generator_exit=$rc" >> "$GITHUB_OUTPUT"
           echo "Luna model candidate generation exit code: $rc"
-          exit 0
-      - name: Check real model M1 controls in Chromium (diagnostic only)
+          exit "$rc"
+      - name: Check real model M1 controls in Chromium
         if: steps.model.outputs.generator_exit == '0'
         shell: bash
         run: |
