@@ -69,7 +69,7 @@ jobs:
           python tools/benchmark_luna_game_models.py \
             --model models/Qwen3-4B-Q4_K_M.gguf \
             --runtime llama-build/bin/llama-cli \
-            --label qwen3-4b --attempts 2 \
+            --label qwen3-4b --attempts 2 --max-tokens 3800 --context 8192 \
             --prompt-file results/luna_arcade_m2/prepared_prompt.txt \
             --out results/luna_arcade_m2
           rc=$?
