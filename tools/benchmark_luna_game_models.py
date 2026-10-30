@@ -72,19 +72,20 @@ def command(runtime:Path,model:Path,prompt:str,tokens:int=2600)->list[str]:
             "--no-display-prompt","--simple-io","--no-warmup",
             "--reasoning","off","--jinja"]
 
-def generate(runtime:Path,model:Path,out:Path,label:str,attempts:int=2)->dict:
+def generate(runtime:Path,model:Path,out:Path,label:str,attempts:int=2,prompt_override:str|None=None)->dict:
     if not runtime.is_file() or not model.is_file():
         raise FileNotFoundError("Runtime/quantized GGUF missing")
     if attempts not in (1,2,3):raise ValueError("invalid_attempts")
     out.mkdir(parents=True,exist_ok=True)
+    active_prompt=prompt_override if prompt_override is not None else PROMPT
     report={"benchmark":"Luna native GameDev v4","model":label,"model_file":model.name,
             "model_sha256":sha(model),
-            "prompt_sha256":hashlib.sha256(PROMPT.encode("utf-8")).hexdigest(),
+            "prompt_sha256":hashlib.sha256(active_prompt.encode("utf-8")).hexdigest(),
             "source_author":"real local GGUF model","assistant_gameplay_code_used":False,
             "gameplay_verified":False,"accepted_source":False,"attempts":[]}
     feedback=""
     for attempt in range(1,attempts+1):
-        prompt=PROMPT+("\nNa tentativa anterior: "+feedback+
+        prompt=active_prompt+("\nNa tentativa anterior: "+feedback+
                       ". Reescreva o arquivo JS inteiro e válido." if feedback else "")
         started=time.monotonic()
         try:
@@ -119,8 +120,10 @@ def main()->int:
     p.add_argument("--out",type=Path,required=True)
     p.add_argument("--label",choices=("ornith-1.5-9b","qwen3-4b"),required=True)
     p.add_argument("--attempts",type=int,choices=(1,2,3),default=2)
+    p.add_argument("--prompt-file",type=Path,default=None,help="Optional original challenge prompt; default keeps legacy benchmark unchanged")
     args=p.parse_args()
-    report=generate(args.runtime,args.model,args.out,args.label,args.attempts)
+    custom=args.prompt_file.read_text(encoding="utf-8") if args.prompt_file else None
+    report=generate(args.runtime,args.model,args.out,args.label,args.attempts,prompt_override=custom)
     print(json.dumps(report,ensure_ascii=False,indent=2),flush=True)
     return 0 if report["accepted_source"] else 1
 
