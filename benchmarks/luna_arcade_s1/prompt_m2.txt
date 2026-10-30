@@ -19,3 +19,5 @@ window.__LUNA_GAMEDEV_QA__={snapshot:()=>({
  platforms:platforms.map(p=>({x:p.x,y:p.y,width:p.width,height:p.height,oneWay:!!p.oneWay})),mode
 })};
 Não esconda ou falsifique o estado nesse hook. O avaliador irá enviar setas, Z e X e comparar snapshots. Prioridade: lógica executável sem erros, depois mecânicas e apresentação. Sem declarar sucesso na resposta.
+
+TESTES AUTOMATIZADOS M2: inicie o jogador perto do solo em x=80, com facing=1, e ao menos um inimigo com hp>=12 no alcance frontal inicial (ex.: x=135). Três pressões separadas de KeyZ devem reduzir hp do inimigo com cooldown (não por frame), mesmo se o combo ainda não for visualmente perfeito. Exponha player.combo como inteiro atual (0,1,2,3) no snapshot, nunca valor inventado. Ao segurar ArrowLeft, facing passa a -1. KeyX deve executar habilidade sem exception. Não esconda estado. O avaliador humano julgará o visual a partir de screenshot real; nunca afirme aprovação visual no código.
