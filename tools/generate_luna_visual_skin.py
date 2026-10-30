@@ -24,7 +24,7 @@ def clean_skin(raw: str) -> str:
     text=re.sub(r"(?:\[end of text\]|</s>|<\|im_end\|>)\s*$","",text).strip()
     match=re.fullmatch(r"```(?:javascript|js)?\s*\n(.*?)\n```",text,re.I|re.S)
     if match: text=match.group(1).strip()
-    if not 350<=len(text)<=20000:raise ValueError("invalid_skin_size")
+    if not 220<=len(text)<=20000:raise ValueError("invalid_skin_size")
     if DANGEROUS.search(text) or re.search(r"<script|document\.|\b(?:window\.location|XMLHttpRequest)\b",text,re.I):
         raise ValueError("unsafe_visual_source")
     if not re.search(r"window\.LunaSkin\s*=",text):
