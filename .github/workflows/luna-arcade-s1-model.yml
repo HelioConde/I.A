@@ -1,0 +1,79 @@
+name: Luna Arcade S1 - Real GameCoder M1
+
+on:
+  push:
+    branches: [feature/luna-gamedev-knowledge-v1]
+    paths:
+      - "benchmarks/luna_arcade_s1/**"
+      - "tools/benchmark_luna_game_models.py"
+      - "tests/test_luna_arcade_s1_mission.py"
+      - ".github/workflows/luna-arcade-s1-model.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mission-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_luna_arcade_s1_mission.py -q
+      - run: python -m compileall -q tools/benchmark_luna_game_models.py
+
+  model-generate:
+    needs: mission-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      PYTHONUNBUFFERED: "1"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check out fixed llama.cpp source
+        uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Build GGUF inference runtime on CPU
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+      - name: Download fixed, hash-verified Qwen3-4B GGUF
+        run: |
+          python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install; print(install())"
+      - name: Generate M1 gameplay code using real Luna GameCoder model
+        id: model
+        shell: bash
+        run: |
+          mkdir -p results/luna_arcade_s1
+          set +e
+          python tools/benchmark_luna_game_models.py \
+            --model models/Qwen3-4B-Q4_K_M.gguf \
+            --runtime llama-build/bin/llama-cli \
+            --label qwen3-4b --attempts 2 \
+            --prompt-file benchmarks/luna_arcade_s1/prompt_m1.txt \
+            --out results/luna_arcade_s1
+          rc=$?
+          set -e
+          echo "generator_exit=$rc" >> "$GITHUB_OUTPUT"
+          echo "Luna model candidate generation exit code: $rc"
+          exit 0
+      - name: Upload genuine model output, if any, and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-arcade-s1-m1-qwen4b
+          path: results/luna_arcade_s1/
+          if-no-files-found: warn
+          retention-days: 30
