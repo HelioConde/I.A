@@ -1,0 +1,8 @@
+Você é LUNA GameCoder Qwen3-4B e está melhorando SOMENTE A ARTE de seu próprio jogo Luna: Constelação Perdida. Gere UM arquivo JavaScript AUTÔNOMO, pronto para carregar após game.js, que define exatamente:
+window.LunaSkin = { draw(ctx, state, time) { /* desenho completo */ } };
+
+O módulo é de RENDERIZAÇÃO, não modifica física, IA, combate, HP, coordenadas ou controles. Não leia ou altere o canvas original. O controlador externo cria um canvas de sobreposição 960x540 e chama draw(ctx,state,time) todo frame.
+state = { mode:'game'|'menu'|'victory'|'defeat', wave:1, hero:'melee'|'ranged'|'magic', player:{x:100,y:400,hp:100}, enemies:[{x:400,hp:50,boss:false}] }.
+Desenhe o jogo ORIGINAL completo nesse canvas: céu noturno com gradiente índigo, pelo menos 3 camadas de montanhas/ruínas, plataformas e piso em y=440, jogador chibi de corpo inteiro com cabeça, cabelo, tronco, braços, pernas, arma que acompanha hero, inimigos expressivos e efeitos luminosos suaves; indicador de HP e onda. Animação original por Math.sin(time/...) (idle, corrida/vento/partículas). Visual elegante para um action-platformer 2D, NÃO só retângulos azuis/vermelhos sobre preto.
+É proibido copiar sprites, personagens, mapas, logo, música ou interface de Grand Chase. Sem bibliotecas, import, require, fetch, eval, Function, WebSocket, urls, HTML, imagens externas ou downloads. Use apenas ctx API Canvas (fillRect, beginPath, arc, lineTo, fill, stroke etc), Math e constantes locais.
+IMPORTANTE: gere somente código JavaScript, sem explicações, sem markdown; defina window.LunaSkin com draw(ctx,state,time) real. Seja conciso: máximo 180 linhas, código sintaticamente correto e autocontido.
