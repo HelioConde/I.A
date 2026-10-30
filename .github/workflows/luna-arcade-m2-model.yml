@@ -8,12 +8,18 @@ on:
       - "benchmarks/luna_arcade_s1/m2_combat_visual.json"
       - ".github/workflows/luna-arcade-m2-model.yml"
       - "site-tests/check-luna-arcade-m2.cjs"
+      - "tools/prepare_luna_arcade_prompt.py"
+      - "tools/benchmark_luna_game_models.py"
   pull_request:
     branches: [main]
     paths:
       - "benchmarks/luna_arcade_s1/prompt_m2.txt"
       - ".github/workflows/luna-arcade-m2-model.yml"
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
   contents: read
