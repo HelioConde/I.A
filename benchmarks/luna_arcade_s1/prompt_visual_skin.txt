@@ -1,8 +1,20 @@
-Você é LUNA GameCoder Qwen3-4B e está melhorando SOMENTE A ARTE de seu próprio jogo Luna: Constelação Perdida. Gere UM arquivo JavaScript AUTÔNOMO, pronto para carregar após game.js, que define exatamente:
-window.LunaSkin = { draw(ctx, state, time) { /* desenho completo */ } };
+Você é LUNA GameCoder (modelo Qwen3-4B). Crie SOMENTE um módulo ORIGINAL de DESENHO para melhorar seu jogo Luna: Constelação Perdida. Responda apenas código JavaScript válido, sem markdown ou explicação, criando exatamente:
+window.LunaSkin = { draw(ctx, state, time) { /* todo o desenho */ } };
 
-O módulo é de RENDERIZAÇÃO, não modifica física, IA, combate, HP, coordenadas ou controles. Não leia ou altere o canvas original. O controlador externo cria um canvas de sobreposição 960x540 e chama draw(ctx,state,time) todo frame.
-state = { mode:'game'|'menu'|'victory'|'defeat', wave:1, hero:'melee'|'ranged'|'magic', player:{x:100,y:400,hp:100}, enemies:[{x:400,hp:50,boss:false}] }.
-Desenhe o jogo ORIGINAL completo nesse canvas: céu noturno com gradiente índigo, pelo menos 3 camadas de montanhas/ruínas, plataformas e piso em y=440, jogador chibi de corpo inteiro com cabeça, cabelo, tronco, braços, pernas, arma que acompanha hero, inimigos expressivos e efeitos luminosos suaves; indicador de HP e onda. Animação original por Math.sin(time/...) (idle, corrida/vento/partículas). Visual elegante para um action-platformer 2D, NÃO só retângulos azuis/vermelhos sobre preto.
-É proibido copiar sprites, personagens, mapas, logo, música ou interface de Grand Chase. Sem bibliotecas, import, require, fetch, eval, Function, WebSocket, urls, HTML, imagens externas ou downloads. Use apenas ctx API Canvas (fillRect, beginPath, arc, lineTo, fill, stroke etc), Math e constantes locais.
-IMPORTANTE: gere somente código JavaScript, sem explicações, sem markdown; defina window.LunaSkin com draw(ctx,state,time) real. Seja conciso: máximo 180 linhas, código sintaticamente correto e autocontido.
+O canvas já existe: ctx é um CanvasRenderingContext2D de 960x540. O código principal (movimento, combate e input) NÃO será alterado. NÃO crie outro canvas, NÃO use document, import, require, eval, Function, fetch, imagens remotas nem URLs.
+
+ESTADO REAL recebido:
+state={mode:'menu'|'game'|'victory'|'defeat',hero:'melee'|'ranged'|'magic',wave:0,player:{x:100,y:400,hp:100},enemies:[]}.
+Durante o MENU e na VITÓRIA, enemies pode ser array VAZIO. NUNCA use state.enemies[0].x sem verificar se existe; desenhe inimigos com for(const enemy of (state.enemies||[])) e use (enemy.y??420), porque o jogo atual pode fornecer apenas x e hp! O player está sempre disponível no estado. Ao desenhar, nunca mude state, não altere objetos do jogo.
+
+BUG CONCRETO DA TENTATIVA ANTERIOR (run 41045744843): erro de navegador "Cannot read properties of undefined (reading 'x')" ao chamar ctx.arc(enemy.x,enemy.y,...), pois state.enemies[0] era undefined na tela de menu. CORRIJA. O navegador precisa renderizar menu com zero inimigos, gameplay com inimigos e vitória com zero inimigos SEM EXCEÇÕES.
+
+VISUAL ORIGINAL, inspirado na qualidade de um action-platformer clássico, mas NÃO copie arte, sprites, personagens, nomes, mapas, UI ou música de Grand Chase. Faça no máximo 130 linhas úteis de JS:
+- Céu de fantasia com gradiente REAL usando const sky=ctx.createLinearGradient(0,0,0,540); sky.addColorStop(...); ctx.fillStyle=sky. NUNCA use fillStyle='linear-gradient(...)' pois é CSS inválido em Canvas.
+- 3 planos distintos: céu estrelado, montanhas azuladas distantes, ruínas e árvores em silhueta, solo texturizado em y=440.
+- Herói de corpo inteiro e armadura ou roupa de fantasia com cabeça/cabelo, ombros, braços, pernas, botas e espada/cajado/arco conforme state.hero; use formas e cores variadas, não apenas um círculo ou um retângulo. Desenhe em torno de state.player.x e state.player.y usando ctx.save/translate/restore.
+- Para cada inimigo existente, criatura original com corpo, olhos, chifres e brilho; use enemy.x e enemy.y??420.
+- Partículas animadas com Math.sin(time/...), movimento suave; barras de HP e onda legíveis.
+- Cores coerentes índigo, ciano, azul esmeralda e dourado; bom contraste.
+
+Não gere 100 variáveis inúteis, não gere HTML nem controles. Código curto e FUNCIONAL que também desenhe algo visível em estado de menu com enemies vazios. Só window.LunaSkin.draw(ctx,state,time).
