@@ -16,3 +16,19 @@ def test_preparation_uses_trained_router_and_real_model_without_claiming_finetun
     assert "ArrowDown" in prompt.read_text(encoding="utf-8")
     assert "Qwen3-4B" in report.read_text(encoding="utf-8")
     assert json.loads(report.read_text(encoding="utf-8"))==result
+
+def test_preparation_m2_uses_combat_and_visual_skills(tmp_path):
+    prompt=tmp_path/"m2.txt"
+    report=tmp_path/"m2.json"
+    evidence=module.prepare(prompt,report,stage="m2")
+    task_text=" ".join(item["task"].lower() for item in evidence["selections"])
+    assert evidence["stage"]=="m2"
+    assert "combo" in task_text and "personagem" in task_text
+    assert "KeyX" in prompt.read_text(encoding="utf-8")
+    assert "Skills selecionadas pelo roteador treinado" in prompt.read_text(encoding="utf-8")
+    assert evidence["gamecoder_fine_tuned"] is False
+
+def test_unknown_stage_rejected(tmp_path):
+    import pytest
+    with pytest.raises(ValueError, match="Unknown arcade stage"):
+        module.prepare(tmp_path/"prompt.txt",tmp_path/"report.json",stage="invalid")
