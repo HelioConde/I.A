@@ -27,9 +27,13 @@ const path = require('node:path');
   await page.keyboard.down('ArrowRight');await page.waitForTimeout(450);await page.keyboard.up('ArrowRight');
   const moved=await qa();
   report.checks.push({name:'move_right',ok:!!(moved?.player&&initial?.player&&moved.player.x>initial.player.x+1)});
-  await page.keyboard.press('ArrowUp');await page.waitForTimeout(100);
+  const jumpStart=await qa();
+  await page.keyboard.down('ArrowUp');
+  await page.waitForTimeout(100);
   const jumped=await qa();
-  report.checks.push({name:'jump_changes_y',ok:!!(jumped?.player&&moved?.player&&jumped.player.y<moved.player.y-1)});
+  await page.keyboard.up('ArrowUp');
+  report.jump_trace={before:jumpStart?.player,after100ms:jumped?.player};
+  report.checks.push({name:'jump_changes_y',ok:!!(jumped?.player&&jumpStart?.player&&jumped.player.y<jumpStart.player.y-1)});
   // Probe down input without pretending that a floor-only snapshot proves one-way platform logic.
   const beforeDown=await qa();
   await page.keyboard.down('ArrowDown'); await page.waitForTimeout(180); await page.keyboard.up('ArrowDown');
@@ -41,6 +45,8 @@ const path = require('node:path');
   const hasOneWay=platformData.some(p=>p?.oneWay===true&&Number.isFinite(p.x)&&Number.isFinite(p.y));
   report.checks.push({name:'one_way_platform_observable',ok:hasOneWay});
   report.platforms_observed=platformData.length;
+  report.platform_observations=platformData;
+  report.player_after_down=afterDown?.player;
   // Only run a true drop test when model gameplay puts us on a raised one-way platform.
   // Avoid fabricating success by teleporting the character via the test harness.
   let landed=false;
