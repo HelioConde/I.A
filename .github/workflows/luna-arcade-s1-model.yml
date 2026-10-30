@@ -88,7 +88,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          cp site/luna-created/index.html results/luna_arcade_s1/index.html
+          cp benchmarks/luna_arcade_s1/qa/index.html results/luna_arcade_s1/index.html
           cp results/luna_arcade_s1/game.js results/luna_arcade_s1/game.js
           python -m http.server 4817 --bind 127.0.0.1 --directory results/luna_arcade_s1 >/tmp/luna-m1.log 2>&1 &
           cd site-tests
