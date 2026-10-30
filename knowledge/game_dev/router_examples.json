@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "provenance": "Luna project original curated examples; no third-party code and no model generated code labeled as authored by Luna",
+  "examples": [
+    {
+      "skill": "gdd",
+      "text": "crie um documento de design para um rpg 2d",
+      "split": "train"
+    },
+    {
+      "skill": "gdd",
+      "text": "planeje a historia e o loop principal do jogo",
+      "split": "train"
+    },
+    {
+      "skill": "gdd",
+      "text": "defina mecanicas e escopo de um novo game",
+      "split": "train"
+    },
+    {
+      "skill": "gdd",
+      "text": "escreva um gdd com objetivo e progressao",
+      "split": "test"
+    },
+    {
+      "skill": "backlog",
+      "text": "divida o inventario em tarefas pequenas",
+      "split": "train"
+    },
+    {
+      "skill": "backlog",
+      "text": "crie backlog ordenado com criterios de aceite",
+      "split": "train"
+    },
+    {
+      "skill": "backlog",
+      "text": "separe a implementacao em historias de desenvolvimento",
+      "split": "train"
+    },
+    {
+      "skill": "backlog",
+      "text": "organize dependencias do sprint",
+      "split": "test"
+    },
+    {
+      "skill": "fsm",
+      "text": "implemente maquina de estados idle walk jump",
+      "split": "train"
+    },
+    {
+      "skill": "fsm",
+      "text": "transicoes de estados para inimigo patrulhar atacar",
+      "split": "train"
+    },
+    {
+      "skill": "fsm",
+      "text": "controle fsm de personagem com animacoes",
+      "split": "train"
+    },
+    {
+      "skill": "fsm",
+      "text": "crie state machine para movimento e combate",
+      "split": "test"
+    },
+    {
+      "skill": "event_bus",
+      "text": "crie um barramento de eventos desacoplado",
+      "split": "train"
+    },
+    {
+      "skill": "event_bus",
+      "text": "avisar hud quando inimigo morrer",
+      "split": "train"
+    },
+    {
+      "skill": "event_bus",
+      "text": "publique eventos de inventario para outros sistemas",
+      "split": "train"
+    },
+    {
+      "skill": "event_bus",
+      "text": "implemente subscribe unsubscribe para sinais",
+      "split": "test"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "converta gdscript godot para unity csharp",
+      "split": "train"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "traduza codigo de phaser para godot",
+      "split": "train"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "adapte mecanica entre motores de jogo",
+      "split": "train"
+    },
+    {
+      "skill": "engine_conversion",
+      "text": "migre logica de unity para javascript canvas",
+      "split": "test"
+    },
+    {
+      "skill": "debug",
+      "text": "analise stack trace do erro null reference",
+      "split": "train"
+    },
+    {
+      "skill": "debug",
+      "text": "corrija crash de jogo em execucao",
+      "split": "train"
+    },
+    {
+      "skill": "debug",
+      "text": "encontre causa de excecao no codigo",
+      "split": "train"
+    },
+    {
+      "skill": "debug",
+      "text": "investigue logs e reproduza falha",
+      "split": "test"
+    },
+    {
+      "skill": "performance",
+      "text": "otimize fps e reduza garbage collection",
+      "split": "train"
+    },
+    {
+      "skill": "performance",
+      "text": "analise gargalo no update por frame",
+      "split": "train"
+    },
+    {
+      "skill": "performance",
+      "text": "corrija uso excessivo de memoria",
+      "split": "train"
+    },
+    {
+      "skill": "performance",
+      "text": "melhore desempenho do loop de renderizacao",
+      "split": "test"
+    },
+    {
+      "skill": "shader",
+      "text": "escreva shader glsl de agua",
+      "split": "train"
+    },
+    {
+      "skill": "shader",
+      "text": "crie efeito dissolve em hlsl",
+      "split": "train"
+    },
+    {
+      "skill": "shader",
+      "text": "converta shader graph para codigo",
+      "split": "train"
+    },
+    {
+      "skill": "shader",
+      "text": "implemente contorno visual com shader",
+      "split": "test"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "gere prompt para sprite pixel art",
+      "split": "train"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "padronize prompt de textura seamless",
+      "split": "train"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "descreva concept art consistente",
+      "split": "train"
+    },
+    {
+      "skill": "asset_prompt",
+      "text": "crie prompt de asset baseado na art bible",
+      "split": "test"
+    }
+  ]
+}
