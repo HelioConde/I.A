@@ -36,22 +36,27 @@ def clean_skin(raw: str) -> str:
     if not syntax_valid(text):raise ValueError("javascript_syntax_error")
     return text+"\n"
 
-def generate(runtime:Path,model:Path,out:Path,attempts:int=2)->dict:
+def generate(runtime:Path,model:Path,out:Path,attempts:int=2,feedback_file:Path|None=None)->dict:
     if not runtime.is_file() or not model.is_file():
         raise FileNotFoundError("Missing verified runtime or GGUF")
     out.mkdir(parents=True,exist_ok=True)
     prompt=PROMPT.read_text(encoding="utf-8")
+    if feedback_file is not None:
+        feedback_text=feedback_file.read_text(encoding="utf-8")
+        if not 50<=len(feedback_text)<=25000: raise ValueError("invalid_browser_feedback")
+        prompt+="\n\nDIAGNÓSTICO DE EXECUÇÃO REAL PARA AUTORREPARO:\n"+feedback_text
     report={"status":"INCOMPLETE","model_file":model.name,"model_sha256":sha(model),
             "prompt_sha256":hashlib.sha256(prompt.encode()).hexdigest(),
             "visual_source_author":"real local GGUF model",
-            "assistant_visual_code_used":False,"model_visual_verified":False,"attempts":[]}
+            "assistant_visual_code_used":False,"model_visual_verified":False,"attempts":[],
+            "browser_repair_requested":feedback_file is not None}
     feedback=""
     for i in range(1,attempts+1):
         full=prompt+("\nCorreção da tentativa anterior: "+feedback+
                      ". Reescreva APENAS o módulo completo." if feedback else "")
         began=time.monotonic()
         try:
-            proc=subprocess.run(command(runtime,model,full,tokens=2400,context=4096),
+            proc=subprocess.run(command(runtime,model,full,tokens=2900 if feedback_file else 2400,context=8192 if feedback_file else 4096),
                 capture_output=True,text=True,encoding="utf-8",errors="replace",timeout=1200)
             raw=proc.stdout or ""
             (out/f"visual-attempt-{i}.raw.txt").write_text(raw,encoding="utf-8")
@@ -78,8 +83,9 @@ def main()->int:
     ap.add_argument("--runtime",type=Path,required=True)
     ap.add_argument("--out",type=Path,required=True)
     ap.add_argument("--attempts",type=int,choices=(1,2,3),default=2)
+    ap.add_argument("--feedback-file",type=Path,default=None)
     args=ap.parse_args()
-    report=generate(args.runtime,args.model,args.out,args.attempts)
+    report=generate(args.runtime,args.model,args.out,args.attempts,feedback_file=args.feedback_file)
     print(json.dumps(report,ensure_ascii=False))
     return 0 if report["status"]=="STATIC_VISUAL_CANDIDATE" else 1
 
