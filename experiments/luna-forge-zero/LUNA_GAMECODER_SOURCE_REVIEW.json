@@ -1,0 +1,164 @@
+{
+  "schema": "luna-gamecoder-github-source-review-v1",
+  "reviewed_on": "2026-10-30",
+  "scope": "Review of selected repositories shared by user for game-mechanics learning",
+  "execution_status": "CANDIDATES_ONLY_NOT_DOWNLOADED_NOT_TRAINED",
+  "existing_training_corpus_unchanged": true,
+  "rules": {
+    "code_only": true,
+    "project_licenses_not_automatically_asset_licenses": true,
+    "never_include": "game binaries, assets, proprietary sprites, embedded ROMs, downloads, external submodules or unlicensed source",
+    "local_retrieval": "explicit opt-in only, pin repository commits and retain full license notices",
+    "holdout": "repository-disjoint; no training, feedback, prompt tuning or model selection on holdout",
+    "importer_limitations": "Existing github_corpus.py accepts MIT .gd/.js/.ts/.tsx, not Apache Python, C++, HTML",
+    "notice": "MIT requires preservation of copyright and license notice; Apache-2.0 has its own attribution conditions"
+  },
+  "candidates": [
+    {
+      "repo": "RafaelForbeck/Godot-2025-Plataforma-2D-YouTube",
+      "commit": "fe9509f692c3b58434e7ca2a876c620aa784203e",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "e391b6d714a675db6ee34a68fd0e589e0a88d4c7",
+      "language": "GDScript",
+      "status": "eligible_for_code_only_import_after_review",
+      "proposed_split": "train",
+      "code_paths": [
+        "scripts/player.gd",
+        "scripts/skeleton.gd",
+        "scripts/moving_platform.gd",
+        "scripts/camera.gd",
+        "scripts/level_end.gd"
+      ],
+      "curriculum": [
+        "states",
+        "movement",
+        "wall_jump",
+        "enemies",
+        "platforms"
+      ],
+      "notes": "Tutorial-derived work. Do not use sprites, music or code outside the scoped paths."
+    },
+    {
+      "repo": "douglasadones/Escudeiro",
+      "commit": "9a519eb5117a0b1c453aa63b7fbc0e8bceaf8116",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "3abc667cce389293a3a94c4cc63054c1918a14a0",
+      "language": "GDScript",
+      "status": "eligible_for_code_only_import_after_review",
+      "proposed_split": "reserved_holdout",
+      "code_paths": [
+        "scripts/player/escudeiro.gd",
+        "scripts/player/texture.gd",
+        "scripts/levels/caverna.gd"
+      ],
+      "curriculum": [
+        "player_physics",
+        "combat",
+        "animations"
+      ],
+      "notes": "Keep ENTIRE repository out of training and repair feedback if chosen as holdout. No assets."
+    },
+    {
+      "repo": "arthurBrito1/jogo-pulapula-Javascript",
+      "commit": "e7d1da320d30a94a9da5753efda437b18e0fa85d",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "9f69f361b687f466884358c45732d42b2492e6d1",
+      "language": "HTML/JavaScript",
+      "status": "reference_only_importer_unsupported",
+      "proposed_split": "none",
+      "code_paths": [
+        "inicio/Jogo1.html",
+        "inicio/Jogo2 morte ao tocar em obstaculos.html"
+      ],
+      "curriculum": [
+        "simple_jump",
+        "collision"
+      ],
+      "notes": "The existing importer rejects .html. Extraction would need new audited parser and license preserving pipeline."
+    },
+    {
+      "repo": "moises-dias/hunter-adventures",
+      "commit": "a403bc09d3583005ad689ed2ebbfe1361e678788",
+      "license": "MIT",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "b6b0665ce297449b45f6e963a103778e2086985d",
+      "language": "C++",
+      "status": "reference_only_importer_unsupported",
+      "proposed_split": "none",
+      "code_paths": [
+        "arquivos .h e .cpp/Ataque_Normal_Jogador.cpp",
+        "arquivos .h e .cpp/Chefao.cpp"
+      ],
+      "curriculum": [
+        "attacks",
+        "bosses"
+      ],
+      "notes": "Different language and library dependencies. Do not mix with JavaScript/GDScript training."
+    },
+    {
+      "repo": "felipeph/pgzero-platformer",
+      "commit": "a9a831e5aa81e84d3f55dcc7e44129406f77c570",
+      "license": "Apache-2.0",
+      "license_evidence": "LICENSE",
+      "license_blob_sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "language": "Python",
+      "status": "reference_only_importer_license_and_language_unsupported",
+      "proposed_split": "none",
+      "code_paths": [
+        "game.py"
+      ],
+      "curriculum": [
+        "movement",
+        "enemies",
+        "levels"
+      ],
+      "notes": "Existing importer allows MIT only. Distinct license handling required. Bundled Kenney assets are NOT approved for reuse by this review."
+    }
+  ],
+  "quarantined_no_detected_license": [
+    "fanuelson/jogo-plataforma",
+    "marina-barbosa/Um-Jogo",
+    "laisbrito1/JogoPlataforma",
+    "renantescaro/phaser-jogo-plataformas-teste",
+    "cpelichek/projeto_plataforma_JS",
+    "anderama/prisoner-rescue",
+    "Juawo/PickGem",
+    "bianca-bezerra/RachandoOBico",
+    "ilmoruuu/dontScroll",
+    "Lucas-Github-23/Pixel-Adventure-Agrinho",
+    "VILHALVA/CURSO-DE-GODOT",
+    "AugustoCGM/Project-Godot",
+    "JaderGedeon/Sky-Bunny",
+    "Giovanenero/JogoPlataforma2D-Jungle",
+    "lab-rats-team/mandacaru",
+    "JDaniielC/IP-project-2020.2",
+    "mikaelhayden/EnemyGuy",
+    "ianq1w1/pgzeroPlatformer"
+  ],
+  "separate_copyleft_review": [
+    {
+      "repo": "icarodgl/plataforma",
+      "license": "GPL-3.0",
+      "reason": "Not in existing MIT-only collector and would need separate license handling"
+    },
+    {
+      "repo": "fga-eps-mds/2017.1-PlataformaJogosUnB",
+      "license": "GPL-3.0",
+      "reason": "Platform project, not a 2D-game mechanics curriculum source"
+    }
+  ],
+  "not_gameplay_training_sources": [
+    "RouBR-dev/PortHub",
+    "RouBR-dev/Winlator-Games",
+    "henriquegpb/rodada",
+    "sucodelarangela/esports-ignite",
+    "PedroLeoo07/playstation-api",
+    "GabiDeutner/site-boardgames",
+    "dellabeneta/emu.dellabeneta.com",
+    "iuripedroso/GameSetter"
+  ],
+  "next_action": "Explicitly review selected code paths and update existing source collector with pinned code-only MIT paths; then run synthetic provenance CI before opting in to local collection/training."
+}
