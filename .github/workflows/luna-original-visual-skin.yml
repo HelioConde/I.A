@@ -1,0 +1,104 @@
+name: Luna Original - Real Qwen Visual Skin
+on:
+  push:
+    branches: [feature/luna-gamedev-knowledge-v1]
+    paths:
+      - "benchmarks/luna_arcade_s1/prompt_visual_skin.txt"
+      - "tools/generate_luna_visual_skin.py"
+      - "tests/test_luna_visual_skin.py"
+      - "site-tests/luna-visual-overlay-bridge.js"
+      - "site-tests/check-luna-visual-skin.cjs"
+      - ".github/workflows/luna-original-visual-skin.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_luna_visual_skin.py -q
+      - run: python -m compileall -q tools/generate_luna_visual_skin.py
+      - run: node --check site-tests/luna-visual-overlay-bridge.js
+      - run: node --check site-tests/check-luna-visual-skin.cjs
+  model-visual:
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      PYTHONUNBUFFERED: "1"
+      LD_LIBRARY_PATH: ${{ github.workspace }}/llama-build/bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Checkout fixed CPU llama.cpp source
+        uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          ref: f4d8af608a6b39946406f9439edfb6e83ca6a923
+          path: llama-src
+          persist-credentials: false
+      - name: Build runtime
+        run: |
+          cmake -S llama-src -B llama-build -DGGML_NATIVE=OFF -DGGML_CUDA=OFF -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build llama-build --target llama-cli -j 4
+      - name: Download official Qwen3-4B verified GGUF
+        run: |
+          python -c "import sys;sys.path.insert(0,'tools');from install_game_coder_model import install;print(install())"
+      - name: Ask real Luna GameCoder to draw a new independent visual skin
+        id: generate
+        shell: bash
+        run: |
+          set +e
+          python tools/generate_luna_visual_skin.py --model models/Qwen3-4B-Q4_K_M.gguf --runtime llama-build/bin/llama-cli --out results/luna_visual_skin --attempts 2
+          rc=$?
+          set -e
+          echo "accepted=$([[ $rc -eq 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          exit "$rc"
+      - name: Prepare preview from existing Qwen-authored game without editing gameplay
+        if: steps.generate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          cp site/luna-created/{game.js,styles.css,provenance.json} results/luna_visual_skin/
+          cp site-tests/luna-visual-overlay-bridge.js results/luna_visual_skin/overlay-bridge.js
+          python - <<'PY'
+          from pathlib import Path
+          src=Path('site/luna-created/index.html').read_text(encoding='utf-8')
+          marker='</body>'
+          assert src.count(marker)==1
+          scripts='<script src="visual.js" defer></script><script src="overlay-bridge.js" defer></script>'
+          Path('results/luna_visual_skin/index.html').write_text(src.replace(marker,scripts+'\n'+marker),encoding='utf-8')
+          PY
+      - name: Validate real model visual render and unchanged gameplay in Chromium
+        if: steps.generate.outputs.accepted == 'true'
+        shell: bash
+        run: |
+          python -m http.server 4819 --bind 127.0.0.1 --directory results/luna_visual_skin >/tmp/luna-visual.log 2>&1 &
+          cd site-tests
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          node check-luna-visual-skin.cjs
+      - name: Archive authentic model visual.js and screenshots for human review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-original-real-visual-skin
+          path: results/luna_visual_skin/
+          if-no-files-found: warn
+          retention-days: 30
