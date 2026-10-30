@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "code_reuse": "Review LICENSE and individual file notices before copying; retain attribution and notices.",
+    "eval_isolation": "Never include held-out benchmark repositories in retrieval or training.",
+    "no_automatic_training": true
+  },
+  "sources": [
+    {
+      "id": "opengame",
+      "repository": "leigest519/OpenGame",
+      "license": "Apache-2.0",
+      "role": "agent_architecture",
+      "split": "reference",
+      "priority": 1
+    },
+    {
+      "id": "game-studios",
+      "repository": "Donchitos/Claude-Code-Game-Studios",
+      "license": "MIT",
+      "role": "workflow_skills",
+      "split": "reference",
+      "priority": 1
+    },
+    {
+      "id": "godot-platformer",
+      "repository": "RafaelForbeck/Godot-2025-Plataforma-2D-YouTube",
+      "license": "MIT",
+      "role": "gdscript_examples",
+      "split": "candidate_train",
+      "priority": 1
+    },
+    {
+      "id": "flatris",
+      "repository": "ovidiuch/flatris",
+      "license": "MIT",
+      "role": "javascript_game_architecture",
+      "split": "candidate_train",
+      "priority": 2
+    },
+    {
+      "id": "crafty",
+      "repository": "craftyjs/Crafty",
+      "license": "MIT",
+      "role": "javascript_engine_architecture",
+      "split": "candidate_train",
+      "priority": 2
+    },
+    {
+      "id": "pgzero-platformer",
+      "repository": "felipeph/pgzero-platformer",
+      "license": "Apache-2.0",
+      "role": "python_platformer_examples",
+      "split": "candidate_train",
+      "priority": 2
+    },
+    {
+      "id": "pula-pula",
+      "repository": "arthurBrito1/jogo-pulapula-Javascript",
+      "license": "MIT",
+      "role": "basic_collisions",
+      "split": "candidate_train",
+      "priority": 3
+    },
+    {
+      "id": "hunter-adventures",
+      "repository": "moises-dias/hunter-adventures",
+      "license": "MIT",
+      "role": "cpp_game_examples",
+      "split": "candidate_train",
+      "priority": 3
+    },
+    {
+      "id": "flappy-dqn",
+      "repository": "yenchenlin/DeepLearningFlappyBird",
+      "license": "MIT",
+      "role": "reinforcement_learning_reference",
+      "split": "reference",
+      "priority": 3
+    },
+    {
+      "id": "escudeiro",
+      "repository": "douglasadones/Escudeiro",
+      "license": "MIT",
+      "role": "held_out_godot_platformer",
+      "split": "eval_holdout",
+      "priority": 1
+    }
+  ]
+}
