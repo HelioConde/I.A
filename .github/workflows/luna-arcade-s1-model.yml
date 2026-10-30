@@ -97,7 +97,7 @@ jobs:
           node check-luna-arcade-m1.cjs
           code=$?
           echo "Chromium diagnostic exit code: $code"
-          exit 0
+          exit "$code"
       - name: Upload genuine model output, if any, and provenance
         if: always()
         uses: actions/upload-artifact@v4
