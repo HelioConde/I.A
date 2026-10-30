@@ -11,8 +11,8 @@ def test_training_and_eval_is_deterministic():
     a,ra=mod.train_and_evaluate()
     b,rb=mod.train_and_evaluate()
     assert a==b and ra==rb
-    assert ra["train_examples"]==27
-    assert ra["test_examples"]==9
+    assert ra["train_examples"]==99
+    assert ra["test_examples"]==27
 
 def test_router_rejects_unknown_labels(tmp_path):
     data=json.loads(mod.DATA.read_text(encoding="utf-8"))
