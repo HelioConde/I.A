@@ -62,11 +62,13 @@ const path = require('node:path');
     }
   }
   if(landed){
+    report.checks.push({name:'one_way_platform_reachable',ok:true});
     const before=await qa();
     await page.keyboard.down('ArrowDown');await page.waitForTimeout(450);await page.keyboard.up('ArrowDown');
     const after=await qa();
     report.checks.push({name:'one_way_drop_real',ok:!!after?.player&&after.player.y>before.player.y+5});
   }else{
+    report.checks.push({name:'one_way_platform_reachable',ok:false});
     report.unverified=['one_way_drop_real_no_reachable_platform','three_hit_combo','facing_hitbox','visual_quality'];
   }
   await page.keyboard.press('KeyZ');await page.waitForTimeout(150);
